@@ -136,14 +136,25 @@
     \SIstyle{S-Africa}
     \SIunitspace{{\cdot}}
     \SIunitdot{{\cdot}}
-    
- \usepackage{acronym}%.......................... Acronym package to handle acronyms in text
+
+% generate nice bookmarks and hyperrefs when exporting to pdf and dvi (screen version):
+\usepackage[a4paper,plainpages=false,colorlinks,linktocpage,bookmarks=true,bookmarksopen=false]{hyperref}
+% use this for printing only (no color, print version):
+%\usepackage[a4paper,plainpages=false,colorlinks=false,linktocpage,bookmarks=true,bookmarksopen=false]{hyperref}
 
 % correct bad hyphenation here
 \hyphenation{op-tical net-works semi-conduc-tor}
 
+%List of acronyms used in text
+ \usepackage{acronym}%.......................... Acronym package to handle acronyms in text
+
+\acrodef{MMOG}{Massively Multiplayer Online Game}
+\acrodef{MMORPG}{Massively Multiplayer Online Role Playing Game}
+\acrodef{WoW}{World of Warcraft}
+\acrodef{MUD}{Multi-User Dungeon}
 
 \begin{document}
+
 %
 % paper title
 \title{A Scalable Distributed Peer-to-Peer MMOG Architecture}
@@ -162,15 +173,34 @@ Email: jgilmore@ieee.org}}
 The abstract goes here.
 \end{abstract}
 
+\hfill May, 2010
+
 \section{Introduction}
 
-\IEEEPARstart{T}{his} demo file is intended to serve as a ``starter file''
-for IEEE journal papers produced under \LaTeX\ using
-IEEEtran.cls version 1.7 and later.
 
-\hfill mds
+\IEEEPARstart{M}{assively} Multiplayer Online Games are characterised by expansive worlds, where a large number of players interact online with each other and the virtual environment, to achieve certain goals through collaboration and teamwork. Throughout the development of \acp{MMOG}, role play
+has been tightly coupled to this type of game. This is perhaps due to the exploration and player interaction aspects. Role play allows players to fully immerse themselves in the game and might, therefore, provide for a more compelling experience. Because of this tight coupling, the terms \ac{MMORPG} and \ac{MMOG} have almost become synonymous. Throughout this work, a distinction will, however, be made between the two.
 
-\hfill January 11, 2007
+\subsection{A brief history of MMORPGs}
+
+\acp{MMOG} have a history stretching from 1978 to the present. A complete history of \acp{MMOG} and the histories of the games and boardgames that they originate from can be found in \cite{mmog_past_present_future} and Chapter 1 of \cite{designing_virtual_worlds}. The first games that could be called \acp{MMOG} were \acp{MUD} (1978) \cite{mud_intro}. \acp{MUD} are entirely text-based, with players exploring areas by receiving descriptions of what they were ``seeing'' and typing commands to move and interact with objects or players. \acp{MUD} contain many of the elements that today are still central to the \ac{MMOG} concept. These elements include exploration, large worlds, multiplayer, social interaction and progression.
+
+After \acp{MUD}, there were many \acp{MMORPG} that acted as building blocks for what is recognised today as being an \ac{MMORPG}. The first graphical \ac{MMORPG} was Neverwinter Nights (1991) \cite{nwn_aol}. Neverwinter Nights was not an Internet based game, it was hosted on what today is the AOL network. Meridian 59 (1994) was the first \ac{MMOG} to have featured a monthly subscription fee, receive wide media coverage and most importantly, the first \ac{MMOG} to feature a 3D engine \cite{meridian59_hist}.
+
+The first \ac{MMORPG} to be commercially successful and largely credited with popularising the genre was Ultima Online (1997). Ultima Online used existing intellectual property from the Ultima universe as well as an aggressive marketing campaign by game publisher EA, to quickly gain 100,000 subscribers. Everquest (1999) is credited for bringing \acp{MMORPG} into mainstream Western Culture. It featured a large persistent 3D environment that was capable of hosting up to 15000 players per server \cite{everquest2_capacity}.
+
+\acp{MMORPG} in the first millennium are considered to be of the first generation. These games provided blueprints for all \acp{MMORPG}
+to follow in the second generation. While there are many more games in the second generation, these games are characterised by little innovation
+in the genre and focus more on improving graphics and ease-of-use \cite{mmog_past_present_future}. Notable games in this generation are: Final Fantasy XI (2000) (console based), Dark Age of Camelot (2001) (realm vs. realm combat) and Anarchy Online (2001) (instancing).
+
+Eve Online (2003), developed by CCP Games in Iceland, brought many new innovations to the \ac{MMORPG}. It was the first successful MMORPG to feature a science fiction theme. It was the first MMOG to have a single distributed server architecture. This meant that no sharding was required. Sharding is a method by which the game world is duplicated onto multiple servers to distribute load. Players cannot communicate between shards as these worlds are complectly isolated from each other. By employing a distributed server architecture, where different regions of the virtual world was hosted on different servers, players could have a seamless and more immersive experience. This was accomplished by hosting different star systems on different servers. Players have to use a warp gate to travel between star systems. This mechanic is used to mask the time it takes to move the player from one server to another. In 2006, CCP Games launched the largest supercomputer in the gaming industry to upgrade their existing infrastructure and enable Eve to support more than 50,000 concurrent users \cite{eve_launces_supcom}. This number that was surpassed in 2009 with 54,181 concurrent users in game \cite{eve_pcu}.
+
+Another innovation of Eve was the in-game economy. CCP games appointed Dr. Eyj\'{o}lfur Gu\~{o}mundsson as chief economist of Eve online in 2006 \cite{eve_economist}. His duties were to monitor and predict market trends in the game world and produce detailed quarterly economic reports \cite{eve_econ_rep}.  The economy is based on a open market system ruled by supply and demand. No other game has implemented an in-game economy in such a rigourous fashion.
+
+Blizzards's \ac{WoW} (2004) is the most successful MMORPG to date. After six years it still has by far the most subscribers of any MMOG, totaling 11,5 million, each paying \$15 per month subscription \cite{wow_subscibers}. In 2008 it was estimated that WoW holds more than 60\% of the MMORPG subscription market \cite{mmog_sub_market}. From the first generation of games, a steady growth has been seen in the MMOG space, but before the run away success of WoW, no one had estimated that the gaming market could be this large \cite{mmog_growth_analysis}.
+
+The success of WoW has largely been attributed to the strong integration of social networks into the mechanics of the game. Players don't just play WoW to experience the game content, they also play the game to meet up with friends and socialise. Guilds are also an integral part of WoW. Guilds are collections of players that choose to play together to achieve some common goal. It is interesting to note that WoW is not attributed with many innovations. Most games that came before it implemented most of the features in WoW. What WoW did do, is combine all previous innovations into a package that was accessible to a large number of people.
+
 
 \section{Conclusion}
 The conclusion goes here.
