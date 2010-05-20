@@ -24,9 +24,10 @@
 
 % *** GRAPHICS RELATED PACKAGES ***
 %
-  \usepackage[pdftex]{graphicx}
+  \usepackage{graphicx}
   \graphicspath{{figs/}}
-  \DeclareGraphicsExtensions{.pdf}
+  \DeclareGraphicsExtensions{.pdf,.png}
+  \usepackage{color}
 
 % *** MATH PACKAGES ***
 %
@@ -113,7 +114,21 @@
 % The latest version and documentation of caption.sty can be obtained at:
 % http://www.ctan.org/tex-archive/macros/latex/contrib/caption/
 
-
+%Setting captions to centered (Not IEEE journal standard)
+\makeatletter
+\long\def\@makecaption#1#2{\ifx\@captype\@IEEEtablestring%
+\footnotesize\begin{center}{\normalfont\footnotesize #1}\\
+{\normalfont\footnotesize\scshape #2}\end{center}%
+\@IEEEtablecaptionsepspace
+\else
+\@IEEEfigurecaptionsepspace
+\setbox\@tempboxa\hbox{\normalfont\footnotesize {#1.}~~ #2}%
+\ifdim \wd\@tempboxa >\hsize%
+\setbox\@tempboxa\hbox{\normalfont\footnotesize {#1.}~~ }%
+\parbox[t]{\hsize}{\normalfont\footnotesize \noindent\unhbox\@tempboxa#2}%
+\else
+\hbox to\hsize{\normalfont\footnotesize\hfil\box\@tempboxa\hfil}\fi\fi}
+\makeatother
 
 
 % *** FLOAT PACKAGES ***
@@ -152,6 +167,7 @@
 \acrodef{MMORPG}{Massively Multiplayer Online Role Playing Game}
 \acrodef{WoW}{World of Warcraft}
 \acrodef{MUD}{Multi-User Dungeon}
+\acrodef{PvP}{Player-versus-Player}
 
 \begin{document}
 
@@ -178,8 +194,28 @@ The abstract goes here.
 \section{Introduction}
 
 
-\IEEEPARstart{M}{assively} Multiplayer Online Games are characterised by expansive worlds, where a large number of players interact online with each other and the virtual environment, to achieve certain goals through collaboration and teamwork. Throughout the development of \acp{MMOG}, role play
-has been tightly coupled to this type of game. This is perhaps due to the exploration and player interaction aspects. Role play allows players to fully immerse themselves in the game and might, therefore, provide for a more compelling experience. Because of this tight coupling, the terms \ac{MMORPG} and \ac{MMOG} have almost become synonymous. Throughout this work, a distinction will, however, be made between the two.
+\IEEEPARstart{W}{ith} the advent of broadband Internet, \acp{MMOG} have gained significant popularity over the course of the past few years.
+Figure \ref{fig_mmog_subscriptions} shows the total number of active MMOG subscriptions over time for the period 1997 to 2008. From here, the accelerating growth of the MMOG market is evident.
+%
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[width=0.5\columnwidth]{MMOG_subscriptions}
+ \caption{Total number of active MMOG player subscriptions over time \cite{mmo_growth_chart}.}
+ \label{fig_mmog_subscriptions}
+\end{figure}
+
+\acp{MMOG} are characterised by expansive worlds, where a large number of players interact online with each other and the virtual environment to achieve certain goals through collaboration and teamwork. Throughout the development of \acp{MMOG}, role play has been tightly coupled to this type of game. This is perhaps due to the exploration and player interaction aspects. Role play allows players to fully immerse themselves in the game world and might, therefore, provide for a more compelling experience. Because of this tight coupling, the terms \ac{MMORPG} and \ac{MMOG} have almost become synonymous. Throughout this work, a distinction will, however, be made between the two.
+
+\acp{MMOG} hold great commercial as well as academic value. From a commercial perspective, the growing number of active subscriptions shown in Figure \ref{fig_mmog_subscriptions} translates to a growing \ac{MMOG} market. Figure \ref{fig_mmog_market} shows the online games market forecast by DFC Intelligence, a company specialising in game market forecasts for various sectors.
+%
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[width=0.5\columnwidth]{DFC_MMOG_market}
+ \caption{DFC Intelligence MMOG market forecast '08 \cite{Fan_phd}.}
+ \label{fig_mmog_market}
+\end{figure}
+
+From an academic perspective, \acp{MMOG} also hold great value. An MMOG is a complex networked application, with clients requiring reliable real-time feedback on actions taken. The design of an MMOG requires in-depth knowledge of server architectures and network design. The design of a server architecture determines how may players the game will be able to host and what the user experience will be in terms of quality of service. The server architecture must be able to handle thousands of requests, store large amounts of data, update the game state and send responses back to all clients in real time.
 
 \subsection{A brief history of MMORPGs}
 
@@ -187,7 +223,7 @@ has been tightly coupled to this type of game. This is perhaps due to the explor
 
 After \acp{MUD}, there were many \acp{MMORPG} that acted as building blocks for what is recognised today as being an \ac{MMORPG}. The first graphical \ac{MMORPG} was Neverwinter Nights (1991) \cite{nwn_aol}. Neverwinter Nights was not an Internet based game, it was hosted on what today is the AOL network. Meridian 59 (1994) was the first \ac{MMOG} to have featured a monthly subscription fee, receive wide media coverage and most importantly, the first \ac{MMOG} to feature a 3D engine \cite{meridian59_hist}.
 
-The first \ac{MMORPG} to be commercially successful and largely credited with popularising the genre was Ultima Online (1997). Ultima Online used existing intellectual property from the Ultima universe as well as an aggressive marketing campaign by game publisher EA, to quickly gain 100,000 subscribers. Everquest (1999) is credited for bringing \acp{MMORPG} into mainstream Western Culture. It featured a large persistent 3D environment that was capable of hosting up to 15000 players per server \cite{everquest2_capacity}.
+The first \ac{MMORPG} to be commercially successful and largely credited with popularising the genre was Ultima Online (1997). Ultima Online used existing intellectual property from the Ultima universe as well as an aggressive marketing campaign by game publisher EA, to quickly gain 100,000 subscribers. NCsoft's Lineage (1998) looked similar to Ultima Online, but was more \ac{PvP} oriented and with an added castle siege mechanism, became very popular in South Korea. Lineage had more than three million subscribers at one point, most of them from South Korea \cite{mmog_subscriptions}. Everquest (1999) is credited for bringing \acp{MMORPG} into mainstream Western Culture. It featured a large persistent 3D environment that was capable of hosting up to 15000 players per server \cite{everquest2_capacity}.
 
 \acp{MMORPG} in the first millennium are considered to be of the first generation. These games provided blueprints for all \acp{MMORPG}
 to follow in the second generation. While there are many more games in the second generation, these games are characterised by little innovation
@@ -197,10 +233,22 @@ Eve Online (2003), developed by CCP Games in Iceland, brought many new innovatio
 
 Another innovation of Eve was the in-game economy. CCP games appointed Dr. Eyj\'{o}lfur Gu\~{o}mundsson as chief economist of Eve online in 2006 \cite{eve_economist}. His duties were to monitor and predict market trends in the game world and produce detailed quarterly economic reports \cite{eve_econ_rep}.  The economy is based on a open market system ruled by supply and demand. No other game has implemented an in-game economy in such a rigourous fashion.
 
-Blizzards's \ac{WoW} (2004) is the most successful MMORPG to date. After six years it still has by far the most subscribers of any MMOG, totaling 11,5 million, each paying \$15 per month subscription \cite{wow_subscibers}. In 2008 it was estimated that WoW holds more than 60\% of the MMORPG subscription market \cite{mmog_sub_market}. From the first generation of games, a steady growth has been seen in the MMOG space, but before the run away success of WoW, no one had estimated that the gaming market could be this large \cite{mmog_growth_analysis}.
+Blizzards's \ac{WoW} (2004) is the most successful MMORPG to date. After six years it still has by far the most subscribers of any MMOG, totaling 11,5 million, each paying \$15 per month subscription \cite{wow_subscibers}. In 2008 it was estimated that WoW holds more than 60\% of the MMORPG subscription market \cite{mmog_sub_market}. From the first generation of games, a steady growth has been seen in the MMOG space, but before the run away success of WoW, no one had estimated that the gaming market could be this large \cite{mmog_growth_analysis}. It should be noted, however, that the growth seen in the \ac{MMOG} market, is mostly due to growth in the Asian markets and that the size of these markets are much larger than the size of the Western markets.
 
-The success of WoW has largely been attributed to the strong integration of social networks into the mechanics of the game. Players don't just play WoW to experience the game content, they also play the game to meet up with friends and socialise. Guilds are also an integral part of WoW. Guilds are collections of players that choose to play together to achieve some common goal. It is interesting to note that WoW is not attributed with many innovations. Most games that came before it implemented most of the features in WoW. What WoW did do, is combine all previous innovations into a package that was accessible to a large number of people.
+The success of \ac{WoW} has largely been attributed to the overall quality and finish of the game \cite{wow_csf}. It is interesting to note that WoW is not attributed with many innovations. Most games that came before it implemented most of the features in WoW. What WoW did do, is combine all previous innovations into a package that was accessible to a large number of people.  Players also don't just play WoW to experience the game content, they also play the game to meet up with friends and socialise. Guilds are also an integral part of WoW. Guilds are collections of players that choose to play together to achieve some common goal.
 
+\section{Overview of MMOG network architectures}
+
+The previous section presented a brief history of the \ac{MMOG} and more specifically, the \ac{MMORPG} genre. This section explores the network architecture that is generally employed by this genre of games. The network architecture of a system specifies how the different entities in the network communicate. On a high level, there are two well-known general network architectures: The client/server model and the peer-to-peer model. Bear in mind that these models are not specific to MMOGS, what is specific to them is how the models are implemented to store and disseminate data. These models specify how data are distributed over the network and what the levels of control are that each entity in the network possesses.
+
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport= 1cm 3cm 12cm 10cm, width=0.5\columnwidth]{network_archs}
+ \caption{Peer-to-Peer architecture}
+ \label{fig_p2p_arch}
+\end{figure}
+%
+Figure \ref{fig_p2p_arch} shows a peer-to-peer network architecture
 
 \section{Conclusion}
 The conclusion goes here.
