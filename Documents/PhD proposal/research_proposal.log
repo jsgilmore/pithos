@@ -1,14 +1,18 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (MiKTeX 2.8) (preloaded format=pdflatex 2010.5.11)  20 MAY 2010 15:11
+This is pdfTeXk, Version 3.1415926-1.40.9 (Web2C 7.5.7) (format=pdflatex 2009.8.10)  26 MAY 2010 11:06
 entering extended mode
-**C:/Users/jgilmore/Documents/p2p_mmog/Documents/PhD*proposal/research_proposal
-.tex
-
-("C:/Users/jgilmore/Documents/p2p_mmog/Documents/PhD proposal/research_proposal
-.tex"
+ %&-line parsing enabled.
+**research_proposal.tex
+(./research_proposal.tex
 LaTeX2e <2005/12/01>
-Babel <v3.8l> and hyphenation patterns for english, dumylang, nohyphenation, ge
-rman, ngerman, german-x-2009-06-19, ngerman-x-2009-06-19, french, loaded.
-("C:\Program Files (x86)\MiKTeX 2.8\tex\latex\ieeetran\IEEEtran.cls"
+Babel <v3.8l> and hyphenation patterns for english, usenglishmax, dumylang, noh
+yphenation, german-x-2008-06-18, ngerman-x-2008-06-18, ancientgreek, ibycus, ar
+abic, basque, bulgarian, catalan, pinyin, coptic, croatian, czech, danish, dutc
+h, esperanto, estonian, farsi, finnish, french, galician, german, ngerman, mono
+greek, greek, hungarian, icelandic, indonesian, interlingua, irish, italian, la
+tin, lithuanian, mongolian, mongolian2a, bokmal, nynorsk, polish, portuguese, r
+omanian, russian, sanskrit, serbian, slovak, slovenian, spanish, swedish, turki
+sh, ukenglish, ukrainian, uppersorbian, welsh, loaded.
+(/usr/local/texlive/2008/texmf-dist/tex/latex/IEEEtran/IEEEtran.cls
 Document Class: IEEEtran 2007/03/05 V1.7a by Michael Shell
 -- See the "IEEEtran_HOWTO" manual for usage information.
 -- http://www.michaelshell.org/tex/ieeetran/
@@ -19,7 +23,7 @@ Document Class: IEEEtran 2007/03/05 V1.7a by Michael Shell
 \@IEEEtrantmptoksA=\toks14
 LaTeX Font Info:    Try loading font information for OT1+ptm on input line 366.
 
-("C:\Program Files (x86)\MiKTeX 2.8\tex\latex\psnfss\ot1ptm.fd"
+(/usr/local/texlive/2008/texmf-dist/tex/latex/psnfss/ot1ptm.fd
 File: ot1ptm.fd 2001/06/04 font definitions for OT1/ptm.
 )
 ** ATTENTION: Single column mode is not typically used with IEEE publications.
@@ -93,62 +97,62 @@ LaTeX Font Info:    Font shape `OT1/ptm/bx/it' in size <24> not available
 \@IEEEtmpitemindent=\dimen116
 \c@IEEEbiography=\count90
 \@IEEEtranrubishbin=\box26
-) ("C:\Program Files (x86)\MiKTeX 2.8\tex\latex\cite\cite.sty"
-LaTeX Info: Redefining \cite on input line 285.
-LaTeX Info: Redefining \nocite on input line 356.
-Package: cite 2009/08/29  v 5.2
+) (/usr/local/texlive/2008/texmf-dist/tex/latex/cite/cite.sty
+LaTeX Info: Redefining \cite on input line 149.
+LaTeX Info: Redefining \nocite on input line 214.
+Package: cite 2003/11/04  v 4.01
 )
-("C:\Program Files (x86)\MiKTeX 2.8\tex\latex\graphics\graphicx.sty"
+(/usr/local/texlive/2008/texmf-dist/tex/latex/graphics/graphicx.sty
 Package: graphicx 1999/02/16 v1.0f Enhanced LaTeX Graphics (DPC,SPQR)
 
-("C:\Program Files (x86)\MiKTeX 2.8\tex\latex\graphics\keyval.sty"
+(/usr/local/texlive/2008/texmf-dist/tex/latex/graphics/keyval.sty
 Package: keyval 1999/03/16 v1.13 key=value parser (DPC)
 \KV@toks@=\toks15
 )
-("C:\Program Files (x86)\MiKTeX 2.8\tex\latex\graphics\graphics.sty"
+(/usr/local/texlive/2008/texmf-dist/tex/latex/graphics/graphics.sty
 Package: graphics 2006/02/20 v1.0o Standard LaTeX Graphics (DPC,SPQR)
 
-("C:\Program Files (x86)\MiKTeX 2.8\tex\latex\graphics\trig.sty"
+(/usr/local/texlive/2008/texmf-dist/tex/latex/graphics/trig.sty
 Package: trig 1999/03/16 v1.09 sin cos tan (DPC)
 )
-("C:\Program Files (x86)\MiKTeX 2.8\tex\latex\00miktex\graphics.cfg"
+(/usr/local/texlive/2008/texmf/tex/latex/config/graphics.cfg
 File: graphics.cfg 2007/01/18 v1.5 graphics configuration of teTeX/TeXLive
 )
 Package graphics Info: Driver file: pdftex.def on input line 90.
 
-("C:\Program Files (x86)\MiKTeX 2.8\tex\latex\pdftex-def\pdftex.def"
-File: pdftex.def 2009/08/25 v0.04m Graphics/color for pdfTeX
+(/usr/local/texlive/2008/texmf-dist/tex/latex/pdftex-def/pdftex.def
+File: pdftex.def 2008/09/08 v0.04l Graphics/color for pdfTeX
 \Gread@gobject=\count91
 ))
 \Gin@req@height=\dimen117
 \Gin@req@width=\dimen118
 )
-("C:\Program Files (x86)\MiKTeX 2.8\tex\latex\graphics\color.sty"
+(/usr/local/texlive/2008/texmf-dist/tex/latex/graphics/color.sty
 Package: color 2005/11/14 v1.0j Standard LaTeX Color (DPC)
 
-("C:\Program Files (x86)\MiKTeX 2.8\tex\latex\00miktex\color.cfg"
+(/usr/local/texlive/2008/texmf/tex/latex/config/color.cfg
 File: color.cfg 2007/01/18 v1.5 color configuration of teTeX/TeXLive
 )
 Package color Info: Driver file: pdftex.def on input line 130.
 )
-("C:\Program Files (x86)\MiKTeX 2.8\tex\latex\ams\math\amsmath.sty"
+(/usr/local/texlive/2008/texmf-dist/tex/latex/amsmath/amsmath.sty
 Package: amsmath 2000/07/18 v2.13 AMS math features
 \@mathmargin=\skip44
 
 For additional information on amsmath, use the `?' option.
-("C:\Program Files (x86)\MiKTeX 2.8\tex\latex\ams\math\amstext.sty"
+(/usr/local/texlive/2008/texmf-dist/tex/latex/amsmath/amstext.sty
 Package: amstext 2000/06/29 v2.01
 
-("C:\Program Files (x86)\MiKTeX 2.8\tex\latex\ams\math\amsgen.sty"
+(/usr/local/texlive/2008/texmf-dist/tex/latex/amsmath/amsgen.sty
 File: amsgen.sty 1999/11/30 v2.0
 \@emptytoks=\toks16
 \ex@=\dimen119
 ))
-("C:\Program Files (x86)\MiKTeX 2.8\tex\latex\ams\math\amsbsy.sty"
+(/usr/local/texlive/2008/texmf-dist/tex/latex/amsmath/amsbsy.sty
 Package: amsbsy 1999/11/29 v1.2d
 \pmbraise@=\dimen120
 )
-("C:\Program Files (x86)\MiKTeX 2.8\tex\latex\ams\math\amsopn.sty"
+(/usr/local/texlive/2008/texmf-dist/tex/latex/amsmath/amsopn.sty
 Package: amsopn 1999/12/14 v2.01 operator names
 )
 \inf@bad=\count92
@@ -189,7 +193,7 @@ LaTeX Font Info:    Redeclaring font encoding OMS on input line 568.
 LaTeX Info: Redefining \[ on input line 2666.
 LaTeX Info: Redefining \] on input line 2667.
 )
-("C:\Program Files (x86)\MiKTeX 2.8\tex\latex\tools\array.sty"
+(/usr/local/texlive/2008/texmf-dist/tex/latex/tools/array.sty
 Package: array 2005/08/23 v2.4b Tabular extension package (FMi)
 \col@sep=\dimen128
 \extrarowheight=\dimen129
@@ -197,12 +201,12 @@ Package: array 2005/08/23 v2.4b Tabular extension package (FMi)
 \extratabsurround=\skip47
 \backup@length=\skip48
 )
-("C:\Program Files (x86)\MiKTeX 2.8\tex\latex\mdwtools\mdwmath.sty"
+(/usr/local/texlive/2008/texmf-dist/tex/latex/mdwtools/mdwmath.sty
 Package: mdwmath 1996/04/11 1.1 Nice mathematical things
 \sq@sqrt=\count104
 LaTeX Info: Redefining \sqrt on input line 84.
 )
-("C:\Program Files (x86)\MiKTeX 2.8\tex\latex\mdwtools\mdwtab.sty"
+(/usr/local/texlive/2008/texmf-dist/tex/latex/mdwtools/mdwtab.sty
 Package: mdwtab 1998/04/28 1.9 Table typesetting with style
 \tab@state=\count105
 \tab@columns=\count106
@@ -221,10 +225,10 @@ Package: mdwtab 1998/04/28 1.9 Table typesetting with style
 \fn@notes=\box29
 \fn@width=\dimen138
 )
-("C:\Program Files (x86)\MiKTeX 2.8\tex\latex\subfig\subfig.sty"
+(/usr/local/texlive/2008/texmf-dist/tex/latex/subfig/subfig.sty
 Package: subfig 2005/06/28 ver: 1.3 subfig package
 
-("C:\Program Files (x86)\MiKTeX 2.8\tex\latex\caption\caption3.sty"
+(/usr/local/texlive/2008/texmf-dist/tex/latex/caption/caption3.sty
 Package: caption3 2008/08/24 v3.1j caption3 kernel (AR)
 \captionmargin=\dimen139
 \captionmargin@=\dimen140
@@ -249,53 +253,53 @@ Package caption Info: Unknown document class (or package),
 \sf@top=\skip54
 \sf@bottom=\skip55
 )
-("C:\Program Files (x86)\MiKTeX 2.8\tex\latex\base\fixltx2e.sty"
+(/usr/local/texlive/2008/texmf-dist/tex/latex/base/fixltx2e.sty
 Package: fixltx2e 2006/03/24 v1.1n fixes to LaTeX
 LaTeX Info: Redefining \em on input line 420.
 LaTeX Info: The control sequence `\[' is already robust on input line 471.
 LaTeX Info: The control sequence `\]' is already robust on input line 472.
 )
-("C:\Program Files (x86)\MiKTeX 2.8\tex\latex\ltxmisc\url.sty"
+(/usr/local/texlive/2008/texmf-dist/tex/latex/ltxmisc/url.sty
 \Urlmuskip=\muskip11
 Package: url 2006/04/12  ver 3.3  Verb mode for urls, etc.
 )
-("C:\Program Files (x86)\MiKTeX 2.8\tex\latex\SIstyle\sistyle.sty"
+(/usr/local/texlive/2008/texmf-dist/tex/latex/SIstyle/sistyle.sty
 Package: sistyle 2008/07/16 v2.3a SI units and numbers (DNJ Els)
 \ttoks@A=\toks24
 \ttoks@B=\toks25
 )
-("C:\Program Files (x86)\MiKTeX 2.8\tex\latex\hyperref\hyperref.sty"
-Package: hyperref 2009/09/10 v6.78u Hypertext links for LaTeX
+(/usr/local/texlive/2008/texmf-dist/tex/latex/hyperref/hyperref.sty
+Package: hyperref 2009/02/22 v6.78p Hypertext links for LaTeX
 
-("C:\Program Files (x86)\MiKTeX 2.8\tex\generic\oberdiek\ifpdf.sty"
-Package: ifpdf 2009/04/10 v2.0 Provides the ifpdf switch (HO)
+(/usr/local/texlive/2008/texmf-dist/tex/generic/oberdiek/ifpdf.sty
+Package: ifpdf 2007/12/12 v1.6 Provides the ifpdf switch (HO)
 Package ifpdf Info: pdfTeX in pdf mode detected.
 )
-("C:\Program Files (x86)\MiKTeX 2.8\tex\generic\oberdiek\ifvtex.sty"
+(/usr/local/texlive/2008/texmf-dist/tex/generic/oberdiek/ifvtex.sty
 Package: ifvtex 2008/11/04 v1.4 Switches for detecting VTeX and its modes (HO)
 Package ifvtex Info: VTeX not detected.
 )
-("C:\Program Files (x86)\MiKTeX 2.8\tex\latex\ifxetex\ifxetex.sty"
+(/usr/local/texlive/2008/texmf-dist/tex/generic/ifxetex/ifxetex.sty
 Package: ifxetex 2009/01/23 v0.5 Provides ifxetex conditional
 )
-("C:\Program Files (x86)\MiKTeX 2.8\tex\latex\oberdiek\hycolor.sty"
+(/usr/local/texlive/2008/texmf-dist/tex/latex/oberdiek/hycolor.sty
 Package: hycolor 2008/09/08 v1.4 Code for color options of hyperref/bookmark (H
 O)
 
-("C:\Program Files (x86)\MiKTeX 2.8\tex\latex\oberdiek\xcolor-patch.sty"
+(/usr/local/texlive/2008/texmf-dist/tex/latex/oberdiek/xcolor-patch.sty
 Package: xcolor-patch 2008/09/08 xcolor patch
 ))
 \@linkdim=\dimen146
 \Hy@linkcounter=\count114
 \Hy@pagecounter=\count115
 
-("C:\Program Files (x86)\MiKTeX 2.8\tex\latex\hyperref\pd1enc.def"
-File: pd1enc.def 2009/09/10 v6.78u Hyperref: PDFDocEncoding definition (HO)
+(/usr/local/texlive/2008/texmf-dist/tex/latex/hyperref/pd1enc.def
+File: pd1enc.def 2009/02/22 v6.78p Hyperref: PDFDocEncoding definition (HO)
 )
-("C:\Program Files (x86)\MiKTeX 2.8\tex\generic\oberdiek\etexcmds.sty"
+(/usr/local/texlive/2008/texmf-dist/tex/generic/oberdiek/etexcmds.sty
 Package: etexcmds 2007/12/12 v1.2 Prefix for e-TeX command names (HO)
 
-("C:\Program Files (x86)\MiKTeX 2.8\tex\generic\oberdiek\infwarerr.sty"
+(/usr/local/texlive/2008/texmf-dist/tex/generic/oberdiek/infwarerr.sty
 Package: infwarerr 2007/09/09 v1.2 Providing info/warning/message (HO)
 )
 Package etexcmds Info: Could not find \expanded.
@@ -303,62 +307,57 @@ Package etexcmds Info: Could not find \expanded.
 (etexcmds)             that some package has redefined \expanded.
 (etexcmds)             In the latter case, load this package earlier.
 )
-("C:\Program Files (x86)\MiKTeX 2.8\tex\latex\00miktex\hyperref.cfg"
+(/usr/local/texlive/2008/texmf/tex/latex/config/hyperref.cfg
 File: hyperref.cfg 2002/06/06 v1.2 hyperref configuration of TeXLive
 )
-("C:\Program Files (x86)\MiKTeX 2.8\tex\latex\oberdiek\kvoptions.sty"
-Package: kvoptions 2009/08/13 v3.4 Keyval support for LaTeX options (HO)
-
-("C:\Program Files (x86)\MiKTeX 2.8\tex\generic\oberdiek\kvsetkeys.sty"
-Package: kvsetkeys 2009/07/30 v1.5 Key value parser with default handler suppor
-t (HO)
-))
-Package hyperref Info: Option `plainpages' set `false' on input line 2864.
-Package hyperref Info: Option `colorlinks' set `true' on input line 2864.
-Package hyperref Info: Option `linktocpage' set `true' on input line 2864.
-Package hyperref Info: Option `bookmarks' set `true' on input line 2864.
-Package hyperref Info: Option `bookmarksopen' set `false' on input line 2864.
-Package hyperref Info: Hyper figures OFF on input line 2975.
-Package hyperref Info: Link nesting OFF on input line 2980.
-Package hyperref Info: Hyper index ON on input line 2983.
-Package hyperref Info: Plain pages OFF on input line 2990.
-Package hyperref Info: Backreferencing OFF on input line 2995.
+(/usr/local/texlive/2008/texmf-dist/tex/latex/oberdiek/kvoptions.sty
+Package: kvoptions 2007/10/18 v3.0 Keyval support for LaTeX options (HO)
+)
+Package hyperref Info: Option `plainpages' set `false' on input line 2824.
+Package hyperref Info: Option `colorlinks' set `true' on input line 2824.
+Package hyperref Info: Option `linktocpage' set `true' on input line 2824.
+Package hyperref Info: Option `bookmarks' set `true' on input line 2824.
+Package hyperref Info: Option `bookmarksopen' set `false' on input line 2824.
+Package hyperref Info: Hyper figures OFF on input line 2935.
+Package hyperref Info: Link nesting OFF on input line 2940.
+Package hyperref Info: Hyper index ON on input line 2943.
+Package hyperref Info: Plain pages OFF on input line 2950.
+Package hyperref Info: Backreferencing OFF on input line 2955.
 
 Implicit mode ON; LaTeX internals redefined
-Package hyperref Info: Bookmarks ON on input line 3191.
-LaTeX Info: Redefining \url on input line 3428.
-("C:\Program Files (x86)\MiKTeX 2.8\tex\generic\oberdiek\bitset.sty"
+Package hyperref Info: Bookmarks ON on input line 3145.
+LaTeX Info: Redefining \url on input line 3382.
+(/usr/local/texlive/2008/texmf-dist/tex/generic/oberdiek/bitset.sty
 Package: bitset 2007/09/28 v1.0 Data type bit set (HO)
 
-("C:\Program Files (x86)\MiKTeX 2.8\tex\generic\oberdiek\intcalc.sty"
+(/usr/local/texlive/2008/texmf-dist/tex/generic/oberdiek/intcalc.sty
 Package: intcalc 2007/09/27 v1.1 Expandable integer calculations (HO)
 )
-("C:\Program Files (x86)\MiKTeX 2.8\tex\generic\oberdiek\bigintcalc.sty"
+(/usr/local/texlive/2008/texmf-dist/tex/generic/oberdiek/bigintcalc.sty
 Package: bigintcalc 2007/11/11 v1.1 Expandable big integer calculations (HO)
 
-("C:\Program Files (x86)\MiKTeX 2.8\tex\generic\oberdiek\pdftexcmds.sty"
-Package: pdftexcmds 2009/04/10 v0.4 LuaTeX support for pdfTeX utility functions
+(/usr/local/texlive/2008/texmf-dist/tex/generic/oberdiek/pdftexcmds.sty
+Package: pdftexcmds 2007/12/12 v0.3 LuaTeX support for pdfTeX utility functions
  (HO)
-
-("C:\Program Files (x86)\MiKTeX 2.8\tex\generic\oberdiek\ifluatex.sty"
-Package: ifluatex 2009/04/17 v1.2 Provides the ifluatex switch (HO)
-Package ifluatex Info: LuaTeX not detected.
-)
-Package pdftexcmds Info: LuaTeX not detected on input line 144.
+Package pdftexcmds Info: LuaTeX not detected on input line 139.
 )))
+(/usr/local/texlive/2008/texmf-dist/tex/generic/oberdiek/kvsetkeys.sty
+Package: kvsetkeys 2007/09/29 v1.3 Key value parser with default handler suppor
+t (HO)
+)
 \Fld@menulength=\count116
 \Field@Width=\dimen147
 \Fld@charsize=\dimen148
 \Field@toks=\toks26
-Package hyperref Info: Hyper figures OFF on input line 4346.
-Package hyperref Info: Link nesting OFF on input line 4351.
-Package hyperref Info: Hyper index ON on input line 4354.
-Package hyperref Info: backreferencing OFF on input line 4361.
-Package hyperref Info: Link coloring ON on input line 4364.
-Package hyperref Info: Link coloring with OCG OFF on input line 4371.
-Package hyperref Info: PDF/A mode OFF on input line 4376.
+Package hyperref Info: Hyper figures OFF on input line 4299.
+Package hyperref Info: Link nesting OFF on input line 4304.
+Package hyperref Info: Hyper index ON on input line 4307.
+Package hyperref Info: backreferencing OFF on input line 4314.
+Package hyperref Info: Link coloring ON on input line 4317.
+Package hyperref Info: Link coloring with OCG OFF on input line 4324.
+Package hyperref Info: PDF/A mode OFF on input line 4329.
 
-("C:\Program Files (x86)\MiKTeX 2.8\tex\generic\oberdiek\atbegshi.sty"
+(/usr/local/texlive/2008/texmf-dist/tex/generic/oberdiek/atbegshi.sty
 Package: atbegshi 2008/07/31 v1.9 At begin shipout hook (HO)
 )
 \Hy@abspage=\count117
@@ -366,35 +365,37 @@ Package: atbegshi 2008/07/31 v1.9 At begin shipout hook (HO)
 \c@Hfootnote=\count119
 )
 *hyperref using default driver hpdftex*
-("C:\Program Files (x86)\MiKTeX 2.8\tex\latex\hyperref\hpdftex.def"
-File: hpdftex.def 2009/09/10 v6.78u Hyperref driver for pdfTeX
+(/usr/local/texlive/2008/texmf-dist/tex/latex/hyperref/hpdftex.def
+File: hpdftex.def 2009/02/22 v6.78p Hyperref driver for pdfTeX
 \Fld@listcount=\count120
 )
-("C:\Program Files (x86)\MiKTeX 2.8\tex\latex\acronym\acronym.sty"
+(/usr/local/texlive/2008/texmf-dist/tex/latex/acronym/acronym.sty
 Package: acronym 2009/01/25 v1.34 Support for acronyms (Tobias Oetiker)
 
-("C:\Program Files (x86)\MiKTeX 2.8\tex\latex\bigfoot\suffix.sty"
+(/usr/local/texlive/2008/texmf-dist/tex/latex/bigfoot/suffix.sty
 Package: suffix 2006/07/15 1.5 Variant command support
 )
 \AC@clearlist=\toks27
 )
-("C:\Users\jgilmore\Documents\p2p_mmog\Documents\PhD proposal\research_proposal
-.aux")
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 172.
-LaTeX Font Info:    ... okay on input line 172.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 172.
-LaTeX Font Info:    ... okay on input line 172.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 172.
-LaTeX Font Info:    ... okay on input line 172.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 172.
-LaTeX Font Info:    ... okay on input line 172.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 172.
-LaTeX Font Info:    ... okay on input line 172.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 172.
-LaTeX Font Info:    ... okay on input line 172.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 172.
-LaTeX Font Info:    ... okay on input line 172.
- ("C:\Program Files (x86)\MiKTeX 2.8\tex\context\base\supp-pdf.tex"
+(./research_proposal.aux)
+\openout1 = `research_proposal.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 176.
+LaTeX Font Info:    ... okay on input line 176.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 176.
+LaTeX Font Info:    ... okay on input line 176.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 176.
+LaTeX Font Info:    ... okay on input line 176.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 176.
+LaTeX Font Info:    ... okay on input line 176.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 176.
+LaTeX Font Info:    ... okay on input line 176.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 176.
+LaTeX Font Info:    ... okay on input line 176.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 176.
+LaTeX Font Info:    ... okay on input line 176.
+
+(/usr/local/texlive/2008/texmf-dist/tex/context/base/supp-pdf.tex
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count121
 \scratchdimen=\dimen149
@@ -409,89 +410,96 @@ LaTeX Font Info:    ... okay on input line 172.
 )
 Package caption Info: Begin \AtBeginDocument code.
 Package caption3 Info: subfig package 1.2 or 1.3 is loaded.
-LaTeX Info: Redefining \subref on input line 172.
+LaTeX Info: Redefining \subref on input line 176.
 Package caption Info: End \AtBeginDocument code.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <7> on input line 172.
+(Font)              <7> on input line 176.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <5> on input line 172.
-Package hyperref Info: Link coloring ON on input line 172.
- ("C:\Program Files (x86)\MiKTeX 2.8\tex\latex\hyperref\nameref.sty"
+(Font)              <5> on input line 176.
+Package hyperref Info: Link coloring ON on input line 176.
+ (/usr/local/texlive/2008/texmf-dist/tex/latex/hyperref/nameref.sty
 Package: nameref 2007/05/29 v2.31 Cross-referencing by name of section
 
-("C:\Program Files (x86)\MiKTeX 2.8\tex\latex\oberdiek\refcount.sty"
+(/usr/local/texlive/2008/texmf-dist/tex/latex/oberdiek/refcount.sty
 Package: refcount 2008/08/11 v3.1 Data extraction from references (HO)
 )
 \c@section@level=\count126
 )
-LaTeX Info: Redefining \ref on input line 172.
-LaTeX Info: Redefining \pageref on input line 172.
+LaTeX Info: Redefining \ref on input line 176.
+LaTeX Info: Redefining \pageref on input line 176.
 
-("C:\Users\jgilmore\Documents\p2p_mmog\Documents\PhD proposal\research_proposal
-.out")
-("C:\Users\jgilmore\Documents\p2p_mmog\Documents\PhD proposal\research_proposal
-.out")
+(./research_proposal.out) (./research_proposal.out)
 \@outlinefile=\write3
+\openout3 = `research_proposal.out'.
+
 \AtBeginShipoutBox=\box31
 Package acronym Info: Label `acro:MMOG' newly defined as it shall be overridden
 
-although it is yet undefined on input line 197.
- <figs/MMOG_subscriptions.png, id=27, 685.8122pt x 469.00218pt>
+although it is yet undefined on input line 201.
+
+<figs/MMOG_subscriptions.png, id=59, 685.8122pt x 469.00218pt>
 File: figs/MMOG_subscriptions.png Graphic file (type png)
 
 <use figs/MMOG_subscriptions.png>
 Package acronym Info: Label `acro:MMORPG' newly defined as it shall be overridd
 en
-although it is yet undefined on input line 207.
+although it is yet undefined on input line 211.
 
-<figs/DFC_MMOG_market.png, id=32, 658.71094pt x 554.07pt>
+<figs/DFC_MMOG_market.png, id=63, 658.71094pt x 554.07pt>
 File: figs/DFC_MMOG_market.png Graphic file (type png)
 
 <use figs/DFC_MMOG_market.png>
 Package acronym Info: Label `acro:MUD' newly defined as it shall be overridden
-although it is yet undefined on input line 222.
- [1{C:/ProgramData/MiKTeX/2.8/pdftex/config/pdftex.map} <C:/Users/jgilmore/Docu
-ments/p2p_mmog/Documents/PhD proposal/figs/MMOG_subscriptions.png>]
-Package acronym Info: Label `acro:PvP' newly defined as it shall be overridden
 although it is yet undefined on input line 226.
- [2 <C:/Users/jgilmore/Documents/p2p_mmog/Documents/PhD proposal/figs/DFC_MMOG_
-market.png>]
+ [1{/usr/local/texlive/2008/texmf-var/fonts/map/pdftex/updmap/pdftex.map} <./fi
+gs/MMOG_subscriptions.png>]
+Package acronym Info: Label `acro:PvP' newly defined as it shall be overridden
+although it is yet undefined on input line 230.
+ [2 <./figs/DFC_MMOG_market.png>]
 Package acronym Info: Label `acro:WoW' newly defined as it shall be overridden
-although it is yet undefined on input line 236.
+although it is yet undefined on input line 240.
+Package acronym Info: Label `acro:CS' newly defined as it shall be overridden
+although it is yet undefined on input line 246.
+Package acronym Info: Label `acro:CMS' newly defined as it shall be overridden
+although it is yet undefined on input line 246.
 
 
-pdfTeX warning: pdflatex (file C:/Users/jgilmore/Documents/p2p_mmog/Documents/P
-hD proposal/figs/network_archs.pdf): PDF inclusion: found PDF version <1.5>, bu
-t at most version <1.4> allowed
-<figs/network_archs.pdf, id=83, 846.16125pt x 598.48593pt>
-File: figs/network_archs.pdf Graphic file (type pdf)
+LaTeX Warning: Reference `fig_cs_arch' on page 3 undefined on input line 248.
 
-<use figs/network_archs.pdf>
-("C:\Users\jgilmore\Documents\p2p_mmog\Documents\PhD proposal\research_proposal
-.bbl"
+[3]
+Package acronym Info: Label `acro:NPC' newly defined as it shall be overridden
+although it is yet undefined on input line 272.
+Package acronym Info: Label `acro:P2P' newly defined as it shall be overridden
+although it is yet undefined on input line 281.
+ [4]
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <8> on input line 27.
+(Font)              <8> on input line 295.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <6> on input line 27.
- [3 <C:/Users/jgilmore/Documents/p2p_mmog/Documents/PhD proposal/figs/network_a
-rchs.pdf>]) [4]
-("C:\Users\jgilmore\Documents\p2p_mmog\Documents\PhD proposal\research_proposal
-.aux") ) 
+(Font)              <6> on input line 295.
+
+
+LaTeX Warning: Reference `' on page 5 undefined on input line 318.
+
+(./research_proposal.bbl [5]) [6] (./research_proposal.aux)
+
+LaTeX Warning: There were undefined references.
+
+ ) 
 Here is how much of TeX's memory you used:
- 6874 strings out of 495285
- 103890 string characters out of 3179869
- 187796 words of memory out of 3000000
- 9932 multiletter control sequences out of 15000+200000
- 42023 words of font info for 84 fonts, out of 3000000 for 9000
- 17 hyphenation exceptions out of 8191
- 37i,7n,38p,1325b,474s stack positions out of 5000i,500n,10000p,200000b,50000s
-{C:/Program Files (x86)/MiKTeX 2.8/fonts/enc/dvips/fontname/8r.enc}<C:/
-Program Files (x86)/MiKTeX 2.8/fonts/type1/urw/times/utmb8a.pfb><C:/Program Fil
-es (x86)/MiKTeX 2.8/fonts/type1/urw/times/utmr8a.pfb><C:/Program Files (x86)/Mi
-KTeX 2.8/fonts/type1/urw/times/utmri8a.pfb>
-Output written on research_proposal.pdf (4 pages, 238183 bytes).
+ 6874 strings out of 493876
+ 102564 string characters out of 1150568
+ 189389 words of memory out of 3000000
+ 9994 multiletter control sequences out of 10000+50000
+ 44854 words of font info for 87 fonts, out of 3000000 for 5000
+ 717 hyphenation exceptions out of 8191
+ 36i,8n,38p,1341b,378s stack positions out of 5000i,500n,10000p,200000b,50000s
+{/usr/local/texlive/2008/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/local/t
+exlive/2008/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/texlive/200
+8/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2008/texmf-di
+st/fonts/type1/urw/times/utmri8a.pfb>
+Output written on research_proposal.pdf (6 pages, 181136 bytes).
 PDF statistics:
- 315 PDF objects out of 1000 (max. 8388607)
- 35 named destinations out of 1000 (max. 500000)
- 74 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 165 PDF objects out of 1000 (max. 8388607)
+ 49 named destinations out of 1000 (max. 131072)
+ 127 words of extra memory for PDF output out of 10000 (max. 10000000)
 
