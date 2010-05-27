@@ -172,6 +172,8 @@
 \acrodef{CS}[C/S]{Client/Server}
 \acrodef{CMS}[C/MS]{Client/Multi-Server}
 \acrodef{NPC}{Non-Player Character}
+\acrodef{aoi}[AoI]{Area of Interest}
+\acrodef{alm}[ALM]{Application Level Multicast}
 
 \begin{document}
 
@@ -317,8 +319,30 @@ The server or cluster is housed in a secured location, where access can be contr
 
 If this model is contrasted with a P2P model, the P2P model has some significant security challenges \cite{}. The challenges reside in the fact that peers are not under the control of the game producer. Since all server data are distributed amongst peers, all peers have access to sections of the server data. Peers also have access to the distributed server code. One advantage that can be exploited is that no peer contains all server data and no one peer has more authority than another. This allows for schemes such as quorum algorithms to be used to increase the security level. This and other techniques are discussed in Section \ref{}.
 
-\subsection{Key challenges}
+\subsection{Key challenges and requirements}
 
+In past literature, key requirements and challenges have been identified that a successful \ac{P2P} architecture will have to address. The six key challenges identified of such a system are: interest management, event dissemination, security, state persistency, NPC hosting and authentication \cite{}. Keep in mind that these challenges are not unique to a P2P system, but their solutions are. The key requirements are \cite{}. 
+
+%Describe key requirements
+%Explain P2P overlays
+
+%Describe key challenges and how they link to the key requirements
+Interest management is used to determine the smallest amount of information that a peer requires, in order to present an accurate representation of the world to each player \cite{}. The main idea is that a player has a limited visual range and a limited area around the player in which it can interact with objects. The player requires update information of all objects in this area, called the player's \ac{aoi}. AoI calculations also rely on the fact the a player's direction and velocity of movement also cannot change instantaneously and are bounded. Extensive research has been done into solving AoI problems. The solutions range from aura/nimbus \cite{} to publish/subscribe \cite{} to Voronoi diagram models \cite{}. Generally, interest management solutions can be divided into coarsely or finely grained solutions.
+
+Coarsely grained solutions usually divide the game world into multiple regions and when a player enters a region, it subscribes to that regions events. All players in the region then receive the region's events, even for players not in their AoI. Finely grained techniques create groups of players from their \acp{aoi}. Groups of interacting players directly exchange information, so all players only receive information that is relevant to them. The grain of the solution in turn determines the type of event dissemination that should be used \cite{}.
+
+Event dissemination deals with how information should be sent to peers after interest management has determined which information should be sent \cite{}. Recently, \ac{alm} and unicast techniques of event dissemination have become popular, depending on the grain of the event dissemination. \ac{alm} is used, instead of router level multicast, because of a lack of general support for this technology at the router level \cite{}.
+
+ALM is used for coarsely grained interest management techniques, while unicast is used for finely grained techniques. Unicast is not used for coarsely grained techniques, because it's not scalable \cite{}, but ALM significantly increases the message latency in the system, because messages first have to be routed over a P2P overlay network \cite{}. ALM is however preferred over unicast for large numbers of messages, because of the weak scalability.
+%Check badumna
+
+Security has been identified as a major issue for P2P systems \cite{}. This is because of the lack of control of peers. There are various security issues and these are usually divided according to the level of the protocol stack where they occur. The areas that have been identified by \cite{} and expanded upon by \cite{} are: game level, application level, network level and infrastructure level. Game level threats are usually referred to as cheats. These are ways in which a malicious players may gain an unfair advantage over other players, within the confines of the game. These cheats are usually because of software bugs and some examples are duplication and teleport cheats.
+
+Application level threats are where malicious players alter the game software to gain an unfair advantage. This is usually done by gaining access to the game state to which they should not have access at the current time. An example of this is map reveal cheats in strategy game. Where the fog of war is removed and the player can observe all the opponent's movements. Other cheats are sometimes used that augment the player's User Interface (UI) with extra information that allows the player to make more informed decisions. It is debatable whether these additions are cheats, but they are considered almost essential for competitive \ac{WoW} play \cite{}.
+
+For P2P threats, securing the network level is of great importance and mainly focusses on securing the IP level network. The field has recently received more attention than in the past and has started to bear fruit \cite{}. The solutions concern securing the system against classic IP layer threats such as dalaying packets in transit, dropping packets and altering packets. Handling the alteration of packets is a specialised field in security and effectively attempts to make the system Byzantine fault tolerant \cite{}.
+
+In the P2P overlay, replication with quorum (voting) \cite{} and erasure codes \cite{} are used in order to secure the system against malicious nodes, altering objects. This is, however, an ongoing research field with many issues still open. Open issues include ensuring reliable system performance under collusion attacks.
 
 
 \section{Proposed architecture}
