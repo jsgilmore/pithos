@@ -339,6 +339,8 @@ The server or cluster is housed in a secured location, where access can be contr
 
 \subsection{P2P Overlays}
 
+\cite{pastry}
+
 \subsection{Key challenges}
 \label{key_challenges}
 
@@ -351,9 +353,11 @@ A recent article has identified six key challenges of P2P systems: Interest Mana
 
 %Describe key challenges
 \subsubsection{Interest Management}
-Interest management is used to determine the smallest amount of information that a peer requires, in order to present an accurate representation of the world to each player. The idea is not specific to P2P MMOGs and was already formally put forward in \cite{First_IM} and later with greater focus on a distributed environment in \cite{Whang_agent_based_IM}. The main idea is that a player has a limited visual range and a limited area around the player in which it can interact with objects. The player requires update information of all objects in this area, called the player's \ac{aoi}. AoI calculations also rely on the fact the a player's direction and velocity of movement also cannot change instantaneously and are bounded. Extensive research has been done into solving AoI problems and a comparison of techniques can be found in \cite{Boulanger_IM_compare}. The solutions range from aura/nimbus \cite{Benford_spatial_IM} to publish/subscribe \cite{zoned_federation} to Voronoi based models \cite{Hu_voronoi_IM}, \cite{Buyukkaya_voronoi_state_management} to hybrid models \cite{hybrid_IM}, \cite{MOPAR}. Generally, interest management solutions can be divided into coarsely or finely grained solutions.
+Interest management is used to determine the smallest amount of information that a peer requires, in order to present an accurate representation of the world to each player. The idea is not specific to P2P MMOGs and was already formally put forward in \cite{First_IM} and later with greater focus on a distributed environment in \cite{Whang_agent_based_IM}. The main idea is that a player has a limited visual range and a limited area around the player in which it can interact with objects. The player requires update information of all objects in this area, called the player's \ac{aoi}. AoI calculations also rely on the fact the a player's direction and velocity of movement also cannot change instantaneously and are bounded. Extensive research has been done into solving AoI problems and a comparison of techniques can be found in \cite{Boulanger_IM_compare}. The solutions range from aura/nimbus \cite{Benford_spatial_IM} to publish/subscribe \cite{mercury_publish_subscribe} to Voronoi based models \cite{Hu_voronoi_IM}, \cite{Buyukkaya_voronoi_state_management} to hybrid models \cite{hybrid_IM}, \cite{MOPAR}, \cite{fan_mediator_paper}. Generally, interest management solutions can be divided into coarsely or finely grained solutions, although the hybrid models, especially MOPAR, seem to have gained greater popularity because they seem to have all the benefits of the two solutions and little of the drawbacks.
 
 Coarsely grained solutions usually divide the game world into multiple regions and when a player enters a region, it subscribes to that region's events. This is called the region-based publish subscribe model \cite{Fan_deisgn_issues_p2p}. All players in the region then receive the region's events, even for players not in their AoI. Finely grained techniques create groups of players from their \acp{aoi}. Groups of interacting players directly exchange information, so all players only receive information that is relevant to them. This has been termed the spatial model \cite{Fan_deisgn_issues_p2p}. The grain of the solution in turn determines the type of event dissemination that should be used, as described later in this section.
+
+%The issue with the finely grained model is scalability. As nodes join, the number of messages increase quadratically, as previously mentioned. This means that in highly populated regions, too many messages are sent to nodes which can increase latency to unmanageable levels. Highly populated regions will however experience the same issues if no dynamic regioning is implemented.
 
 %Event Dissemination
 \subsubsection{Event Dissemination}
@@ -368,7 +372,7 @@ ALM is used for coarsely grained interest management techniques, while unicast i
 
 For an in-depth review of the security issues facing peer-to-peer system in general, refer to \cite{p2p_security_issues}. These issues are the same issues facing P2P MMOGs, with the exception of the game and application layer issues. %Check this?
 
-Cheating mitigation has been identified as a major issue for P2P systems \cite{knutsson_p2p_first}, \cite{challenges_p2p_gaming}, \cite{lock_step_NEO}. The challenges reside in the fact that peers are not under the control of the game producer. Since all server data are distributed amongst peers, all peers have access to sections of the server data. Peers also have access to the distributed server code. One advantage that can be exploited is that no peer contains all server data and no one peer has more authority than another.
+Cheating mitigation has been identified as a major issue for P2P systems \cite{knutsson_p2p_first}, \cite{challenges_p2p_gaming}, \cite{cheat_proof_event_ordering}. The challenges reside in the fact that peers are not under the control of the game producer. Since all server data are distributed amongst peers, all peers have access to sections of the server data. Peers also have access to the distributed server code. One advantage that can be exploited is that no peer contains all server data and no one peer has more authority than another.
 
 There are various security issues and these are usually divided according to the level of the protocol stack where they occur. The areas that have been identified by \cite{cheat_proof_event_ordering} and expanded upon by \cite{cheating_taxonomy} are: game level, application level, protocol level and infrastructure level. This is consistent with the generally used layered security model \cite{distributed_systems_security}. Game level cheats are ways in which a malicious player may gain an unfair advantage over other players, within the confines of the game. These cheats are usually because of software bugs and some examples are duplication and teleport cheats.
 
@@ -395,7 +399,7 @@ This direct communication reduces bandwidth usage in the network, because at thi
 
 We believe that a scheme where the regions or groups move with the groups of players will enhance the functionality of this scheme. If players are grouped more intelligently, less traffic will have to flow between groups, which will reduce the number of queries to the DHT, which in turn will improve the latency of the overall system. Using groups or flocks would, therefore, compliment this technique. The issue with such a system would be how to uniquely identify a group and how the identification would be applied when groups merge or split. The identification is required in order to ensure that disconnected nodes are able to reconnect, once they have joined a group.
 
-As Game Event Dissemination is closely coupled to the Interest Management technique, unicast will be employed. Unicast is used between all master nodes as well as between all slave nodes in MOPAR. Unicast holds many advantages over ALM, if the number of neighbouring nodes are bound. ALM introduces significant delays into the communications system, by the use of an overlay that requires $O(\log(n))$ hops on average to route a message to a target. While $O(\log(n))$ is sufficient and indeed a good order complexity for routing, in a latency critical application such as an MMOG, this is not sufficient. Unicast, in contrast, provides an $O(1)$ routing complexity. And the fact that groups are used, allows for the unicast group size to be bound.
+As Game Event Dissemination is closely coupled to the Interest Management technique, unicast will be employed. Unicast is used between all master nodes as well as between all slave nodes in MOPAR. Unicast holds many advantages over ALM, if the number of neighbouring nodes are bound. ALM introduces significant delays into the communications system, by the use of an overlay that requires $O(\log_{2^b}(N))$ maximum hops to route a message to a target. While this is sufficient and indeed a good order complexity for routing, in a latency critical application such as an MMOG, this is not sufficient. Unicast, in contrast, provides an $O(1)$ routing complexity. And the fact that groups are used, allows for the unicast group size to be bound.
 
 Security is also of great importance to the design of an MMOG architecture and so security issues will be kept in mind when designing the MMOG architecture. Recent advances and surveys can be used to improve game security, by improving the security of currently used peer-to-peer overlays. Examples include using secure node ID assignments, by making use of a Certification Authority, or designing the system in such a way that a peer cannot select or report it's own node ID. All aspects of security will be investigated, this includes Authentication, Authorisation, Data Integrity, Confidentiality, Availability, Trust, Privacy and Identity Management \cite{distributed_systems_security}. Current schemes usually only handle one or two of these requirements as will be discussed in Section \ref{current_architectures}.
 
@@ -419,7 +423,7 @@ After the architecture has been implemented, it will be tested and compared to o
 
 \subsection{Classic models}
 
-As an introduction to consistency models, an overview of the two common models, currently used in computer games will be described. The models used in P2P MMOGs are all permutations of these two basic models. The two models are based on the two different network models. These are the P2P-based model, also called the event-based model \cite{}, and the Client/Server-based model, also called update-based model \cite{}.
+As an introduction to consistency models, an overview of the two common models, currently used in computer games will be described. The models used in P2P MMOGs are all permutations of these two basic models. The two models are based on the two different network models. These are the P2P-based model, also called the event-based model \cite{p2p_cm_aoe}, and the Client/Server-based model, also called update-based model \cite{unreal_networking}.
 
 To understand these two models, some basic terms should first be understood. These terms are: ``event'', ``update'', ``game state'', ``game logic''. Events are generated by players and can be thought of as actions taken by players. These include casting a spell, using an item or walking. Logic is applied to events to determine what updates should be applied to the game state. Game logic is thus a think function, which determines how the world should change as a result of an event. Another way to think about game logic is to see it as the game rules. A player casting a spell might cause another player's health to be reduced, her own health to be increased or a monster to spawn. When a player is walking, the logic will cause the player's position to update at the speed, which the player is able to walk.
 
@@ -436,7 +440,7 @@ Game logic communicates how the world should change via game updates. Game updat
 %
 Figure \ref{fig_p2p_cm} shows the P2P model. In this model the complete game state is stored on each peer \cite{}. Any event that a peer generates is sent to all other peers. These events are used as inputs to the game logic, which creates updates, which is used to update the global game state at each peer.
 
-It is at this level that consistency becomes important. The order in which updates are received should be the same for all peers, otherwise the game states of different peers may become inconsistent. Usually some kind of lockstep technique is used to solve this issue \cite{}. The issue with lockstep is that it reduces the latency to twice that of the peer with the highest latency. Various techniques have been proposed that improves the latency by including some deadline when all events should be submitted \cite{}. This, however, makes it impossible for a player with a high latency to play the game with anyone other than from her own continent.
+It is at this level that consistency becomes important. The order in which updates are received should be the same for all peers, otherwise the game states of different peers may become inconsistent. Usually some kind of lockstep technique is used to solve this issue \cite{pessimistic_lock_step}. The issue with lockstep is that it reduces the latency to twice that of the peer with the highest latency. Various techniques have been proposed that improves the latency by including introducing some deadline before which all events should be submitted \cite{cheat_proof_event_ordering}. This, however, makes it impossible for a player with a high latency to play the game with anyone other than from her own continent.
 
 The issue with the event-based model is that it is not scalable, since all peers should connect to all other peers and every event is transmitted to all peers. This means that as $n$, the number of peers in the network, increases, the amount of traffic increases with a factor of $n^2$. The security issues of the P2P networking model, on which this consistency model is based, are also present. Slowdown is also experienced by all players if one player's latency is below par, since the lockstep mechanism has to wait for all events to be received for that round.
 
@@ -446,9 +450,9 @@ This approach greatly assists with security, as clients cannot influence the sta
 
 \subsection{P2P MMOG models}
 
-Very little work has been done on state persistency for MMOGs. Generally two approaches are currently used for state persistency: super peer storage \cite{} and overlay storage \cite{}. Super peer storage relies on the super peer storing all relevant information in its area of interest. An example of this is in \cite{}, where the world is segmented into regions with the consistency model depicted in Figure \ref{fig_cs_region_cm}. Super peers exist that act as regional servers. Each super peer handles all game logic and distributes updates to all peers in its region. The super peer also handles state persistency for its region, hosting NPCs and persistent player data. The Voronoi approach \cite{} also uses a type of super-peer approach, but with the sizes of the regions being much smaller. A node controls and hosts all objects in its Voronoi region.
+Very little work has been done on state persistency for MMOGs. Generally three approaches are currently used for state persistency: super peer storage \cite{knutsson_p2p_first}, overlay storage \cite{Douglas05enablingmassively}, \cite{using_freenet_storage}, \cite{overlay_storage1}, \cite{Fan_phd}, \cite{past_storage_focus} and distance-based storage \cite{Buyukkaya_voronoi_state_management}, \cite{Hu_voronoi_IM}. Hybrid techniques, distinguishing permanent data from ephemeral data have also been proposed \cite{zoned_federation}.
 
-Overlay storage, shown in Figure \ref{fig_cs_region_cm} entails using a distributed file storage system, based on a P2P overlay, to host objects. It seems that the reason for using the P2P overlay storage technique is because Scribe is usually used for \ac{ALM} \cite{}. Scribe uses the Pastry overlay, which also supports PAST, a Pastry based distributed file storage scheme. The reason for this choice then seems to be one of ease and not of a serious consideration of the storage requirements of a P2P MMOGs.
+Super peer storage relies on the super peer storing all relevant information in its domain. An example of this is in \cite{knutsson_p2p_first}, where the world is segmented into regions and super peers act as regional servers to all peers in their region. Each super peer handles all game logic and distributes updates to all peers in its region. The super peer also handles state persistency for its region, hosting NPCs, objects and persistent player data.
 
 \begin{figure}[htbp]
  \centering
@@ -456,9 +460,60 @@ Overlay storage, shown in Figure \ref{fig_cs_region_cm} entails using a distribu
  \caption{Region-based Client/Server consistency model}
  \label{fig_cs_region_cm}
 \end{figure}
+%
+The consistency model for this approach is depicted in Figure \ref{fig_cs_region_cm}. One can see that this approach is modelled on the update based model, but segmented into separate regions. The role of the server is here fulfilled by a super peer, which is a peer that is selected in some logical way, from the available set of peers and then promoted. Server selection in itself is a complex topic that has to deal with determining whether a peer has sufficient resources available and also whether the peer is trustworthy.
+
+Each super peer in this model houses the complete region state as shown. Super peers also house the real game logic. Clients in the region only house copies of the regional objects and some client logic to update the local copies of objects housed. Like the \ac{CS} model, clients only send events to super peers, where super peers apply the game logic and send state updates to clients.
+
+The super peer storage model has many potential issues. Overloading of the super peer is one. A super peer could be relatively easily overloaded if a region becomes too crowded, since a super peer is merely the computer of some player in the game and not a specialised server machine. The question of fairness also arises. The idea of a P2P MMOG model is that all peers share resources. With this model, peers with extra resources are expected to donate these resources for the good of all. Players might consider it unfair, when they are constantly expected to donate resources, some of which they might have to pay for.
+
+Another issue is reliability. In a P2P system, with a high rate of churn, players are expected to constantly leave and join the network. Because of this reality, redundancy mechanisms have to be developed that would ensure state data are always available, even when a super node leaves the network. It is possible to solve these issues by having redundant super peers in each region, that take over hosting responsibility if the main super peer leaves. This has been mentioned in the literature, but no concrete schemes of data migration have been presented \cite{}. Other schemes to support improved reliability deal with reputation mechanisms for super peers. Super peers that have more resources and stay in the network longer are preferred during super peer selection, using reputation mechanisms \cite{fan_mediator_paper}.
+
+The third, and probably most important issue is that of security. If a single peer is allowed to house the player information of a large group of players, it might become possible for such a peer to modify the data to suit his own ends. The issue is not only that modification of the data might be possible, but also that it would not be possible for the cheating to be detected, because of no centralised logging. A scheme that would improve the reliability of this systems has been proposed, where every event is also sent to the backup super peer of the region \cite{past_storage_focus}. The main super peer responds with the update and the backup super peer responds with a hash of the update. A peer can then check whether the hashes match to determine whether the data has been received correctly. A hash is not the state update itself, so will be much smaller, but the events that have to be sent to all super peers will significantly increase traffic in the network and bandwidth usage by peers.
+
+There are, however, also advantages to super peer storage. All data are stored on the super peer, which means that storing data is a low latency operation. The regional state can be stored and retrieved at very high speeds. Data retrieval from such a storage is also relatively fast. As fast as data retrieval from a server. Peers can request data from a super peer and the data can be returned to the peer in one hop after transmission of the request. Super peers may, however, become overloaded with requests and thereby increase the latency of the system.
+
+Overlay storage makes use of an overlay-based distributed storage scheme to reliably distribute and store data on all nodes connected to the P2P overlay. For the purposes of this document, the overlay storage can be thought of as a storage medium or database, distributed over all peers.
+Overlay storage is a very popular storage method, currently used by most P2P MMOG architectures. This is believed to be more as a consequence of the use of Scribe than any inherit benefit to P2P MMOGs \cite{past_storage_focus}. This is also the motivation used in Chapter 4 of \cite{Fan_phd}, where the Mediator architecture is described. Scribe is an implementation of \ac{alm} that uses the Pastry overlay as the structure to send multicast messages over \cite{scribe}. Pastry is an implementation of a P2P overlay network that handles all routing as discussed in Section \ref{}. Past is a distributed persistent storage implemented to use Pastry for routing data and requests for data. The reason for using overlay storage in so many implementations seem to be merely the availability after using Scribe. The implementation of state persistency, however, does not have to be linked with the event dissemination scheme. A P2P overlay may be used for event dissemination, and another method can be used to ensure state persistency.
+
+An evaluation of overlay storage also shows some issues when used for state persistency in MMOGs. The main issue with this mode of storage is summed up by the creators of PAST: ``Finally, PAST is intended as an archival storage and content distribution utility and not as a general-purpose filesystem. It is assumed that users interact primarily with a conventional filesystem, which acts as a local cache for files stored in PAST.'' \cite{storage_and_chaching_PAST}. This is not how the file system interaction occurs in MMOGs. For MMOGs, a distributed file system is required that allows for real-time file storage and retrieval.
+
+The most significant issue with overlay storage is the delay incurred when storing and retrieving data. As data can be stored anywhere on the network and the network is not fully connected, it takes $O(\log_{2^b}(N))$ hops on average to retrieve or store a data item \cite{storage_and_chaching_PAST}. Where $b$ is usually chosen as 4. Although this is a good order complexity for a routing algorithm in a large network, it is not sufficient to support a real-time application.
+
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=2cm 5cm 27cm 19.5cm, width=\columnwidth]{region_based_CS_CM_P2PO}
+ \caption{Region-based Client/Server with overlay consistency model}
+ \label{fig_cs_region_o_cm}
+\end{figure}
+%
+Overlay storage, shown in Figure \ref{fig_cs_region_cm} entails using a distributed file storage system, based on a P2P overlay to host objects. Figure \ref{fig_cs_region_cm} actually shows a type of Super Peer/Overlay hybrid storage implemented in \cite{zoned_federation}, but the basic principles remain the same. The model depicted in Figure \ref{fig_cs_region_cm}, uses an overlay storage managed by regional super peers. The reason for this management is to achieve state consistency. If all nodes were allowed to update the global state stored in the overlay, the world would become inconsistent for many. This is because updates take time to be stored and retrieved and because it can be expected that many nodes will want to access the same stored data when in the same area, the regioning approach again provides a method to achieve synchronisation.
+
+The world is divided into regions and so data stored for one region will have no effect on the sate of other regions. This can of course be debated, but for global specific data a global ``region'' can be created. Super peers then act as servers that use their section of the overlay as their own storage databases. Data consistency may be assured as all access to a region's data is controlled by that region's super peer. The Zoned Federation model further uses local caching at super peers to achieve real-time access to data. Overlay storage is used as a backup mechanism to achieve data persistency and redundancy.
+
+Distance based approaches, such as the Voronoi storage approaches \cite{Buyukkaya_voronoi_state_management}, \cite{Hu_voronoi_IM} and also some of the NPC hosting approaches \cite{} store object data on the peer closest to the object in the virtual world. Some distance metric is used to determine on which node an object should be stored. For the Voronoi approaches, a node controls and hosts all objects within its Voronoi region. The reasoning is that there is a high probability that the player closest to the object is also the player using the object. Examples of this are where a player is trading or fighting with an NPC. The only problem with this reasoning is that usually multiple nodes are interacting with a single object. The examples of the NPC monster and trader are again relevant. Usually many players interact with a trader NPC and usually players attack monster NPCs in groups.
+
+Multiple player interaction is, however, not really an issue when compared to other state persistency approaches. In the best cast, the object being used by a player is also hosted on that player's node. If another player requires use of a remotely hosted object, that player may still interact with the object, where the host node is now acting as a server to that player. This means that every player hosting an object becomes a server for that object. For the case where a player interacts with an object hosted locally, there is no object latency. In the case where a player accesses a remotely hosted object, there is only one hop latency, the same as with a client server application. The advantage however is that the total server load for all objects is distributed amongst all peer, which means that each peer should have to handle much less queries than with the super peer storage approach. This might protect peers from becoming overloaded.
+
+Issues with this approach stem from the fact the players are constantly moving. When players move, the objects in their regions change. Objects, therefore, have to be constantly handed over from one peer to another, which might cause significant network traffic. An object in transit might also delay interaction with that object.
+
+Reliability is also an issue, because of network churn. When nodes leave the network, the objects that they controlled should still be accessible. Redundancy and added overlay storage can be implemented here to ensure reliability.
+
+The main issue with the distance based scheme is security. Nodes that have the most interest in an object also have the most interest to manipulate that object in ways inconsistent with the game rules. When objects are hosted on nodes that have the most interest in them, there will be a strong drive to try and manipulate these objects. Because these modification are all local, it is also not possible to log the alterations and detect cheating. Means by which local objects can be secured have to be found or distance based algorithms with quorum need to be investigated.
+
 
 \section{Proposed state persistency model}
 \label{proposed_persistency}
+
+A novel state persistency architecture is proposed in this work, specifically designed to meet the real-time requirements of P2P MMOGs. The main issues that were identified during the literature study were: reliability, responsiveness, security, fairness and consistency. For the storage to be reliable, it must not be possible for data to be lost, and stored data should always be available when a node requests it.
+
+To ensure system responsiveness, data must be stored or retrieved in real-time. With real-time, it is meant that data should be available within a certain time frame that would ensure correct functionality of the MMOG requiring it. The variance in times when data become available should also be small.
+
+The storing system should store data securely. It should not be possible for data to be altered in ways that are inconsistent with the game rules. It should also be possible to identify nodes that alter the data in this malicious way. This also adds the requirement that nodes should be authenticated in the storage system and that only authorised nodes should be able to alter data.
+
+Ensuring fairness in the system means distributing load evenly according to the abilities of individual nodes. This ensures that not only a small number of nodes provide all system resources required for the system to function, but that all nodes contribute what they can, in order to support the system.
+
+The consistency requirement specifies that requests for data items should return the same data item to any node. A more lax, but possibly still sufficient consistency requirement states that a node requesting data should not be able to distinguish another nodes data request returned as different from its own. This definition attempts to encapsulate world consistency
 
 \begin{figure}[htbp]
  \centering
@@ -466,10 +521,31 @@ Overlay storage, shown in Figure \ref{fig_cs_region_cm} entails using a distribu
  \caption{Group-based Peer-to-Peer with overlay consistency model}
  \label{fig_p2p_group_o_cm}
 \end{figure}
+%
+Figure \ref{fig_p2p_group_o_cm} shows the initial proposed state persistency model for an MMOG. 
+
 
 Game state will be defined in this work as objects with state and logic. Objects can also produce events to be sent to other
 
-\section{Current state persistency models}
+\section{Related state persistency models}
+
+Table \ref{tab_storage} presents a comparison of how currently storage system handle the four key issues identified.
+%
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|r|c|c|c|c|c|}
+\hline
+Storage type & Reliability & Responsiveness & Security & Fairness & Consistency\\
+\hline
+Region-based Super Peer & Medium & High & Low & Low & High\\
+Overlay & High & Low & Medium & High & Low\\
+Region-based Super Peer/Overlay & High & High & Low & Low & High\\
+Distance-based & Low & High & Low & High & Low\\
+\hline
+\end{tabular}
+\caption{Differences between storage mechanisms}
+\label{tab_storage}
+\end{table}
 
 \section{Expected Outcomes}
 
