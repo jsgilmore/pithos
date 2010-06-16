@@ -225,9 +225,34 @@ Figure \ref{fig_mmog_subscriptions} shows the total number of active MMOG subscr
 
 From an academic perspective, \acp{MMOG} also hold great value. An MMOG is a complex networked application, with clients requiring reliable real-time feedback on actions taken. The design of an MMOG requires in-depth knowledge of server architectures and network design. The design of a server architecture determines how may players the game will be able to host and what the user experience will be in terms of quality of service. The server architecture must be able to handle thousands of requests, store large amounts of data, update the game state and send responses back to all clients in real time.
 
-%Complete Introduction
+MMOGs, therefore, hold great academic as well as commercial value. Recently, significant research has been done in order to develop \ac{P2P} MMOGs. These P2P MMOGs hold many advantages over current systems, as discussed in Section \ref{p2p_mmog_overview}. These \ac{P2P} MMOGs, however, still have many issues that need to be resolved before they can become commercially viable, as discussed in Section \ref{key_challenges}.
+
+The issue that will be focused on in this study will be ensuring data integrity and persistency in these P2P MMOGs. The question will also be asked which is the better architecture for MMOGs? The classic architecture will be compared to the P2P architecture in order to answer this question. While doing this, a novel architecture will also be developed to improve upon the current P2P architectures by using what was learned from this study.	
+
+Section \ref{mmog_history} presents a history of MMOGs in an effort to show the advancement the advancement and major contributors in the field over the past few years.
+%
+Section \ref{classic_network_models} discusses classic networking models used in current MMOGs. The models are described and the advantages and disadvantages of each are compared.
+%
+Section \ref{p2p_network_models} introduces the P2P MMOG networking model currently in use. It discusses all aspects of the model and compared different approaches employed.
+%
+Section \ref{proposed_architecture} proposes a novel P2P MMOG architecture, which makes use of knowledge gained from the development of previous architectures.
+%
+Section \ref{related_architectures} compares the proposed architectures to related ones and discusses the differences of the architectures and the novelty of the proposed architecture.
+%
+Section \ref{consistency_models} details how file storage and consistency are handled in a range of systems currently employed.
+%
+Section \ref{proposed_consistency} proposes a novel state persistency model, to support the proposed architecture and improve storage performance in MMOGs.
+%
+Section \ref{related_cm} compares the proposed consistency model to a currently used model that is most related.
+%
+Section \ref{evaluation_techniques} describes how the system will be evaluated. Including a discussion of the testing of the architecture and simulation and testing of the consistency model.
+%
+Section \ref{expected_outcomes} presents the expected outcomes and contributions of this work.
+
+
 
 \section{A brief history of MMORPGs}
+\label{mmog_history}
 
 \acp{MMOG} have a history stretching from 1978 to the present. A complete history of \acp{MMOG} and the histories of the games and boardgames that they originate from can be found in \cite{mmog_past_present_future} and Chapter 1 of \cite{designing_virtual_worlds}. The first games that could be called \acp{MMOG} were \acp{MUD} (1978) \cite{mud_intro}. \acp{MUD} are entirely text-based, with players exploring areas by receiving descriptions of what they were ``seeing'' and typing commands to move and interact with objects or players. \acp{MUD} contain many of the elements that today are still central to the \ac{MMOG} concept. These elements include exploration, large worlds, multiplayer, social interaction and progression.
 
@@ -250,7 +275,8 @@ The success of \ac{WoW} has largely been attributed to the overall quality and f
 All games in the history of \acp{MMOG} can be thought of as a collection of architectures that together make up the game. Architectures can be grouped to form other architectures. The game itself is also an architecture. This proposal will focus on the networking architecture of the game.
 
 
-\section{Overview of MMOG network models}
+\section{Classic MMOG network models}
+\label{classic_network_models}
 
 The network architecture, also called the network model of a system, specifies how the different entities in the network communicate, where authority lies and whether a centralised or distributed approach is followed. The networking model used, determines how the different nodes in the network interact and what the roles of these different nodes are. The consistency model used, is based on the networking model, but determines how data are stored on the system as well as how data are moved from one node to another. Throughout this work, data persistency is handled as a subset of data consistency.
 
@@ -291,8 +317,11 @@ In general, the issues addressed and improved by the \ac{CMS} architecture are r
 
 The disadvantages of this system is that the administration complexity is greatly increased. Such systems, although capable of handling many more users than a single server, is also much more expensive. These disadvantages are however not technical problems and so it is assumed for current games, that these systems are what is required if a game is to be hosted for a large number of players.
 
-\section{Peer-to-Peer MMOG architectures}
+\section{Peer-to-Peer MMOG network models}
+\label{p2p_network_models}
+
 \subsection{Overview}
+\label{p2p_mmog_overview}
 
 Recently, an architecture making use of the peer-to-peer networking model to host MMOGs, has gained popularity. This was first formally published in \cite{knutsson_p2p_first}. A new research field has been opened up, which is attempting to make the peer-to-peer model a viable alternative to the classic \ac{CS} and \ac{CMS} architectures. This architecture does, however, still have a few major issues that need to be solved before MMOGs can be developed that use it. If these issues, discussed in Section \ref{key_challenges}, can be solved, a \ac{P2P} architecture holds some powerful advantages over a \ac{CS} system.
 
@@ -390,7 +419,7 @@ All distributed resource sharing models require incentive mechanisms. Torrent sy
 
 The issue of game state persistency will be dealt with in detail in Sections \ref{consistency_models} and \ref{proposed_persistency}. Game state persistency will form the focus of this work. All that might be said at this stage is what was stated by Lu Fan in Section 3.5.3 of a recently completed PhD on the topic of P2P MMOGs: ``Game state persistency if a major challenge for P2P MMOGs as existing P2P storage infrastructures are designed to support file sharing, and seldom fulfil the performance and security requirements of a MMOG. ...the persistency area is still immature with many problems waiting for be investigated.'' \cite{Fan_phd}. This is the same person who also identified the issues focussed on in this section.
 
-\section{Proposed architecture}
+\section{Proposed P2P MMOG architecture}
 \label{proposed_architecture}
 
 We propose to develop a truly distributed P2P MMOG architecture, using hybrid techniques to improve upon current performance. The architecture will be developed to solve the six issues of P2P systems discussed in Section \ref{key_challenges}. Existing solutions to each of the six issues will be combined into a novel architecture, with the exception of state persistency. For state persistency, a completely novel approach will be followed in line with the design of the overall architecture.
@@ -413,8 +442,8 @@ The focus of this work will, however, be on game state persistency. This is an a
 
 It is argued that NPC hosting is a specialised form of state persistency. NPCs are seen as objects with logic and state, both of which are data that has to be stored. This merely requires for the definition of game state to be expanded, as elaborated upon in Section \ref{classic_models}. Object logic is both something that has to be stored as well as executed. The question of how and where object logic should be executed should also be investigated.
 
-\section{Current architectures}
-\label{current_architectures}
+\section{Related P2P MMOG architectures}
+\label{related_architectures}
 
 %Remember to talk about security in P2P overlays
 
@@ -434,7 +463,7 @@ Game logic communicates how the world should change via game updates. Game updat
 
 For the purposes of this work, game objects are objects with both state and logic, which means they consume both storage space, as well as CPU power. Game objects can also produce events, which should be sent to other objects. When this definition is used, NPC objects may be classified as a specific type of a game object, which forms part of the global game state. The question of NPC hosting then also becomes a question of state persistency.
 
-\subsection{Classic models}
+\subsection{Classic consistency models}
 \label{classic_models}
 
 As an introduction to consistency models, an overview of the two common models, currently used in computer games will be described. The models used in P2P MMOGs are all permutations of these two basic models. The two models are based on the two different network models. These are the P2P-based model, also called the event-based model \cite{p2p_cm_aoe}, and the Client/Server-based model, also called update-based model \cite{unreal_networking}.
@@ -458,7 +487,7 @@ An alternative to the event-based model is the update-based model, shown in Figu
 
 This approach greatly assists with security, as clients cannot influence the state of any other clients and every client's state depends on updates received from the server. The server state is also termed authoritative, because if there is a conflict, the server state is always the state to which the system is expected to return. All the security advantages of the \ac{CS} model also apply to this consistency model. Another reason why the event based model is successful is because it is more scalable then the pure P2P model. More hardware can be used to build a more powerful server, which can handle more client.
 
-\subsection{Client/Multi-Server models}
+\subsection{Client/Multi-Server consistency models}
 \label{cms_models}
 
 %Should I add diagrams here?
@@ -480,7 +509,8 @@ The zone-based method divides the virtual world into zones or regions, which are
 
 As will be seen, P2P MMOG models are merely permutations of the classic and \ac{CMS} consistency models.
 
-\subsection{P2P MMOG models}
+\subsection{P2P MMOG consistency models}
+\label{p2p_mmog_cm}
 
 %Consistency issues
 The main issues related to P2P MMOG consistency models identified during the literature study were: reliability, responsiveness, security, fairness and consistency. For the storage to be reliable, it must not be possible for data to be lost, and stored data should always be available when a node requests it.
@@ -580,8 +610,8 @@ Distance-based & Low & High & Low & High & Low\\
 \end{table}
 
 
-\section{Proposed state persistency model}
-\label{proposed_persistency}
+\section{Proposed consistency model}
+\label{proposed_consistency}
 
 A novel state persistency architecture is proposed in this work, specifically designed to meet the real-time requirements of P2P MMOGs.
 
@@ -600,22 +630,26 @@ All players will form part of a specific group. The hierarchical state persisten
 
 Ephemeral player data might be stored on a second level overlay storage, which only exist amongst the members of every group. Group data can thus be distributed amongst players to achieve maximum fairness. It is also proposed that no central peer be used to apply game logic to peer events as is the case with super peers.
 
-A peer-to-peer event based consistency model is proposed within groups. The disadvantages named in Section \ref{classic_models} will not be an issue as group sizes will be bound. This would allow for all peers to apply game logic and for validity checking to be done on updates sent from peers. This would increase the security of the system and would prevent any malicious super peer from hijacking the game.
+It should be explored whether an event-based or update-based consistency model should be used within groups. If groups sizes could be bound, the disadvantages named in Section \ref{classic_models} will not be an issue. This would allow for all peers to apply game logic and for validity checking to be done on updates sent from peers. This would increase the security of the system and would prevent any malicious super peer from hijacking the game. How a limited group size will affect the game will be investigated to determine whether it is feasible.
 
 It is then proposed that the overlay acts as a slow, but reliable storage medium. With data being constantly backed up to this medium. If data are lost before it could be backed up, the game should still be able to return to a previously stable state for the players that logged out, after logging back in.
 
+The main purpose of the proposed consistency model is to develop a low latency, highly reliable, consistent, fair and secure storage network. It is proposed that the use of super peers be avoided as much as possible, in order to obtain all benifits of a P2P model.
 
-Game state will be defined in this work as objects with state and logic. Objects can also produce events to be sent to other
+\section{Related consistency models}
+\label{related_cm}
 
-\section{Related state persistency models}
+There have been very few papers that deal directly with state persistency in MMOGs. Most papers merely assume that reliable consistent storage is available and sometimes go as far as to propose PAST to be used with Scribe. State persistency has thus far been regarded as a basis to be used to build other MMOG functions on. The few papers that have addresses state persistency directly have been discussed in Section \ref{p2p_mmog_cm}.
 
-A distinction is also made in \cite{}, but what is considered appropriate storage for the different classes differ. In the model proposed in \cite{}, overlay storage was regarded as less reliable then local storage. Items dropped in the world would be stored in the overlay, but players would store their own data on their own nodes. The reason for this was that overlay storage with redundancy was not considered on the overlay side and NPC hosting was also not addressed. Meaning that all data other than player data was considered ephemeral and player data can easily be stored on each node. Security issues were also not considered.
+The existing model that is nearest to the proposed state persistency model would be the Zoned Federation model \cite{zoned_federation}. The main difference between the Zoned Federation model and the proposed model is that the Zoned Federation model uses super peers for data caching, instead of all nodes in the network. This use of super peers has all the issues of super peer storage, discussed in Section \ref{p2p_mmog_cm}. It is believed that a fair, more secure approach, where all users contribute in accordance with their means, should rather be investigated. That would be the novelty of the proposed persistency model.
 
 \section{Proposed evaluation techniques}
+\label{evaluation_techniques}
 
 After the architecture has been implemented, it will be tested and compared to other P2P architectures as well as current \ac{CS} architectures to determine the performance of the implemented system, compared to other P2P systems and to determine the performance of P2P systems, compared to the currently used \ac{CS} system.
 
 \section{Expected outcomes}
+\label{expected_outcomes}
 
 \section{Conclusion}
 The conclusion goes here.
