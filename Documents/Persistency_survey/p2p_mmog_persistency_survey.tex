@@ -1,11 +1,18 @@
-\documentclass[journal,oneside,a4paper,twocolumn]{IEEEtran}
+\documentclass[10pt,a4paper,journal,cspaper,compsoc]{IEEEtran}
 
 % Some very useful LaTeX packages include:
 % (uncomment the ones you want to load)
 
 % *** CITATION PACKAGES ***
 %
-\usepackage{cite}
+\ifCLASSOPTIONcompsoc
+  % IEEE Computer Society needs nocompress option
+  % requires cite.sty v4.0 or later (November 2003)
+  \usepackage[nocompress]{cite}
+\else
+  % normal IEEE
+  \usepackage{cite}
+\fi
 % cite.sty was written by Donald Arseneau
 % V1.6 and later of IEEEtran pre-defines the format of the cite.sty package
 % \cite{} output to follow that of IEEE. Loading the cite package will
@@ -20,11 +27,20 @@
 % The latest version can be obtained at:
 % http://www.ctan.org/tex-archive/macros/latex/contrib/cite/
 % The documentation is contained in the cite.sty file itself.
+%
+% Note that some packages require special options to format as the Computer
+% Society requires. In particular, Computer Society  papers do not use
+% compressed citation ranges as is done in typical IEEE papers
+% (e.g., [1]-[4]). Instead, they list every citation separately in order
+% (e.g., [1], [2], [3], [4]). To get the latter we need to load the cite
+% package with the nocompress option which is supported by cite.sty v4.0
+% and later. Note also the use of a CLASSOPTION conditional provided by
+% IEEEtran.cls V1.7 and later.
 
 
 % *** GRAPHICS RELATED PACKAGES ***
 %
-  \usepackage{graphicx}
+  \usepackage[pdftex]{graphicx}
   \graphicspath{{../Figures/}}
   \DeclareGraphicsExtensions{.pdf,.png}
   \usepackage{color}
@@ -98,37 +114,27 @@
 % quality.
 
 % *** SUBFIGURE PACKAGES ***
-% subfig.sty, also written by Steven Douglas Cochran, is the modern
-% replacement for subfigure.sty. However, subfig.sty requires and
-% automatically loads Axel Sommerfeldt's caption.sty which will override
-% IEEEtran.cls handling of captions and this will result in nonIEEE style
-% figure/table captions. To prevent this problem, be sure and preload
-% caption.sty with its "caption=false" package option. This is will preserve
-% IEEEtran.cls handing of captions. Version 1.3 (2005/06/28) and later
-% (recommended due to many improvements over 1.2) of subfig.sty supports
-% the caption=false option directly:
-\usepackage[caption=false,font=footnotesize]{subfig}
-%
-% The latest version and documentation can be obtained at:
-% http://www.ctan.org/tex-archive/macros/latex/contrib/subfig/
-% The latest version and documentation of caption.sty can be obtained at:
-% http://www.ctan.org/tex-archive/macros/latex/contrib/caption/
+\ifCLASSOPTIONcompsoc
+  \usepackage[caption=false,font=normalsize,labelfont=sf,textfont=sf]{subfig}
+\else
+  \usepackage[caption=false,font=footnotesize]{subfig}
+\fi
 
 %Setting captions to centered (Not IEEE journal standard)
-\makeatletter
-\long\def\@makecaption#1#2{\ifx\@captype\@IEEEtablestring%
-\footnotesize\begin{center}{\normalfont\footnotesize #1}\\
-{\normalfont\footnotesize\scshape #2}\end{center}%
-\@IEEEtablecaptionsepspace
-\else
-\@IEEEfigurecaptionsepspace
-\setbox\@tempboxa\hbox{\normalfont\footnotesize {#1.}~~ #2}%
-\ifdim \wd\@tempboxa >\hsize%
-\setbox\@tempboxa\hbox{\normalfont\footnotesize {#1.}~~ }%
-\parbox[t]{\hsize}{\normalfont\footnotesize \noindent\unhbox\@tempboxa#2}%
-\else
-\hbox to\hsize{\normalfont\footnotesize\hfil\box\@tempboxa\hfil}\fi\fi}
-\makeatother
+%\makeatletter
+%\long\def\@makecaption#1#2{\ifx\@captype\@IEEEtablestring%
+%\footnotesize\begin{center}{\normalfont\footnotesize #1}\\
+%{\normalfont\footnotesize\scshape #2}\end{center}%
+%\@IEEEtablecaptionsepspace
+%\else
+%\@IEEEfigurecaptionsepspace
+%\setbox\@tempboxa\hbox{\normalfont\footnotesize {#1.}~~ #2}%
+%\ifdim \wd\@tempboxa >\hsize%
+%\setbox\@tempboxa\hbox{\normalfont\footnotesize {#1.}~~ }%
+%\parbox[t]{\hsize}{\normalfont\footnotesize \noindent\unhbox\@tempboxa#2}%
+%\else
+%\hbox to\hsize{\normalfont\footnotesize\hfil\box\@tempboxa\hfil}\fi\fi}
+%\makeatother
 
 
 % *** FLOAT PACKAGES ***
@@ -183,15 +189,38 @@
 % paper title
 \title{A Survey of State Persistency in Peer-to-Peer Massively Multiplayer Online Games}
 
-\author{\IEEEauthorblockN{John S. Gilmore and Herman Engelbrecht\\}
-\IEEEauthorblockA{Department of Electronic Engineering\\
-Stellenbosch University\\
-Stellenbosch, South Africa\\
-Email: jgilmore@ml.sun.ac.za, hebrecht@sun.ac.za}}
+\author{John~S.~Gilmore~and~Herman~Engelbrecht% <-this % stops a space
+\IEEEcompsocitemizethanks{\IEEEcompsocthanksitem J.S. Gilmore and H. Engelbrecht are with the MIH Media Laboratory at the Department of Electrical
+and Electronic Engineering, Stellenbosch University, Stellenbosch, South Africa.\protect\\
+% note need leading \protect in front of \\ to get a newline within \thanks as
+% \\ is fragile and will error, could use \hfil\break instead.
+E-mail: jgilmore@ml.sun.ac.za and hebrecht@sun.ac.za}% <-this % stops a space
+\thanks{}}
 
-% make the title area
-\maketitle
+% The paper headers
+\markboth{Journal of Parallel and Distributed Systems, July~2010}%
+{Journal of Parallel and Distributed Systems, July~2010}
+% The only time the second header will appear is for the odd numbered pages
+% after the title page when using the twoside option.
 
+% The publisher's ID mark at the bottom of the page is less important with
+% Computer Society journal papers as those publications place the marks
+% outside of the main text columns and, therefore, unlike regular IEEE
+% journals, the available text space is not reduced by their presence.
+% If you want to put a publisher's ID mark on the page you can do it like
+% this:
+%\IEEEpubid{0000--0000/00\$00.00~\copyright~2007 IEEE}
+% or like this to get the Computer Society new two part style.
+%\IEEEpubid{\makebox[\columnwidth]{\hfill 0000--0000/00/\$00.00~\copyright~2007 IEEE}%
+%\hspace{\columnsep}\makebox[\columnwidth]{Published by the IEEE Computer Society\hfill}}
+% Remember, if you use this you must call \IEEEpubidadjcol in the second
+% column for its text to clear the IEEEpubid mark (Computer Society jorunal
+% papers don't need this extra clearance.)
+
+% for Computer Society papers, we must declare the abstract and index terms
+% PRIOR to the title within the \IEEEcompsoctitleabstractindextext IEEEtran
+% command as these need to go into the title area created by \maketitle.
+\IEEEcompsoctitleabstractindextext{%
 \begin{abstract}
 %\boldmath
 Recently, there has been a drive to move away from a Client/Server approach to Massively Multiplayer Online Games to a Peer-to-Peer approach. This
@@ -202,15 +231,80 @@ placed on state persistency and a hybrid state consistency model is presented to
 ephemeral and persistent data in an attempt to improve the responsiveness of the storage. The model makes use of both overlay storage as well as
 distance based storage to achieve these ends.
 \end{abstract}
+% IEEEtran.cls defaults to using nonbold math in the Abstract.
+% This preserves the distinction between vectors and scalars. However,
+% if the journal you are submitting to favors bold math in the abstract,
+% then you can use LaTeX's standard command \boldmath at the very start
+% of the abstract to achieve this. Many IEEE journals frown on math
+% in the abstract anyway. In particular, the Computer Society does
+% not want either math or citations to appear in the abstract.
 
-\hfill June, 2010
+% Note that keywords are not normally used for peer review papers.
+\begin{keywords}
+State persistency, Peer-to-Peer, Massively Multiplayer Online Games, Virtual Environments, Survey
+\end{keywords}}
 
-\section{Introduction}
+% make the title area
+\maketitle
 
-Peer-to-Peer (P2P) Massively Multiplayer Online Games (MMOGs) have received a significant amount of attention from the research community over the
-past years. Since the first publication on the subject by Knutssonn et al. \cite{knutsson_p2p_first}, the three areas of Interest Management, Game
-Event Dissemination and Security, have received much attention from the research community, but the area of Game State Persistency has remained
-mostly unexplored.
+% To allow for easy dual compilation without having to reenter the
+% abstract/keywords data, the \IEEEcompsoctitleabstractindextext text will
+% not be used in maketitle, but will appear (i.e., to be "transported")
+% here as \IEEEdisplaynotcompsoctitleabstractindextext when compsoc mode
+% is not selected <OR> if conference mode is selected - because compsoc
+% conference papers position the abstract like regular (non-compsoc)
+% papers do!
+\IEEEdisplaynotcompsoctitleabstractindextext
+% \IEEEdisplaynotcompsoctitleabstractindextext has no effect when using
+% compsoc under a non-conference mode.
+
+% For peer review papers, you can put extra information on the cover
+% page as needed:
+% \ifCLASSOPTIONpeerreview
+% \begin{center} \bfseries EDICS Category: 3-BBND \end{center}
+% \fi
+%
+% For peerreview papers, this IEEEtran command inserts a page break and
+% creates the second title. It will be ignored for other modes.
+\IEEEpeerreviewmaketitle
+
+%\section{Introduction}
+% Computer Society journal papers do something a tad strange with the very
+% first section heading (almost always called "Introduction"). They place it
+% ABOVE the main text! IEEEtran.cls currently does not do this for you.
+% However, You can achieve this effect by making LaTeX jump through some
+% hoops via something like:
+%
+\ifCLASSOPTIONcompsoc
+  \noindent\raisebox{2\baselineskip}[0pt][0pt]%
+  {\parbox{\columnwidth}{\section{Introduction}\label{sec:introduction}%
+  \global\everypar=\everypar}}%
+  \vspace{-1\baselineskip}\vspace{-\parskip}\par
+\else
+  \section{Introduction}\label{sec:introduction}\par
+\fi
+%
+% Admittedly, this is a hack and may well be fragile, but seems to do the
+% trick for me. Note the need to keep any \label that may be used right
+% after \section in the above as the hack puts \section within a raised box.
+
+% The very first letter is a 2 line initial drop letter followed
+% by the rest of the first word in caps (small caps for compsoc).
+%
+% form to use if the first word consists of a single letter:
+% \IEEEPARstart{A}{demo} file is ....
+%
+% form to use if you need the single drop letter followed by
+% normal text (unknown if ever used by IEEE):
+% \IEEEPARstart{A}{}demo file is ....
+%
+% Some journals put the first two words in caps:
+% \IEEEPARstart{T}{his demo} file is ....
+%
+\IEEEPARstart{P}{eer-to-Peer (P2P)} Massively Multiplayer Online Games (MMOGs) have received a significant amount of attention from the research
+community over the past years. Since the first publication on the subject by Knutssonn et al. \cite{knutsson_p2p_first}, the three areas of Interest
+Management, Game Event Dissemination and Security, have received much attention from the research community, but the area of Game State Persistency
+has remained mostly unexplored.
 
 Interest Management determines how player actions are filtered to ensure that players only receive actions relevant to them, which reduces the
 bandwidth requirements of the system. Game Event Dissemination entails how these events are then sent to various players. Security ensures that the
@@ -661,20 +755,15 @@ of packet drops or delays.
 
 \section{Conclusion}
 
-This proposal presents an extensive literature study into what the state of the art is of P2P MMOGs. The P2P MMOG architecture is compared to more
-classic architectures, both in terms of the overall network architecture, as well as in terms of the consistency models employed. After a thorough
-investigation into the issues of P2P MMOG, it was determined that state persistency and consistency are areas that still require much attention. With
-this in mind a novel networking architecture as well as a consistency model were proposed that hopes to address some of the issues related to P2P
-MMOGs.
+Conclusion goes here.
 
-The state consistency model distinguishes between ephemeral and persistency game state and proposes a hybrid state consistency model that employs
-overlay storage techniques as backups to achieve low latency state persistency.
-
-Finally, possible testing techniques and a testing framework were presented. The framework will be used to test all contributions and enable a
-rigourous evaluation of all contributions.
-
-A Gantt Chart for the project is provided in the appendix, to provide an estimate of the different activities and the timescale of each. This will be
-reviewed throughout the lifetime of the project, to ensure that it remains possible to complete the project at the end of 2012.
+% trigger a \newpage just before the given reference
+% number - used to balance the columns on the last page
+% adjust value as needed - may need to be readjusted if
+% the document is modified later
+\IEEEtriggeratref{15}
+% The "triggered" command can be changed if desired:
+%\IEEEtriggercmd{\enlargethispage{-5in}}
 
 \bibliographystyle{IEEEtran}
 \bibliography{../BibTeX/P2P_MMOG}
