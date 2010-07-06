@@ -189,8 +189,8 @@
 % paper title
 \title{A Survey of State Persistency in Peer-to-Peer Massively Multiplayer Online Games}
 
-\author{John~S.~Gilmore~and~Herman~Engelbrecht% <-this % stops a space
-\IEEEcompsocitemizethanks{\IEEEcompsocthanksitem J.S. Gilmore and H. Engelbrecht are with the MIH Media Laboratory at the Department of Electrical
+\author{John~S.~Gilmore~and~Herman~A.~Engelbrecht% <-this % stops a space
+\IEEEcompsocitemizethanks{\IEEEcompsocthanksitem J.S. Gilmore and H.A. Engelbrecht are with the MIH Media Laboratory at the Department of Electrical
 and Electronic Engineering, Stellenbosch University, Stellenbosch, South Africa.\protect\\
 % note need leading \protect in front of \\ to get a newline within \thanks as
 % \\ is fragile and will error, could use \hfil\break instead.
@@ -198,8 +198,8 @@ E-mail: jgilmore@ml.sun.ac.za and hebrecht@sun.ac.za}% <-this % stops a space
 \thanks{}}
 
 % The paper headers
-\markboth{Journal of Parallel and Distributed Systems, July~2010}%
-{Journal of Parallel and Distributed Systems, July~2010}
+\markboth{Draft Submission to the Journal of Parallel and Distributed Systems, July~2010}%
+{Draft Submission to the Journal of Parallel and Distributed Systems, July~2010}
 % The only time the second header will appear is for the odd numbered pages
 % after the title page when using the twoside option.
 
@@ -223,13 +223,13 @@ E-mail: jgilmore@ml.sun.ac.za and hebrecht@sun.ac.za}% <-this % stops a space
 \IEEEcompsoctitleabstractindextext{%
 \begin{abstract}
 %\boldmath
-Recently, there has been a drive to move away from a Client/Server approach to Massively Multiplayer Online Games to a Peer-to-Peer approach. This
-can been seen when looking at the number of articles published on Peer-to-Peer systems compared to those published on Client/Server systems. This
-proposal discusses the different architectures currently in use and discusses the key challenges that a move to Peer-to-Peer presents. From the
-discussion, a novel architecture based on groups of players is proposed in an attempts to exploit the flocking behaviour of players. Focus is also
-placed on state persistency and a hybrid state consistency model is presented to deal with persistency in games. The model distinguishes between
-ephemeral and persistent data in an attempt to improve the responsiveness of the storage. The model makes use of both overlay storage as well as
-distance based storage to achieve these ends.
+Recently, there has been a drive to move away from a Client/Server approach to Massively Multiplayer Online Games to a Peer-to-Peer
+approach. This can been seen when looking at the number of articles published on Peer-to-Peer systems compared to those published on Client/Server
+systems. This proposal discusses the different architectures currently in use and discusses the key challenges that a move to Peer-to-Peer presents.
+From the discussion, a novel architecture based on groups of players is proposed in an attempts to exploit the flocking behaviour of players. Focus
+is also placed on state persistency and a hybrid state consistency model is presented to deal with persistency in games. The model distinguishes
+between ephemeral and persistent data in an attempt to improve the responsiveness of the storage. The model makes use of both overlay storage as well
+as distance based storage to achieve these ends.
 \end{abstract}
 % IEEEtran.cls defaults to using nonbold math in the Abstract.
 % This preserves the distinction between vectors and scalars. However,
@@ -240,9 +240,10 @@ distance based storage to achieve these ends.
 % not want either math or citations to appear in the abstract.
 
 % Note that keywords are not normally used for peer review papers.
-\begin{keywords}
-State persistency, Peer-to-Peer, Massively Multiplayer Online Games, Virtual Environments, Survey
-\end{keywords}}
+\begin{IEEEkeywords}
+A.1.0 [\textbf{Introductory and Survey}], J.8.d [\textbf{Internet Applications}]: Distributed file systems, J.8.g [\textbf{Internet Applications}]:
+Games
+\end{IEEEkeywords}}
 
 % make the title area
 \maketitle
@@ -724,7 +725,7 @@ serialisability. Issues may, however, occur when an object is being transferred 
 In order to evaluate any consistency model, metrics have to be defined to measure the key consistency challenges, as described in Section
 \ref{key_challenges_cm}.
 
-To evaluate \emph{consistency} is to evaluate how well the game state remains consistent between peers. For the game state to be consistent, all game
+To evaluate \emph{Consistency} is to evaluate how well the game state remains consistent between peers. For the game state to be consistent, all game
 objects should be consistent. What will be measured is the differences between root and replica objects. Root objects are those objects that
 represent part of the global game state and replica objects are local objects used to display the game state at the client side. When an update is
 sent to a root object, the changes to the root object should be reflected in all replica objects. The appearance of a root object should also be the
@@ -732,7 +733,7 @@ same for all peers. Any peer querying a root object should receive the same obje
 objects as they are queried. What should be tested is how long it takes for an object's appearance to update, after an update has been submitted by
 some node.
 
-To measure \emph{fairness}, the distribution of game state should be measured. This can be measured at a file level, i.e. what is the variance of the
+To measure \emph{Fairness}, the distribution of game state should be measured. This can be measured at a file level, i.e. what is the variance of the
 number of files contained on each node, or on byte level, i.e. what is the variance of the number of bytes stored on each node. A lower variance will
 point to a fairer data persistency scheme.
 
@@ -755,16 +756,16 @@ of packet drops or delays.
 
 \section{Conclusion}
 
-Conclusion goes here.
 
-% trigger a \newpage just before the given reference
-% number - used to balance the columns on the last page
-% adjust value as needed - may need to be readjusted if
-% the document is modified later
-\IEEEtriggeratref{15}
-% The "triggered" command can be changed if desired:
-%\IEEEtriggercmd{\enlargethispage{-5in}}
+After providing an overview of the classic C/S and C/MS state persistency techniques, this survey classified P2P MMOG state persistency techniques
+into super peer based, overlay based and distance based. The advantages and disadvantages of each method were discussed after identifying key
+challenges that state persistency techniques have to solve. These challenges are: Reliability, Security, Fairness, Responsiveness and Consistency.
 
+This survey was written, because of an identified need for a concise summary of the field of P2P MMOG game state persistency. Many techniques used in
+the past were used because of the ease with which they could be integrated into a P2P MMOG. The purpose of this survey is to identify those
+techniques and to stimulate further research, using empirical methods to compare the different storage techniques used.
+
+\IEEEtriggeratref{15} %Balance the bibliography
 \bibliographystyle{IEEEtran}
 \bibliography{../BibTeX/P2P_MMOG}
 
