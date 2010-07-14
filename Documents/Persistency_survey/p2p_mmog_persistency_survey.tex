@@ -197,6 +197,16 @@ and Electronic Engineering, Stellenbosch University, Stellenbosch, South Africa.
 E-mail: jgilmore@ml.sun.ac.za and hebrecht@sun.ac.za}% <-this % stops a space
 \thanks{}}
 
+\author{John~S.~Gilmore~and~Herman~A.~Engelbrecht% <-this % stops a space
+\IEEEcompsocitemizethanks{\IEEEcompsocthanksitem J.S Gilmore is a PhD student with the MIH Media Laboratory at the Department of Electrical
+and Electronic Engineering, Stellenbosch University, Stellenbosch, South Africa.\protect\\
+% note need leading \protect in front of \\ to get a newline within \thanks as
+% \\ is fragile and will error, could use \hfil\break instead.
+E-mail: jgilmore@ml.sun.ac.za
+\IEEEcompsocthanksitem H.A. Engelbrecht is the research manager at the MIH Media Laboratory at the Department of Electrical and Electronic Engineering, Stellenbosch University, Stellenbosch, South Africa.\protect\\
+E-mail: hebrecht@sun.ac.za}% <-this % stops a space
+\thanks{}}
+
 % The paper headers
 \markboth{Draft Submission to the Journal of Parallel and Distributed Systems, July~2010}%
 {Draft Submission to the Journal of Parallel and Distributed Systems, July~2010}
@@ -229,8 +239,11 @@ systems. This proposal discusses the different architectures currently in use an
 From the discussion, a novel architecture based on groups of players is proposed in an attempts to exploit the flocking behaviour of players. Focus
 is also placed on state persistency and a hybrid state consistency model is presented to deal with persistency in games. The model distinguishes
 between ephemeral and persistent data in an attempt to improve the responsiveness of the storage. The model makes use of both overlay storage as well
-as distance based storage to achieve these ends.
-\end{abstract}
+as distance based storage to achieve these ends.\newline
+
+\textbf{Categories and Subject Descriptors}: A.1.0 [\textbf{Introductory and Survey}], C.2.d [\textbf{Distributed Systems}]: Distributed
+applications, J.8.g [\textbf{Internet Applications}]: Games
+\end{abstract}}
 % IEEEtran.cls defaults to using nonbold math in the Abstract.
 % This preserves the distinction between vectors and scalars. However,
 % if the journal you are submitting to favors bold math in the abstract,
@@ -240,10 +253,10 @@ as distance based storage to achieve these ends.
 % not want either math or citations to appear in the abstract.
 
 % Note that keywords are not normally used for peer review papers.
-\begin{IEEEkeywords}
-A.1.0 [\textbf{Introductory and Survey}], J.8.d [\textbf{Internet Applications}]: Distributed file systems, J.8.g [\textbf{Internet Applications}]:
-Games
-\end{IEEEkeywords}}
+%\begin{IEEEkeywords}
+%A.1.0 [\textbf{Introductory and Survey}], C.2.d [\textbf{Distributed Systems}]: Distributed applications, J.8.g [\textbf{Internet Applications}]:
+%Games
+%\end{IEEEkeywords}
 
 % make the title area
 \maketitle
@@ -268,6 +281,8 @@ Games
 % For peerreview papers, this IEEEtran command inserts a page break and
 % creates the second title. It will be ignored for other modes.
 \IEEEpeerreviewmaketitle
+
+\IEEEdisplaynotcompsoctitleabstractindextext
 
 %\section{Introduction}
 % Computer Society journal papers do something a tad strange with the very
@@ -562,8 +577,9 @@ actions while the data are in transit.
 %Overview of three approaches
 Very little work has been done on state persistency for P2P MMOGs. Generally three approaches have been identified for state persistency: super peer
 storage \cite{knutsson_p2p_first}, overlay storage \cite{Douglas05enablingmassively}, \cite{using_freenet_storage}, \cite{Fan_phd},
-\cite{past_storage_focus} and distance-based storage \cite{Buyukkaya_voronoi_state_management}, \cite{Hu_voronoi_IM}, \cite{colyseus_distance_based}.
-Hybrid techniques, distinguishing permanent data from ephemeral data have also been proposed \cite{zoned_federation}, \cite{hybrid_storage1}.
+\cite{past_storage_focus} and distance-based storage \cite{Buyukkaya_voronoi_state_management}, \cite{Hu_voronoi_IM}, \cite{colyseus_distance_based},
+\cite{AtoZ}. Hybrid techniques, distinguishing permanent data from ephemeral data have also been proposed \cite{zoned_federation},
+\cite{hybrid_storage1}.
 
 \begin{table*}[htbp]
 \centering
@@ -585,7 +601,7 @@ no one storage mechanism has fully addressed all the identified issues. What is 
 types of data, are theoretically better suited to the MMOG application. The example of such an architecture is the hybrid architecture, which also
 seems to fare best, when compared to other storage techniques.
 
-\subsection{Key Challenges}
+\subsection{Characteristics}
 \label{key_challenges_cm}
 
 %Consistency issues
@@ -615,6 +631,13 @@ fairness and consistency.
     tower for a player that visits the tower, but no damsel for a player that does not enter the tower, the game experience would not degrade.
     This is because the player not in the tower does not have to know about the damsel. From these two examples, the reason for state persistency
     based on perception, rather than reality is shown.
+
+\emph{Scalability:} Key to the storage of data in a P2P MMOG is that the storage architecture is scalable. This requirement actually underpins all
+other requirements in that scalability specifies that the system should remain reliable, responsive, secure, fair and consistent for any number of
+peers in the network. Scalability is a key requirement of MMOGs, since very large player volumes have to be catered for.
+
+%TODO: Perhaps also add centralised storage as storage type
+%TODO: Individual storage can also be mentioned, where players store their own data (no mention is usually made of NPCs and other objects)
 
 
 All state persistency models will be reviewed with these issues in mind.
@@ -654,12 +677,12 @@ they might have to pay for.
 \subsubsection{Reliability}
 Another issue is reliability. In a P2P system, with a high rate of churn, players are expected to constantly leave and join the network. Because of
 this reality, redundancy mechanisms have to be developed that would ensure state data are always available, even when a super node leaves the
-network. It is possible to solve these issues by having redundant super peers in each region, that take over hosting responsibility if the main super
-peer leaves. One method by which redundant region coordinators are maintained in \cite{knutsson_p2p_first}, is to create backup coordinators on peers
-with IDs closest to the current coordinator. This means that if the main coordinator fails, all data will automatically be routed to the backup,
-because of the feature of DHTs. It is important that the main and backup super peers always posses consistent states, even during a transition from
-main to backup. Other schemes to support improved reliability deal with reputation mechanisms for super peers. Super peers that have more resources
-and stay in the network longer are preferred during super peer selection, using reputation mechanisms \cite{fan_mediator_paper}.
+network. It is possible to solve these issues by having redundant super peers in each region that take over hosting responsibility when the main
+super peer leaves. One method by which redundant region coordinators are maintained in \cite{knutsson_p2p_first}, is to create backup coordinators on
+peers with IDs closest to the current coordinator. This means that if the main coordinator fails, all data will automatically be routed to the
+backup, because of the feature of DHTs. It is important that the main and backup super peers always posses consistent states, even during a
+transition from main to backup. Other schemes to support improved reliability deal with reputation mechanisms for super peers. Super peers that have
+more resources and stay in the network longer are preferred during super peer selection, using reputation mechanisms \cite{fan_mediator_paper}.
 
 \subsubsection{Security}
 The third, and probably most important issue is that of security. If a single peer is allowed to house the player information of a large group of
@@ -682,6 +705,10 @@ Super peer storage is always consistent, because event ordering is handled by a 
 boundaries, the super peer of the region in which the event was triggered will send a message to the super peer in the region affected by the event.
 This is also an event that can be ordered, as the one super peer is handled as a normal peer for the consistency calculation.
 
+\subsubsection{Scalability}
+
+\subsubsection{Current implementations}
+
 \subsection{Overlay storage}
 \label{overlay_storage}
 
@@ -691,6 +718,9 @@ for example SHA-1 \cite{SHA}. The file, along with the ID are sent as a message 
 a closest match of the file ID, where the file is stored. If any nodes wishes to retrieve the file again, it only required the file hash. It can send
 a ``get'' message to the overlay, which will route the message to where the file is situated and retrieve the file. A great advantage of this storage
 technique is that the hash function is random, which ensures a good first order distribution of files over the complete key space.
+
+%Also discuss Oceanstore and maybe Freenet
+%Reference "A Survey of Peer-to-Peer Storage Techniques for Distributed File Systems" by Ragib Hasan, Zahid Anwar, William Yurcik, Larry Brumbaugh and Roy Campbell
 
 %Overlay storage - reason
 Overlay storage is a popular storage method, currently used by most P2P MMOG architectures. This is believed to be more as a consequence of the use
@@ -759,6 +789,10 @@ as additional load on nodes to serve as copies of files.
 Pure overlay storage is very fair, as all nodes share file data and requests equally. Is is also reliable when adequate redundancy is built into the
 system.
 
+\subsubsection{Scalability}
+
+\subsubsection{Current implementations}
+
 \subsection{Hybrid region-based storage}
 
 %Overlay storage - description
@@ -787,6 +821,21 @@ The hybrid region-based overlay storage contains many improvements over pure ove
 reliable as pure overlay storage, but that is where the similarities end. Because all regional files are cached at super peers, the system is very
 responsive. The use of super peers also allows for strict event ordering to be implemented, which ensures data consistency. The only two issues are
 fairness and security, which are the same as for the super peer storage model.
+
+\subsubsection{Reliability}
+\label{hybrid_storage_reliability}
+
+\subsubsection{Responsiveness}
+
+\subsubsection{Consistency}
+
+\subsubsection{Security}
+
+\subsubsection{Fairness}
+
+\subsubsection{Scalability}
+
+\subsubsection{Current implementations}
 
 \subsection{Distance-based storage}
 
@@ -834,35 +883,61 @@ As with super peer storage, peers using distance based storage act as the hosts 
 certain object should be sent to that object's host. This ensures that for any object, there is only one authoritative host, which ensures
 serialisability. Issues may, however, occur when an object is being transferred from one peer to another.
 
+\subsubsection{Scalability}
 
-\section{Evaluation Criteria}
-\label{eval_crit}
+\subsubsection{Current implementations}
+
+\subsection{Evaluation Criteria} \label{eval_crit}
 
 In order to evaluate any consistency model, metrics have to be defined to measure the key consistency challenges, as described in Section
 \ref{key_challenges_cm}. This will allow for different consistency models to be compared and provide a measure of the applicability of any
 consistency model to P2P MMOGs.
 
-To evaluate \emph{Consistency} is to evaluate how well the game state remains consistent between peers. For the game state to be consistent, all game
-objects should be consistent. What can be measured is the differences between root and replica objects. Root objects are those objects that represent
-part of the global game state and replica objects are local objects used to display the game state at the client side. When an update is sent to a
-root object, the changes to the root object should be reflected in all replica objects. The appearance of a root object should also be the same for
-all peers. Any peer querying a root object should receive the same object. This can be tested by querying root objects and updating these objects as
-they are queried. What should be tested is how long it takes for an object's appearance to update, after an update has been submitted by some node.
+\subsubsection{Consistency}
+\emph{Consistency} determines how well the game state remains consistent between peers. For the game state to be consistent, all game objects should
+be consistent. What can be measured is the differences between root and replica objects. Root objects are those objects that represent part of the
+global game state and replica objects are local objects used to display the game state at the client side.
 
-To measure \emph{Fairness}, the distribution of game state amongst all nodes in the P2P network should be measured. This can be measured at a file
+When an update is sent to a root object, the changes to the root object should be reflected in all replica objects. The appearance of a root object
+should also be the same for all peers. Any peer querying a root object should receive the same object. This can be tested by querying root objects
+and updating these objects as they are queried. What should be tested is how long it takes for an object's appearance to update, after an update has
+been submitted by some node.
+
+\subsubsection{Fairness}
+\emph{Fairness} can be evaluated by evaluating the distribution of game state amongst all nodes in the P2P network. This can be measured at a file
 level, i.e. what is the variance of the number of files contained on each node, or on byte level, i.e. what is the variance of the number of bytes
 stored on each node. A lower variance will point to a fairer data persistency scheme.
 
+\subsubsection{Reliability}
 \emph{Reliability} encompasses both robustness and availability. Robustness means that the data should be resilient to nodes leaving the network and
 availability means that data should be available to any node in the network, with the correct permissions. To measure robustness, nodes have to leave
-the network at different rates and the loss of storage for different rates of churn have to be measured. It can then be determined what the churn
-threshold is for the network, to maintain all data at a certain rate of churn. This will be a function of the number of redundant objects in the
-storage system, as reliability can usually be increased with increased redundancy. What should be measured is how well the system performs for a
-specific number of replicas used.
+the network at different rates and the loss of storage for different rates of churn have to be measured.
 
+It can then be determined what the churn threshold is for the network, to maintain all data at a certain rate of churn. This will be a function of
+the number of redundant objects in the storage system, as reliability can usually be increased with increased redundancy. What should be measured is
+how well the system performs for a specific number of replicas used.
+
+\subsubsection{Responsiveness}
 \emph{Responsiveness} can be measured by the time it takes for an object to be available for reading, anywhere in the network, after having been
 written. How long it takes to read or write data to the storage network can also be measured.
 
+\subsubsection{Scalability}
+\emph{Scalability} has been said to underpin all other evaluation criteria. This implies that for a system to be scalable, all other evaluation
+criteria should be measured for very large numbers of nodes. The question of what constitutes a large number of nodes arises. To determine an
+adequate number of nodes, current MMOG architectures can be evaluated.
+
+It is put forward that to classify a system as \emph{sufficiently scalable}, the smallest number of peers that should be used is approximately 3000.
+This is the number of players per server, currently supported by most active C/S MMOG \cite{}. For a system to be classified as \emph{truly
+scalable}, it is believed that the architecture should support 60,000 concurrent users, twenty times more than a sufficiently scalable system. This
+is the number of peak concurrent users (PCUs) currently supported by the super computer used to host Eve Online \cite{eve_pcu}. These two measures
+will ensure that a system is as scalable as other currently available architectures.
+
+For systems that will support the MMOGs of the future, it is believed that a target of 1 million should be used. This number is sixteen times that of
+a truly scalable system and the peak concurrent player count of World of Warcraft in China in 2008 \cite{WoW_china_pcu}. Systems that will support
+these numbers can be classified as \emph{highly scalable}. It is important to note that no current game supports this PCU count on a single server.
+The PCU count presented for WoW spans multiple server clusters.
+
+\subsubsection{Security}
 \emph{Security} is the combination of a number of objectives. These are: Authentication, Authorisation, Data Integrity, Confidentiality,
 Availability, Trust, Privacy and Identity Management \cite{distributed_systems_security}. When comparing different consistency techniques, it should
 first be established which of these objectives does the scheme address. The number of objectives addressed, if addressed in industry standard ways,
@@ -871,7 +946,7 @@ possibly, the modification of data packets by malicious nodes in the network. No
 of the data under these circumstances can be measured by the time it takes to rebuild a file under different rates of packet drops or delays.
 
 
-\section{Conclusion}
+\section{Conclusions and future work}
 
 
 After providing an overview of the classic C/S and C/MS state persistency techniques, this survey classified P2P MMOG state persistency techniques
@@ -882,8 +957,10 @@ This survey was written, because of an identified need for a concise summary of 
 the past were used because of the ease with which they could be integrated into a P2P MMOG. The purpose of this survey is to identify those
 techniques and to stimulate further research, using empirical methods to compare the different storage techniques used.
 
-\newpage
-\IEEEtriggeratref{18} %Balance the bibliography
+%Add future work
+
+%\newpage
+%\IEEEtriggeratref{17} %Balance the bibliography
 \bibliographystyle{IEEEtran}
 \bibliography{../BibTeX/P2P_MMOG}
 
