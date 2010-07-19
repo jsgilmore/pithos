@@ -575,11 +575,30 @@ actions while the data are in transit.
 \label{p2p_mmog_cm_overview}
 
 %Overview of three approaches
-Very little work has been done on state persistency for P2P MMOGs. Generally three approaches have been identified for state persistency: super peer
-storage \cite{knutsson_p2p_first}, overlay storage \cite{Douglas05enablingmassively}, \cite{using_freenet_storage}, \cite{Fan_phd},
-\cite{past_storage_focus} and distance-based storage \cite{Buyukkaya_voronoi_state_management}, \cite{Hu_voronoi_IM}, \cite{colyseus_distance_based},
-\cite{AtoZ}. Hybrid techniques, distinguishing permanent data from ephemeral data have also been proposed \cite{zoned_federation},
-\cite{hybrid_storage1}.
+Very little work has been done on state persistency for P2P MMOGs. Generally three approaches have been identified to achieve state persistency:
+\emph{super peer storage} \cite{knutsson_p2p_first}, \emph{overlay storage} \cite{Douglas05enablingmassively}, \cite{using_freenet_storage},
+\cite{Fan_phd}, \cite{past_storage_focus}, \emph{distance-based storage} \cite{Buyukkaya_voronoi_state_management}, \cite{Hu_voronoi_IM},
+\cite{colyseus_distance_based}, \cite{AtoZ} and \emph{Hybrid storage} \cite{zoned_federation}, \cite{hybrid_storage1}. These four storage
+architectures are detailed in Sections \ref{super_peer_storage}, \ref{overlay_storage}, \ref{hybrid_storage} and \ref{distance_based_storage}.
+
+%Individual storage
+Two other types of storage sometimes described in P2P MMOGs papers are \emph{centralised storage} \cite{badumna_engine},
+\cite{rooney_centralised_storage}, \cite{hybrid_p2p_cs_centralised} and \emph{individual storage} \cite{individual_storage1},
+\cite{cheat_proof_playout}. Centralised storage is storage in a centralised database, the same as for a C/S MMOG. Centralised storage for a MMOG
+requires the same large expensive servers and high bandwidth amounts, required by a classic C/S architecture and therefore does not fit into the P2P
+MMOG paradigm. For this reason, centralised storage will not be evaluated in this paper. Also, in the P2P MMOG papers that use centralised storage,
+no motivation is given for using this storage. These papers focus more on interest management, event dissemination or security, and one can only
+assume that the use of centralised storage is more out of convenance than any real consideration of its function in the P2P system.
+
+%Centralised storage
+The same assumption can be made of individual storage. With individual storage, player data is stored on a player's own computer. In these
+architectures, no thought is given to the storage of NPC state or mutable objects. These objects cannot be as easily mapped to a single node in the
+network as player state can, and therefore require a mapping mechanism to decide where to host these objects. Another issue with individual storage
+is that of security. If all information about a player's character is hosted on that player's computer, there exists significant incentive for
+cheating. It would be possible for a malicious user to gain access to his own data and manipulate that data for self benefit. For example: to give
+himself more experience, health or mana than what he should possess, or to provide him with more powerful items than what he already possesses. For
+these reasons, individual storage will not be explicitly discussed in this survey, however, individual storage can be regarded as a subset of
+distance-based storage, which will be discussed in detail.
 
 \begin{table*}[htbp]
 \centering
@@ -596,10 +615,10 @@ Distance-based & Low & High & Low & High & High\\
 \caption{Differences between storage mechanisms} \label{tab_storage}
 \end{table*}
 %
-Table \ref{tab_storage} presents a summary of how current storage systems handle the five key issues identified. From this table it can be seen that
-no one storage mechanism has fully addressed all the identified issues. What is also shown is that architectures that differentiate between different
-types of data, are theoretically better suited to the MMOG application. The example of such an architecture is the hybrid architecture, which also
-seems to fare best, when compared to other storage techniques.
+Table \ref{tab_storage} presents a characterisation of current storage systems according to the characteristics defined in Section
+\ref{key_challenges_cm}. From this table it can be seen that no one storage mechanism has fully addressed all the identified issues. What is also
+shown is that architectures that differentiate between different types of data, are theoretically better suited to the MMOG application. The example
+of such an architecture is the hybrid architecture, which also seems to fare best, when compared to other storage techniques.
 
 \subsection{Characteristics}
 \label{key_challenges_cm}
@@ -632,23 +651,15 @@ fairness and consistency.
     This is because the player not in the tower does not have to know about the damsel. From these two examples, the reason for state persistency
     based on perception, rather than reality is shown.
 
-\emph{Scalability:} Key to the storage of data in a P2P MMOG is that the storage architecture is scalable. This requirement actually underpins all
-other requirements in that scalability specifies that the system should remain reliable, responsive, secure, fair and consistent for any number of
-peers in the network. Scalability is a key requirement of MMOGs, since very large player volumes have to be catered for.
-
-%TODO: Perhaps also add centralised storage as storage type
-%TODO: Individual storage can also be mentioned, where players store their own data (no mention is usually made of NPCs and other objects)
-
-
 All state persistency models will be reviewed with these issues in mind.
 
 \subsection{Super peer storage}
+\label{super_peer_storage}
 
 %Super peer storage - description
-Super peer storage relies on the super peer storing all relevant information in its domain. An example of this is in \cite{knutsson_p2p_first}, where
-the world is segmented into regions and super peers act as regional servers to all peers in their region. Each super peer handles all game logic and
-distributes updates to all peers in its region. The super peer also handles state persistency for its region, hosting NPCs, objects and persistent
-player data.
+Super peer storage relies on the super peer storing all relevant information in its domain. A domain is usually created by segmenting the world into
+regions and super peers act as regional servers to all peers in their region. Each super peer handles all game logic and distributes updates to all
+peers in its region. The super peer also handles state persistency for its region, hosting NPCs, objects and persistent player data.
 
 \begin{figure*}[htbp]
  \centering
@@ -678,11 +689,9 @@ they might have to pay for.
 Another issue is reliability. In a P2P system, with a high rate of churn, players are expected to constantly leave and join the network. Because of
 this reality, redundancy mechanisms have to be developed that would ensure state data are always available, even when a super node leaves the
 network. It is possible to solve these issues by having redundant super peers in each region that take over hosting responsibility when the main
-super peer leaves. One method by which redundant region coordinators are maintained in \cite{knutsson_p2p_first}, is to create backup coordinators on
-peers with IDs closest to the current coordinator. This means that if the main coordinator fails, all data will automatically be routed to the
-backup, because of the feature of DHTs. It is important that the main and backup super peers always posses consistent states, even during a
-transition from main to backup. Other schemes to support improved reliability deal with reputation mechanisms for super peers. Super peers that have
-more resources and stay in the network longer are preferred during super peer selection, using reputation mechanisms \cite{fan_mediator_paper}.
+super peer leaves. It is important that the main and backup super peers always posses consistent states, even during a transition from main to
+backup. Other schemes to support improved reliability deal with reputation mechanisms for super peers. Super peers that have more resources and stay
+in the network longer are preferred during super peer selection, using reputation mechanisms \cite{fan_mediator_paper}.
 
 \subsubsection{Security}
 The third, and probably most important issue is that of security. If a single peer is allowed to house the player information of a large group of
@@ -705,9 +714,20 @@ Super peer storage is always consistent, because event ordering is handled by a 
 boundaries, the super peer of the region in which the event was triggered will send a message to the super peer in the region affected by the event.
 This is also an event that can be ordered, as the one super peer is handled as a normal peer for the consistency calculation.
 
-\subsubsection{Scalability}
-
 \subsubsection{Current implementations}
+
+Knuttson et al. \cite{knutsson_p2p_first} employ regional coordinators to host all shared object states. The coordinator is chosen as the node whose
+ID is closest to that of the region ID. The region ID is a SHA-1 hash of the regions textual name. This mapping makes it unlikely that the
+coordinator will be a member of the region. The advantages of such a selection scheme is that the opportunities for cheating are reduced, because the
+data are hosted on a pear that has no or little interest in the data, as described in Section \ref{distance_based_storage_security}. Coordinator
+hand-offs are also less than if the coordinator was an elected member of the region. If this is the case, a new coordinator has to be chosen every
+time the current coordinator leaves the region. In this scheme, hand-offs only occur as a result of network churn, which is far lower than the number
+of players moving from one region to another.
+
+Reliability is achieved by maintaining backup coordinators as the DHT neighbours of each region coordinator. One method by which redundant region
+coordinators are maintained in \cite{knutsson_p2p_first}, is to create backup coordinators on peers with IDs closest to the current coordinator. This
+means that if the main coordinator fails, all data will automatically be routed to the backup, because of the feature of DHTs. This method is similar
+to how reliability is achieved in overlay storage as described in Section \ref{overlay_storage_reliability}.
 
 \subsection{Overlay storage}
 \label{overlay_storage}
@@ -789,11 +809,21 @@ as additional load on nodes to serve as copies of files.
 Pure overlay storage is very fair, as all nodes share file data and requests equally. Is is also reliable when adequate redundancy is built into the
 system.
 
-\subsubsection{Scalability}
-
 \subsubsection{Current implementations}
 
+%Merabi, 2004 \cite{using_freenet_storage}
+In 2004, Merabti and El Rhalibi mention the issue of ``Data Storage'' \cite{using_freenet_storage}. It is recognised that a distributed storage
+scheme is required and that such a scheme ``\ldots requires careful designing\ldots''. The use of a data storage architecture based on the Freenet
+project is proposed \cite{clarke_freenet}. Freenet is a distributed storage facility that uses a Darknet to ensure user anonymity when distributing
+files. %Comment of whether this is an applicable solution? How to say this that it sounds like I'm saying it and not that author?
+
+%Douglas, 2005 \cite{Douglas05enablingmassively}
+%Hampel, 2006 \cite{past_storage_focus}
+%Fan, 2009 \cite{Fan_phd}
+
+
 \subsection{Hybrid region-based storage}
+\label{hybrid_storage}
 
 %Overlay storage - description
 \begin{figure*}[htbp]
@@ -833,11 +863,31 @@ fairness and security, which are the same as for the super peer storage model.
 
 \subsubsection{Fairness}
 
-\subsubsection{Scalability}
-
 \subsubsection{Current implementations}
 
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=2cm 0cm 19cm 30cm, angle=-90, width=\columnwidth]{zoned_federation_model}
+ \caption{Zoned Federation Model \cite{zoned_federation}}
+ \label{fig_zoned_federation_model}
+\end{figure}
+%
+The first hybrid state persistency model for P2P MMOGs was proposed by Iimura et al. in 2004 \cite{zoned_federation} and called the ``Zoned
+Federation Model'', shown in Figure \ref{fig_zoned_federation_model}. The regional super peers are called ``Zone Owners'', which handle all events by
+clients in their zone or region. In the Zoned Federation model, a Zone Owner acts as the primary storage medium for all object states in the zone or
+region. As shown in Figure \ref{fig_cs_region_o_cm}, this is analogous to an update based model, divided into zones. The difference here is that the
+game state of all zone owners are regularly backed-up to overlay storage. The zoned federation model can thus be seen as a super peer - overlay
+storage hybrid. The super peers storage provides for low latency data storage and the overlay storage provides security and reliability.
+
+An extended abstract, published by GauthierDickey et al. in 2004 \cite{hybrid_storage1}, proposed to distinguish between permanent and ephemeral
+data. Permanent data are described as data that should exist at all times and ephemeral data are described as data that need only exist for as long
+as its owner is in the game. An item, being dropped by a dispatched NPC, can be considered as ephemeral. When the peer on which the data is hosted
+leaves the area, that item can disappear. An example of permanent data are a player's inventory contents, which can further be classified as
+participatory data or a player's house, which can be classified as existential data. Participatory data are data that need only be available when a
+specific player is in the game and existential data are data that should be available, even when a certain player is not present in the game.
+
 \subsection{Distance-based storage}
+\label{distance_based_storage}
 
 %Distance-based - overview
 Distance based approaches, such as the Voronoi storage approaches \cite{Buyukkaya_voronoi_state_management}, \cite{Hu_voronoi_IM} and also some more
@@ -867,6 +917,8 @@ Reliability is also an issue, because of network churn. When nodes leave the net
 Redundancy and added overlay storage can be implemented here to ensure reliability.
 
 \subsubsection{Security}
+\label{distance_based_storage_security}
+
 The main issue with the distance based scheme is security. Nodes that have the most interest in an object also have the most interest to manipulate
 that object in ways inconsistent with the game rules. When objects are hosted on nodes that have the most interest in them, there will be a strong
 drive to try and manipulate these objects. Because these modification are all local, it is also not possible to log the alterations and detect
@@ -883,15 +935,28 @@ As with super peer storage, peers using distance based storage act as the hosts 
 certain object should be sent to that object's host. This ensures that for any object, there is only one authoritative host, which ensures
 serialisability. Issues may, however, occur when an object is being transferred from one peer to another.
 
-\subsubsection{Scalability}
-
 \subsubsection{Current implementations}
 
 \subsection{Evaluation Criteria} \label{eval_crit}
 
-In order to evaluate any consistency model, metrics have to be defined to measure the key consistency challenges, as described in Section
-\ref{key_challenges_cm}. This will allow for different consistency models to be compared and provide a measure of the applicability of any
-consistency model to P2P MMOGs.
+In order to evaluate any consistency model, metrics have to be defined to measure the key characteristics of a storage system, as described in
+Section \ref{key_challenges_cm}. This will allow for different consistency models to be compared and provide a measure of the applicability of any
+consistency model to P2P MMOGs. Such metrics could also show the performance of one storage architecture, compared to another.
+
+Scalability underpins all evaluation criteria. This implies that for a system to be scalable, all other evaluation criteria should be measured for
+very large numbers of nodes and data. The question of what constitutes a large number of nodes arises. To establish what an adequate number of nodes
+is, current MMOG architectures can be used for inspiration.
+
+It is put forward that to classify a system as \emph{sufficiently scalable}, the smallest number of peers that should be used is approximately 3000.
+This is the number of players per server, currently supported by most active C/S MMOG \cite{}. For a system to be classified as \emph{truly
+scalable}, it is believed that the architecture should support 60,000 concurrent users, twenty times more than a sufficiently scalable system. This
+is the number of peak concurrent users (PCUs) currently supported by the super computer used to host Eve Online in 2010 \cite{eve_pcu}. These two
+measures will ensure that a system is as scalable as other currently available architectures.
+
+For systems that will support the MMOGs of the future, it is believed that a target of 1 million nodes should be used. This number is sixteen times
+that of a truly scalable system and the peak concurrent player count of World of Warcraft in China in 2008 \cite{WoW_china_pcu}. Systems that will
+support these numbers can be classified as \emph{highly scalable}. It is important to note that no current systems support such a large PCU count on
+a single server cluster. The PCU count presented for WoW is the PCU count over all server clusters hosting WoW in China.
 
 \subsubsection{Consistency}
 \emph{Consistency} determines how well the game state remains consistent between peers. For the game state to be consistent, all game objects should
@@ -921,22 +986,6 @@ how well the system performs for a specific number of replicas used.
 \emph{Responsiveness} can be measured by the time it takes for an object to be available for reading, anywhere in the network, after having been
 written. How long it takes to read or write data to the storage network can also be measured.
 
-\subsubsection{Scalability}
-\emph{Scalability} has been said to underpin all other evaluation criteria. This implies that for a system to be scalable, all other evaluation
-criteria should be measured for very large numbers of nodes. The question of what constitutes a large number of nodes arises. To determine an
-adequate number of nodes, current MMOG architectures can be evaluated.
-
-It is put forward that to classify a system as \emph{sufficiently scalable}, the smallest number of peers that should be used is approximately 3000.
-This is the number of players per server, currently supported by most active C/S MMOG \cite{}. For a system to be classified as \emph{truly
-scalable}, it is believed that the architecture should support 60,000 concurrent users, twenty times more than a sufficiently scalable system. This
-is the number of peak concurrent users (PCUs) currently supported by the super computer used to host Eve Online \cite{eve_pcu}. These two measures
-will ensure that a system is as scalable as other currently available architectures.
-
-For systems that will support the MMOGs of the future, it is believed that a target of 1 million should be used. This number is sixteen times that of
-a truly scalable system and the peak concurrent player count of World of Warcraft in China in 2008 \cite{WoW_china_pcu}. Systems that will support
-these numbers can be classified as \emph{highly scalable}. It is important to note that no current game supports this PCU count on a single server.
-The PCU count presented for WoW spans multiple server clusters.
-
 \subsubsection{Security}
 \emph{Security} is the combination of a number of objectives. These are: Authentication, Authorisation, Data Integrity, Confidentiality,
 Availability, Trust, Privacy and Identity Management \cite{distributed_systems_security}. When comparing different consistency techniques, it should
@@ -945,6 +994,7 @@ is already a measure of the security of the system. Data integrity can be tested
 possibly, the modification of data packets by malicious nodes in the network. Nodes can be programmed to randomly drop packets and the availability
 of the data under these circumstances can be measured by the time it takes to rebuild a file under different rates of packet drops or delays.
 
+\subsection{Object distribution}
 
 \section{Conclusions and future work}
 
