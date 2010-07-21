@@ -686,6 +686,8 @@ donate these resources for the good of all. Players might consider it unfair, wh
 they might have to pay for.
 
 \subsubsection{Reliability}
+\label{super_peer_storage_reliability}
+
 Another issue is reliability. In a P2P system, with a high rate of churn, players are expected to constantly leave and join the network. Because of
 this reality, redundancy mechanisms have to be developed that would ensure state data are always available, even when a super node leaves the
 network. It is possible to solve these issues by having redundant super peers in each region that take over hosting responsibility when the main
@@ -714,7 +716,7 @@ Super peer storage is always consistent, because event ordering is handled by a 
 boundaries, the super peer of the region in which the event was triggered will send a message to the super peer in the region affected by the event.
 This is also an event that can be ordered, as the one super peer is handled as a normal peer for the consistency calculation.
 
-\subsubsection{Current implementations}
+\subsubsection{Existing architectures}
 
 Knuttson et al. \cite{knutsson_p2p_first} employ regional coordinators to host all shared object states. The coordinator is chosen as the node whose
 ID is closest to that of the region ID. The region ID is a SHA-1 hash of the regions textual name. This mapping makes it unlikely that the
@@ -790,36 +792,57 @@ used in the presented experiment. The number of 50,000 nodes is based on the num
 fiction MMORPG \cite{eve_pcu}. It is also important to note that these hops are Pastry overlay hops and not Internet Protocol (IP) level hops. One
 Pastry hop can contain a multitude of IP level hops, depending on the organisation of the overlay network.
 
-%Data migration
+%Data migration in Oceanstore
 
 \subsubsection{Consistency}
-Different types of overlays have different advantages and disadvantages. A pure overlay-based storage scheme performs very badly. The scheme is
-inconsistent, because there is no way to synchronise the order of events amongst nodes, which leads to inconsistent states.
+
+A pure overlay-based storage scheme performs very badly. The scheme is inconsistent, because there is no way to synchronise the order of events
+amongst peers, which leads to inconsistent states. Different peers may receive events from other peers in different orders. Events that are not
+received in order can cause inconsistent state updates. If these state updates are then committed to the overlay, different peers may commit
+different updates. To ensure consistency in overlay storage, it is therefore important that only one peer has authoritive control over any object or
+that a mechanism is in place to ensure correct event ordering.
 
 \subsubsection{Security}
 This model does have better security than the super peer storage model as data are distributed amongst all peers and redundancy and quorum techniques
-can be implemented to ensure that files are retrieved with a high level of security. Why the security is rated as average is not because a real lack
-of security, but because of the network overhead, which a secure system introduces.
+can be implemented to ensure that files are retrieved with a high level of security.
 
 To ensure a secure system, copies of files have to be saved at different locations. If a file is retrieved, all copies must be queried and received.
-All received copies then have to be compared to ensure that the contents are correct. This introduces significant additional network overhead as well
-as additional load on nodes to serve as copies of files.
+All received copies then have to be compared to ensure that the contents are correct. This introduces additional network overhead as well as
+additional load on nodes to serve as copies of files.
+
+The network overhead can, however, be reduced by having file replica nodes only send hashes of the files, which may then be compared at the
+requesting node. Hashes require much less bandwidth, while still allowing a requesting node to check update validity by hashing the received update
+and comparing with the received hashes.
 
 \subsubsection{Fairness}
-Pure overlay storage is very fair, as all nodes share file data and requests equally. Is is also reliable when adequate redundancy is built into the
-system.
 
-\subsubsection{Current implementations}
+Overlay storage is fair, as all nodes share file data and requests equally. The system might be made fairer by taking into account the heterogeneity
+of peers. Peers do not all possess the same amount of resources, something which a truly fair system should take into account. The difficulty with
+using such a scheme is that peers can be made to report incorrect resource information in order to reduce their resource donation requirement. This
+is where incentive mechanisms have to be investigated as well as ways to ensure correct resource reporting.
+
+\subsubsection{Existing architectures}
 
 %Merabi, 2004 \cite{using_freenet_storage}
 In 2004, Merabti and El Rhalibi mention the issue of ``Data Storage'' \cite{using_freenet_storage}. It is recognised that a distributed storage
 scheme is required and that such a scheme ``\ldots requires careful designing\ldots''. The use of a data storage architecture based on the Freenet
 project is proposed \cite{clarke_freenet}. Freenet is a distributed storage facility that uses a Darknet to ensure user anonymity when distributing
-files. %Comment of whether this is an applicable solution? How to say this that it sounds like I'm saying it and not that author?
+files. A system such as Freenet is designed for general file sharing, which means that no focus is placed on achieving the high levels of
+responsiveness required for MMOGs.
 
 %Douglas, 2005 \cite{Douglas05enablingmassively}
+Douglas et al. designed a P2P MMOG architecture in 2005 \cite{Douglas05enablingmassively} and implemented state persistency using a distributed
+storage implementation, which they developed in 2003 \cite{Harwood03hashingspatial}. The storage system allows for the manipulation of spatial data,
+while also implementing range queries. This enables the system to store and retrieve data that exist in a certain area of the game world. In the MMOG
+architecture they developed, state persistency is implemented by the ``Spatial Data Service'' (SDS), which is a distributed storage architecture that
+uses the Chord P2P overlay for routing \cite{chord}.
+
 %Hampel, 2006 \cite{past_storage_focus}
-%Fan, 2009 \cite{Fan_phd}
+Recently, PAST has become a popular way to implement state persistency. This is the approach proposed by both Hampel et al. in 2006
+\cite{past_storage_focus} as well as Fan in 2009 \cite{Fan_phd}. In both of these publications, it is said that PAST is used to store the global game
+state, but never is detailed what is stored and how regularly it is stored. Player information is supposed to be stored as game state, by from the
+papers it is unclear how position updates are handled. It is not clear whether the last position of a player is stored at all or how regularly it is
+stored. It is important to know how position updates are handled in the game, as position updates are the most common type \cite{knutsson_p2p_first}.
 
 
 \subsection{Hybrid region-based storage}
@@ -833,37 +856,49 @@ files. %Comment of whether this is an applicable solution? How to say this that 
  \label{fig_cs_region_o_cm}
 \end{figure*}
 %
- Figure \ref{fig_cs_region_o_cm} actually shows a type of Super Peer/Overlay hybrid storage implemented in \cite{zoned_federation}, but the
-basic principles remain the same. The model depicted in Figure \ref{fig_cs_region_o_cm}, uses an overlay storage managed by regional super peers. The
-reason for this management is to achieve state consistency. Although game state is always consistent in overlay storage, because of the inherent
-consistency of DHTs, issues of serialisability can still occur \cite{zoned_federation}. In order for game states to remain consistent, events should
-be serialisable. In the context of state consistency, this means that the order in which events are received at any peer, should be the same. This
-cannot be ensured in this case, because there is no central entity that orders events and an update-based model is not used. If the order in which
-events are processed are not the same, state inconsistencies may arise.
-
-The world is divided into regions and so data stored for one region will have no effect on the sate of other regions. This can of course be debated,
-but for global specific data a global ``region'' can be created. Super peers then act as servers that use their section of the overlay as their own
-storage databases. Data consistency may be assured as all access to a region's data is controlled by that region's super peer. The Zoned Federation
-model further uses local caching at super peers to achieve real-time access to data. Overlay storage is used as a backup mechanism to achieve data
-persistency and redundancy.
-
-The hybrid region-based overlay storage contains many improvements over pure overlay storage. It is just as
-reliable as pure overlay storage, but that is where the similarities end. Because all regional files are cached at super peers, the system is very
-responsive. The use of super peers also allows for strict event ordering to be implemented, which ensures data consistency. The only two issues are
-fairness and security, which are the same as for the super peer storage model.
+Figure \ref{fig_cs_region_o_cm} shows a type of Super Peer/Overlay hybrid storage implemented in \cite{zoned_federation}. The model depicted in
+Figure \ref{fig_cs_region_o_cm} uses an overlay storage, managed by regional super peers. The world is divided into regions, with each region
+controlled by a super peer. The complete region state is cached at every super peer as for super peer storage. There also exists a backup overlay
+storage architecture, to which data may be backed up for long term, redundant and secure storage. The hybrid region-based overlay storage contains
+many improvements over pure overlay storage.
 
 \subsubsection{Reliability}
 \label{hybrid_storage_reliability}
 
+Because of the use of overlay storage for backup, the hybrid region-based storage is almost as reliable as a pure overlay storage. It is classified
+as almost as reliable, because there exists a time lag between when data changes and when it is updated in the overlay. If a super peer fails during
+this time and the data was not backed-up to the overlay, that data could be lost. Backup super peers can, however, be implemented as described in
+Section \ref{super_peer_storage_reliability} to further improve the reliability of the hybrid storage model.
+
 \subsubsection{Responsiveness}
+
+Because all regional files are cached at super peers, the system is as responsive as super peer storage.
 
 \subsubsection{Consistency}
 
+Although game state is always consistent in overlay storage, because of the inherent consistency of DHTs, issues of serialisability can still occur
+\cite{zoned_federation}. In order for game states to remain consistent, events should be serialisable. In the context of state consistency, this
+means that the order in which events are received at any peer, should be the same. This cannot be ensured for overlay storage, because there is no
+central entity that orders events and an update-based model is not used. If the order in which events are processed are not the same, state
+inconsistencies may arise.
+
+In super peer storage, the world is divided into regions and so data stored for one region will have no effect on the sate of other regions. This can
+of course be debated, but for global specific data a global ``region'' can be created. Super peers then act as servers that use their section of the
+overlay as their own storage databases. Data consistency may be assured as all access to a region's data is controlled by that region's super peer.
+
 \subsubsection{Security}
+
+Security in hybrid storage is still an issue, because of the inherent problems of the super peer storage model. Although it is more difficult for
+nodes to access and manipulate data stored in the overlay, a malicious node promoted to super peer status may manipulate the region data it controls.
 
 \subsubsection{Fairness}
 
-\subsubsection{Current implementations}
+The issue of unfairness is also still present in hybrid storage. The system is fairer in that all nodes share the load of the overlay storage, but
+there still exists the unfairness of the super peer storage. As all data exists in both the overlay storage as well as the super peer storage, the
+system is as unfair as super peer storage, because the same amount of data as in super peer storage is not being distributed evenly amongst all
+nodes.
+
+\subsubsection{Existing architectures}
 
 \begin{figure}[htbp]
  \centering
@@ -935,7 +970,14 @@ As with super peer storage, peers using distance based storage act as the hosts 
 certain object should be sent to that object's host. This ensures that for any object, there is only one authoritative host, which ensures
 serialisability. Issues may, however, occur when an object is being transferred from one peer to another.
 
-\subsubsection{Current implementations}
+\subsubsection{Existing architectures}
+
+%Colyseus, 2006
+Bharambe et al. in 2006 created the Colyseus architecture.
+
+%Buyukkaya, 2008
+
+%Hu, 2008
 
 \subsection{Evaluation Criteria} \label{eval_crit}
 
