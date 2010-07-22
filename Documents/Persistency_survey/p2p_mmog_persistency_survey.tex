@@ -973,11 +973,35 @@ serialisability. Issues may, however, occur when an object is being transferred 
 \subsubsection{Existing architectures}
 
 %Colyseus, 2006
-Bharambe et al. in 2006 created the Colyseus architecture.
+Bharambe et al. created the Colyseus architecture in 2006 \cite{colyseus_distance_based}. The architecture is designed to support First Person
+Shooter (FPS) games and implemented to function with Quake II. Mutable game objects are stored on the peer that is nearest to the object in the game
+world. An ``object placer'' component is mentioned, but the details of the placement algorithm are left for future work. The architecture also does
+not implement state persistency, since this is not required for normal FPS games, where object states need only exist to the end of a round and where
+players generally do not leave before the end of the round. Even without the explicit implementation of state persistency, this architecture contains
+many blueprints for how P2P MMOGs can be developed with distributed state persistency.
 
-%Buyukkaya, 2008
+%Buyukkaya and Abdallah, 2008
+%Hu et al., 2008
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[width=\columnwidth]{voronoi_diagram}
+ \caption{Voronoi Diagram \cite{Buyukkaya_voronoi_state_management}}
+ \label{fig_voronoi_diagram}
+\end{figure}
+%
+In 2008, papers were published by Buyukkaya and Abdallah \cite{Buyukkaya_voronoi_state_management}, and Hu et al. \cite{Hu_voronoi_IM}, proposing to
+use Voronoi diagrams \cite{voronoi_diagrams_survey} to implement distance-based storage. Given a set of points, the Voronoi diagram of the set of
+points is the partition of the plane, which associates a region around every point in such a way that all other points contained in the region are
+closer to the centre point than any other point in the set. Figure \ref{fig_voronoi_diagram} shows a Voronoi diagram, where the lines define the
+region boundaries, the dots define the set of points for which the diagram was calculated, the plus signs represent mutable objects and the circle
+represents the \ac{AoI} of a central point in the set.
 
-%Hu, 2008
+Voronoi state management schemes host the mutable objects on the peer in which region the object exists. As peers move around in the virtual world,
+the Voronoi diagram has to be constantly recalculated and objects have to be moved to new owner peers as the regions in which they fall change. The
+significant advantage of a Voronoi approach is that peers only require connections with their neighbours and peers within their AoI. The Voronoi
+diagram provides a scheme to distribute the game objects by. The issues of how regularly an object have to transferred and whether the number of
+transferrals produce sufficiently overhead to implement a real-time game, still have to be seen.
+
 
 \subsection{Evaluation Criteria} \label{eval_crit}
 
@@ -1038,7 +1062,7 @@ of the data under these circumstances can be measured by the time it takes to re
 
 \subsection{Object distribution}
 
-\section{Conclusions and future work}
+\section{Conclusions and challenges}
 
 
 After providing an overview of the classic C/S and C/MS state persistency techniques, this survey classified P2P MMOG state persistency techniques
@@ -1052,7 +1076,7 @@ techniques and to stimulate further research, using empirical methods to compare
 %Add future work
 
 %\newpage
-%\IEEEtriggeratref{17} %Balance the bibliography
+\IEEEtriggeratref{29} %Balance the bibliography
 \bibliographystyle{IEEEtran}
 \bibliography{../BibTeX/P2P_MMOG}
 
