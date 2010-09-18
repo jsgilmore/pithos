@@ -163,6 +163,8 @@
 %List of acronyms used in text
  \usepackage{acronym}%.......................... Acronym package to handle acronyms in text
 
+\usepackage{floatflt}% This is used to flow text around some figures.
+
 \acrodef{MMOG}{Massively Multiplayer Online Game}
 \acrodef{MMORPG}{Massively Multiplayer Online Role Playing Game}
 \acrodef{WoW}{World of Warcraft}
@@ -222,7 +224,64 @@ Overlay storage equally distributes game objects over all peer in the network, b
 evenly spread out, which means that the load is also evenly spread. The problem with this hosting scheme is that it incurs high latencies, because of
 the P2P overlay being created, which incurs a routing cost of $O(\log(n))$.
 
+Each of these methods to distribute and store objects have their own advantages and disadvantages. We are, however, looking at a completely new
+object hosting paradigm that would more naturally distribute game objects and allow for a two-tiered hybrid approach to game state persistency. This
+new paradigm is that of using player groups to distribute objects over. Player objects can then be shared amongst groups of players, instead of a
+single player, with added quorum (voting) mechanisms implemented in the group to ensure the integrity of the P2P system.
+
+We believe that building an MMOG based on groups will allow us to solve many issues related to, not only P2P MMOGs, but also Client/Server MMOGs. For
+the grouping paradigm to be successful, the hypothesis that players usually move in groups and interact with other players in groups should first be
+established.
+
 \section{Trace data requirements}
+
+With this grouping paradigm in mind, we would like to see how players move around in a virtual world. We would like to look at player density in
+different areas and try and determine whether groups of players can be programmatically extracted from the data. We would then like to see what
+average group sizes are, how quickly groups move and what the level of churn in groups is, i.e. how often players leave and enter groups.
+
+To be able to see this behaviour, we require player trace data for specific types of in-game areas, for certain numbers of players. What is
+diffinitly required from that data is:
+\begin{enumerate}
+\item That all players in the data set be uniquely identified.
+\item That it be possible to observe player movements over time.
+\end{enumerate}
+
+No detailed player information is currently required. Some player identifier is sufficient for the traces as the level and motivation for player
+movements will not currently be explored.
+
+The issue has been raised about how the amount of data collected could be decreased, so not as to introduce lag onto the server. Two proposed methods
+were to only select a random sub-set of the total number of players and another was to only record player positions every set number of trace steps.
+Other methods that might also be used to reduce server load is to only monitor players in a limited geographic area and only monitor them for as long
+as is required. It's difficult to give a clear cut answer to any of these questions, as one would prefer to have as detailed player data as possible.
+
+\subsection{Geographic limitation}
+
+\begin{floatingfigure}[l]{0.5\textwidth}
+\centering
+ \includegraphics[width=0.5\textwidth]{Player_density_expectations}
+ \caption{This figure shows the expected player density of players in a virtual world.}
+ \label{fig_player_density}
+\end{floatingfigure}
+%
+If we first look at limiting the geographic area, there are a few areas of interest where player behaviour might be different. This first area is
+that of an NPC questing area, where player receive quests in a city, perform these quests outside the city and then return to the city to complete
+quests and trade with NPC traders. The expected player density of this area is shown in Figure \ref{fig_player_density}. It is expected that a very
+high player density in the city will be present, with many players moving around, mostly on their own, to complete quests and trade.
+
+Outside the city, there are usually areas where quests can be done. These quests are usually in the form of kill $x$ number of NPC and return to the
+quest giver once this number of NPCs have been killed. These NPCs can usually be found in a very specific region near to where the quest was given.
+There are usually many quests to be done and many (sometimes overlapping) areas in which to complete these quests. We would like to monitor player
+movements in such a ``questing''. We would also like to monitor player movement in low and high level areas, to determine the difference in player
+behaviour in these areas. It is expected that higher level areas will show more player grouping, since teamwork is required to complete these areas.
+Some movement is also expected in areas between cities, by players travelling from one level area into another, higher or lower level, area.
+
+Other areas that are also of interest are Player versus Player (PvP) areas. Here, a strong element of grouping is also expected, with one or more
+groups in direct opposition to each other. The movement of one group in these areas, are expected to be very dependant on the movement of the
+opposition group.
+
+\subsection{Player limitation}
+
+\subsection{Trace step limitation}
 
 \section{Database access information}
 
