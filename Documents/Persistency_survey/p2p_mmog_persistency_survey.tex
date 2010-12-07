@@ -327,7 +327,7 @@ Interest Management determines how player actions are filtered to ensure that pl
 bandwidth requirements of the system. Game Event Dissemination entails how these events are then sent to various players. Security ensures that the
 system is not affected by the activity of malicious peers.
 
-Game State Persistency entails storing persistent game data in a distributed way over the the P2P network. Part of an MMOG is ensuring low latency,
+Game State Persistency entails storing persistent game data in a distributed fashion in the the P2P network. Part of an MMOG is ensuring low latency,
 consistent data persistency of all game data. Player data, in-game object states and \ac{NPC} states should all be stored.
 
 This paper classifies the techniques used in documented P2P MMOG architectures and discusses the advantages and disadvantages of the different types
@@ -335,12 +335,14 @@ of storage. To the best of our knowledge, such a classification, where a focus i
 undertaken in the literature. As the field of P2P MMOGs is a growing one, it is believed that a comprehensive survey of persistency techniques is
 required to act as a basis for further research into the field.
 
-The survey will first present an overview of classic models used in \ac{CS} and P2P multiplayer games, in order to compare the classic models with
-the models used in P2P MMOGs. P2P MMOG state persistency techniques are then classified in terms of the type of storage they provide and key
-characteristics are defined by which the performance of these storages may be measured. The three identified types of storage are then described and
-evaluated according to the key challenges, which is followed by a discussion of possible metrics by which the performance of a state persistency
-model might be measured.
+The survey will first introduce other surveys on the the topic of P2P overlay technologies and how these are different from this survey. After this,
+an overview of classic models used in \ac{CS} and P2P multiplayer games is presented, in order to compare the classic models with the models used in
+P2P MMOGs. P2P MMOG state persistency techniques are then classified in terms of the type of storage they provide and key characteristics are defined
+by which the performance of these storages may be measured. The three identified types of storage are then described and evaluated according to the
+key challenges, with references to the relevant work done in each field.
 
+Section \ref{related_work} introduces other surveys in the field of P2P overlays and compares the surveys presented with this survey.
+%
 Section \ref{classic_network_models} introduces the two most common network models used in P2P MMOGs. The classic consistency models later defined
 are based on the network models defined here, so an understanding of the advantages and disadvantages of each is essential.
 %
@@ -352,12 +354,44 @@ three storage approaches according to the identified challenges.
 Section \ref{eval_crit} attempts to define measurable metrics according to the key challenges to enable the comparison of the performance of
 different state persistency models.
 
+\section{Related work}
+\label{related_work}
+
+No papers were found that deal specifically with the issue of P2P state persistency in MMOGs, but some surveys were found that deal with other issues
+of P2P MMOGs, or P2P overlays in general.
+
+Krause presented ``A Case for Mutual Notification: A survey on P2P protocols for Massively Multiplayer Online Games.''
+\cite{IM_and_ED_survey_Krause}. The protocols discussed in this survey focussed on the areas of interest management and event dissemination. Three
+protocols were presented: ``Application Layer Multicast (ALM) based protocols'', ``Supernode based protocols'' and ``Mutual notification based
+protocols''. The first two protocols deal with region-based interest management techniques that employ supernodes, also called super peers, and ALM
+to achieve state consistency. The third protocol, which is presented as an alternative to region-based techniques, is a distance-based technique,
+making use of Voronoi diagrams to achieve state consistency.
+
+While the survey by Krause is also in the area of P2P MMOGs, it deals with the topics of interest management and event dissemination and not with the
+topic of state persistency. In other words, it explains how updates to objects may be sent to earlier versions of an object, but now how these
+objects may be stored.
+
+Webb and Soh presented ``A Survey on Network Game Cheats and P2P Solutions'' \cite{survey_p2p_game_cheats}. The paper introduces a cheat
+classification scheme, defining different ``levels'' of cheating, along with some examples of cheats in each level. For each example given, the
+authors also discuss possible solutions to these cheats. The difference then, between this paper and the survey paper presented by Webb and Soh, is
+that their papers deals with the security issues present in P2P games, while this paper deals with state persistency. In other words, their paper
+deals with securing the information stored in objects as well as securing updates made to objects, while this paper deals with storing those objects.
+
+Both of the previously mentioned articles deal with other issues present in P2P MMOGs, namely interest management, event dissemination and security.
+The paper by Amoretti: ``A Survey of Peer-to-Peer Overlay Schemes: Effectiveness, Efficiency and Security'', provides details of the broader area of
+P2P overlay schemes \cite{amoretti_p2p_overlay_schemes_survey}. The paper focuses on security issues present in P2P overlay schemes, while also
+introducing hybrid, unstructured and structured overlays and provides an extensive list of applications of the different schemes in different areas.
+
+Three areas present in Amoretti's survey and also related to this survey are: Content sharing, distributed storage and gaming. The content sharing
+technologies described in Amoretti's work are considered forms of overlay storage, further discussed in Section \ref{}. While Amoretti's survey gives
+a very broad description of P2P gaming in general and why it should be a viable alternative to a C/S system, this survey deals specifically with the
+area of P2P MMOGs and more specifically, with state persistency in P2P MMOGs.
 
 \section{Classic MMOG network models}
 \label{classic_network_models}
 
 The network model specifies how the different entities in the network communicate, where authority lies and whether a centralised or distributed
-approach is followed. The network model used, determines how the different nodes in the network interact and what the roles of these different nodes
+approach is followed. The network model used determines how the different nodes in the network interact and what the roles of these different nodes
 are. The consistency model used, is based on the network model, but determines how data are stored on the system as well as how root and duplicate
 objects are kept consistent. The consistency model, therefore, includes the state persistency model.
 
@@ -486,10 +520,9 @@ model, also called the event-based model \cite{p2p_cm_aoe}, and the \ac{CS}-base
 \label{classic_cs_event_based}
 
 \begin{figure*}[htbp]
-\centering
-\subfloat[Update-based (peer-to-peer)]{\label{fig_p2p_cm}
+\centering \subfloat[Event-based (peer-to-peer)]{\label{fig_p2p_cm}
 \includegraphics[clip=true, viewport= 2.5cm 0.5cm 19cm 15cm, width=\columnwidth]{CS_P2P_CMs}}
- \subfloat[Event-based (client/server)]{\label{fig_cs_cm}
+ \subfloat[Update-based (client/server)]{\label{fig_cs_cm}
 \includegraphics[clip=true, viewport= 2.5cm 15cm 19cm 30cm, width=\columnwidth]{CS_P2P_CMs}}
 \caption{Consistency models}
 \end{figure*}
@@ -520,7 +553,7 @@ sends updates to the clients, while also updating its own game state.
 This approach greatly assists with security, as clients cannot influence the state of any other clients and every client's state depends on updates
 received from the server. The server state is also termed authoritative, because if there is a conflict, the server state is always the state to
 which the system is expected to return. All the security advantages of the \ac{CS} model also apply to this consistency model. Another reason why the
-event based model is successful is because it is more scalable then the pure P2P model. More hardware can be used to build a more powerful server,
+update based model is successful is because it is more scalable then the pure P2P model. More hardware can be used to build a more powerful server,
 which can handle more clients. This is however very costly as discussed in Section \ref{client_server_network_model}.
 
 \subsection{Client/Multi-Server consistency models}
@@ -639,25 +672,67 @@ of such an architecture is the hybrid architecture, which also seems to fare bes
 \label{key_challenges_cm}
 
 %Consistency issues
-The key challenges related to P2P MMOG consistency models identified during this literature study were: reliability, responsiveness, security and
-fairness.
+The key challenges related to P2P MMOG consistency models identified during this literature study were: scalability, reliability, responsiveness,
+security and fairness. All state persistency models will be reviewed with these characteristics in mind. In order to evaluate any consistency model,
+metrics have to be defined to measure the key characteristics of a storage system. This will allow for different consistency models to be compared
+and provide a measure of the applicability of any consistency model to P2P MMOGs. Such metrics could also compare the performance of one storage
+architecture to another.
 
-\emph{Reliability:} For the storage to be reliable, it must not be possible for data to be lost, and stored data should always be available when a
-    node requests it.
+\subsubsection{Scalability}
+Scalability underpins all evaluation criteria. This implies that for a system to be scalable, all other evaluation criteria should be satisfied for
+very large numbers of nodes and data. The question of what constitutes a large number of nodes arises. To establish what an adequate number of nodes
+is, current MMOG architectures can be used for inspiration.
 
-\emph{Responsiveness:} To ensure system responsiveness, data must be stored or retrieved in real-time. With real-time, it is meant that data
-    should be available within a certain time frame that would ensure correct functionality of the MMOG requiring it. The variance in times when
-    data become available should also be small.
+It is put proposed that to classify a system as \emph{sufficiently scalable}, the smallest number of peers that should be used is approximately 3000.
+This is the number of players per server, currently supported by most active C/S MMOGs. For a system to be classified as \emph{truly scalable}, it is
+believed that the architecture should support 60,000 concurrent users, twenty times more than a sufficiently scalable system. This is the number of
+peak concurrent users (PCUs) currently supported by the super computer used to host Eve Online \cite{eve_pcu}. These two measures will ensure that a
+system is as scalable as other currently available architectures.
 
-\emph{Security:} The storing system should store data securely. It should not be possible for data to be altered in ways that are inconsistent
-    with the game rules. It should also be possible to identify nodes that alter the data in a malicious way. This also adds the requirement
-    that nodes should be authenticated in the storage system and that only authorised nodes should be able to alter data.
+For systems that will support the MMOGs of the future, it is believed that a target of 1 million nodes should be used. This number is sixteen times
+that of a truly scalable system and the peak concurrent player count of World of Warcraft in China in 2008 \cite{WoW_china_pcu}. Systems that will
+support these numbers can be classified as \emph{highly scalable}. It is important to note that no current systems support such a large PCU count on
+a single server cluster. The PCU count presented for WoW is the PCU count over all server clusters hosting WoW in China.
 
-\emph{Fairness:} Ensuring fairness in the system means distributing load evenly according to the abilities of individual nodes. This ensures that
-    not only a small number of nodes provide all system resources required for the system to function, but that all nodes contribute what they
-    can, in order to support the system.
+\subsubsection{Fairness}
+Ensuring fairness in the system means distributing load evenly according to the abilities of individual nodes. This ensures that not only a small
+number of nodes provide all system resources required for the system to function, but that all nodes contribute what they can, in order to support
+the system.
 
-All state persistency models will be reviewed with these characteristics in mind.
+Fairness can be evaluated by evaluating the distribution of game state amongst all nodes in the P2P network. This can be measured at a file level,
+i.e. what is the variance of the number of files contained on each node, or on byte level, i.e. what is the variance of the number of bytes stored on
+each node. A lower variance will point to a fairer data persistency scheme.
+
+\subsubsection{Reliability}
+For the storage to be reliable, it must be impossible for data to be lost, and stored data should always be available when a node requests it.
+
+Reliability encompasses both robustness and availability. Robustness means that the data should be resilient to network churn and availability means
+that data should be available to any node in the network, with the correct permissions. To measure robustness, nodes have to leave the network at
+different rates and the loss of storage for different rates of churn have to be measured.
+
+It can then be determined what the churn threshold is for the network, to maintain all data at a certain rate of churn. This will be a function of
+the number of redundant objects in the storage system, as reliability can usually be increased with increased redundancy. What should be measured is
+how well the system performs for a specific number of replicas used.
+
+\subsubsection{Responsiveness}
+To ensure system responsiveness, data must be stored or retrieved in real-time. With real-time, it is meant that data should be available within a
+certain time frame that would ensure correct functionality of the MMOG requiring it. The variance in times when data become available should also be
+small.
+
+Responsiveness can be measured by the time it takes for an object to be available for reading, anywhere in the network, after having been written.
+How long it takes to read or write data to the storage network can also be measured.
+
+\subsubsection{Security}
+The storing system should store data securely. It should not be possible for data to be altered in ways that are inconsistent with the game rules. It
+should also be possible to identify nodes that alter the data in a malicious way. This also adds the requirement that nodes should be authenticated
+in the storage system and that only authorised nodes should be able to alter data.
+
+Security is the combination of a number of objectives. These are: Authentication, Authorisation, Data Integrity, Confidentiality, Availability,
+Trust, Privacy and Identity Management \cite{distributed_systems_security}. When comparing different consistency techniques, it should first be
+established which of these objectives does the scheme address. The number of objectives addressed, if addressed in industry standard ways, is already
+a measure of the security of the system. Data integrity can be tested by ensuring the storage system can withstand the dropping, delay or, possibly,
+the modification of data packets by malicious nodes in the network. Nodes can be programmed to randomly drop packets and the availability of the data
+under these circumstances can be measured by the time it takes to rebuild a file under different rates of packet drops or delays.
 
 \subsection{Super peer storage}
 \label{super_peer_storage}
@@ -988,55 +1063,6 @@ the Voronoi diagram has to be constantly recalculated and objects have to be mov
 significant advantage of the Voronoi approach is that peers only require connections with their neighbours, and peers within their AoI. The issue of
 how regularly an object has to be transferred and whether the number of transferrals produce sufficiently low overhead to implement a real-time game,
 still have to be investigated.
-
-
-\subsection{Evaluation Criteria} \label{eval_crit}
-
-In order to evaluate any consistency model, metrics have to be defined to measure the key characteristics of a storage system, as described in
-Section \ref{key_challenges_cm}. This will allow for different consistency models to be compared and provide a measure of the applicability of any
-consistency model to P2P MMOGs. Such metrics could also compare the performance of one storage architecture to another.
-
-\subsubsection{Scalability}
-Scalability underpins all evaluation criteria. This implies that for a system to be scalable, all other evaluation criteria should be measured for
-very large numbers of nodes and data. The question of what constitutes a large number of nodes arises. To establish what an adequate number of nodes
-is, current MMOG architectures can be used for inspiration.
-
-It is put forward that to classify a system as \emph{sufficiently scalable}, the smallest number of peers that should be used is approximately 3000.
-This is the number of players per server, currently supported by most active C/S MMOGs. For a system to be classified as \emph{truly scalable}, it is
-believed that the architecture should support 60,000 concurrent users, twenty times more than a sufficiently scalable system. This is the number of
-peak concurrent users (PCUs) currently supported by the super computer used to host Eve Online \cite{eve_pcu}. These two measures will ensure that a
-system is as scalable as other currently available architectures.
-
-For systems that will support the MMOGs of the future, it is believed that a target of 1 million nodes should be used. This number is sixteen times
-that of a truly scalable system and the peak concurrent player count of World of Warcraft in China in 2008 \cite{WoW_china_pcu}. Systems that will
-support these numbers can be classified as \emph{highly scalable}. It is important to note that no current systems support such a large PCU count on
-a single server cluster. The PCU count presented for WoW is the PCU count over all server clusters hosting WoW in China.
-
-\subsubsection{Fairness}
-\emph{Fairness} can be evaluated by evaluating the distribution of game state amongst all nodes in the P2P network. This can be measured at a file
-level, i.e. what is the variance of the number of files contained on each node, or on byte level, i.e. what is the variance of the number of bytes
-stored on each node. A lower variance will point to a fairer data persistency scheme.
-
-\subsubsection{Reliability}
-\emph{Reliability} encompasses both robustness and availability. Robustness means that the data should be resilient to nodes leaving the network and
-availability means that data should be available to any node in the network, with the correct permissions. To measure robustness, nodes have to leave
-the network at different rates and the loss of storage for different rates of churn have to be measured.
-
-It can then be determined what the churn threshold is for the network, to maintain all data at a certain rate of churn. This will be a function of
-the number of redundant objects in the storage system, as reliability can usually be increased with increased redundancy. What should be measured is
-how well the system performs for a specific number of replicas used.
-
-\subsubsection{Responsiveness}
-\emph{Responsiveness} can be measured by the time it takes for an object to be available for reading, anywhere in the network, after having been
-written. How long it takes to read or write data to the storage network can also be measured.
-
-\subsubsection{Security}
-\emph{Security} is the combination of a number of objectives. These are: Authentication, Authorisation, Data Integrity, Confidentiality,
-Availability, Trust, Privacy and Identity Management \cite{distributed_systems_security}. When comparing different consistency techniques, it should
-first be established which of these objectives does the scheme address. The number of objectives addressed, if addressed in industry standard ways,
-is already a measure of the security of the system. Data integrity can be tested by ensuring the storage system can withstand the dropping, delay or,
-possibly, the modification of data packets by malicious nodes in the network. Nodes can be programmed to randomly drop packets and the availability
-of the data under these circumstances can be measured by the time it takes to rebuild a file under different rates of packet drops or delays.
 
 \section{Conclusion}
 
