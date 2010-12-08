@@ -377,6 +377,7 @@ authors also discuss possible solutions to these cheats. The difference then, be
 that their papers deals with the security issues present in P2P games, while this paper deals with state persistency. In other words, their paper
 deals with securing the information stored in objects as well as securing updates made to objects, while this paper deals with storing those objects.
 
+%Amoretti's survey paper on P2P overlay schemes in general
 Both of the previously mentioned articles deal with other issues present in P2P MMOGs, namely interest management, event dissemination and security.
 The paper by Amoretti: ``A Survey of Peer-to-Peer Overlay Schemes: Effectiveness, Efficiency and Security'', provides details of the broader area of
 P2P overlay schemes \cite{amoretti_p2p_overlay_schemes_survey}. The paper focuses on security issues present in P2P overlay schemes, while also
@@ -386,6 +387,17 @@ Three areas present in Amoretti's survey and also related to this survey are: Co
 technologies described in Amoretti's work are considered forms of overlay storage, further discussed in Section \ref{}. While Amoretti's survey gives
 a very broad description of P2P gaming in general and why it should be a viable alternative to a C/S system, this survey deals specifically with the
 area of P2P MMOGs and more specifically, with state persistency in P2P MMOGs.
+
+%Zhang's C/S persistency survey, describing when to perform which types of state updates.
+%A paper recently published by Zhang et. al. deals with persistency in C/S MMORPGs \cite{zhang_cs_persistency_survey}. The paper investigates when
+%game objects should be made persistent, i.e. written to secondary storage from primary storage. It distinguishes between data that should immediately
+%be written to storage, such as an object changing hands in a trade, and data that only has to be written every other update, such as position
+%updates. The paper then continues to define some schemes by which the number of position updates might be reduced as well as stating that MMOG
+%persistence schemes are not widely published and are usually implementation specific.
+%
+%The paper by Zhang et. al. is related to this survey paper in that it looks at persistency and also provides information on what is required in a
+%persistency scheme. The major difference between Zhang et. al.'s paper and this survey is that it deals with a C/S architecture and focusses on when
+%to update objects, not where those objects will be stored.
 
 \section{Classic MMOG network models}
 \label{classic_network_models}
@@ -639,7 +651,7 @@ consideration for its function in the P2P system.
 %Centralised storage
 The same assumption can be made of individual storage. With individual storage, player data are stored on a player's own computer
 \cite{individual_storage1}, \cite{cheat_proof_playout}. In these architectures, no thought is given to the storage of NPC state or mutable objects.
-These objects cannot be as easily mapped to a single node in the network as player state can, and therefore require a mapping mechanism to decide
+These objects cannot be as easily mapped to a single node in the network as player state can and therefore require a mapping mechanism to decide
 where to host these objects.
 
 Another issue with individual storage is that of security. If all information about a player's character is hosted on that player's computer, there
@@ -738,7 +750,7 @@ under these circumstances can be measured by the time it takes to rebuild a file
 \label{super_peer_storage}
 
 %Super peer storage - description
-Super peer storage relies on the super peer storing all relevant information in its domain. A domain is usually created by segmenting the world into
+Super peer storage relies on the super peer storing all information that is in its domain. A domain is usually created by segmenting the world into
 regions and super peers act as regional servers to all peers in their region. Each super peer handles all game logic and distributes updates to all
 peers in its region. The super peer also handles state persistency for its region, hosting NPCs, objects and persistent player data.
 
@@ -995,11 +1007,13 @@ explore how their data classification scheme might be translated into a state pe
 %Distance-based - overview
 Distance based approaches, such as the Voronoi storage approaches \cite{Buyukkaya_voronoi_state_management}, \cite{Hu_voronoi_IM} and also some more
 general approaches \cite{colyseus_distance_based}, store object data on the peer closest to the object in the virtual world. Some distance metric is
-used to determine on which node an object should be stored. For the Voronoi approaches, a node controls and hosts all objects within its Voronoi
-region. The reasoning is that there is a high probability that the player closest to the object is also the player using the object. Examples of this
-are where a player is trading or fighting with an NPC. The only problem with this reasoning is that usually multiple nodes are interacting with a
-single object. The examples of the NPC monster and trader are again relevant. Usually many players interact with a trader NPC and usually players
-attack monster NPCs in groups.
+used to determine on which node an object should be stored.
+
+For the Voronoi approaches, described in more detail in Section \ref{distance_based_existing_archs}, a node controls and hosts all objects within its
+Voronoi region. The reasoning is that there is a high probability that the player closest to the object is also the player using the object. Examples
+of this are where a player is trading or fighting with an NPC. The only problem with this reasoning is that usually multiple nodes are interacting
+with a single object. The examples of the NPC monster and trader are again relevant. Usually many players interact with a trader NPC and usually
+players attack monster NPCs in groups.
 
 \subsubsection{Responsiveness}
 %Distance-based - issues
@@ -1034,6 +1048,7 @@ average number of objects hosted by other peers. This will not be a major issue,
 overloaded peer. This will depend on the movement of the overloaded peer as well as that of neighbouring peers.
 
 \subsubsection{Existing architectures}
+\label{distance_based_existing_archs}
 
 %Colyseus, 2006
 Bharambe et al. created the Colyseus architecture in 2006 \cite{colyseus_distance_based}. The architecture is designed to support First Person
@@ -1052,17 +1067,23 @@ players generally do not leave before the end of the round.
 \end{figure}
 %
 In 2008, papers were published by Buyukkaya and Abdallah \cite{Buyukkaya_voronoi_state_management}, and Hu et al. \cite{Hu_voronoi_IM}, proposing to
-use Voronoi diagrams \cite{voronoi_diagrams_survey} to implement distance-based storage. Given a set of points, the Voronoi diagram of the set of
-points is the partition of the plane, which associates a region around every point in such a way that all other points contained in the region are
-closer to the centre point than any other point in the set. Figure \ref{fig_voronoi_diagram} shows a Voronoi diagram, where the lines define the
-region boundaries, the dots define the set of points for which the diagram was calculated, the plus signs represent mutable objects and the circle
-represents the \ac{AoI} of a central point in the set.
+use Voronoi diagrams \cite{voronoi_diagrams_survey} to implement distance-based storage. A thesis by Chang also describes and the Voronoi approach in
+more detail and how to achieve game state consistency amongst all nodes in a Voronoi network \cite{Chang_Voronoi_state_management_masters}. All these
+works form part of the VAST project, which is being created to be a fully functional P2P overlay architecture, using Voronoi diagrams as its basis
+\cite{VAST}.
+
+Given a set of points, the Voronoi diagram of the set of points is the partition of the plane, which associates a region around every point in such a
+way that all other points contained in the region are closer to the centre point than any other point in the set. Figure \ref{fig_voronoi_diagram}
+shows a Voronoi diagram, where the lines define the region boundaries, the dots define the players, which make up the set of points for which the
+diagram was calculated, the plus signs represent mutable objects and the circle represents the \ac{AoI} of a central point in the set.
 
 Voronoi state management schemes host the mutable objects on the peer in which region the object exists. As peers move around in the virtual world,
 the Voronoi diagram has to be constantly recalculated and objects have to be moved to new owner peers as the regions in which they fall change. The
-significant advantage of the Voronoi approach is that peers only require connections with their neighbours, and peers within their AoI. The issue of
-how regularly an object has to be transferred and whether the number of transferrals produce sufficiently low overhead to implement a real-time game,
-still have to be investigated.
+significant advantage of the Voronoi approach is that peers only require connections with their neighbours, and peers within their AoI.
+
+A major issue with the Voronoi diagram approach is that peers move around fairly regularly, which means that game objects have to be constantly moved
+to new peers as the regions change. Because object transfer introduces overhead into the system, how regularly an object has to be transferred and
+whether the number of transferrals produce sufficiently low overhead to implement a real-time game, still have to be investigated.
 
 \section{Conclusion}
 
