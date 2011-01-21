@@ -169,6 +169,9 @@
 %List of acronyms used in text
  \usepackage{acronym}%.......................... Acronym package to handle acronyms in text
 
+%Add elegant support for Big-O notation
+\providecommand{\OO}[1]{\operatorname{O}\left(#1\right)}
+
 \acrodef{MMOG}{Massively Multiplayer Online Game}
 \acrodef{MMORPG}{Massively Multiplayer Online Role Playing Game}
 \acrodef{WoW}{World of Warcraft}
@@ -509,8 +512,8 @@ and ``game object''.
 \emph{Update:} Game logic communicates how the world should change via game updates. Game updates are the incremental changes that specify how
     the game state should change.
 
-\emph{Game State} The state of the game is the positions, health and all other attributes of all players, NPCs and game objects in the game
-    world. Game state consists of a collection of game objects. An NPC as well as an immutable plant are both examples of game objects that
+\emph{Game State} The state of the game is the positions, health and all other attributes of all players, \acp{NPC} and game objects in the game
+    world. Game state consists of a collection of game objects. An \ac{NPC} as well as an immutable plant are both examples of game objects that
     together make up the game state.
 
 \emph{Game objects:} When discussing how to segment game state, it is sometimes easier to speak in terms of game objects, since they are
@@ -740,29 +743,34 @@ structured network overlay.
 \label{key_challenges}
 
 A recent article has identified six key challenges of P2P systems: Interest Management, Game Event Dissemination, NPC Host Allocation, Game State
-Persistency, Cheating Mitigation and Incentive Mechanisms \cite{Fan_deisgn_issues_p2p}. Currently, these are the most pressing issues to be addressed
-in the design of a P2P game. Each of these challenges will be described below, except NPC host allocation. NPC host allocation is handled as a
-specialised form of state persistency management in this work.
+Persistency, Cheating Mitigation and Incentive Mechanisms \cite{Fan_deisgn_issues_p2p}. A brief overview of these challenges will be introduced
+below. It should be noted that the overview presented here is just that, an overview of the different techniques and general trends present in the
+different areas of peer-to-peer MMOGs. This overview does not presume to present an exhaustive list of papers in these areas, rather to place the
+topic of state persistency in context; to show readers how state persistency fits into the context of peer-to-peer games and to allow readers to
+distinguish between, for example, the topics of state persistency, interest management and event dissemination.
 
 %Some key requirements have also been identified. These requirements stipulate what characteristics an MMOG should poses, to be classified as such.
 %These are: Distribution, Consistency, Self-Organisation, Persistency, Availability, Interactivity, Scalability, Security, Efficiency,
 %Maintainability \cite{Schiele_p2p_requirements}.
 
 %Describe key requirements
-%Explain P2P overlays
 
 %Describe key challenges
-\subsubsection{Interest Management}
+\subsubsection{Interest management}
 \label{key_challenges_im}
 
 Interest management is used to determine the smallest amount of information that a peer requires, in order to present an accurate representation of
 the world to each player. The idea is not specific to P2P MMOGs and was already formally put forward in \cite{First_IM} and later with greater focus
-on a distributed environment in \cite{Whang_agent_based_IM}. The main idea is that a player has a limited visual range and a limited area around the
-player in which it can interact with objects. The player requires update information of all objects in this area, called the player's \ac{aoi}. AoI
-calculations also rely on the fact the a player's direction and velocity of movement cannot change instantaneously and are bounded. Extensive
-research has been done into solving AoI problems and a comparison of techniques can be found in \cite{Boulanger_IM_compare}. The solutions range from
-aura/nimbus \cite{Benford_spatial_IM} to publish/subscribe \cite{mercury_publish_subscribe} to Voronoi based models \cite{Hu_voronoi_IM},
-\cite{Buyukkaya_voronoi_state_management} to hybrid models \cite{hybrid_IM}, \cite{MOPAR}, \cite{fan_mediator_paper}.
+on a distributed environment in \cite{Whang_agent_based_IM}.
+
+The main idea is that a player has a limited visual range and a limited area around the player in which it can interact with objects. The player
+requires update information of all objects in this area, called the player's \ac{aoi}. AoI calculations also rely on the fact the a player's
+direction and velocity of movement cannot change instantaneously and are bounded.
+
+Extensive research has been done into solving AoI problems and a comparison of techniques can be found in \cite{Boulanger_IM_compare} and
+\cite{IM_and_ED_survey_Krause}. The solutions range from aura/nimbus \cite{Benford_spatial_IM} to publish/subscribe \cite{mercury_publish_subscribe}
+to Voronoi based models \cite{Hu_voronoi_IM}, \cite{Buyukkaya_voronoi_state_management} to hybrid models \cite{hybrid_IM}, \cite{MOPAR},
+\cite{fan_mediator_paper}.
 
 Generally, interest management solutions can be divided into coarsely or finely grained solutions, although the hybrid models, especially MOPAR, seem
 to have gained greater popularity because they seem to have all the benefits of the two solutions and little of the drawbacks \cite{MOPAR}. MOPAR has
@@ -770,10 +778,16 @@ been shown to perform better than either a finely grained technique or a coarsel
 
 Coarsely grained solutions usually divide the game world into multiple regions and when a player enters a region, it subscribes to that region's
 events. This is called the region-based publish subscribe model \cite{Fan_deisgn_issues_p2p}. All players in the region then receive the region's
-events, even for players not in their AoI. Finely grained techniques create groups of players from their \acp{aoi}. Groups of interacting players
-directly exchange information, so all players only receive information that is relevant to them. This has been termed the spatial model
-\cite{Fan_deisgn_issues_p2p}. The grain of the solution in turn determines the type of event dissemination that should be used, as described later in
-this section.
+events, even for players not in their AoI.
+
+Finely grained techniques create groups of players from their \acp{aoi}. Groups of interacting players directly exchange information, so all players
+only receive information that is relevant to them. This has been termed the spatial model \cite{Fan_deisgn_issues_p2p}. The grain of the solution in
+turn determines the type of event dissemination that should be used, as described later in this section.
+
+Another example of finely grained interest management was presented in \cite{IM_frontier_sets}. Interest management was achieved by making use of
+frontier sets and this was implemented in Quake 3. By using Frontier Sets, it is possible to describe an area in which a player may move, where no
+other players will require updates of that movement. Conversely, a set of other players that require movement updates from a specific player is also
+given by the frontier set.
 
 MOPAR partitions the game world into hexagonal regions and appoints ``home'' nodes to act as bootstrap nodes for each region. A home node of a region
 is that node whose ID is the closest match the the region ID. This allows any node to find the home node for a region. A master node is then selected
@@ -781,12 +795,14 @@ for every region, whose function it is to inform slave nodes of new neighbours. 
 Slave nodes send direction and velocity updates to their masters. Masters communicate directly with other masters if a node is about to enter their
 region. Masters inform their slaves of a new neighbour. Slaves communicate directly with each other, once identified by a master.
 
+
+
 %The issue with the finely grained model is scalability. As nodes join, the number of messages increase quadratically, as previously mentioned.
 %This means that in highly populated regions, too many messages are sent to nodes which can increase latency to unmanageable levels. Highly populated
 %regions will however experience the same issues if no dynamic regioning is implemented.
 
 %Event Dissemination
-\subsubsection{Event Dissemination}
+\subsubsection{Event dissemination}
 Event dissemination deals with how information should be sent to peers after interest management has determined which information should be sent. The
 first application of event dissemination for online games can be found in \cite{first_GED}. Recently, \ac{alm} and unicast techniques of event
 dissemination have become popular, depending on the grain of the event dissemination. \ac{alm} is used, instead of router level multicast, because of
@@ -796,10 +812,15 @@ ALM is used for coarsely grained interest management techniques, while unicast i
 coarsely grained techniques, because it is not scalable. For a network with $N$ nodes, $N^2$ messages are exchanges for every player action. ALM,
 however, significantly increases the message latency in the system, because messages first have to be routed over a structured overlay network. ALM
 is however preferred over unicast for large numbers of messages, because of the weak scalability of unicast.
-%Check Badumna
+
+An ALM scheme has recently been proposed, that sends updates to locations in the virtual world, rather than specific players
+\cite{Ghaffari_Delaunay_churn_mobility}. This removes the need to first determine which nodes will be affected by an event, before the event may be
+transmitted. Another ALM scheme proposed sends messages to the AoI neighbours, instead of to all the players in the region
+\cite{Seeger_area_based_gossip_multicast}. This effectively implements a basic interest management scheme, where only neighbouring players can
+receive events.
 
 %Cheating Mitigation
-\subsubsection{Cheating Mitigation}
+\subsubsection{Cheating mitigation}
 \label{key_challenges_cheating}
 
 Cheating mitigation has been identified as a major issue for P2P systems \cite{knutsson_p2p_first}, \cite{challenges_p2p_gaming},
@@ -814,10 +835,10 @@ are ways in which a malicious player may gain an unfair advantage over other pla
 because of software bugs and some examples are duplication and teleport cheats.
 
 Application level cheats are where malicious players alter the game software to gain an unfair advantage. This is usually done by gaining access to
-the game state to which they should not have access at the current time. An example of this is map reveal cheats in strategy games. Where the fog of
-war is removed and the player can observe all the opponent's movements. Other cheats are sometimes used that augment the player's \ac{ui} with extra
-information that allows the player to make more informed decisions. It is debatable whether these additions are cheats. They are, however, considered
-almost essential for competitive \ac{WoW} play.
+the game state to which they should not have access at the current time. An example of this is ``map reveal'' cheats in strategy games. Where the
+``fog of war'' is removed and the player can observe all the opponent's movements. Other cheats are sometimes used that augment the player's \ac{ui}
+with extra information that allows the player to make more informed decisions. It is debatable whether these additions are cheats. They are, however,
+considered almost essential for competitive \ac{WoW} play.
 
 Protocol level cheats are cheats based on the different methods of communicating data across the system. These usually concern dropping, delaying of
 modifying IP packets to achieve certain outcomes in the game. Infrastructure level cheats concern exploiting the underlying infrastructure on which
@@ -829,7 +850,7 @@ started to bear fruit \cite{survey_p2p_game_cheats}. This is, however, an ongoin
 of the security issues facing peer-to-peer system in general, refer to \cite{p2p_security_issues}. These issues are the same issues facing P2P MMOGs,
 with the exception of the game and application layer issues.
 
-\subsubsection{Incentive Mechanisms}
+\subsubsection{Incentive mechanisms}
 
 P2P schemes require all players to share resources in order to ensure that the system functions correctly. The issue with this is that players are
 people who might not want to share their resources, but still benefit from the resources of others. This is where incentive mechanisms become
@@ -846,29 +867,40 @@ This might create a type of meta game, where players try to gain as much reputat
 really enforce the provisioning of resources. A player who does not want to provide resources might not see a higher reputation as sufficient
 incentive to provide resources.
 
-Other issues with incentive schemes is that sometimes players have limited or no resources. Such players should be hosted with other player with
+Other issues with incentive schemes is that sometimes players might have insufficient resources. Such players should be aided by other players with
 sufficient resources and not be disallowed to play the game. When limited resources are taken into account, the issue of reporting a false amount of
-available resources becomes a problem. A peer that has sufficient resources, might report insufficient resources, to not be penalised.
+available resources becomes a problem. A peer that has sufficient resources, might report insufficient resources, to not be penalised. It is evident
+that there exists space for more research in this field.
 
-The field of incentive mechanisms is an ongoing one.
+\subsubsection{Game state persistency}
 
-\subsubsection{Game State Persistency}
+The issue of game state persistency will be dealt with in detail in the rest of the paper, since it forms the focus of this work. Game state
+persistency involves the storage of game objects, either in primary or secondary storage. Lu Fan in Section 3.5.3 of a recently completed PhD on the
+topic of P2P MMOGs had this to say about state persistency: ``Game state persistency is a major challenge for P2P MMOGs as existing P2P storage
+infrastructures are designed to support file sharing, and seldom fulfil the performance and security requirements of a MMOG. \ldots the persistency
+area is still immature with many problems waiting to be investigated.'' \cite{Fan_phd}.
 
-The issue of game state persistency will be dealt with in detail in Sections \ref{consistency_models}, \ref{p2p_mmog_cm} and
-\ref{proposed_consistency}. Game state persistency will form the focus of this work. All that might be said at this stage is what was stated by Lu
-Fan in Section 3.5.3 of a recently completed PhD on the topic of P2P MMOGs: ``Game state persistency is a major challenge for P2P MMOGs as existing
-P2P storage infrastructures are designed to support file sharing, and seldom fulfil the performance and security requirements of a MMOG. \ldots the
-persistency area is still immature with many problems waiting to be investigated.'' \cite{Fan_phd}.
+\subsubsection{Distributed computation}
+
+Some changes were made to the original classification by Fan relating to NPC host allocation. In the original NPC host allocation classification,
+both NPC state and computational routines are combined into a single category. In the classification presented below, NPC state forms part of normal
+game state persistency, since NPC objects are game objects like any other. The NPC routines requiring computational power are grouped under the
+heading of distributed computation. This heading is meant to include the distribution of all in game computational elements.
+
+Some game objects require computational power to function. An example of this is the Artificial Intelligence routines of \acp{NPC} or the computation
+of physics effects on in-game objects. Some architectures assume that the computational requirements will be fulfilled where the object state is
+hosted \cite{solipsis}, but other schemes exist that allows for the CPU power to be distributed amongst peers. One such scheme makes use of a ``job
+board'' like mechanism, where tasks are advertised on specialised super peers. Other peers monitor these super peers and may elect to perform the
+advertised tasks \cite{fan_mediator_paper}.
+
 
 \section{P2P MMOG consistency models}
 \label{p2p_mmog_cm_overview}
 
 %Overview of three approaches
 Very little work has been done on state persistency for P2P MMOGs. Generally four approaches have been identified to achieve state persistency:
-\emph{super peer storage} \cite{knutsson_p2p_first}, \emph{overlay storage} \cite{Douglas05enablingmassively}, \cite{using_freenet_storage},
-\cite{Fan_phd}, \cite{past_storage_focus}, \emph{distance-based storage} \cite{Buyukkaya_voronoi_state_management}, \cite{Hu_voronoi_IM},
-\cite{colyseus_distance_based}, \cite{AtoZ} and \emph{hybrid storage} \cite{zoned_federation}, \cite{hybrid_storage1}. These four storage
-architectures are detailed in Sections \ref{super_peer_storage}, \ref{overlay_storage}, \ref{hybrid_storage} and \ref{distance_based_storage}.
+\emph{super peer storage}, \emph{overlay storage}, \emph{distance-based storage} and \emph{hybrid storage}. These four storage architectures are
+detailed in Sections \ref{super_peer_storage}, \ref{overlay_storage}, \ref{hybrid_storage} and \ref{distance_based_storage}.
 
 %Individual storage
 Two other types of storage sometimes described in P2P MMOGs papers are \emph{centralised storage} and \emph{individual storage}. Centralised storage
@@ -895,14 +927,16 @@ regarded as a subset of distance-based storage, which will be discussed in detai
 
 \begin{table*}[htbp]
 \centering
-\begin{tabular}{|r|c|c|c|c|}
+\begin{tabular}{|r|c|c|c|c|l|}
 \hline
-Storage type & Reliability & Responsiveness & Security & Fairness\\
+Storage type & Reliability & Responsiveness & Security & Fairness & Examples\\
 \hline
-Super Peer & Medium & High & Low & Low\\
-Overlay & High & Low & Medium & High\\
-Hybrid & High & High & Low & Low\\
-Distance-based & Low & High & Low & High\\
+Super Peer & Medium & High & Low & Low & \cite{knutsson_p2p_first}\\
+Overlay & High & Low & Medium & High & \cite{Douglas05enablingmassively}, \cite{using_freenet_storage},
+\cite{Fan_phd}, \cite{past_storage_focus}\\
+Hybrid & High & High & Low & Low & \cite{zoned_federation}, \cite{hybrid_storage1}\\
+Distance-based & Low & High & Low & High & \cite{Buyukkaya_voronoi_state_management}, \cite{Hu_voronoi_IM},
+\cite{colyseus_distance_based}, \cite{solipsis}\\
 \hline
 \end{tabular}
 \caption{Differences between storage mechanisms} \label{tab_storage}
@@ -911,7 +945,9 @@ Distance-based & Low & High & Low & High\\
 Table \ref{tab_storage} presents a characterisation of current storage systems according to the characteristics defined in Section
 \ref{key_challenges_cm}. From this table it can be seen that no one storage mechanism has fully addressed all the identified issues. What is also
 shown is that architectures that differentiate between different types of data, are theoretically better suited to the MMOG application. The example
-of such an architecture is the hybrid architecture, which also seems to fare best, when compared to other storage techniques.
+of such an architecture is the hybrid architecture, which also seems to fare best, when compared to other storage techniques. Table \ref{tab_storage}
+also provides some references that act as examples of the different storage types mentioned. These example architecture will be discussed in detail
+in the sections to follow.
 
 \subsection{Characteristics}
 \label{key_challenges_cm}
@@ -1083,7 +1119,7 @@ dissemination, and another method can be used to ensure state persistency.
 \label{overlay_storage_reliability}
 
 Overlay storage can be made very reliable, using redundancy. One method used to achieve high reliability in PAST is to store $k$ replicas for any
-file stored in PAST, in order to ensure the availability of the file. These replicas as stored at the neighbouring nodes of the node containing the
+file stored in PAST, in order to ensure the availability of the file. These replicas are stored at the neighbouring nodes of the node containing the
 original file. Neighbours are the $k$ nodes whose IDs are closest to that of the root node. By the characteristics of \ac{DHT} distance-based
 routing, if the node with the original data leaves the network, packets will automatically be routed to the neighbouring node, where the duplicate
 will then be. This technique ensures high availability of data and the number of duplicates can be chosen according to the reliability of the
@@ -1147,7 +1183,8 @@ In 2004, Merabti and El Rhalibi mention the issue of ``Data Storage'' \cite{usin
 scheme is required and that such a scheme ``\ldots requires careful designing\ldots''. The use of a data storage architecture based on the Freenet
 project is proposed \cite{clarke_freenet}. Freenet is a distributed storage facility that uses a Darknet to ensure user anonymity when distributing
 files. A system such as Freenet is designed for general file sharing, which means that no focus is placed on achieving the high levels of
-responsiveness required for MMOGs.
+responsiveness required for MMOGs. While the need for state persistency is briefly mentioned in the 2004 paper by Marabti and El Rhalibi, Douglas et
+al. implement a workable solution for state persistency in 2005.
 
 %Douglas, 2005 \cite{Douglas05enablingmassively}
 Douglas et al. designed a P2P MMOG architecture in 2005 \cite{Douglas05enablingmassively} and implemented state persistency using a distributed
@@ -1161,8 +1198,13 @@ Recently, PAST has become a popular way to implement state persistency. This is 
 \cite{past_storage_focus} as well as Fan in 2009 \cite{Fan_phd}. In both of these publications, it is said that PAST is used to store the global game
 state, but never is detailed what is stored and how regularly it is stored. Player information is supposed to be stored as game state, but from the
 papers it is unclear how position updates are handled. It is not clear whether the last position of a player is stored at all or how regularly it is
-stored. It is important to know how position updates are handled in the game, as position updates are the most common type \cite{knutsson_p2p_first}.
+stored. It is important to know how position updates are handled in the game, since position updates are the most common type of update
+\cite{knutsson_p2p_first}.
 
+The main difference between the implementation by Douglas et al. and the PAST implementations, is that the former supports range queries on spatial
+data, which allows for a set of objects to be returned, queried by their virtual in-game position. With PAST, the exact ID of an object is required
+before it may be retrieved. Using PAST is the simplest means by which game state persistency may be implemented, but PAST is not necessarily the
+application best suited to game state persistency. There exists a need for more research into appropriate state persistency mechanisms for P2P MMOGs.
 
 \subsection{Hybrid region-based storage}
 \label{hybrid_storage}
@@ -1239,17 +1281,31 @@ explore how their data classification scheme might be translated into a state pe
 
 %Distance-based - overview
 Distance based approaches, such as the Voronoi storage approaches \cite{Buyukkaya_voronoi_state_management}, \cite{Hu_voronoi_IM} and also some more
-general approaches \cite{colyseus_distance_based}, store object data on the peer closest to the object in the virtual world. Some distance metric is
-used to determine on which node an object should be stored.
+general approaches \cite{colyseus_distance_based}, \cite{solipsis}, store object data on the peer closest to the object in the virtual world. Some
+distance metric is used to determine on which node an object should be stored.
+
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[width=\columnwidth]{voronoi_diagram}
+ \caption{Voronoi Diagram \cite{Buyukkaya_voronoi_state_management}}
+ \label{fig_voronoi_diagram}
+\end{figure}
+%
+Given a set of points, the Voronoi diagram of the set of points is the partition of the plane, which associates a region around every point in such a
+way that all other points contained in the region are closer to the centre point than any other point in the set. Figure \ref{fig_voronoi_diagram}
+shows a Voronoi diagram, where the lines define the region boundaries, the dots define the players, which make up the set of points for which the
+diagram was calculated, the plus signs represent mutable objects and the circle represents the \ac{AoI} of a central point in the set.
 
 For the Voronoi approaches, described in more detail in Section \ref{distance_based_existing_archs}, a node controls and hosts all objects within its
 Voronoi region. The reasoning is that there is a high probability that the player closest to the object is also the player using the object. Examples
-of this are where a player is trading or fighting with an NPC. The only problem with this reasoning is that usually multiple nodes are interacting
-with a single object. The examples of the NPC monster and trader are again relevant. Usually many players interact with a trader NPC and usually
-players attack monster NPCs in groups.
+of this are where a player is trading or fighting with an NPC.
 
 \subsubsection{Responsiveness}
+
 %Distance-based - issues
+The only problem with this reasoning is that usually multiple nodes are interacting with a single object. The examples of the NPC monster and trader
+are again relevant. Usually many players interact with a trader NPC and usually players attack monster NPCs in groups.
+
 Multiple player interactions are, however, not as big an issue as others have made it out to be \cite{Fan_deisgn_issues_p2p}. In the best case, the
 object being used by a player is also hosted on that player's node. If another player requires use of a remotely hosted object, that player may still
 interact with the object, where the host node is now acting as a server to that player. This means that every player hosting an object becomes a
@@ -1260,11 +1316,20 @@ with the super peer storage approach. This might protect peers from becoming ove
 
 Issues with this approach stem from the fact the players are constantly moving. When players move, the objects in their regions change. Objects,
 therefore, have to be constantly handed over from one peer to another, which might cause significant network traffic. An object in transit might also
-delay interaction with that object.
+delay interaction with that object. Because object transfer introduces overhead into the system, how regularly an object has to be transferred and
+whether the number of transferrals produce sufficiently low overhead to implement a real-time game, still have to be investigated.
+
+Voronoi-based storage schemes also become unresponsive when communications are no longer between neighbours, but between two arbitrary nodes in the
+Voronoi overlay. When such communications occur, the average required time to route a message is $\OO{N^{1/2}}$ for a two-dimensional configuration.
+Advancements have been made that suggest augmenting the Voronoi overlay with additional links to far off nodes to create a small world network. This
+reduces the average routing time to $\OO{\log{N}}$, the same as for overlay storage \cite{Steiner_voronoi_shortcuts}.
 
 \subsubsection{Reliability}
-Reliability is also an issue, because of network churn. When nodes leave the network, the objects that they controlled should still be accessible.
-Redundancy and added overlay storage can be implemented here to ensure reliability.
+
+Reliability is still an open issue, because of network churn. When nodes leave the network, the objects that they controlled should still be
+accessible. No papers have yet dealt with the issue of reliability in distance-based storage network. The same solution that is used for overlay
+storage, namely the presence of redundant peers, might also be implemented for distance storage. Another structured overlay might even be used to
+implement this redundancy in exactly the same way it is done with overlay storage.
 
 \subsubsection{Security}
 \label{distance_based_storage_security}
@@ -1275,10 +1340,12 @@ drive to try and manipulate these objects. Because these modification are all lo
 cheating. Means by which local objects can be secured have to be found or distance based algorithms with quorum need to be investigated.
 
 \subsubsection{Fairness}
+
 Distance-based storage is relatively fair as all objects are distributed amongst all nodes. Where the system becomes somewhat unfair is when a node
 is nearest to a large number of objects. For Voronoi regioning approaches, this is when a peer's Voronoi region contains many more objects than the
-average number of objects hosted by other peers. This will not be a major issue, depending on how long the objects have to be hosted on the
-overloaded peer. This will depend on the movement of the overloaded peer as well as that of neighbouring peers.
+average number of objects hosted by other peers. This might not be a major issue, depending on how long the objects have to be hosted on the
+overloaded peer. This will depend on the movement of the overloaded peer as well as that of neighbouring peers. The use of aggregators as a proposed
+solution to this problem is discussed in Section \ref{distance_based_existing_archs}.
 
 \subsubsection{Existing architectures}
 \label{distance_based_existing_archs}
@@ -1287,36 +1354,41 @@ overloaded peer. This will depend on the movement of the overloaded peer as well
 Bharambe et al. created the Colyseus architecture in 2006 \cite{colyseus_distance_based}. The architecture is designed to support First Person
 Shooter (FPS) games and implemented to function with Quake II. Mutable game objects are stored on the peer that is nearest to the object in the game
 world. An ``object placer'' component is mentioned, but the details of the placement algorithm are left for future work. The architecture also does
-not implement state persistency, since this is not required for normal FPS games, where object states need only exist to the end of a round and where
-players generally do not leave before the end of the round.
+not implement non-volatile state persistency, since this is not required for normal FPS games, where object states need only exist to the end of a
+round and where players generally do not leave before the end of the round. This means that object states are only stored in primary memory, until
+the end of a game round.
 
-%Buyukkaya and Abdallah, 2008
-%Hu et al., 2008
-\begin{figure}[htbp]
- \centering
- \includegraphics[width=\columnwidth]{voronoi_diagram}
- \caption{Voronoi Diagram \cite{Buyukkaya_voronoi_state_management}}
- \label{fig_voronoi_diagram}
-\end{figure}
-%
+%Solipsis, 2008
+The Solipsis architecture was created by Frey et al. in 2008 \cite{solipsis}. The architecture uses Voronoi diagrams to create virtual regions.
+Stationary objects are maintained by site nodes until a player picks up an object. When an object is picked up, control of that object is transferred
+to the player that picked up the object. The Solipsis architecture focusses on distributed physics computation and when a player gains control of an
+object, that player is responsible for the object's physics computations. That player should also save all object state until a new player takes the
+object, at which time control is transferred to her. Control can also be transferred back to a site node if an object remains stationary for some
+time.
+
+That differentiates the Solipsis distance-based storage from the other architectures presented in this section, is that object states are only
+handled by peers as long as those peers directly use an object. At other times, those objects are handled by site nodes. This differs from other
+distance-based storage techniques, where all objects that are nearest to a player in the virtual world are controlled by that player.
+
+%Buyukkaya and Abdallah, 2008 and Hu et al., 2008
 In 2008, papers were published by Buyukkaya and Abdallah \cite{Buyukkaya_voronoi_state_management}, and Hu et al. \cite{Hu_voronoi_IM}, proposing to
-use Voronoi diagrams \cite{voronoi_diagrams_survey} to implement distance-based storage. A thesis by Chang also describes and the Voronoi approach in
-more detail and how to achieve game state consistency amongst all nodes in a Voronoi network \cite{Chang_Voronoi_state_management_masters}. All these
-works form part of the VAST project, which is being created to be a fully functional P2P overlay architecture, using Voronoi diagrams as its basis
-\cite{VAST}.
+use Voronoi diagrams \cite{voronoi_diagrams_survey} to implement distance-based storage. Voronoi state management schemes host the mutable objects on
+the peer in which region the object exists. As peers move around in the virtual world, the Voronoi diagram has to be constantly recalculated and
+objects have to be moved to new owner peers as the regions in which they fall change. The significant advantage of the Voronoi approach is that peers
+only require connections with their neighbours, and peers within their AoI.
 
-Given a set of points, the Voronoi diagram of the set of points is the partition of the plane, which associates a region around every point in such a
-way that all other points contained in the region are closer to the centre point than any other point in the set. Figure \ref{fig_voronoi_diagram}
-shows a Voronoi diagram, where the lines define the region boundaries, the dots define the players, which make up the set of points for which the
-diagram was calculated, the plus signs represent mutable objects and the circle represents the \ac{AoI} of a central point in the set.
+A thesis by Chang also describes the Voronoi approach in more detail and how to achieve game state consistency amongst all nodes in a Voronoi network
+\cite{Chang_Voronoi_state_management_masters}. What distinguishes this work from the others is the implementation of a load balancing mechanism. When
+peers get overloaded, another, more powerful peer is chosen as an Aggregator. The Aggregator assumes responsibility for a larger area that
+encompasses multiple peers. This scheme will reduce the load on peers with minimal resources, but it is uncertain how this would reduce load when
+peers with an average amount of resources in an area become overloaded.
 
-Voronoi state management schemes host the mutable objects on the peer in which region the object exists. As peers move around in the virtual world,
-the Voronoi diagram has to be constantly recalculated and objects have to be moved to new owner peers as the regions in which they fall change. The
-significant advantage of the Voronoi approach is that peers only require connections with their neighbours, and peers within their AoI.
+These works form part of the VAST project, which is being created to be a fully functional P2P overlay architecture, using Voronoi diagrams as its
+basis \cite{VAST}.
 
-A major issue with the Voronoi diagram approach is that peers move around fairly regularly, which means that game objects have to be constantly moved
-to new peers as the regions change. Because object transfer introduces overhead into the system, how regularly an object has to be transferred and
-whether the number of transferrals produce sufficiently low overhead to implement a real-time game, still have to be investigated.
+The reason why state persistency in Voronoi-based P2P MMOGs architectures are mostly distance-based approaches, is because the Voronoi diagram
+immediately identifies which objects are closest to a particular peer, and therefore, which objects that peer has to host. Architectures not making
+use of Voronoi diagrams still require some other mechanism to identify which objects which peers should host.
 
 \section{Conclusion}
 
@@ -1334,7 +1406,7 @@ This survey was written, because of an identified need for a concise summary of 
 the past were used because of the ease with which they could be integrated into a P2P MMOG. The purpose of this survey is to identify those
 techniques and to stimulate further research, using empirical methods to compare the different storage techniques used.
 
-\newpage
+%\newpage
 %\IEEEtriggeratref{43} %Balance the bibliography
 \bibliographystyle{IEEEtran}
 \bibliography{../BibTeX/P2P_MMOG}
