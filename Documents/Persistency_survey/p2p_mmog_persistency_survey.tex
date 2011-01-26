@@ -402,90 +402,6 @@ system, this survey deals specifically with the area of P2P MMOGs and more speci
 %persistency scheme. The major difference between Zhang et. al.'s paper and this survey is that it deals with a C/S architecture and focusses on when
 %to update objects, not where those objects will be stored.
 
-\section{Classic MMOG network models}
-\label{classic_network_models}
-
-The network model specifies how the different entities in the network communicate, where authority lies and whether a centralised or distributed
-approach is followed. The network model used determines how the different nodes in the network interact and what the roles of these different nodes
-are. The consistency model used, is based on the network model, but determines how data are stored on the system as well as how root and duplicate
-objects are kept consistent. The consistency model, therefore, includes the state persistency model.
-
-Currently, all MMOGs being operated run on a \ac{CS} network model or a distributed \ac{CS} network model, also called a Client/Multi-Server (C/MS)
-model. The simplest form of a network model used in MMOGs is the pure \ac{CS} model. Other games, such as strategy games and first person shooter
-games regularly employ the peer-to-peer network model to achieve greater system responsiveness, as discussed in Section \ref{classic_cs_event_based}.
-
-\begin{figure}[htbp]
-\centering
- \subfloat[Client/Server]{\label{fig_cs_arch}
-\includegraphics[clip=true, viewport= 0cm 12cm 11.5cm 21.5cm, width=0.5\columnwidth]{network_archs}}
-\subfloat[Client/Multi-Server]{\label{fig_cms_arch}
-\includegraphics[clip=true, viewport= 12cm 10.5cm 23cm 21cm, width=0.5\columnwidth]{network_archs}}
-\caption{Network architectures}
-\end{figure}
-
-\subsection{Client/Server}
-\label{client_server_network_model}
-
-Figure \ref{fig_cs_arch} shows the \ac{CS} model. The server is the entity on which the MMOG is hosted and is controlled by the game operator.
-Clients are computers operated by players, that connect to the server to play the game. The server is responsible for handling all queries from
-clients. Clients never communicate with other clients; they send their actions to the server and receive the updated states of other players from the
-server.
-
-The \ac{CS} architecture has two main advantages that made it the architecture of choice for all MMOG developers. Because of the centralised approach
-of the architecture, both administration and security are greatly simplified. Administration is simplified, because the game operator has full
-control over the server, server data and code. Efficient logging is also supported, because the server is able to not only log all server actions,
-but also all client actions.
-
-Security is a significant issue in MMOGs, since some players sell in-game currency for real-world currency \cite{chinese_gold_farmer}. This makes the
-MMOG a platform that is capable of producing income, which increases the incentive of players to gain an unfair advantage over others. The more
-popular an MMOG, the greater the security threat. Because the operator has full control over the server code and is never required to furnish the
-client with the server code, a potential attacker never has any knowledge of the server architecture and code. Because clients are never allowed to
-communicate, all malicious users can be filtered out of the network by the server when detected and even banned from the network.
-
-Operators are able to ban players, since these games usually require a game account, which is linked to a copy of the game as well as some payment
-method. This introduces a large cost to players whose accounts are banned. The server or cluster is also housed in a secured location, where access
-can be controlled. These factors simplify the security of the \ac{CS} model by allowing the developers to place all intelligence in the server.
-
-The \ac{CS} architecture, however, does have some disadvantages. These are: weak robustness, weak scalability, high cost to the operator, high
-latency, high amount of required server bandwidth and weak handling of transient loads. These disadvantages are described below.
-
-The robustness of the system is weak because it is a single point of failure. If the server fails or goes down for maintenance, the game is off-line
-and players are unable to play.
-
-The system is also not scalable, since a single server cannot easily be extended with more resources. Even if an off-line approach is used, where
-hardware is upgraded after the system is taken down for maintenance, the hardware required to support a game hosting more than 3000 players, become
-prohibitively expensive. In 2004, it was estimated that an MMOG that supports approximately 30,000 players, requires 2 to 3 years to develop and
-costs more than \$10 mil \cite{cs_mmog_cost}, \cite{igda_online_whitepaper}. With newer games using high definition graphics and the general drive in
-the market to improve on previous titles, the cost of MMOG games can only be expected to increase.
-
-The server hardware should be able to support peak system loads, which means that sufficient resources should always be provisioned to support these
-peak load. This is not an economically viable solution, because resources to handle peak loads are not used most of the time. This translates to
-operators paying for the provisioning of resources, without having active players that pay for these resources.
-
-This disadvantage also leads to a high cost to the operator, which translates to high costs for clients or reduced profit. The cost is due to the
-hardware that is required to host the system as well as maintenance and running costs. Running costs include bandwidth provisioning and IT personnel.
-Maintenance costs include replacement of malfunctioning or outdated hardware. It has been estimated that maintenance and running costs consume
-approximately 80\% of game revenue during the lifetime of the game \cite{cs_mmog_cost}.
-
-Because no clients are allowed to communicate with other clients, every change that is made to the game world by a client, first had to be
-communicated to the server, which in turns relays this message to all clients after applying game logic and artificial intelligence (AI) algorithms.
-This two hop path, with the additional time for computation added by the server as well as possible buffering at the server when many clients
-communicate, significantly increases the latency of the system compared to a system where direct communication is used.
-
-\subsection{Client/Multi-Server}
-In an effort to address some of the \ac{CS} issues, the distributed \ac{CS}, also called \ac{CMS}, was introduced. In a distributed \ac{CS} model,
-the server functions are distributed amongst multiple machines to distribute the server load.
-
-In general, the issues addressed and improved by the \ac{CMS} architecture are robustness, scalability, and peak load handling. The system is more
-robust, because the failure of one server will not necessarily lead to the failure of the whole system for certain system designs. The system is more
-scalable, because many less powerful servers may be used, which allows for the hosting of more players than what is currently possible with single
-server hardware. It also handles transient loads better, because, for cases where loads can be predicted, resources can by moved between servers to
-improve the user experience.
-
-The disadvantages of this system is that the administration complexity is greatly increased. Such systems, although capable of handling many more
-users than a single server, is also more expensive. These disadvantages are, however, not technical problems and so it is assumed for current games,
-that these systems are what is required if a game is to be hosted for a large number of players.
-
 \section{Classic consistency models}
 \label{classic_models}
 
@@ -541,15 +457,16 @@ model, also called the event-based model \cite{p2p_cm_aoe}, and the \ac{CS}-base
 %
 Figure \ref{fig_p2p_cm} shows the P2P model. In this model the complete game state is stored on each peer. Any event that a peer generates is sent to
 all other peers. These events are used as inputs to the game logic, which creates updates, which are then used to update the global game state at
-each peer.
+each peer. The event-based model works well for strategy games, and was implemented in Age of Empires \cite{p2p_cm_aoe} and Starcraft
+\cite{starcraft_network_model}.
 
-It is at this level that consistency becomes important. The order in which updates are received should be the same for all peers, otherwise the game
-states of different peers may become inconsistent. Usually some kind of lockstep technique is used to solve this issue \cite{pessimistic_lock_step}.
-The issue with lockstep is that it reduces the latency to twice that of the peer with the highest latency. Various techniques have been proposed that
-improves the latency by introducing some deadline before which all events should be submitted \cite{cheat_proof_event_ordering}. This, however, makes
-it impossible for a player with a high latency to play the game with anyone other than from her own continent. When latencies issues are not present
-and all players possess reasonable latencies, the event-based model can provide for an high-degree of responsiveness, because of no extra latency
-being added by a server and no extra server hop required for communications.
+The order in which updates are received should be the same for all peers, otherwise the game states of different peers may become inconsistent.
+Usually some kind of lockstep technique is used to solve this issue \cite{pessimistic_lock_step}. The issue with lockstep is that it reduces the
+latency to twice that of the peer with the highest latency. Various techniques have been proposed that improves the latency by introducing some
+deadline before which all events should be submitted \cite{cheat_proof_event_ordering}. This, however, makes it impossible for a player with a high
+latency to play the game with anyone other than from her own continent. When latencies issues are not present and all players possess reasonable
+latencies, the event-based model can provide for an high-degree of responsiveness, because of no extra latency being added by a server and no extra
+server hop required for communications.
 
 The issue with the event-based model is that it is not scalable, since all peers should connect to all other peers and every event is transmitted to
 everyone. This means that as $N$, the number of peers in the network, increases, the amount of traffic increases with a factor of $N^2$. The security
@@ -557,6 +474,7 @@ issues of the P2P network model, on which this consistency model is based, are a
 player's latency is below par, since the lockstep mechanism has to wait for all events to be received for that round to conclude.
 
 \subsubsection{Update-based (C/S)}
+
 An alternative to the event-based model is the update-based model, shown in Figure \ref{fig_cs_cm}. This model is based on the Client/Server network
 model. An authoritative global game state is housed on the server and a non-authoritative local game state is housed on all clients for display
 purposes. No real game logic is housed at the clients, only on the server. All clients send events to the server, which applies the game logic and
@@ -567,6 +485,9 @@ received from the server. The server state is also termed authoritative, because
 which the system is expected to return. All the security advantages of the \ac{CS} model also apply to this consistency model. Another reason why the
 update based model is successful is because it is more scalable then the pure P2P model. More hardware can be used to build a more powerful server,
 which can handle more clients. This is, however, costly as discussed in Section \ref{client_server_network_model}.
+
+The update-based model is used in many, if not all, MMOGs currently in operation. This includes games like World of Warcraft, Eve Online and Ultima
+Online, to name just a few.
 
 \subsection{Client/Multi-Server consistency models}
 \label{cms_models}
@@ -587,6 +508,9 @@ shards could be difficult to log in to. Players are also reluctant to move to a 
 their ``home'' shard. Sharding doesn't allocate resources efficiently, as one shard may be overpopulated while another is underpopulated. There is no
 way to dynamically distribute the available resources from one shard to another. For all practical purposes, this approach is still merely a \ac{CS}
 approach, with players forced into a specific \ac{CS} environment.
+
+Another examples of this model is Blizzard's World of Warcraft, where many copies exist of the same game world. Specific details of the network
+architecture of WoW have not been made available by Blizzard.
 
 \subsubsection{Replication-based}
 %Redundant
@@ -626,6 +550,8 @@ balance the regions.
 Dynamic regions are being investigated, where regions can be dynamically shifted from one server to another, in order to balance load
 \cite{zone_based_dyn}. This approach adds overhead and significant complexity with regards to the migration of the data and the handling of player
 actions while the data are in transit.
+
+A well known example of this model is Eve Online.
 
 \section{Peer-to-Peer MMOG network architectures}
 \label{p2p_network_models}
@@ -839,7 +765,7 @@ board'' like mechanism, where tasks are advertised on specialised super peers. O
 advertised tasks \cite{fan_mediator_paper}.
 
 
-\section{P2P MMOG state persistency models}
+\section{Peer-to-Peer MMOG state persistency models}
 \label{p2p_mmog_cm_overview}
 
 %Overview of three approaches
@@ -871,7 +797,7 @@ Super Peer & Medium & High & Low & Low & \cite{knutsson_p2p_first}\\
 Overlay & High & Low & Medium & High & \cite{Douglas05enablingmassively}, \cite{using_freenet_storage},
 \cite{Fan_phd}, \cite{past_storage_focus}\\
 Hybrid & High & High & Low & Low & \cite{zoned_federation}, \cite{hybrid_storage1}\\
-Distance-based & Low & High & Low & Medium & \cite{Buyukkaya_voronoi_state_management}, \cite{Hu_voronoi_IM},
+Distance-based & Medium & High & Low & Medium & \cite{Buyukkaya_voronoi_state_management}, \cite{Hu_voronoi_IM},
 \cite{colyseus_distance_based}, \cite{solipsis}\\
 \hline
 \end{tabular}
@@ -1054,6 +980,12 @@ The disadvantages are:
         to network churn. The architectures reviewed did not implement such mechanisms.
 \end{enumerate}
 
+No recent mentions could be found of researchers implementing super peer storage for P2P MMOGs. This means that there has been very little evolution
+in super peer storage and that super peer storage is currently less mature than other storage schemes. Super peer storage might still be used for
+small independent casual games, such as online board games, where a group of friends can implicitly trust each other or where the risk of cheating is
+at a minimum. The reason why this storage method is recommended for games from independent developers, is because the scheme is easy to implement and
+will not require much resources when used for small games.
+
 \subsection{Overlay storage}
 \label{overlay_storage}
 
@@ -1184,6 +1116,15 @@ The disadvantages are:
 %    \item Another disadvantage of pure overlay storage is the maintenance of storage consistency.
 \end{enumerate}
 
+Overlay storage is currently a mature storage scheme i.t.o. security, robustness and fairness, but its applicability to games is still uncertain.
+More data is required to determine what the latency requirements are for online games i.t.o. storage and whether overlays can meet these levels of
+responsiveness. No such studies could be found. Without such studies, overlay storage might still be applicable to games where data do not have to be
+committed to storage in real-time. Games where other consistency mechanisms exist and where the overlay is primarily used to backup data.
+
+Depending on the implementation, such a backup storage scheme could be used for role-playing games. Overlay storage will place some restrictions on
+certain game mechanics, but it is possible that games could be designed around these restrictions. The primary restriction being that data cannot be
+immediately retrieved from storage.
+
 \subsection{Hybrid region-based storage}
 \label{hybrid_storage}
 
@@ -1265,7 +1206,7 @@ worst of these two types of storage. The advantages of the scheme are:
 %
 \begin{enumerate}
     \item There exists a high level of reliability, because of the presence of the backup overlay storage.
-    \item The system is very responsive due to the use of super peers peer storage.
+    \item The system is very responsive due to the use of super peer storage.
 \end{enumerate}
 
 The disadvantages are:
@@ -1276,6 +1217,12 @@ The disadvantages are:
     \item The system is also not fair. Even though all game states are distributed in the overlay, super peers are still required to store
         another copy of the game world, extra to the data stored in the overlay.
 \end{enumerate}
+
+Hybrid region-based storage has all the advantages of super peer storage, but with the additional reliability of overlay storage. For this reason, it
+is recommended that any game requiring high levels of reliability and responsiveness use hybrid storage, instead of super peer storage. This storage
+type currently seems to be the most mature storage type, but the security issue limits the scope of games that might be implemented. For this reason,
+this storage type is still only usable for small independent MMOGs, where the risk of cheating is reduced by the social pressures of a small
+community, where all players no each other and play together frequently.
 
 \subsection{Distance-based storage}
 \label{distance_based_storage}
@@ -1407,8 +1354,12 @@ Some disadvantages are:
         since the nodes hosting objects have an incentive to manipulate those objects.
 \end{enumerate}
 
-\section{Conclusion}
+Distance based storage is still fairly immature, but shows a lot of promise. Even though the storage is not yet reliable, it could conceivably be
+possible to add overlay storage as a backup to the system and thereby add reliability. If voting techniques can be used to update game state, some of
+the security issues might also be solved. With these two issues addressed, the high farness of the storage makes it an excellent candidate to power
+the P2P MMOGs of the future.
 
+\section{Conclusion}
 
 After providing an overview of the classic C/S and C/MS state persistency techniques, this survey classified P2P MMOG state persistency techniques
 into super peer based, overlay based, distance based and hybrid storage. The advantages and disadvantages of each method were discussed after
@@ -1422,6 +1373,8 @@ of the application.
 This survey was written, because of an identified need for a concise summary of the field of P2P MMOG game state persistency. Many techniques used in
 the past were used because of the ease with which they could be integrated into a P2P MMOG. The purpose of this survey is to identify those
 techniques and to stimulate further research, using empirical methods to compare the different storage techniques used.
+
+%None of the schemes are applicable to large MMOGs, well indie stuff.
 
 %\newpage
 %\IEEEtriggeratref{43} %Balance the bibliography
