@@ -202,12 +202,12 @@ E-mail: jgilmore@ml.sun.ac.za and hebrecht@sun.ac.za}% <-this % stops a space
 \thanks{}}
 
 \author{John~S.~Gilmore~and~Herman~A.~Engelbrecht% <-this % stops a space
-\IEEEcompsocitemizethanks{\IEEEcompsocthanksitem J.S Gilmore is a PhD student with the MIH Media Laboratory at the Department of Electrical
+\IEEEcompsocitemizethanks{\IEEEcompsocthanksitem J.S Gilmore is a PhD student at the MIH Media Laboratory at the Department of Electrical
 and Electronic Engineering, Stellenbosch University, Stellenbosch, South Africa.\protect\\
 % note need leading \protect in front of \\ to get a newline within \thanks as
 % \\ is fragile and will error, could use \hfil\break instead.
 E-mail: jgilmore@ml.sun.ac.za
-\IEEEcompsocthanksitem H.A. Engelbrecht is the research manager at the MIH Media Laboratory at the Department of Electrical and Electronic Engineering, Stellenbosch University, Stellenbosch, South Africa.\protect\\
+\IEEEcompsocthanksitem H.A. Engelbrecht is the research manager at the MIH Media Laboratory.\protect\\
 E-mail: hebrecht@sun.ac.za}% <-this % stops a space
 \thanks{}}
 
@@ -301,7 +301,7 @@ Applications}]: Games
   \global\everypar=\everypar}}%
   \vspace{-1\baselineskip}\vspace{-\parskip}\par
 \else
-  \section{Introduction}\label{sec:introduction}\par
+\section{Introduction}\label{sec:introduction}\par
 \fi
 %
 % Admittedly, this is a hack and may well be fragile, but seems to do the
@@ -321,47 +321,45 @@ Applications}]: Games
 % Some journals put the first two words in caps:
 % \IEEEPARstart{T}{his demo} file is ....
 %
-\IEEEPARstart{P}{eer-to-Peer (P2P)} Massively Multiplayer Online Games (MMOGs) have received a significant amount of attention from the research
-community over the past years. Since the first publication on the subject by Knutssonn et al. \cite{knutsson_p2p_first}, the three areas of Interest
-Management, Game Event Dissemination and Security, have received much attention from the research community, but the area of Game State Persistency
-has remained mostly unexplored.
+\IEEEPARstart{P}{eer-to-Peer (P2P)} Massively Multiplayer Online Games (MMOGs) have received significant attention from the research community, since
+the first publication on the subject by Knutssonn et al. in 2004 \cite{knutsson_p2p_first}. Many challenges that have to be solved before P2P MMOGs
+can be implemented commercially have been identified. Over the past few years, researchers have been addressing these challenges. Initially, this
+paper introduces some related surveys that have been completed in the field of P2P MMOGs and P2P applications in general, in Section
+\ref{related_work}.
 
-Interest Management determines how player actions are filtered to ensure that players only receive actions relevant to them, which reduces the
-bandwidth requirements of the system. Game Event Dissemination entails how these events are then sent to various players. Security ensures that the
-system is not affected by the activity of malicious peers.
+As background, an introduction of some classic consistency models, currently used in computers games, are introduced in Section \ref{classic_models}.
+These consistency models are what the P2P state persistency models are based on and so an understanding of how they work will allow the reader to
+understand the state persistency models.
 
-Game State Persistency entails storing persistent game data in a distributed fashion in the the P2P network. Part of an MMOG is ensuring low latency,
-consistent data persistency of all game data. Player data, in-game object states and \ac{NPC} states should all be stored.
+After this brief introduction of classic theory, the field of P2P MMOGs is introduced in Section \ref{p2p_network_architectures}. This is done by
+first introducing the P2P overlay in Section \ref{overlays}, which is the key difference between more well known P2P applications, for example: video
+streaming, BitTorrent and VoIP, and P2P MMOGs. After this introduction, the advantages of P2P MMOGs compared to normal \ac{CS} MMOGs are discussed in
+Section \ref{p2p_network_architectures}. The list of advantages is followed by a brief overview of key challenges facing P2P MMOGs in general, in
+Section \ref{key_challenges}. These challenges are: Interest Management, Event Dissemination, Cheating Mitigation, Incentive Mechanisms, Game State
+Persistency and Distributed computing.
 
-This paper classifies the techniques used in documented P2P MMOG architectures and discusses the advantages and disadvantages of the different types
-of storage. To the best of our knowledge, such a classification, where a focus is placed specifically on state persistency in P2P MMOGs, has not been
-undertaken in the literature. As the field of P2P MMOGs is a growing one, it is believed that a comprehensive survey of persistency techniques is
-required to act as a basis for further research into the field.
+After the P2P MMOG overview, the remainder of the paper focuses exclusively on one of the key challenges mentioned, namely: state persistency for P2P
+MMOGs in Section \ref{p2p_mmog_state_persistency}. The paper classifies the techniques used in documented P2P MMOG architectures and discusses the
+advantages and disadvantages of the different types of storage. To the best of our knowledge, such a classification, where a focus is placed
+specifically on state persistency in P2P MMOGs, has not been undertaken in the literature. As the field of P2P MMOGs is a growing one, it is believed
+that a comprehensive survey of persistency techniques is required to act as a basis for further research into the field.
 
-The survey will first introduce other surveys on the the topic of P2P overlay technologies and how these are different from this survey. After this,
-an overview of classic models used in \ac{CS} and P2P multiplayer games is presented, in order to compare the classic models with the models used in
-P2P MMOGs. P2P MMOG state persistency techniques are then classified in terms of the type of storage they provide and key characteristics are defined
-by which the performance of these storages may be measured. The three identified types of storage are then described and evaluated according to the
-key challenges, with references to the relevant work done in each field.
-
-Section \ref{related_work} introduces other surveys in the field of P2P overlays and compares the surveys presented with this survey.
-%
-Section \ref{classic_network_models} introduces the two most common network models used in P2P MMOGs. The classic consistency models later defined
-are based on the network models defined here, so an understanding of the advantages and disadvantages of each is essential.
-%
-Section \ref{classic_models} details how state persistency is handled in P2P, \ac{CS} and \ac{CMS} systems employed in multiplayer games today.
-%
-Section \ref{p2p_mmog_cm_overview} discusses how state persistency is implemented in P2P MMOGs by defining five key challenges and then discussing
-three storage approaches according to the identified challenges.
-%
-Section \ref{eval_crit} attempts to define measurable metrics according to the key challenges to enable the comparison of the performance of
-different state persistency models.
+Before the analysis of state persistency techniques, the chapter introduces some key characteristics that are expected of state persistency models
+for P2P MMOGs. Each type of storage is then evaluated according to these required characteristics. The characteristics are: Scalability, Fairness,
+Reliability, Security and Responsiveness. Each section describing storage types also includes a section presenting some key architectures that are
+representative of the storage type discussed, followed by a comparison between these architectures. Each storage type section is concluded by a
+summary and recommendations to researchers and implementers who wish to integrate one of these storage types into their own work.
 
 \section{Related work}
 \label{related_work}
 
 No papers were found that deal specifically with the subject of P2P state persistency in MMOGs, but some surveys were found that deal with other
 issues of P2P MMOGs, or P2P overlays in general.
+
+In 2007 Schiele et al. published the paper: ``Requirements of Peer-to-Peer-based Massively Multiplayer Online Gaming''
+\cite{Schiele_p2p_requirements}. This paper presents a broad overview of some key requirements that P2P MMOGs should possess, to function correctly
+under any load for any amount of time. These are: distribution, consistency, self-organisation, persistency, availability, interactivity,
+scalability, security, efficiency and maintainability. The focus of this paper is on the persistency requirement identified in the paper by Schiele.
 
 Krause presented ``A Case for Mutual Notification: A survey on P2P protocols for Massively Multiplayer Online Games.''
 \cite{IM_and_ED_survey_Krause}. The protocols discussed in this survey focussed on the areas of interest management and event dissemination. Three
@@ -405,12 +403,18 @@ system, this survey deals specifically with the area of P2P MMOGs and more speci
 \section{Classic consistency models}
 \label{classic_models}
 
-A consistency model is based on the network model, but deals with how data are stored and distributed throughout the system. Usually a game object
-exists in two forms. The root object and the replica object. Root objects are the objects traditionally housed on the Server in the C/S based MMOGs.
-All clients obtain replicas of these objects and duplicate them locally in order to perform low latency computations. An example would be an NPC
-monster. When the players perceive the monster in the virtual world, a duplicate of the NPC objects is sent to the user's computer for display
+A consistency model deals with how data are stored and distributed throughout the system and is based on an underlying network model. The network
+model is usually either \ac{CS} or \ac{P2P}.
+
+A game object exists in two forms: the root object and the replica object. Root objects are the objects traditionally housed on the Server in the C/S
+based MMOGs. All clients obtain replicas of these objects and duplicate them locally in order to perform low latency computations. An example would
+be an NPC monster. When players perceive the monster in the virtual world, a duplicate of the NPC objects is sent to the user's computer for display
 purposes. When another player attacks the NPC, the change in health will be computed at the server and an update is then sent in order to ensure
 consistency between the root objects and the replica object.
+
+The method by which the states between root and replica objects are updated is called the consistency model. State persistency, which deals with how
+and where objects are stored, usually forms part of the consistency model because the consistency model also deals with object states. Because of
+this reason, some knowledge is required of the classic consistency models, in order to evaluate the P2P state persistency models.
 
 \subsection{Terminology}
 
@@ -554,7 +558,7 @@ actions while the data are in transit.
 A well known example of this model is Eve Online.
 
 \section{Peer-to-Peer MMOG network architectures}
-\label{p2p_network_models}
+\label{p2p_network_architectures}
 
 In 2004, an architecture using the peer-to-peer networking model to host MMOGs was proposed by Knutsson et al. \cite{knutsson_p2p_first}. This
 revealed a new research field, which attempts to establish the P2P model as a viable alternative to the classic \ac{CS} and \ac{CMS} architectures.
@@ -597,6 +601,7 @@ said that unstructured overlays are good at finding ``hay'', while structured ov
 \cite{Rodrigues_acm_comms_p2p}.
 
 \subsection{Advantages}
+\label{p2p_advantages}
 
 The system is robust, because there is no server that can fail, only individual peers. Individual peers failing will not affect any other peers other
 than the peer that failed. This behaviour makes game down-time extremely unlikely.
@@ -766,12 +771,17 @@ advertised tasks \cite{fan_mediator_paper}.
 
 
 \section{Peer-to-Peer MMOG state persistency models}
-\label{p2p_mmog_cm_overview}
+\label{p2p_mmog_state_persistency}
+
+This section identifies state persistency techniques used in P2P MMOGs, since very little work has been done in this field. State persistency is
+treated as a sub domain of state consistency, in that state persistency models define where and how the root or authoritive objects are stored. It is
+assumed that replica objects are always stored in the primary memory of the clients that immediately require the information contained in the root
+object.
 
 %Overview of three approaches
-Very little work has been done on state persistency for P2P MMOGs. Generally four approaches have been identified to achieve state persistency:
-\emph{super peer storage}, \emph{overlay storage}, \emph{distance-based storage} and \emph{hybrid storage}. These four storage architectures are
-detailed in Sections \ref{super_peer_storage}, \ref{overlay_storage}, \ref{hybrid_storage} and \ref{distance_based_storage}.
+Four approaches have been identified by which state persistency is achieved in P2P MMOGs: \emph{super peer storage}, \emph{overlay storage},
+\emph{distance-based storage} and \emph{hybrid storage}. These four storage architectures are detailed in Sections \ref{super_peer_storage},
+\ref{overlay_storage}, \ref{hybrid_storage} and \ref{distance_based_storage}.
 
 %Individual storage
 Two other types of storage sometimes described in P2P MMOGs papers are \emph{centralised storage} and \emph{individual storage}. Centralised storage
@@ -815,22 +825,23 @@ in the sections to follow.
 \label{key_challenges_cm}
 
 %Consistency issues
-The key challenges related to P2P MMOG consistency models identified during this literature study were: scalability, reliability, responsiveness,
-security and fairness. All state persistency models will be reviewed with these characteristics in mind. In order to evaluate any consistency model,
-metrics have to be defined to measure the key characteristics of a storage system. This will allow for different consistency models to be compared
-and provide a measure of the applicability of any consistency model to P2P MMOGs. Such metrics could also compare the performance of one storage
+The key challenges related to P2P MMOG persistency models identified during this literature study were: scalability, reliability, responsiveness,
+security and fairness. All state persistency models will be reviewed with these characteristics in mind. In order to evaluate any persistency model,
+metrics have to be defined to measure the key characteristics of a storage system. This will allow for different persistency models to be compared
+and provide a measure of the applicability of any persistency model to P2P MMOGs. Such metrics could also compare the performance of one storage
 architecture to another.
 
 \subsubsection{Scalability}
 Scalability underpins all evaluation criteria. This implies that for a system to be scalable, all other evaluation criteria should be satisfied for
-large numbers of nodes and data. The question of what constitutes a large number of nodes arises. To establish what an adequate number of nodes is,
-current MMOG architectures can be used for inspiration.
+large numbers of nodes and data. For this reason, scalability will not be explicitly reviewed in the following storage types. Rather, all other
+evaluation criteria will be evaluated for a large number of nodes, thereby taking into account scalability.
 
-It is put proposed that to classify a system as \emph{sufficiently scalable}, the smallest number of peers that should be used is approximately 3000.
-This is the number of players per server, currently supported by most active C/S MMOGs. For a system to be classified as \emph{truly scalable}, it is
-believed that the architecture should support 60,000 concurrent users, twenty times more than a sufficiently scalable system. This is the number of
-peak concurrent users (PCUs) currently supported by the super computer used to host Eve Online \cite{eve_pcu}. These two measures will ensure that a
-system is as scalable as other currently available architectures.
+The question of what constitutes a large number of nodes arises. To establish what an adequate number of nodes is, current MMOG architectures can be
+used for inspiration. It is proposed that to classify a system as \emph{sufficiently scalable}, the smallest number of peers that should be used is
+approximately 3000. This is the number of players per server, currently supported by most active C/S MMOGs. For a system to be classified as
+\emph{truly scalable}, it is believed that the architecture should support 60,000 concurrent users, twenty times more than a sufficiently scalable
+system. This is the number of peak concurrent users (PCUs) currently supported by the super computer used to host Eve Online \cite{eve_pcu}. These
+two measures will ensure that a system is as scalable as other currently available architectures.
 
 For systems that will support the MMOGs of the future, it is believed that a target of 1 million nodes should be used. This number is sixteen times
 that of a truly scalable system and the peak concurrent player count of World of Warcraft in China in 2008 \cite{WoW_china_pcu}. Systems that will
@@ -871,7 +882,7 @@ should also be possible to identify nodes that alter the data in a malicious way
 in the storage system and that only authorised nodes should be able to alter data.
 
 Security is the combination of a number of objectives. These are: Authentication, Authorisation, Data Integrity, Confidentiality, Availability,
-Trust, Privacy and Identity Management \cite{distributed_systems_security}. When comparing different consistency techniques, it should first be
+Trust, Privacy and Identity Management \cite{distributed_systems_security}. When comparing different state persistency techniques, it should first be
 established which of these objectives does the scheme address. The number of objectives addressed, if addressed in industry standard ways, is already
 a measure of the security of the system. Data integrity can be tested by ensuring the storage system can withstand the dropping, delay or, possibly,
 the modification of data packets by malicious nodes in the network. Nodes can be programmed to randomly drop packets and the availability of the data
@@ -1119,7 +1130,8 @@ The disadvantages are:
 Overlay storage is currently a mature storage scheme i.t.o. security, robustness and fairness, but its applicability to games is still uncertain.
 More data is required to determine what the latency requirements are for online games i.t.o. storage and whether overlays can meet these levels of
 responsiveness. No such studies could be found. Without such studies, overlay storage might still be applicable to games where data do not have to be
-committed to storage in real-time. Games where other consistency mechanisms exist and where the overlay is primarily used to backup data.
+committed to storage in real-time. Such games might implement state persistency in primary memory and use overlay storage as a long term backup
+method.
 
 Depending on the implementation, such a backup storage scheme could be used for role-playing games. Overlay storage will place some restrictions on
 certain game mechanics, but it is possible that games could be designed around these restrictions. The primary restriction being that data cannot be
@@ -1132,7 +1144,7 @@ immediately retrieved from storage.
 \begin{figure*}[htbp]
  \centering
  \includegraphics[clip=true, viewport=2cm 5cm 27cm 19.5cm, width=\textwidth]{region_based_CS_CM_P2PO}
- \caption{Region-based Client/Server with overlay consistency model}
+ \caption{Hybrid region-based super peer storage with backup overlay storage consistency model}
  \label{fig_cs_region_o_cm}
 \end{figure*}
 %
