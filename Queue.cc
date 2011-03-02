@@ -45,7 +45,7 @@ void Queue::handleMessage(cMessage *msg)
 
 		queue->insert(pkt);
 
-		if (gate("out")->getChannel()->isBusy())
+		if (gate("out")->getTransmissionChannel()->isBusy())
 		{
 			//Schedule the module to send the next packet as soon as the previous packet finishes
 			scheduleAt(gate("out")->getChannel()->getTransmissionFinishTime(), event);

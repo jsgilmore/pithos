@@ -41,11 +41,11 @@ void Game::handleMessage(cMessage *msg)
 {
 	if (msg == event)
 	{
-		//char packet_name[20];
+		long filesize = (long)exponential(objectSize_av);
+		EV << "Bit length: " << filesize << "\n";
 		int peer_index = intuniform(0, 20);
 		PithosMsg *write_msg = new PithosMsg("storageRequest");
-		write_msg->setByteLength(exponential(objectSize_av));
-		//write_msg->setName("Storage req");
+		write_msg->setByteLength(filesize);
 		write_msg->setPayloadType(STORE_REQ);
 
 		//Depending on the index, the message is either sent to an indexed peer, or the super peer.

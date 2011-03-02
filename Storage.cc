@@ -38,10 +38,11 @@ void Storage::handleMessage(cMessage *msg)
 
 	if (pithos_m->getPayloadType() == STORE_REQ)
 	{
-		EV << getName() << " " << getIndex() << " received store request of size " << pithos_m->getByteLength() << "\n";
-		delete(pithos_m);
+		EV << getParentModule()->getName() << " " << getParentModule()->getIndex() << " received store request of size " << pithos_m->getByteLength() << "\n";
 
 		sendObjectForStore(pithos_m->getByteLength());
+
+		delete(pithos_m);
 	}
 	else if (pithos_m->getPayloadType() == WRITE)
 	{
