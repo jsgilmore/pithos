@@ -113,7 +113,6 @@ $O/Queue.o: Queue.cc \
 	Queue.h
 $O/Game.o: Game.cc \
 	Game.h \
-	Message_m.h \
 	Storage.h
 $O/Pithos_m.o: Pithos_m.cc \
 	Pithos_m.h

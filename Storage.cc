@@ -37,10 +37,10 @@ void Storage::handleMessage(cMessage *msg)
 {
 	if (strcmp(msg->getArrivalGate()->getName(), "write") == 0)
 	{
-		Message *m = check_and_cast<Message *>(msg);
-		EV << getParentModule()->getName() << " " << getParentModule()->getIndex() << " received store request of size " << m->getValue() << "\n";
+		cMessage *m = check_and_cast<cMessage *>(msg);
+		EV << getParentModule()->getName() << " " << getParentModule()->getIndex() << " received store request of size " << m->getKind() << "\n";
 
-		sendObjectForStore(m->getValue());
+		sendObjectForStore(m->getKind());
 
 		delete(m);
 	}

@@ -43,11 +43,10 @@ void Game::handleMessage(cMessage *msg)
 	{
 		char msgName [20];
 		int64 filesize = exponential(objectSize_av);
-		write_msg = new Message("storReq");
+		cMessage *write_msg = new cMessage("storReq");
 		sprintf(msgName, "store_req-%d", getParentModule()->getIndex());
 		write_msg->setName(msgName);
-		write_msg->setValue(filesize);
-		write_msg->setPayloadType(STORE_REQ);
+		write_msg->setKind(filesize);
 
 		send(write_msg, "write");
 		write_msg = NULL;
