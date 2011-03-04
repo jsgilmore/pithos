@@ -15,6 +15,7 @@
 
 #include "Storage.h"
 #include "Pithos_m.h"
+#include "Message_m.h"
 
 Storage::Storage()
 {
@@ -34,18 +35,19 @@ void Storage::initialize()
 
 void Storage::handleMessage(cMessage *msg)
 {
-	PithosMsg *pithos_m = check_and_cast<PithosMsg *>(msg);
-
-	if (pithos_m->getPayloadType() == STORE_REQ)
+	if (strcmp(msg->getArrivalGate()->getName(), "write") == 0)
 	{
-		EV << getParentModule()->getName() << " " << getParentModule()->getIndex() << " received store request of size " << pithos_m->getByteLength() << "\n";
+		Message *m = check_and_cast<Message *>(msg);
+		EV << getParentModule()->getName() << " " << getParentModule()->getIndex() << " received store request of size " << m->getValue() << "\n";
 
-		sendObjectForStore(pithos_m->getByteLength());
+		sendObjectForStore(m->getValue());
 
-		delete(pithos_m);
+		delete(m);
 	}
-	else if (pithos_m->getPayloadType() == WRITE)
+	else if (strcmp(msg->getArrivalGate()->getName(), "in") == 0)
 	{
+		PithosMsg *pithos_m = check_and_cast<PithosMsg *>(msg);
+
 		EV << getName() << " " << getIndex() << " received write command of size " << pithos_m->getByteLength() << "\n";
 
 		storeObject(pithos_m->getByteLength());
@@ -53,7 +55,7 @@ void Storage::handleMessage(cMessage *msg)
 	}
 	else {
 		EV << "Illegal message received\n";
-		delete(pithos_m);
+		delete(msg);
 	}
 }
 
@@ -83,12 +85,17 @@ int Storage::getObjectSize(int index)
 void Storage::sendObjectForStore(int o_size)
 {
 	int storage_node_index = intuniform(0, 19);
+	simtime_t sendDelay = gate("out", storage_node_index)->getTransmissionChannel()->getTransmissionFinishTime()-simTime();
 
 	PithosMsg *write = new PithosMsg("write");
 	write->setByteLength(o_size);
 	write->setPayloadType(WRITE);
 
-	send(write, "out", storage_node_index);
+	if (gate("out", storage_node_index)->getTransmissionChannel()->isBusy())
+	{
+		sendDelayed(write, sendDelay, "out", storage_node_index);
+	}
+	else send(write, "out", storage_node_index);
 }
 
 void Storage::storeObject(int o_size)

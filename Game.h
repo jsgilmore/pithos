@@ -18,12 +18,15 @@
 
 #include <omnetpp.h>
 
+#include "Message_m.h"
+
 class Game : public cSimpleModule
 {
 	private:
 		simtime_t writeTime_av;
 		double objectSize_av;
 		cMessage *event;
+		Message *write_msg;
 	public:
 		Game();
 		virtual ~Game();

@@ -20,14 +20,12 @@
  * <pre>
  * enum PayloadTypes
  * {
- *     STORE_REQ = 1;
- *     WRITE = 2;
+ *     WRITE = 1;
  * };
  * </pre>
  */
 enum PayloadTypes {
-    STORE_REQ = 1,
-    WRITE = 2
+    WRITE = 1
 };
 
 /**

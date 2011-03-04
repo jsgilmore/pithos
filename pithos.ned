@@ -21,19 +21,20 @@ simple Storage
         @class(Storage);
     gates:
         output out[];
-        input q_in;
+        input in[];
         input write;
         output read @loose;
 }
 
-simple Queue
+simple Game
 {
     parameters:
-        @class(Queue);
-        @display("i=block/queue;q=queue");
+        @class(Game);
+        @display("i=block/source");
+        double avWriteTime @unit(s) = default(50s);	//0.1 ms average
+        double avObjectSize = default(1024);	//1 KB average
     gates:
-        input in[];
-        output out;
+        output write;
 }
 
 module Peer
@@ -43,26 +44,15 @@ module Peer
     gates:
         input in[];
         output out[];
-        input write @directIn;
     submodules:
         storage: Storage;
-        queue: Queue;
+        game: Game;
     connections:
-        queue.out --> storage.q_in;
-        write --> storage.write;
+        game.write --> storage.write;
         for i=0..sizeof(out)-1 {
             storage.out++ --> out[i];
-            in[i] --> queue.in++;
+            in[i] --> storage.in++;
         }
-}
-
-simple Game
-{
-    parameters:
-        @class(Game);
-        @display("i=block/source");
-        double avWriteTime @unit(s) = default(5s);	//0.1 ms average
-        double avObjectSize = default(5*1024*1024);	//5 MB average
 }
 
 network Pithos
@@ -71,7 +61,6 @@ network Pithos
     submodules:
         peer[20]: Peer;
         super_peer: Peer;
-        game: Game;
     connections:
         for j=0..18, for i=j..18 {
             peer[j].out++ --> {  datarate = 384Kbps; } --> peer[i+1].in++;

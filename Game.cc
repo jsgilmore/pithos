@@ -17,7 +17,7 @@
 
 #include "Game.h"
 #include "Storage.h"
-#include "Pithos_m.h"
+
 
 Game::Game() {
 	// TODO Auto-generated constructor stub
@@ -41,17 +41,16 @@ void Game::handleMessage(cMessage *msg)
 {
 	if (msg == event)
 	{
-		long filesize = (long)exponential(objectSize_av);
-		EV << "Bit length: " << filesize << "\n";
-		int peer_index = intuniform(0, 20);
-		PithosMsg *write_msg = new PithosMsg("storageRequest");
-		write_msg->setByteLength(filesize);
+		char msgName [20];
+		int64 filesize = exponential(objectSize_av);
+		write_msg = new Message("storReq");
+		sprintf(msgName, "store_req-%d", getParentModule()->getIndex());
+		write_msg->setName(msgName);
+		write_msg->setValue(filesize);
 		write_msg->setPayloadType(STORE_REQ);
 
-		//Depending on the index, the message is either sent to an indexed peer, or the super peer.
-		if (peer_index != 20)
-			sendDirect(write_msg, getParentModule()->getSubmodule("peer", peer_index), "write");
-		else sendDirect(write_msg, getParentModule()->getSubmodule("super_peer"), "write");
+		send(write_msg, "write");
+		write_msg = NULL;
 
 		scheduleAt(simTime()+exponential(writeTime_av), event);
 	}

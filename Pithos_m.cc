@@ -33,7 +33,6 @@ void doUnpacking(cCommBuffer *, T& t) {
 EXECUTE_ON_STARTUP(
     cEnum *e = cEnum::find("PayloadTypes");
     if (!e) enums.getInstance()->add(e = new cEnum("PayloadTypes"));
-    e->insert(STORE_REQ, "STORE_REQ");
     e->insert(WRITE, "WRITE");
 );
 
