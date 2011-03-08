@@ -14,33 +14,36 @@
 // 
 
 #include "Storage.h"
-#include "Pithos_m.h"
-#include "Message_m.h"
 
 Storage::Storage()
 {
-	storage_size = 0;
-	WATCH(storage_size);
-	WATCH(storage);
 }
 
 Storage::~Storage() {
-	// TODO Auto-generated destructor stub
+	delete(storage);
 }
 
 void Storage::initialize()
 {
+	storage = new cQueue();
+	storage->setName("queue");
 
+	//Initialise queue statistics collection
+	qlenSignal = registerSignal("qlen");
+	busySignal = registerSignal("busy");
+	queueingTimeSignal = registerSignal("queueingTime");
+	emit(qlenSignal, storage->length());
+	emit(busySignal, 0);
 }
 
 void Storage::handleMessage(cMessage *msg)
 {
 	if (strcmp(msg->getArrivalGate()->getName(), "write") == 0)
 	{
-		cMessage *m = check_and_cast<cMessage *>(msg);
-		EV << getParentModule()->getName() << " " << getParentModule()->getIndex() << " received store request of size " << m->getKind() << "\n";
+		Message *m = check_and_cast<Message *>(msg);
+		EV << getParentModule()->getName() << " " << getParentModule()->getIndex() << " received store request of size " << m->getValue() << "\n";
 
-		sendObjectForStore(m->getKind());
+		sendObjectForStore(m->getValue());
 
 		delete(m);
 	}
@@ -49,7 +52,6 @@ void Storage::handleMessage(cMessage *msg)
 		PithosMsg *pithos_m = check_and_cast<PithosMsg *>(msg);
 
 		EV << getName() << " " << getIndex() << " received write command of size " << pithos_m->getByteLength() << "\n";
-
 		storeObject(pithos_m->getByteLength());
 		delete(pithos_m);
 	}
@@ -64,9 +66,11 @@ int Storage::getStorageBytes()
 	int i;
 	int total_size = 0;
 
-	for (i = 0 ; i < storage_size ; i++)
+	//This is inefficient, since a sequential search will be done for every element in the queue.
+	//TODO: The "forEachChild" method should rather be implemented with an appropriate visitor class.
+	for (i = 0 ; i < storage->getLength() ; i++)
 	{
-		total_size += storage[i];
+		total_size += ((go *)storage->get(i))->getSize();
 	}
 
 	return total_size;
@@ -74,17 +78,12 @@ int Storage::getStorageBytes()
 
 int Storage::getStorageFiles()
 {
-	return storage_size;
+	return storage->getLength();
 }
 
-int Storage::getObjectSize(int index)
+void Storage::sendObjectForStore(int64_t o_size)
 {
-	return storage[index];
-}
-
-void Storage::sendObjectForStore(int o_size)
-{
-	int storage_node_index = intuniform(0, 19);
+	int storage_node_index = intuniform(0, 18);	//18. because there are 20 nodes, which means 19 connections, which means 0-18 values.
 	simtime_t sendDelay = gate("out", storage_node_index)->getTransmissionChannel()->getTransmissionFinishTime()-simTime();
 
 	PithosMsg *write = new PithosMsg("write");
@@ -94,11 +93,19 @@ void Storage::sendObjectForStore(int o_size)
 	if (gate("out", storage_node_index)->getTransmissionChannel()->isBusy())
 	{
 		sendDelayed(write, sendDelay, "out", storage_node_index);
+		emit(busySignal, 1);
 	}
-	else send(write, "out", storage_node_index);
+	else {
+		send(write, "out", storage_node_index);
+		emit(busySignal, 0);
+	}
 }
 
-void Storage::storeObject(int o_size)
+void Storage::storeObject(int64_t o_size)
 {
-	storage[storage_size++] = o_size;
+	go *game_object = new go();
+	game_object->setSize(o_size);
+	storage->insert(game_object);
+
+	emit(qlenSignal, storage->length());
 }

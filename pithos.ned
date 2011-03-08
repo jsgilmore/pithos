@@ -19,6 +19,13 @@ simple Storage
 {
     parameters:
         @class(Storage);
+        @signal[qlen](type="int");
+        @signal[busy](type="bool");
+        @signal[queueingTime](type="simtime_t");
+        @statistic[qlen](title="queue length";record=vector,timeavg,max;interpolationmode=sample-hold);
+        @statistic[busy](title="server busy state";record=vector,timeavg;interpolationmode=sample-hold);
+        @statistic[queueingTime](title="queueing time at dequeue";unit=s;interpolationmode=none);
+        
     gates:
         output out[];
         input in[];
@@ -31,7 +38,7 @@ simple Game
     parameters:
         @class(Game);
         @display("i=block/source");
-        double avWriteTime @unit(s) = default(50s);	//0.1 ms average
+        double avWriteTime @unit(s) = default(0.001s);	//0.1 ms average
         double avObjectSize = default(1024);	//1 KB average
     gates:
         output write;

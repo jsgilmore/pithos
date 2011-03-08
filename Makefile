@@ -1,12 +1,12 @@
 #
-# OMNeT++/OMNEST Makefile for Pithos
+# OMNeT++/OMNEST Makefile for pithos
 #
 # This file was generated with the command:
-#  opp_makemake -f --deep -O out
+#  opp_makemake -f --deep -O out -I/home/jgilmore/omnetpp-4.1/include
 #
 
 # Name of target to be created (-o option)
-TARGET = Pithos$(EXE_SUFFIX)
+TARGET = pithos$(EXE_SUFFIX)
 
 # User interface (uncomment one) (-u option)
 USERIF_LIBS = $(ALL_ENV_LIBS) # that is, $(TKENV_LIBS) $(CMDENV_LIBS)
@@ -14,7 +14,7 @@ USERIF_LIBS = $(ALL_ENV_LIBS) # that is, $(TKENV_LIBS) $(CMDENV_LIBS)
 #USERIF_LIBS = $(TKENV_LIBS)
 
 # C++ include paths (with -I)
-INCLUDE_PATH = -I.
+INCLUDE_PATH = -I/home/jgilmore/omnetpp-4.1/include -I. -Iresults
 
 # Additional object and library files to link with
 EXTRA_OBJS =
@@ -28,12 +28,18 @@ PROJECTRELATIVE_PATH =
 O = $(PROJECT_OUTPUT_DIR)/$(CONFIGNAME)/$(PROJECTRELATIVE_PATH)
 
 # Object files for local .cc and .msg files
-OBJS = $O/Game.o $O/Queue.o $O/Storage.o $O/Message_m.o $O/Pithos_m.o
+OBJS = \
+    $O/Game.o \
+    $O/Queue.o \
+    $O/Storage.o \
+    $O/go.o \
+    $O/message_m.o \
+    $O/pithos_m.o
 
 # Message files
 MSGFILES = \
-    Message.msg \
-    Pithos.msg
+    message.msg \
+    pithos.msg
 
 #------------------------------------------------------------------------------
 
@@ -93,27 +99,34 @@ msgheaders: $(MSGFILES:.msg=_m.h)
 
 clean:
 	-rm -rf $O
-	-rm -f Pithos Pithos.exe libPithos.so libPithos.a libPithos.dll libPithos.dylib
+	-rm -f pithos pithos.exe libpithos.so libpithos.a libpithos.dll libpithos.dylib
 	-rm -f ./*_m.cc ./*_m.h
+	-rm -f results/*_m.cc results/*_m.h
 
 cleanall: clean
 	-rm -rf $(PROJECT_OUTPUT_DIR)
 
 depend:
-	$(MAKEDEPEND) $(INCLUDE_PATH) -f Makefile -P\$$O/ -- $(MSG_CC_FILES)  ./*.cc
+	$(MAKEDEPEND) $(INCLUDE_PATH) -f Makefile -P\$$O/ -- $(MSG_CC_FILES)  ./*.cc results/*.cc
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
-$O/Message_m.o: Message_m.cc \
-	Message_m.h
-$O/Storage.o: Storage.cc \
-	Message_m.h \
-	Storage.h \
-	Pithos_m.h
-$O/Queue.o: Queue.cc \
-	Queue.h
 $O/Game.o: Game.cc \
+	message_m.h \
+	go.h \
+	pithos_m.h \
 	Game.h \
 	Storage.h
-$O/Pithos_m.o: Pithos_m.cc \
-	Pithos_m.h
+$O/message_m.o: message_m.cc \
+	message_m.h
+$O/pithos_m.o: pithos_m.cc \
+	pithos_m.h
+$O/Queue.o: Queue.cc \
+	Queue.h
+$O/Storage.o: Storage.cc \
+	message_m.h \
+	go.h \
+	pithos_m.h \
+	Storage.h
+$O/go.o: go.cc \
+	go.h
 

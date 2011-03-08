@@ -25,7 +25,7 @@ Game::Game() {
 }
 
 Game::~Game() {
-	delete(event);
+	cancelAndDelete(event);
 }
 
 void Game::initialize()
@@ -42,12 +42,12 @@ void Game::handleMessage(cMessage *msg)
 	if (msg == event)
 	{
 		char msgName [20];
-		int64 filesize = exponential(objectSize_av);
-		cMessage *write_msg = new cMessage("storReq");
+		int64_t filesize = exponential(objectSize_av);
+		Message *write_msg = new Message("storReq");
 		sprintf(msgName, "store_req-%d", getParentModule()->getIndex());
 		write_msg->setName(msgName);
-		write_msg->setKind(filesize);
-
+		write_msg->setValue(filesize);
+		write_msg->setPayloadType(STORE_REQ);
 		send(write_msg, "write");
 		write_msg = NULL;
 

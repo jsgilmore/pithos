@@ -18,6 +18,8 @@
 
 #include <omnetpp.h>
 
+#include "message_m.h"
+
 class Game : public cSimpleModule
 {
 	private:

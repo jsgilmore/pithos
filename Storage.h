@@ -18,6 +18,10 @@
 
 #include <omnetpp.h>
 
+#include "pithos_m.h"
+#include "message_m.h"
+#include "go.h"
+
 class Storage : public cSimpleModule
 {
 	public:
@@ -25,15 +29,16 @@ class Storage : public cSimpleModule
 		virtual ~Storage();
 		int getStorageBytes();
 		int getStorageFiles();
-		int getObjectSize(int index);
-		void storeObject(int o_size);
+		void storeObject(int64_t o_size);
 	private:
-		int storage_size;
-		int storage[];
+		cQueue *storage;
 	protected:
+		simsignal_t qlenSignal;
+		simsignal_t busySignal;
+		simsignal_t queueingTimeSignal;
 		virtual void initialize();
 		virtual void handleMessage(cMessage *msg);
-		void sendObjectForStore(int o_size);
+		void sendObjectForStore(int64_t o_size);
 };
 
 Define_Module(Storage);
