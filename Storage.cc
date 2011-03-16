@@ -35,7 +35,7 @@ void Storage::handleMessage(cMessage *msg)
 
 		EV << getName() << " " << getIndex() << " received write command of size " << game_object->getSize() << "\n";
 
-		storage.insert(game_object);
+		storage.insert((cObject *)game_object);		//This cast is important, otherwise a segfault occurs when calling the cQueue destructor
 
 		emit(qlenSignal, storage.length());
 		delete(msg);
