@@ -18,7 +18,7 @@
 
 #include <omnetpp.h>
 
-#include "message_m.h"
+#include "Message_m.h"
 
 class Game : public cSimpleModule
 {

@@ -77,12 +77,12 @@ void Message::parsimUnpack(cCommBuffer *b)
     doUnpacking(b,this->payloadType_var);
 }
 
-int Message::getValue() const
+int64_t Message::getValue() const
 {
     return value_var;
 }
 
-void Message::setValue(int value_var)
+void Message::setValue(int64_t value_var)
 {
     this->value_var = value_var;
 }
@@ -195,7 +195,7 @@ const char *MessageDescriptor::getFieldTypeString(void *object, int field) const
         field -= basedesc->getFieldCount(object);
     }
     static const char *fieldTypeStrings[] = {
-        "int",
+        "int64_t",
         "int",
     };
     return (field>=0 && field<2) ? fieldTypeStrings[field] : NULL;
@@ -241,7 +241,7 @@ std::string MessageDescriptor::getFieldAsString(void *object, int field, int i) 
     }
     Message *pp = (Message *)object; (void)pp;
     switch (field) {
-        case 0: return long2string(pp->getValue());
+        case 0: return int642string(pp->getValue());
         case 1: return long2string(pp->getPayloadType());
         default: return "";
     }
@@ -257,7 +257,7 @@ bool MessageDescriptor::setFieldAsString(void *object, int field, int i, const c
     }
     Message *pp = (Message *)object; (void)pp;
     switch (field) {
-        case 0: pp->setValue(string2long(value)); return true;
+        case 0: pp->setValue(string2int64(value)); return true;
         case 1: pp->setPayloadType(string2long(value)); return true;
         default: return false;
     }

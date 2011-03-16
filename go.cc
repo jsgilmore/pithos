@@ -20,6 +20,12 @@ go::go()
 	size = 0;
 }
 
+go::go(const char *name)
+{
+	size = 0;
+	setName(name);
+}
+
 int64_t go::getSize()
 {
 	return size;

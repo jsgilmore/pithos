@@ -32,7 +32,7 @@ enum MessageTypes {
  * Class generated from <tt>Message.msg</tt> by opp_msgc.
  * <pre>
  * message Message {
- *     int value;
+ *     int64_t value;
  *     int payloadType enum(MessageTypes);
  * }
  * </pre>
@@ -40,7 +40,7 @@ enum MessageTypes {
 class Message : public ::cMessage
 {
   protected:
-    int value_var;
+    int64_t value_var;
     int payloadType_var;
 
     // protected and unimplemented operator==(), to prevent accidental usage
@@ -56,8 +56,8 @@ class Message : public ::cMessage
     virtual void parsimUnpack(cCommBuffer *b);
 
     // field getter/setter methods
-    virtual int getValue() const;
-    virtual void setValue(int value_var);
+    virtual int64_t getValue() const;
+    virtual void setValue(int64_t value_var);
     virtual int getPayloadType() const;
     virtual void setPayloadType(int payloadType_var);
 };

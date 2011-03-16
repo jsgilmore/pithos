@@ -13,32 +13,26 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#ifndef PEER_H_
-#define PEER_H_
+#ifndef STORAGE_H_
+#define STORAGE_H_
 
 #include <omnetpp.h>
 
-#include "pithos_m.h"
-#include "message_m.h"
 #include "go.h"
 
 class Storage : public cSimpleModule
 {
 	public:
 		Storage();
-		virtual ~Storage();
 		int getStorageBytes();
 		int getStorageFiles();
-		void storeObject(int64_t o_size);
 	private:
-		cQueue *storage;
+		cQueue storage;
 	protected:
 		simsignal_t qlenSignal;
-		simsignal_t busySignal;
 		simsignal_t queueingTimeSignal;
 		virtual void initialize();
 		virtual void handleMessage(cMessage *msg);
-		void sendObjectForStore(int64_t o_size);
 };
 
 Define_Module(Storage);

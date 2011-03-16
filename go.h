@@ -18,12 +18,13 @@
 
 #include <omnetpp.h>
 
-class go : public cObject
+class go : public cNamedObject
 {
 	private:
 		int64_t size;
 	public:
 		go();
+		go(const char *);
 		int64_t getSize();
 		void setSize(int64_t o_size);
 };

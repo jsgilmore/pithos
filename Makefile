@@ -2,7 +2,7 @@
 # OMNeT++/OMNEST Makefile for pithos
 #
 # This file was generated with the command:
-#  opp_makemake -f --deep -O out -I/home/jgilmore/omnetpp-4.1/include
+#  opp_makemake -f --deep -O out
 #
 
 # Name of target to be created (-o option)
@@ -14,7 +14,7 @@ USERIF_LIBS = $(ALL_ENV_LIBS) # that is, $(TKENV_LIBS) $(CMDENV_LIBS)
 #USERIF_LIBS = $(TKENV_LIBS)
 
 # C++ include paths (with -I)
-INCLUDE_PATH = -I/home/jgilmore/omnetpp-4.1/include -I. -Iresults
+INCLUDE_PATH = -I. -Iresults
 
 # Additional object and library files to link with
 EXTRA_OBJS =
@@ -30,16 +30,17 @@ O = $(PROJECT_OUTPUT_DIR)/$(CONFIGNAME)/$(PROJECTRELATIVE_PATH)
 # Object files for local .cc and .msg files
 OBJS = \
     $O/Game.o \
+    $O/go.o \
+    $O/Peer_logic.o \
     $O/Queue.o \
     $O/Storage.o \
-    $O/go.o \
-    $O/message_m.o \
-    $O/pithos_m.o
+    $O/Message_m.o \
+    $O/Pithos_m.o
 
 # Message files
 MSGFILES = \
-    message.msg \
-    pithos.msg
+    Message.msg \
+    Pithos.msg
 
 #------------------------------------------------------------------------------
 
@@ -111,22 +112,24 @@ depend:
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 $O/Game.o: Game.cc \
-	message_m.h \
 	go.h \
-	pithos_m.h \
+	Message_m.h \
 	Game.h \
 	Storage.h
-$O/message_m.o: message_m.cc \
-	message_m.h
-$O/pithos_m.o: pithos_m.cc \
-	pithos_m.h
+$O/Pithos_m.o: Pithos_m.cc \
+	Pithos_m.h
+$O/Message_m.o: Message_m.cc \
+	Message_m.h
 $O/Queue.o: Queue.cc \
 	Queue.h
-$O/Storage.o: Storage.cc \
-	message_m.h \
-	go.h \
-	pithos_m.h \
-	Storage.h
 $O/go.o: go.cc \
 	go.h
+$O/Peer_logic.o: Peer_logic.cc \
+	go.h \
+	Message_m.h \
+	Peer_logic.h \
+	Pithos_m.h
+$O/Storage.o: Storage.cc \
+	go.h \
+	Storage.h
 

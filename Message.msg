@@ -13,7 +13,7 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 message Message {
-    int value;
+    int64_t value;
     int payloadType enum(MessageTypes);
 }
 

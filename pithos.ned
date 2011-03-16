@@ -19,18 +19,31 @@ simple Storage
 {
     parameters:
         @class(Storage);
+        @display("i=abstract/cache");
         @signal[qlen](type="int");
-        @signal[busy](type="bool");
         @signal[queueingTime](type="simtime_t");
         @statistic[qlen](title="queue length";record=vector,timeavg,max;interpolationmode=sample-hold);
-        @statistic[busy](title="server busy state";record=vector,timeavg;interpolationmode=sample-hold);
         @statistic[queueingTime](title="queueing time at dequeue";unit=s;interpolationmode=none);
+        
+    gates:
+        output read;
+        input write;
+}
+
+simple Peer_logic
+{
+    parameters:
+        @class(Peer_logic);
+        @display("i=block/cogwheel");
+        @signal[busy](type="bool");
+        @statistic[busy](title="server busy state";record=vector,timeavg;interpolationmode=sample-hold);
         
     gates:
         output out[];
         input in[];
-        input write;
-        output read @loose;
+        output write;
+        input read;
+        input request;
 }
 
 simple Game
@@ -52,13 +65,16 @@ module Peer
         input in[];
         output out[];
     submodules:
+        peer_logic: Peer_logic;
         storage: Storage;
         game: Game;
     connections:
-        game.write --> storage.write;
+        game.write --> peer_logic.request;
+        peer_logic.write --> storage.write;
+        storage.read --> peer_logic.read;
         for i=0..sizeof(out)-1 {
-            storage.out++ --> out[i];
-            in[i] --> storage.in++;
+            peer_logic.out++ --> out[i];
+            in[i] --> peer_logic.in++;
         }
 }
 
