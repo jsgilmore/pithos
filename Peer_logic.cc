@@ -44,13 +44,11 @@ void Peer_logic::handleMessage(cMessage *msg)
 	else if (strcmp(msg->getArrivalGate()->getName(), "in") == 0)
 	{
 		PithosMsg *pithos_m = check_and_cast<PithosMsg *>(msg);
-		go *game_object = new go("game_object");
-		cMessage *storage_msg = new cMessage("storage");
+		Message *storage_msg = new Message("storage");
 
 		EV << getName() << " " << getIndex() << " received write command of size " << pithos_m->getByteLength() << "\n";
 
-		game_object->setSize(pithos_m->getByteLength());
-		storage_msg->addObject(game_object);
+		storage_msg->setValue(pithos_m->getByteLength());
 		send(storage_msg, "write");
 
 		delete(pithos_m);

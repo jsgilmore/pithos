@@ -30,7 +30,6 @@ O = $(PROJECT_OUTPUT_DIR)/$(CONFIGNAME)/$(PROJECTRELATIVE_PATH)
 # Object files for local .cc and .msg files
 OBJS = \
     $O/Game.o \
-    $O/go.o \
     $O/Peer_logic.o \
     $O/Queue.o \
     $O/Storage.o \
@@ -112,7 +111,6 @@ depend:
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 $O/Game.o: Game.cc \
-	go.h \
 	Message_m.h \
 	Game.h \
 	Storage.h
@@ -122,14 +120,10 @@ $O/Message_m.o: Message_m.cc \
 	Message_m.h
 $O/Queue.o: Queue.cc \
 	Queue.h
-$O/go.o: go.cc \
-	go.h
 $O/Peer_logic.o: Peer_logic.cc \
-	go.h \
 	Message_m.h \
 	Peer_logic.h \
 	Pithos_m.h
 $O/Storage.o: Storage.cc \
-	go.h \
 	Storage.h
 

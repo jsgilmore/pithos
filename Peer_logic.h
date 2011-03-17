@@ -20,7 +20,7 @@
 
 #include "Pithos_m.h"
 #include "Message_m.h"
-#include "go.h"
+//#include "go.h"
 
 class Peer_logic: public cSimpleModule
 {

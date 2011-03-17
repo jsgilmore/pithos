@@ -17,13 +17,16 @@
 #define STORAGE_H_
 
 #include <omnetpp.h>
+#include <assert.h>
 
-#include "go.h"
+#include "Message_m.h"
+//#include "Go.h"
 
 class Storage : public cSimpleModule
 {
 	public:
 		Storage();
+		virtual ~Storage();
 		int getStorageBytes();
 		int getStorageFiles();
 	private:
