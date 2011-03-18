@@ -46,6 +46,22 @@ simple Peer_logic
         input request;
 }
 
+simple Super_peer_logic
+{
+    parameters:
+        @class(Super_peer_logic);
+        @display("i=block/cogwheel");
+        @signal[busy](type="bool");
+        @statistic[busy](title="server busy state";record=vector,timeavg;interpolationmode=sample-hold);
+        
+    gates:
+        output out[];
+        input in[];
+        output write;
+        input read;
+        input request;
+}
+
 simple Game
 {
     parameters:
@@ -78,12 +94,33 @@ module Peer
         }
 }
 
+module Super_peer
+{
+    parameters:
+        @display("i=device/pc_l");
+    gates:
+        input in[];
+        output out[];
+    submodules:
+        super_peer_logic: Super_peer_logic;
+        storage: Storage;
+        game: Game;
+    connections:
+        game.write --> super_peer_logic.request;
+        super_peer_logic.write --> storage.write;
+        storage.read --> super_peer_logic.read;
+        for i=0..sizeof(out)-1 {
+            super_peer_logic.out++ --> out[i];
+            in[i] --> super_peer_logic.in++;
+        }
+}
+
 network Pithos
 {
     @display("bgl=2");
     submodules:
         peer[20]: Peer;
-        super_peer: Peer;
+        super_peer: Super_peer;
     connections:
         for j=0..18, for i=j..18 {
             peer[j].out++ --> {  datarate = 384Kbps; } --> peer[i+1].in++;

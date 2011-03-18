@@ -13,24 +13,24 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#include "Peer_logic.h"
+#include "Super_peer_logic.h"
 
-Peer_logic::Peer_logic()
+Super_peer_logic::Super_peer_logic()
 {
 }
 
-Peer_logic::~Peer_logic()
+Super_peer_logic::~Super_peer_logic()
 {
 }
 
-void Peer_logic::initialize()
+void Super_peer_logic::initialize()
 {
 	//Initialise queue statistics collection
 	busySignal = registerSignal("busy");
 	emit(busySignal, 0);
 }
 
-void Peer_logic::handleMessage(cMessage *msg)
+void Super_peer_logic::handleMessage(cMessage *msg)
 {
 	if (strcmp(msg->getArrivalGate()->getName(), "request") == 0)
 	{
@@ -61,7 +61,7 @@ void Peer_logic::handleMessage(cMessage *msg)
 	}
 }
 
-void Peer_logic::sendObjectForStore(int64_t o_size)
+void Super_peer_logic::sendObjectForStore(int64_t o_size)
 {
 	int storage_node_index = intuniform(0, 18);	//18. because there are 20 nodes, which means 19 connections, which means 0-18 values.
 	simtime_t sendDelay = gate("out", storage_node_index)->getTransmissionChannel()->getTransmissionFinishTime()-simTime();

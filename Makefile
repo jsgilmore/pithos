@@ -1,12 +1,12 @@
 #
-# OMNeT++/OMNEST Makefile for pithos
+# OMNeT++/OMNEST Makefile for Pithos
 #
 # This file was generated with the command:
 #  opp_makemake -f --deep -O out
 #
 
 # Name of target to be created (-o option)
-TARGET = pithos$(EXE_SUFFIX)
+TARGET = Pithos$(EXE_SUFFIX)
 
 # User interface (uncomment one) (-u option)
 USERIF_LIBS = $(ALL_ENV_LIBS) # that is, $(TKENV_LIBS) $(CMDENV_LIBS)
@@ -30,9 +30,11 @@ O = $(PROJECT_OUTPUT_DIR)/$(CONFIGNAME)/$(PROJECTRELATIVE_PATH)
 # Object files for local .cc and .msg files
 OBJS = \
     $O/Game.o \
-    $O/Peer_logic.o \
     $O/Queue.o \
+    $O/Peer_logic.o \
     $O/Storage.o \
+    $O/GameObject.o \
+    $O/Super_peer_logic.o \
     $O/Message_m.o \
     $O/Pithos_m.o
 
@@ -99,7 +101,7 @@ msgheaders: $(MSGFILES:.msg=_m.h)
 
 clean:
 	-rm -rf $O
-	-rm -f pithos pithos.exe libpithos.so libpithos.a libpithos.dll libpithos.dylib
+	-rm -f Pithos Pithos.exe libPithos.so libPithos.a libPithos.dll libPithos.dylib
 	-rm -f ./*_m.cc ./*_m.h
 	-rm -f results/*_m.cc results/*_m.h
 
@@ -110,20 +112,36 @@ depend:
 	$(MAKEDEPEND) $(INCLUDE_PATH) -f Makefile -P\$$O/ -- $(MSG_CC_FILES)  ./*.cc results/*.cc
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
-$O/Game.o: Game.cc \
+$O/Peer_logic (copy).o: Peer_logic (copy).cc \
 	Message_m.h \
-	Game.h \
-	Storage.h
-$O/Pithos_m.o: Pithos_m.cc \
+	GameObject.h \
+	Peer_logic.h \
+	Pithos_m.h
+$O/Super_peer_logic.o: Super_peer_logic.cc \
+	Super_peer_logic.h \
+	Message_m.h \
+	GameObject.h \
 	Pithos_m.h
 $O/Message_m.o: Message_m.cc \
 	Message_m.h
+$O/Storage.o: Storage.cc \
+	Message_m.h \
+	Storage.h \
+	GameObject.h
 $O/Queue.o: Queue.cc \
 	Queue.h
 $O/Peer_logic.o: Peer_logic.cc \
 	Message_m.h \
+	GameObject.h \
 	Peer_logic.h \
 	Pithos_m.h
-$O/Storage.o: Storage.cc \
-	Storage.h
+$O/Pithos_m.o: Pithos_m.cc \
+	Pithos_m.h
+$O/Game.o: Game.cc \
+	Game.h \
+	Message_m.h \
+	Storage.h \
+	GameObject.h
+$O/GameObject.o: GameObject.cc \
+	GameObject.h
 

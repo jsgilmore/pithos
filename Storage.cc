@@ -46,17 +46,19 @@ void Storage::initialize()
 
 void Storage::handleMessage(cMessage *msg)
 {
-		Message *storage_msg = check_and_cast<Message *>(msg);
+		GameObject *go = (GameObject *)msg->removeObject("GameObject");
+		assert(go!=NULL);
 
-		EV << getName() << " " << getIndex() << " received write command of size " << storage_msg->getValue() << "\n";
+		EV << getName() << " " << getIndex() << " received write command of size " << go->getSize() << "\n";
 
-		storage.insert(storage_msg);		//This cast is important, otherwise a segfault occurs when calling the cQueue destructor
+		storage.insert(go);		//This cast is important, otherwise a segfault occurs when calling the cQueue destructor
 
 		//test_o = (go *)storage.pop();
 
 		//EV << "Test size = " << test_o->getSize() << "\n";
 
 		emit(qlenSignal, storage.length());
+		delete(msg);
 }
 
 int Storage::getStorageBytes()

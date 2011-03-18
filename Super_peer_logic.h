@@ -13,31 +13,27 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#ifndef STORAGE_H_
-#define STORAGE_H_
+#ifndef PEER_LOGIC_H_
+#define PEER_LOGIC_H_
 
 #include <omnetpp.h>
-#include <assert.h>
 
+#include "Pithos_m.h"
 #include "Message_m.h"
 #include "GameObject.h"
 
-class Storage : public cSimpleModule
+class Super_peer_logic: public cSimpleModule
 {
 	public:
-		Storage();
-		virtual ~Storage();
-		int getStorageBytes();
-		int getStorageFiles();
-	private:
-		cQueue storage;
+		Super_peer_logic();
+		virtual ~Super_peer_logic();
 	protected:
-		simsignal_t qlenSignal;
-		simsignal_t queueingTimeSignal;
+		simsignal_t busySignal;
 		virtual void initialize();
 		virtual void handleMessage(cMessage *msg);
+		void sendObjectForStore(int64_t o_size);
 };
 
-Define_Module(Storage);
+Define_Module(Super_peer_logic);
 
-#endif /* PEER_H_ */
+#endif /* PEER_LOGIC_H_ */
