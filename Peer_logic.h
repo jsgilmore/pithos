@@ -17,6 +17,7 @@
 #define PEER_LOGIC_H_
 
 #include <omnetpp.h>
+#include <assert.h>
 
 #include "Pithos_m.h"
 #include "Message_m.h"
@@ -28,10 +29,13 @@ class Peer_logic: public cSimpleModule
 		Peer_logic();
 		virtual ~Peer_logic();
 	protected:
+		int network_size;
 		simsignal_t busySignal;
 		virtual void initialize();
 		virtual void handleMessage(cMessage *msg);
 		void sendObjectForStore(int64_t o_size);
+		void handleStore(cMessage *msg);
+		void handleRequest(cMessage *msg);
 };
 
 Define_Module(Peer_logic);

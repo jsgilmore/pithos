@@ -34,7 +34,7 @@ void Game::initialize()
 	objectSize_av = par("avObjectSize");
 
 	event = new cMessage("event");
-	scheduleAt(5.0, event);
+	scheduleAt(simTime(), event);
 }
 
 void Game::handleMessage(cMessage *msg)

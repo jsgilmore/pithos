@@ -21,16 +21,6 @@ Storage::Storage()
 
 Storage::~Storage()
 {
-	/*int i;
-	int length = storage.getLength();
-	Message *storage_msg;
-
-	for (i = 0 ; i < length ; i++)
-	{
-		assert(storage.front() != NULL);
-		storage_msg = ((Message *)storage.pop());
-		delete(storage_msg);
-	}*/
 }
 
 void Storage::initialize()
@@ -40,8 +30,10 @@ void Storage::initialize()
 
 	//Initialise queue statistics collection
 	qlenSignal = registerSignal("qlen");
+	qsizeSignal = registerSignal("qsize");
 	queueingTimeSignal = registerSignal("queueingTime");
 	emit(qlenSignal, storage.length());
+	emit(qsizeSignal, getStorageBytes());
 }
 
 void Storage::handleMessage(cMessage *msg)
@@ -58,6 +50,7 @@ void Storage::handleMessage(cMessage *msg)
 		//EV << "Test size = " << test_o->getSize() << "\n";
 
 		emit(qlenSignal, storage.length());
+		emit(qsizeSignal, getStorageBytes());
 		delete(msg);
 }
 
@@ -70,7 +63,7 @@ int Storage::getStorageBytes()
 	//TODO: The "forEachChild" method should rather be implemented with an appropriate visitor class.
 	for (i = 0 ; i < storage.getLength() ; i++)
 	{
-		total_size += ((Message *)storage.get(i))->getValue();
+		total_size += ((GameObject *)storage.get(i))->getSize();
 	}
 
 	return total_size;

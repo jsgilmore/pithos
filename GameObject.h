@@ -18,12 +18,18 @@
 
 #include <omnetpp.h>
 
+enum ObjectTypes {
+    ROOT = 1,
+    REPLICA = 0
+};
+
 class GameObject : public cOwnedObject
 {
-	private:
+	protected:
 		int64_t size;
+		int type;
 	public:
-		GameObject(const char *name=NULL);
+		GameObject(const char *name=NULL, int type=ROOT);
 		GameObject(const GameObject& other);
 		virtual ~GameObject();
 		virtual GameObject *dup() const;
@@ -32,6 +38,8 @@ class GameObject : public cOwnedObject
 
 		int64_t getSize();
 		void setSize(int64_t o_size);
+		int getType();
+		void setType(int o_type);
 };
 
 #endif /* GO_H_ */

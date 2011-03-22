@@ -25,6 +25,8 @@ Super_peer_logic::~Super_peer_logic()
 
 void Super_peer_logic::initialize()
 {
+	network_size = par("network_size");
+
 	//Initialise queue statistics collection
 	busySignal = registerSignal("busy");
 	emit(busySignal, 0);
@@ -34,49 +36,15 @@ void Super_peer_logic::handleMessage(cMessage *msg)
 {
 	if (strcmp(msg->getArrivalGate()->getName(), "request") == 0)
 	{
-		Message *m = check_and_cast<Message *>(msg);
-		EV << getParentModule()->getName() << " " << getParentModule()->getIndex() << " received store request of size " << m->getValue() << "\n";
-
-		sendObjectForStore(m->getValue());
-
-		delete(m);
+		handleRequest(msg);
 	}
 	else if (strcmp(msg->getArrivalGate()->getName(), "in") == 0)
 	{
-		PithosMsg *pithos_m = check_and_cast<PithosMsg *>(msg);
-		cMessage *storage_msg = new cMessage("storage");
-		GameObject *go = new GameObject("GameObject");
-
-		EV << getName() << " " << getIndex() << " received write command of size " << pithos_m->getByteLength() << "\n";
-
-		go->setSize(pithos_m->getByteLength());
-		storage_msg->addObject(go);
-		send(storage_msg, "write");
-
-		delete(pithos_m);
+		handleStore(msg);
 	}
 	else {
 		EV << "Illegal message received\n";
-		delete(msg);
 	}
-}
 
-void Super_peer_logic::sendObjectForStore(int64_t o_size)
-{
-	int storage_node_index = intuniform(0, 18);	//18. because there are 20 nodes, which means 19 connections, which means 0-18 values.
-	simtime_t sendDelay = gate("out", storage_node_index)->getTransmissionChannel()->getTransmissionFinishTime()-simTime();
-
-	PithosMsg *write = new PithosMsg("write");
-	write->setByteLength(o_size);
-	write->setPayloadType(WRITE);
-
-	if (gate("out", storage_node_index)->getTransmissionChannel()->isBusy())
-	{
-		sendDelayed(write, sendDelay, "out", storage_node_index);
-		emit(busySignal, 1);
-	}
-	else {
-		send(write, "out", storage_node_index);
-		emit(busySignal, 0);
-	}
+	delete(msg);
 }

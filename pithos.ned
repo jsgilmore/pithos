@@ -23,8 +23,8 @@ simple Storage
         @signal[qlen](type="int");
         @signal[queueingTime](type="simtime_t");
         @statistic[qlen](title="queue length";record=vector,timeavg,max;interpolationmode=sample-hold);
+        @statistic[qsize](title="queue size";record=vector,timeavg,max;interpolationmode=sample-hold);
         @statistic[queueingTime](title="queueing time at dequeue";unit=s;interpolationmode=none);
-        
     gates:
         output read;
         input write;
@@ -37,7 +37,9 @@ simple Peer_logic
         @display("i=block/cogwheel");
         @signal[busy](type="bool");
         @statistic[busy](title="server busy state";record=vector,timeavg;interpolationmode=sample-hold);
-        
+        int network_size = 21;
+        int replicas_g = 3;
+        int replicas_sp = 1;
     gates:
         output out[];
         input in[];
@@ -46,20 +48,10 @@ simple Peer_logic
         input request;
 }
 
-simple Super_peer_logic
+simple Super_peer_logic extends Peer_logic
 {
     parameters:
         @class(Super_peer_logic);
-        @display("i=block/cogwheel");
-        @signal[busy](type="bool");
-        @statistic[busy](title="server busy state";record=vector,timeavg;interpolationmode=sample-hold);
-        
-    gates:
-        output out[];
-        input in[];
-        output write;
-        input read;
-        input request;
 }
 
 simple Game

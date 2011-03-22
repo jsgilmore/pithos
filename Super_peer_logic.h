@@ -13,25 +13,24 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#ifndef PEER_LOGIC_H_
-#define PEER_LOGIC_H_
+#ifndef SUPER_PEER_LOGIC_H_
+#define SUPER_PEER_LOGIC_H_
 
 #include <omnetpp.h>
 
 #include "Pithos_m.h"
 #include "Message_m.h"
 #include "GameObject.h"
+#include "Peer_logic.h"
 
-class Super_peer_logic: public cSimpleModule
+class Super_peer_logic : public Peer_logic
 {
 	public:
 		Super_peer_logic();
 		virtual ~Super_peer_logic();
 	protected:
-		simsignal_t busySignal;
 		virtual void initialize();
 		virtual void handleMessage(cMessage *msg);
-		void sendObjectForStore(int64_t o_size);
 };
 
 Define_Module(Super_peer_logic);

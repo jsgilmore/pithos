@@ -17,9 +17,10 @@
 
 //Register_Class(GameObject);
 
-GameObject::GameObject(const char *name) : cOwnedObject(name)
+GameObject::GameObject(const char *name, int o_type) : cOwnedObject(name)
 {
 	size = 0;
+	type = o_type;
 }
 
 GameObject::GameObject(const GameObject& other) : cOwnedObject(other.getName())
@@ -44,6 +45,7 @@ GameObject& GameObject::operator=(const GameObject& other)
 	cOwnedObject::operator=(other);
 
 	size = other.size;
+	type = other.type;
 
 	return *this;
 }
@@ -51,7 +53,7 @@ GameObject& GameObject::operator=(const GameObject& other)
 std::string GameObject::info()
 {
 	std::stringstream out;
-	out << "size = " << size;
+	out << "GameObject: size = " << size << ", type = " << type;
 	return out.str();
 }
 
@@ -63,4 +65,14 @@ int64_t GameObject::getSize()
 void GameObject::setSize(int64_t o_size)
 {
 	size = o_size;
+}
+
+int GameObject::getType()
+{
+	return type;
+}
+
+void GameObject::setType(int o_type)
+{
+	type = o_type;
 }

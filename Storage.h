@@ -33,6 +33,7 @@ class Storage : public cSimpleModule
 		cQueue storage;
 	protected:
 		simsignal_t qlenSignal;
+		simsignal_t qsizeSignal;
 		simsignal_t queueingTimeSignal;
 		virtual void initialize();
 		virtual void handleMessage(cMessage *msg);
