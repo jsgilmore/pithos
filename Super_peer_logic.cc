@@ -21,26 +21,50 @@ Super_peer_logic::Super_peer_logic()
 
 Super_peer_logic::~Super_peer_logic()
 {
+	cancelAndDelete(event);
 }
 
 void Super_peer_logic::initialize()
 {
+	event = new cMessage("event");
+	super_peer_index = THIS;
+
 	network_size = par("network_size");
 
 	//Initialise queue statistics collection
 	busySignal = registerSignal("busy");
 	emit(busySignal, 0);
+
+	scheduleAt(simTime(), event);
+}
+
+void Super_peer_logic::sp_identify()
+{
+	int i;
+	PithosMsg *inform = new PithosMsg("inform");
+	inform->setPayloadType(INFORM);
+	inform->setByteLength(sizeof(int));	//This is the size of the int sent in the packet
+
+	for (i = 0 ; i < network_size-2 ; i++)
+	{
+		send(inform->dup(), "out", i);
+	}
+	delete(inform);
 }
 
 void Super_peer_logic::handleMessage(cMessage *msg)
 {
-	if (strcmp(msg->getArrivalGate()->getName(), "request") == 0)
+	if (msg == event)	//It's important that this is the first if, because there exists no arrival gate if the message is an event.
+	{
+		sp_identify();	//Broadcast the index of this super peer to all peers
+	}
+	else if (strcmp(msg->getArrivalGate()->getName(), "request") == 0)
 	{
 		handleRequest(msg);
 	}
 	else if (strcmp(msg->getArrivalGate()->getName(), "in") == 0)
 	{
-		handleStore(msg);
+		handleP2PMsg(msg);
 	}
 	else {
 		EV << "Illegal message received\n";

@@ -20,18 +20,21 @@
  * <pre>
  * enum PayloadTypes
  * {
- *     WRITE = 1;
+ *     WRITE = 1;		
+ *     INFORM = 2;		
  * };
  * </pre>
  */
 enum PayloadTypes {
-    WRITE = 1
+    WRITE = 1,
+    INFORM = 2
 };
 
 /**
  * Class generated from <tt>Pithos.msg</tt> by opp_msgc.
  * <pre>
  * packet PithosMsg {
+ *     int value;
  *     int payloadType enum(PayloadTypes);
  * }
  * </pre>
@@ -39,6 +42,7 @@ enum PayloadTypes {
 class PithosMsg : public ::cPacket
 {
   protected:
+    int value_var;
     int payloadType_var;
 
     // protected and unimplemented operator==(), to prevent accidental usage
@@ -54,6 +58,8 @@ class PithosMsg : public ::cPacket
     virtual void parsimUnpack(cCommBuffer *b);
 
     // field getter/setter methods
+    virtual int getValue() const;
+    virtual void setValue(int value_var);
     virtual int getPayloadType() const;
     virtual void setPayloadType(int payloadType_var);
 };

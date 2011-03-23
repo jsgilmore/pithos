@@ -26,6 +26,7 @@ Peer_logic::~Peer_logic()
 void Peer_logic::initialize()
 {
 	network_size = par("network_size");
+	super_peer_index = UNKNOWN;
 
 	//Initialise queue statistics collection
 	busySignal = registerSignal("busy");
@@ -40,20 +41,31 @@ void Peer_logic::handleRequest(cMessage *msg)
 	sendObjectForStore(m->getValue());
 }
 
-void Peer_logic::handleStore(cMessage *msg)
+void Peer_logic::handleP2PMsg(cMessage *msg)
 {
 	PithosMsg *pithos_m = check_and_cast<PithosMsg *>(msg);
-	cMessage *storage_msg = new cMessage("storage");
 
-	GameObject *go = (GameObject *)pithos_m->removeObject("GameObject");
+	if (pithos_m->getPayloadType() == WRITE)
+	{
+		cMessage *storage_msg = new cMessage("storage");
+		GameObject *go = (GameObject *)pithos_m->removeObject("GameObject");
 
-	if (go->getType() == ROOT)
-		EV << getName() << " " << getIndex() << " received root Game Object of size " << go->getSize() << "\n";
-	else if (go->getType() == REPLICA)
-		EV << getName() << " " << getIndex() << " received replica Game Object of size " << go->getSize() << "\n";
+		if (go->getType() == ROOT)
+			EV << getName() << " " << getIndex() << " received root Game Object of size " << go->getSize() << "\n";
+		else if (go->getType() == REPLICA)
+			EV << getName() << " " << getIndex() << " received replica Game Object of size " << go->getSize() << "\n";
 
-	storage_msg->addObject(go);
-	send(storage_msg, "write");
+		storage_msg->addObject(go);
+		send(storage_msg, "write");
+	}
+	else if (pithos_m->getPayloadType() == INFORM)
+	{
+		super_peer_index = msg->getArrivalGate()->getIndex();
+		EV << "A new super peer has been identified on gate " << super_peer_index << "\n";
+	}
+	else {
+		EV << "Illegal P2P message received\n";
+	}
 }
 
 void Peer_logic::handleMessage(cMessage *msg)
@@ -64,7 +76,7 @@ void Peer_logic::handleMessage(cMessage *msg)
 	}
 	else if (strcmp(msg->getArrivalGate()->getName(), "in") == 0)
 	{
-		handleStore(msg);
+		handleP2PMsg(msg);
 	}
 	else {
 		EV << "Illegal message received\n";

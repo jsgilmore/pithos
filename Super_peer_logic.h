@@ -25,6 +25,9 @@
 
 class Super_peer_logic : public Peer_logic
 {
+	private:
+		cMessage *event;
+		void sp_identify();
 	public:
 		Super_peer_logic();
 		virtual ~Super_peer_logic();

@@ -65,6 +65,16 @@ simple Game
         output write;
 }
 
+simple Overlay_comms
+{
+    parameters:
+        @class(Overlay_comms);
+        @display("i=block/rxtx");
+    gates:
+        inout peer_gate;
+        inout overlay_gate;
+}
+
 module Peer
 {
     parameters:

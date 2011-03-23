@@ -23,18 +23,24 @@
 #include "Message_m.h"
 #include "GameObject.h"
 
+enum SP_indeces {
+    UNKNOWN = -1,
+    THIS = -2
+};
+
 class Peer_logic: public cSimpleModule
 {
 	public:
 		Peer_logic();
 		virtual ~Peer_logic();
 	protected:
+		int super_peer_index;
 		int network_size;
 		simsignal_t busySignal;
 		virtual void initialize();
 		virtual void handleMessage(cMessage *msg);
 		void sendObjectForStore(int64_t o_size);
-		void handleStore(cMessage *msg);
+		void handleP2PMsg(cMessage *msg);
 		void handleRequest(cMessage *msg);
 };
 

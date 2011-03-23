@@ -34,12 +34,14 @@ EXECUTE_ON_STARTUP(
     cEnum *e = cEnum::find("PayloadTypes");
     if (!e) enums.getInstance()->add(e = new cEnum("PayloadTypes"));
     e->insert(WRITE, "WRITE");
+    e->insert(INFORM, "INFORM");
 );
 
 Register_Class(PithosMsg);
 
 PithosMsg::PithosMsg(const char *name, int kind) : cPacket(name,kind)
 {
+    this->value_var = 0;
     this->payloadType_var = 0;
 }
 
@@ -57,6 +59,7 @@ PithosMsg& PithosMsg::operator=(const PithosMsg& other)
 {
     if (this==&other) return *this;
     cPacket::operator=(other);
+    this->value_var = other.value_var;
     this->payloadType_var = other.payloadType_var;
     return *this;
 }
@@ -64,13 +67,25 @@ PithosMsg& PithosMsg::operator=(const PithosMsg& other)
 void PithosMsg::parsimPack(cCommBuffer *b)
 {
     cPacket::parsimPack(b);
+    doPacking(b,this->value_var);
     doPacking(b,this->payloadType_var);
 }
 
 void PithosMsg::parsimUnpack(cCommBuffer *b)
 {
     cPacket::parsimUnpack(b);
+    doUnpacking(b,this->value_var);
     doUnpacking(b,this->payloadType_var);
+}
+
+int PithosMsg::getValue() const
+{
+    return value_var;
+}
+
+void PithosMsg::setValue(int value_var)
+{
+    this->value_var = value_var;
 }
 
 int PithosMsg::getPayloadType() const
@@ -130,7 +145,7 @@ const char *PithosMsgDescriptor::getProperty(const char *propertyname) const
 int PithosMsgDescriptor::getFieldCount(void *object) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 1+basedesc->getFieldCount(object) : 1;
+    return basedesc ? 2+basedesc->getFieldCount(object) : 2;
 }
 
 unsigned int PithosMsgDescriptor::getFieldTypeFlags(void *object, int field) const
@@ -143,8 +158,9 @@ unsigned int PithosMsgDescriptor::getFieldTypeFlags(void *object, int field) con
     }
     static unsigned int fieldTypeFlags[] = {
         FD_ISEDITABLE,
+        FD_ISEDITABLE,
     };
-    return (field>=0 && field<1) ? fieldTypeFlags[field] : 0;
+    return (field>=0 && field<2) ? fieldTypeFlags[field] : 0;
 }
 
 const char *PithosMsgDescriptor::getFieldName(void *object, int field) const
@@ -156,16 +172,18 @@ const char *PithosMsgDescriptor::getFieldName(void *object, int field) const
         field -= basedesc->getFieldCount(object);
     }
     static const char *fieldNames[] = {
+        "value",
         "payloadType",
     };
-    return (field>=0 && field<1) ? fieldNames[field] : NULL;
+    return (field>=0 && field<2) ? fieldNames[field] : NULL;
 }
 
 int PithosMsgDescriptor::findField(void *object, const char *fieldName) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
     int base = basedesc ? basedesc->getFieldCount(object) : 0;
-    if (fieldName[0]=='p' && strcmp(fieldName, "payloadType")==0) return base+0;
+    if (fieldName[0]=='v' && strcmp(fieldName, "value")==0) return base+0;
+    if (fieldName[0]=='p' && strcmp(fieldName, "payloadType")==0) return base+1;
     return basedesc ? basedesc->findField(object, fieldName) : -1;
 }
 
@@ -179,8 +197,9 @@ const char *PithosMsgDescriptor::getFieldTypeString(void *object, int field) con
     }
     static const char *fieldTypeStrings[] = {
         "int",
+        "int",
     };
-    return (field>=0 && field<1) ? fieldTypeStrings[field] : NULL;
+    return (field>=0 && field<2) ? fieldTypeStrings[field] : NULL;
 }
 
 const char *PithosMsgDescriptor::getFieldProperty(void *object, int field, const char *propertyname) const
@@ -192,7 +211,7 @@ const char *PithosMsgDescriptor::getFieldProperty(void *object, int field, const
         field -= basedesc->getFieldCount(object);
     }
     switch (field) {
-        case 0:
+        case 1:
             if (!strcmp(propertyname,"enum")) return "PayloadTypes";
             return NULL;
         default: return NULL;
@@ -223,7 +242,8 @@ std::string PithosMsgDescriptor::getFieldAsString(void *object, int field, int i
     }
     PithosMsg *pp = (PithosMsg *)object; (void)pp;
     switch (field) {
-        case 0: return long2string(pp->getPayloadType());
+        case 0: return long2string(pp->getValue());
+        case 1: return long2string(pp->getPayloadType());
         default: return "";
     }
 }
@@ -238,7 +258,8 @@ bool PithosMsgDescriptor::setFieldAsString(void *object, int field, int i, const
     }
     PithosMsg *pp = (PithosMsg *)object; (void)pp;
     switch (field) {
-        case 0: pp->setPayloadType(string2long(value)); return true;
+        case 0: pp->setValue(string2long(value)); return true;
+        case 1: pp->setPayloadType(string2long(value)); return true;
         default: return false;
     }
 }
@@ -253,8 +274,9 @@ const char *PithosMsgDescriptor::getFieldStructName(void *object, int field) con
     }
     static const char *fieldStructNames[] = {
         NULL,
+        NULL,
     };
-    return (field>=0 && field<1) ? fieldStructNames[field] : NULL;
+    return (field>=0 && field<2) ? fieldStructNames[field] : NULL;
 }
 
 void *PithosMsgDescriptor::getFieldStructPointer(void *object, int field, int i) const
