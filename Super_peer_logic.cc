@@ -21,7 +21,7 @@ Super_peer_logic::Super_peer_logic()
 
 Super_peer_logic::~Super_peer_logic()
 {
-	cancelAndDelete(event);
+
 }
 
 void Super_peer_logic::initialize()
@@ -33,6 +33,7 @@ void Super_peer_logic::initialize()
 
 	//Initialise queue statistics collection
 	busySignal = registerSignal("busy");
+	OverlayWriteSignal = registerSignal("OverlayWrite");
 	emit(busySignal, 0);
 
 	scheduleAt(simTime(), event);
@@ -52,6 +53,23 @@ void Super_peer_logic::sp_identify()
 	delete(inform);
 }
 
+void Super_peer_logic::handleOverlayWrite(PithosMsg *pithos_m)
+{
+	EV << "Overlay write request received at super peer. Congratualations! You've reached the end of what has thus far been implemented!\n";
+	emit(OverlayWriteSignal, 1);
+}
+
+void Super_peer_logic::handleP2PMsg(cMessage *msg)
+{
+	PithosMsg *pithos_m = check_and_cast<PithosMsg *>(msg);
+
+	if (pithos_m->getPayloadType() == OVERLAY_WRITE)
+	{
+		handleOverlayWrite(pithos_m);
+	}
+	else Peer_logic::handleP2PMsg(msg);
+}
+
 void Super_peer_logic::handleMessage(cMessage *msg)
 {
 	if (msg == event)	//It's important that this is the first if, because there exists no arrival gate if the message is an event.
@@ -66,9 +84,7 @@ void Super_peer_logic::handleMessage(cMessage *msg)
 	{
 		handleP2PMsg(msg);
 	}
-	else {
-		EV << "Illegal message received\n";
-	}
+	else error("Illegal message received");
 
 	delete(msg);
 }

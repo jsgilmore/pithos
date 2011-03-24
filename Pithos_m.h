@@ -21,13 +21,15 @@
  * enum PayloadTypes
  * {
  *     WRITE = 1;		
- *     INFORM = 2;		
+ *     OVERLAY_WRITE = 2;
+ *     INFORM = 3;		
  * };
  * </pre>
  */
 enum PayloadTypes {
     WRITE = 1,
-    INFORM = 2
+    OVERLAY_WRITE = 2,
+    INFORM = 3
 };
 
 /**

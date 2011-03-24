@@ -20,7 +20,8 @@
 
 enum ObjectTypes {
     ROOT = 1,
-    REPLICA = 0
+    REPLICA = 2,
+    OVERLAY = 3
 };
 
 class GameObject : public cOwnedObject

@@ -35,6 +35,9 @@ class Storage : public cSimpleModule
 		simsignal_t qlenSignal;
 		simsignal_t qsizeSignal;
 		simsignal_t queueingTimeSignal;
+		simsignal_t overlayObjectsSignal;
+		simsignal_t rootObjectsSignal;
+		simsignal_t replicaObjectsSignal;
 		virtual void initialize();
 		virtual void handleMessage(cMessage *msg);
 };

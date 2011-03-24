@@ -34,24 +34,35 @@ void Storage::initialize()
 	queueingTimeSignal = registerSignal("queueingTime");
 	emit(qlenSignal, storage.length());
 	emit(qsizeSignal, getStorageBytes());
+
+	overlayObjectsSignal = registerSignal("OverlayObject");
+	rootObjectsSignal = registerSignal("RootObject");
+	replicaObjectsSignal = registerSignal("ReplicaObject");
 }
 
 void Storage::handleMessage(cMessage *msg)
 {
-		GameObject *go = (GameObject *)msg->removeObject("GameObject");
-		assert(go!=NULL);
+	if (!(msg->hasObject("GameObject")))
+		error("Storage received a message with no game object attached");
 
-		EV << getName() << " " << getIndex() << " received write command of size " << go->getSize() << "\n";
+	GameObject *go = (GameObject *)msg->removeObject("GameObject");
 
-		storage.insert(go);		//This cast is important, otherwise a segfault occurs when calling the cQueue destructor
+	EV << getName() << " " << getIndex() << " received write command of size " << go->getSize() << "\n";
 
-		//test_o = (go *)storage.pop();
+	storage.insert(go);
 
-		//EV << "Test size = " << test_o->getSize() << "\n";
+	emit(qlenSignal, storage.length());
+	emit(qsizeSignal, getStorageBytes());
 
-		emit(qlenSignal, storage.length());
-		emit(qsizeSignal, getStorageBytes());
-		delete(msg);
+	if (go->getType() == ROOT)
+		emit(rootObjectsSignal, 1);
+	else if (go->getType() == REPLICA)
+		emit(replicaObjectsSignal, 1);
+	else if (go->getType() == OVERLAY)
+		emit(overlayObjectsSignal, 1);
+	else error("The game object type was incorrectly set");
+
+	delete(msg);
 }
 
 int Storage::getStorageBytes()

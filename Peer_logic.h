@@ -37,11 +37,16 @@ class Peer_logic: public cSimpleModule
 		int super_peer_index;
 		int network_size;
 		simsignal_t busySignal;
+
 		virtual void initialize();
 		virtual void handleMessage(cMessage *msg);
+
 		void sendObjectForStore(int64_t o_size);
 		void handleP2PMsg(cMessage *msg);
 		void handleRequest(cMessage *msg);
+		void GroupStore(PithosMsg *write, GameObject *go);
+		void OverlayStore(PithosMsg *write, GameObject *go);
+		void handleOverlayWrite(PithosMsg *pithos_m);
 };
 
 Define_Module(Peer_logic);

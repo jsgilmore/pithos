@@ -34,6 +34,7 @@ EXECUTE_ON_STARTUP(
     cEnum *e = cEnum::find("PayloadTypes");
     if (!e) enums.getInstance()->add(e = new cEnum("PayloadTypes"));
     e->insert(WRITE, "WRITE");
+    e->insert(OVERLAY_WRITE, "OVERLAY_WRITE");
     e->insert(INFORM, "INFORM");
 );
 

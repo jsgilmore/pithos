@@ -24,5 +24,6 @@ packet PithosMsg {
 enum PayloadTypes
 {
     WRITE = 1;		//A packet sent over the network, containing a game object to be stored.
-    INFORM = 2;		//A packet sent from a Super Peer, informing a peer of its ID.
+    OVERLAY_WRITE = 2;
+    INFORM = 3;		//A packet sent from a Super Peer, informing a peer of its ID.
 };

@@ -17,6 +17,7 @@
 
 Peer_logic::Peer_logic()
 {
+	super_peer_index = UNKNOWN;
 }
 
 Peer_logic::~Peer_logic()
@@ -26,7 +27,6 @@ Peer_logic::~Peer_logic()
 void Peer_logic::initialize()
 {
 	network_size = par("network_size");
-	super_peer_index = UNKNOWN;
 
 	//Initialise queue statistics collection
 	busySignal = registerSignal("busy");
@@ -63,9 +63,11 @@ void Peer_logic::handleP2PMsg(cMessage *msg)
 		super_peer_index = msg->getArrivalGate()->getIndex();
 		EV << "A new super peer has been identified on gate " << super_peer_index << "\n";
 	}
-	else {
-		EV << "Illegal P2P message received\n";
+	else if (pithos_m->getPayloadType() == OVERLAY_WRITE)
+	{
+		EV << "An overlay write request was received, but this peer is not a super peer. The request will be ignored.\n";
 	}
+	else error ("Illegal P2P message received");
 }
 
 void Peer_logic::handleMessage(cMessage *msg)
@@ -78,39 +80,29 @@ void Peer_logic::handleMessage(cMessage *msg)
 	{
 		handleP2PMsg(msg);
 	}
-	else {
-		EV << "Illegal message received\n";
-	}
+	else error("Illegal message received");
 
 	delete(msg);
 }
 
-void Peer_logic::sendObjectForStore(int64_t o_size)
+void Peer_logic::GroupStore(PithosMsg *write, GameObject *go)
 {
 	int i;
-	int replicas = par("replicas_g");
-	int storage_node_index;
 	simtime_t sendDelay;
-	PithosMsg *write;
-	PithosMsg *write_dup;
-	GameObject *go;
+	int group_replicas = par("replicas_g");
+	int storage_node_index;
 	GameObject *go_dup;
+	PithosMsg *write_dup;
 
-	//Create the packet that will house the game object
-	write = new PithosMsg("write");
-	write->setByteLength(o_size);
-	write->setPayloadType(WRITE);
-
-	go = new GameObject("GameObject");
-	go->setSize(o_size);
-
-	//Send the message to be stored on the specified number of replicas.
-	for (i = 0 ; i < replicas ; i++)
+	for (i = 0 ; i < group_replicas ; i++)
 	{
 		go_dup = go->dup();
 		write_dup = write->dup();
 
-		if (i > 0) go_dup->setType(REPLICA);
+		if (i > 0) {
+			go_dup->setType(REPLICA);
+			write_dup->setName("replica_write");
+		}
 
 		write_dup->addObject(go_dup);
 
@@ -127,6 +119,60 @@ void Peer_logic::sendObjectForStore(int64_t o_size)
 			emit(busySignal, 0);
 		}
 	}
-	delete(write);
-	delete(go);
+}
+
+void Peer_logic::OverlayStore(PithosMsg *write, GameObject *go)
+{
+	int i;
+	simtime_t sendDelay;
+	int overlay_replicas = par("replicas_sp");
+
+	if (super_peer_index == UNKNOWN)
+	{
+		EV << "No super peer has been identified. The object will not be replicated in the Overlay\n";
+		return;
+	}
+	else if (super_peer_index == THIS)
+	{
+		EV << "The message originated at the super peer. This should still be handled.\n";
+		return;
+	}
+
+	write->setPayloadType(OVERLAY_WRITE);
+	write->setValue(overlay_replicas);
+	go->setType(OVERLAY);
+	write->setName("overlay_write");
+	write->addObject(go);
+
+
+	if (gate("out", super_peer_index)->getTransmissionChannel()->isBusy())
+	{
+		sendDelay = gate("out", super_peer_index)->getTransmissionChannel()->getTransmissionFinishTime()-simTime();
+		sendDelayed(write, sendDelay, "out", super_peer_index);
+		emit(busySignal, 1);
+	}
+	else {
+		send(write, "out", super_peer_index);
+		emit(busySignal, 0);
+	}
+}
+
+void Peer_logic::sendObjectForStore(int64_t o_size)
+{
+	PithosMsg *write;
+	GameObject *go;
+
+	//Create the packet that will house the game object
+	write = new PithosMsg("write");
+	write->setByteLength(o_size);
+	write->setPayloadType(WRITE);
+
+	go = new GameObject("GameObject");
+	go->setSize(o_size);
+
+	//Send the message to be stored on the specified number of replicas in the group.
+	GroupStore(write, go);
+
+	OverlayStore(write, go);	//Send the message to be stored on the specified number of replicas in the overlay.
+
 }

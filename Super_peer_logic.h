@@ -32,8 +32,12 @@ class Super_peer_logic : public Peer_logic
 		Super_peer_logic();
 		virtual ~Super_peer_logic();
 	protected:
+		simsignal_t OverlayWriteSignal;
+
 		virtual void initialize();
 		virtual void handleMessage(cMessage *msg);
+		void handleOverlayWrite(PithosMsg *pithos_m);
+		void handleP2PMsg(cMessage *msg);
 };
 
 Define_Module(Super_peer_logic);

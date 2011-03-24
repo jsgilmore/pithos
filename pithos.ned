@@ -15,16 +15,35 @@
 
 package pithos;
 
+simple Game
+{
+    parameters:
+        @class(Game);
+        @display("i=block/source");
+        double avWriteTime @unit(s) = default(0.001s);	//0.1 ms average
+        double avObjectSize = default(1024);	//1 KB average
+    gates:
+        output write;
+}
+
 simple Storage
 {
     parameters:
         @class(Storage);
         @display("i=abstract/cache");
         @signal[qlen](type="int");
+        @signal[qsize](type="int");
         @signal[queueingTime](type="simtime_t");
         @statistic[qlen](title="queue length";record=vector,timeavg,max;interpolationmode=sample-hold);
         @statistic[qsize](title="queue size";record=vector,timeavg,max;interpolationmode=sample-hold);
         @statistic[queueingTime](title="queueing time at dequeue";unit=s;interpolationmode=none);
+        
+        @signal[OverlayObject](type="int");
+        @signal[RootObject](type="int");
+        @signal[ReplicaObject](type="int");
+        @statistic[OverlayObject](title="Overlay Objects";record=sum);
+        @statistic[RootObject](title="Root Objects";record=sum);
+        @statistic[ReplicaObject](title="Replica Objects";record=sum);
     gates:
         output read;
         input write;
@@ -39,7 +58,7 @@ simple Peer_logic
         @statistic[busy](title="server busy state";record=vector,timeavg;interpolationmode=sample-hold);
         int network_size = 21;
         int replicas_g = 3;
-        int replicas_sp = 1;
+        int replicas_sp = 2;
     gates:
         output out[];
         input in[];
@@ -52,27 +71,10 @@ simple Super_peer_logic extends Peer_logic
 {
     parameters:
         @class(Super_peer_logic);
-}
-
-simple Game
-{
-    parameters:
-        @class(Game);
-        @display("i=block/source");
-        double avWriteTime @unit(s) = default(0.001s);	//0.1 ms average
-        double avObjectSize = default(1024);	//1 KB average
-    gates:
-        output write;
-}
-
-simple Overlay_comms
-{
-    parameters:
-        @class(Overlay_comms);
-        @display("i=block/rxtx");
-    gates:
-        inout peer_gate;
-        inout overlay_gate;
+        @signal[OverlayWrite](type="int");
+        @statistic[OverlayWrite](title="Overlay writes";record=sum);
+	gates:
+	    inout overlay_gate[] @loose;
 }
 
 module Peer
