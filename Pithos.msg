@@ -26,4 +26,5 @@ enum PayloadTypes
     WRITE = 1;		//A packet sent over the network, containing a game object to be stored.
     OVERLAY_WRITE = 2;
     INFORM = 3;		//A packet sent from a Super Peer, informing a peer of its ID.
+    INFORM_REQ = 4;	//A packet sent from the Super peer logic to the peer logic, to request the transmission of an inform broadcast.
 };

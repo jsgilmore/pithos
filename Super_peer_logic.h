@@ -23,7 +23,7 @@
 #include "GameObject.h"
 #include "Peer_logic.h"
 
-class Super_peer_logic : public Peer_logic
+class Super_peer_logic : public cSimpleModule
 {
 	private:
 		cMessage *event;
@@ -32,6 +32,7 @@ class Super_peer_logic : public Peer_logic
 		Super_peer_logic();
 		virtual ~Super_peer_logic();
 	protected:
+		int network_size;
 		simsignal_t OverlayWriteSignal;
 
 		virtual void initialize();

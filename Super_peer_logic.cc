@@ -27,47 +27,27 @@ Super_peer_logic::~Super_peer_logic()
 void Super_peer_logic::initialize()
 {
 	event = new cMessage("event");
-	super_peer_index = THIS;
-
-	network_size = par("network_size");
 
 	//Initialise queue statistics collection
-	busySignal = registerSignal("busy");
 	OverlayWriteSignal = registerSignal("OverlayWrite");
-	emit(busySignal, 0);
 
 	scheduleAt(simTime(), event);
 }
 
 void Super_peer_logic::sp_identify()
 {
-	int i;
-	PithosMsg *inform = new PithosMsg("inform");
-	inform->setPayloadType(INFORM);
+	PithosMsg *inform = new PithosMsg("inform_req");
+	inform->setPayloadType(INFORM_REQ);
 	inform->setByteLength(sizeof(int));	//This is the size of the int sent in the packet
 
-	for (i = 0 ; i < network_size-2 ; i++)
-	{
-		send(inform->dup(), "out", i);
-	}
-	delete(inform);
+	send(inform, "peer_gate$o");
 }
 
 void Super_peer_logic::handleOverlayWrite(PithosMsg *pithos_m)
 {
 	EV << "Overlay write request received at super peer. Congratualations! You've reached the end of what has thus far been implemented!\n";
+
 	emit(OverlayWriteSignal, 1);
-}
-
-void Super_peer_logic::handleP2PMsg(cMessage *msg)
-{
-	PithosMsg *pithos_m = check_and_cast<PithosMsg *>(msg);
-
-	if (pithos_m->getPayloadType() == OVERLAY_WRITE)
-	{
-		handleOverlayWrite(pithos_m);
-	}
-	else Peer_logic::handleP2PMsg(msg);
 }
 
 void Super_peer_logic::handleMessage(cMessage *msg)
@@ -76,15 +56,17 @@ void Super_peer_logic::handleMessage(cMessage *msg)
 	{
 		sp_identify();	//Broadcast the index of this super peer to all peers
 	}
-	else if (strcmp(msg->getArrivalGate()->getName(), "request") == 0)
+	else if (strcmp(msg->getArrivalGate()->getName(), "peer_gate$i") == 0)
 	{
-		handleRequest(msg);
+		PithosMsg *pithos_m = check_and_cast<PithosMsg *>(msg);
+
+		if (pithos_m->getPayloadType() == OVERLAY_WRITE)
+		{
+			handleOverlayWrite(pithos_m);
+		}
+		else error("Super peer received an unknown message");
 	}
-	else if (strcmp(msg->getArrivalGate()->getName(), "in") == 0)
-	{
-		handleP2PMsg(msg);
-	}
-	else error("Illegal message received");
+	else error("Illegal message received at super peer");
 
 	delete(msg);
 }

@@ -112,32 +112,32 @@ depend:
 	$(MAKEDEPEND) $(INCLUDE_PATH) -f Makefile -P\$$O/ -- $(MSG_CC_FILES)  ./*.cc results/*.cc
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
+$O/Message_m.o: Message_m.cc \
+	Message_m.h
 $O/Super_peer_logic.o: Super_peer_logic.cc \
 	Super_peer_logic.h \
 	Message_m.h \
 	GameObject.h \
 	Peer_logic.h \
 	Pithos_m.h
-$O/Message_m.o: Message_m.cc \
-	Message_m.h
+$O/Queue.o: Queue.cc \
+	Queue.h
 $O/Storage.o: Storage.cc \
 	Message_m.h \
 	Storage.h \
 	GameObject.h
-$O/Queue.o: Queue.cc \
-	Queue.h
 $O/Peer_logic.o: Peer_logic.cc \
 	Message_m.h \
 	GameObject.h \
 	Peer_logic.h \
+	Pithos_m.h
+$O/Pithos_m.o: Pithos_m.cc \
 	Pithos_m.h
 $O/Game.o: Game.cc \
 	Game.h \
 	Message_m.h \
 	Storage.h \
 	GameObject.h
-$O/Pithos_m.o: Pithos_m.cc \
-	Pithos_m.h
 $O/GameObject.o: GameObject.cc \
 	GameObject.h
 

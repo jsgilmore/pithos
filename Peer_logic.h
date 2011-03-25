@@ -47,6 +47,7 @@ class Peer_logic: public cSimpleModule
 		void GroupStore(PithosMsg *write, GameObject *go);
 		void OverlayStore(PithosMsg *write, GameObject *go);
 		void handleOverlayWrite(PithosMsg *pithos_m);
+		void handleSPMsg(cMessage *msg);
 };
 
 Define_Module(Peer_logic);

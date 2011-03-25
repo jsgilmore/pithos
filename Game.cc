@@ -51,7 +51,8 @@ void Game::handleMessage(cMessage *msg)
 		send(write_msg, "write");
 		write_msg = NULL;
 
-		scheduleAt(simTime()+exponential(writeTime_av), event);
+		if (simTime() < 0.2)	//This should ensure that the simulation ends.
+			scheduleAt(simTime()+exponential(writeTime_av), event);
 	}
 	else delete(msg);
 }

@@ -65,16 +65,20 @@ simple Peer_logic
         output write;
         input read;
         input request;
+        inout sp_gate @loose;
 }
 
-simple Super_peer_logic extends Peer_logic
+simple Super_peer_logic
 {
     parameters:
         @class(Super_peer_logic);
+        @display("i=block/cogwheel");
+        int network_size = 21;
         @signal[OverlayWrite](type="int");
         @statistic[OverlayWrite](title="Overlay writes";record=sum);
 	gates:
 	    inout overlay_gate[] @loose;
+	    inout peer_gate;
 }
 
 module Peer
@@ -106,16 +110,18 @@ module Super_peer
         input in[];
         output out[];
     submodules:
+        peer_logic: Peer_logic;
         super_peer_logic: Super_peer_logic;
         storage: Storage;
         game: Game;
     connections:
-        game.write --> super_peer_logic.request;
-        super_peer_logic.write --> storage.write;
-        storage.read --> super_peer_logic.read;
+        peer_logic.sp_gate <--> super_peer_logic.peer_gate;
+        game.write --> peer_logic.request;
+        peer_logic.write --> storage.write;
+        storage.read --> peer_logic.read;
         for i=0..sizeof(out)-1 {
-            super_peer_logic.out++ --> out[i];
-            in[i] --> super_peer_logic.in++;
+            peer_logic.out++ --> out[i];
+            in[i] --> peer_logic.in++;
         }
 }
 

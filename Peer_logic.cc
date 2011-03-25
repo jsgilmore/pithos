@@ -17,15 +17,19 @@
 
 Peer_logic::Peer_logic()
 {
-	super_peer_index = UNKNOWN;
 }
 
 Peer_logic::~Peer_logic()
 {
+
 }
 
 void Peer_logic::initialize()
 {
+	if (getParentModule()->findSubmodule("super_peer_logic") == -1)
+		super_peer_index = UNKNOWN;
+	else super_peer_index = THIS;
+
 	network_size = par("network_size");
 
 	//Initialise queue statistics collection
@@ -65,9 +69,30 @@ void Peer_logic::handleP2PMsg(cMessage *msg)
 	}
 	else if (pithos_m->getPayloadType() == OVERLAY_WRITE)
 	{
-		EV << "An overlay write request was received, but this peer is not a super peer. The request will be ignored.\n";
+		if (super_peer_index != THIS)
+			EV << "An overlay write request was received, but this peer is not a super peer. The request will be ignored.\n";
+		else send(pithos_m->dup(), "sp_gate$o");
 	}
 	else error ("Illegal P2P message received");
+}
+
+void Peer_logic::handleSPMsg(cMessage *msg)
+{
+	int i;
+	PithosMsg *pithos_m = check_and_cast<PithosMsg *>(msg);
+
+	if (pithos_m->getPayloadType() == INFORM_REQ)
+	{
+		pithos_m->setPayloadType(INFORM);
+		pithos_m->setName("inform");
+
+		for (i = 0 ; i < network_size-1 ; i++)
+		{
+			send(pithos_m->dup(), "out", i);
+		}
+		//The original message is deleted in the handMessage function.
+	}
+	else error("Peer logic received invalid packet from super peer logic");
 }
 
 void Peer_logic::handleMessage(cMessage *msg)
@@ -79,6 +104,10 @@ void Peer_logic::handleMessage(cMessage *msg)
 	else if (strcmp(msg->getArrivalGate()->getName(), "in") == 0)
 	{
 		handleP2PMsg(msg);
+	}
+	else if (strcmp(msg->getArrivalGate()->getName(), "sp_gate$i") == 0)
+	{
+		handleSPMsg(msg);
 	}
 	else error("Illegal message received");
 
@@ -123,18 +152,14 @@ void Peer_logic::GroupStore(PithosMsg *write, GameObject *go)
 
 void Peer_logic::OverlayStore(PithosMsg *write, GameObject *go)
 {
-	int i;
 	simtime_t sendDelay;
 	int overlay_replicas = par("replicas_sp");
 
 	if (super_peer_index == UNKNOWN)
 	{
 		EV << "No super peer has been identified. The object will not be replicated in the Overlay\n";
-		return;
-	}
-	else if (super_peer_index == THIS)
-	{
-		EV << "The message originated at the super peer. This should still be handled.\n";
+		delete(write);
+		delete(go);
 		return;
 	}
 
@@ -144,6 +169,12 @@ void Peer_logic::OverlayStore(PithosMsg *write, GameObject *go)
 	write->setName("overlay_write");
 	write->addObject(go);
 
+	if (super_peer_index == THIS)
+	{
+		send(write, "sp_gate$o");
+		emit(busySignal, 0);
+		return;
+	}
 
 	if (gate("out", super_peer_index)->getTransmissionChannel()->isBusy())
 	{

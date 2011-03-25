@@ -23,13 +23,15 @@
  *     WRITE = 1;		
  *     OVERLAY_WRITE = 2;
  *     INFORM = 3;		
+ *     INFORM_REQ = 4;	
  * };
  * </pre>
  */
 enum PayloadTypes {
     WRITE = 1,
     OVERLAY_WRITE = 2,
-    INFORM = 3
+    INFORM = 3,
+    INFORM_REQ = 4
 };
 
 /**

@@ -36,6 +36,7 @@ EXECUTE_ON_STARTUP(
     e->insert(WRITE, "WRITE");
     e->insert(OVERLAY_WRITE, "OVERLAY_WRITE");
     e->insert(INFORM, "INFORM");
+    e->insert(INFORM_REQ, "INFORM_REQ");
 );
 
 Register_Class(PithosMsg);
