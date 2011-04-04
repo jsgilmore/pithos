@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by opp_msgc 4.1 from Message.msg.
+// Generated file, do not edit! Created by opp_msgc 4.1 from applications/Pithos/Message.msg.
 //
 
 #ifndef _MESSAGE_M_H_
@@ -16,7 +16,7 @@
 
 
 /**
- * Enum generated from <tt>Message.msg</tt> by opp_msgc.
+ * Enum generated from <tt>applications/Pithos/Message.msg</tt> by opp_msgc.
  * <pre>
  * enum MessageTypes
  * {
@@ -29,7 +29,7 @@ enum MessageTypes {
 };
 
 /**
- * Class generated from <tt>Message.msg</tt> by opp_msgc.
+ * Class generated from <tt>applications/Pithos/Message.msg</tt> by opp_msgc.
  * <pre>
  * message Message {
  *     int64_t value;

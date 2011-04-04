@@ -13,7 +13,10 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package pithos;
+package oversim.applications.Pithos;
+
+import oversim.common.BaseApp;
+import oversim.common.ITier;
 
 simple Game
 {
@@ -68,7 +71,7 @@ simple Peer_logic
         inout sp_gate @loose;
 }
 
-simple Super_peer_logic
+simple Super_peer_logic extends BaseApp
 {
     parameters:
         @class(Super_peer_logic);
@@ -76,6 +79,7 @@ simple Super_peer_logic
         int network_size = 21;
         @signal[OverlayWrite](type="int");
         @statistic[OverlayWrite](title="Overlay writes";record=sum);
+        int largestKey;
 	gates:
 	    inout overlay_gate[] @loose;
 	    inout peer_gate;
@@ -102,37 +106,80 @@ module Peer
         }
 }
 
-module Super_peer
+module Super_peer like ITier
 {
     parameters:
         @display("i=device/pc_l");
     gates:
-        input in[];
-        output out[];
+        input in[];				 // gate to the local P2P group
+        output out[];			 // gate from the local P2P group
+        
+        input udpIn;             // gate from the UDP layer
+        output udpOut;           // gate to the UDP layer
+        input from_lowerTier;    // gate from the lower tier
+        input from_upperTier;    // gate from the upper tier
+        output to_lowerTier;     // gate to the lower tier
+        output to_upperTier;     // gate to the upper tier
+        input trace_in;          // gate for trace file commands
+        input tcpIn;             // gate from the TCP layer
+        output tcpOut;           // gate to the TCP layer
     submodules:
         peer_logic: Peer_logic;
         super_peer_logic: Super_peer_logic;
         storage: Storage;
         game: Game;
-    connections:
+    connections allowunconnected:
+        //Internal connection to the peer_logic, storage and game modules
         peer_logic.sp_gate <--> super_peer_logic.peer_gate;
         game.write --> peer_logic.request;
         peer_logic.write --> storage.write;
         storage.read --> peer_logic.read;
+        
+        //Connections to the external local group peers
         for i=0..sizeof(out)-1 {
             peer_logic.out++ --> out[i];
             in[i] --> peer_logic.in++;
         }
+
+		//Connections to the Oversim simulation modules
+        from_lowerTier --> super_peer_logic.from_lowerTier;
+        to_lowerTier <-- super_peer_logic.to_lowerTier;
+        udpIn --> super_peer_logic.udpIn;
+        udpOut <-- super_peer_logic.udpOut;
+        tcpIn --> super_peer_logic.tcpIn;
+        tcpOut <-- super_peer_logic.tcpOut;
+        trace_in --> super_peer_logic.trace_in;
 }
 
-network Pithos
+module Local_group like ITier
 {
-    @display("bgl=2");
+    parameters:
+        @display("i=block/network");
+    gates:
+        input udpIn;             // gate from the UDP layer
+        output udpOut;           // gate to the UDP layer
+        input from_lowerTier;    // gate from the lower tier
+        input from_upperTier;    // gate from the upper tier
+        output to_lowerTier;     // gate to the lower tier
+        output to_upperTier;     // gate to the upper tier
+        input trace_in;          // gate for trace file commands
+        input tcpIn;             // gate from the TCP layer
+        output tcpOut;           // gate to the TCP layer
     submodules:
         peer[20]: Peer;
         super_peer: Super_peer;
-    connections:
-        for j=0..18, for i=j..18 {
+    connections allowunconnected:
+        //Connections to the Oversim simulation modules
+        from_lowerTier --> super_peer.from_lowerTier;
+        to_lowerTier <-- super_peer.to_lowerTier;
+        udpIn --> super_peer.udpIn;
+        udpOut <-- super_peer.udpOut;
+        tcpIn --> super_peer.tcpIn;
+        tcpOut <-- super_peer.tcpOut;
+        trace_in --> super_peer.trace_in;
+        
+        for j=0..18, for i=j..18
+        {
             peer[j].out++ --> {  datarate = 384Kbps; } --> peer[i+1].in++;
             peer[i+1].out++ --> {  datarate = 384Kbps; } --> peer[j].in++;
         }

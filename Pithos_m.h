@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by opp_msgc 4.1 from Pithos.msg.
+// Generated file, do not edit! Created by opp_msgc 4.1 from applications/Pithos/Pithos.msg.
 //
 
 #ifndef _PITHOS_M_H_
@@ -16,12 +16,12 @@
 
 
 /**
- * Enum generated from <tt>Pithos.msg</tt> by opp_msgc.
+ * Enum generated from <tt>applications/Pithos/Pithos.msg</tt> by opp_msgc.
  * <pre>
  * enum PayloadTypes
  * {
  *     WRITE = 1;		
- *     OVERLAY_WRITE = 2;
+ *     OVERLAY_WRITE_REQ = 2;
  *     INFORM = 3;		
  *     INFORM_REQ = 4;	
  * };
@@ -29,13 +29,13 @@
  */
 enum PayloadTypes {
     WRITE = 1,
-    OVERLAY_WRITE = 2,
+    OVERLAY_WRITE_REQ = 2,
     INFORM = 3,
     INFORM_REQ = 4
 };
 
 /**
- * Class generated from <tt>Pithos.msg</tt> by opp_msgc.
+ * Class generated from <tt>applications/Pithos/Pithos.msg</tt> by opp_msgc.
  * <pre>
  * packet PithosMsg {
  *     int value;

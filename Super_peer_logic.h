@@ -18,16 +18,22 @@
 
 #include <omnetpp.h>
 
+#include "BaseApp.h"	//Oversim base application definition
+#include "UnderlayConfigurator.h"
+
 #include "Pithos_m.h"
 #include "Message_m.h"
 #include "GameObject.h"
+#include "Overlay_msg_m.h"
 #include "Peer_logic.h"
 
-class Super_peer_logic : public cSimpleModule
+class Super_peer_logic : public BaseApp
 {
 	private:
 		cMessage *event;
 		void sp_identify();
+
+		int largestKey;           // we'll store the "largestKey" parameter here for the Overlay
 	public:
 		Super_peer_logic();
 		virtual ~Super_peer_logic();
@@ -35,7 +41,13 @@ class Super_peer_logic : public cSimpleModule
 		int network_size;
 		simsignal_t OverlayWriteSignal;
 
-		virtual void initialize();
+		void initializeApp(int stage);                 // called when the module is being created
+		void finishApp();                              // called when the module is about to be destroyed
+		void handleTimerEvent(cMessage* msg);          // called when we received a timer message
+		void deliver(OverlayKey& key, cMessage* msg);  // called when we receive a message from the overlay
+		void handleUDPMessage(cMessage* msg);          // called when we receive a UDP message
+		CompType getThisCompType();
+
 		virtual void handleMessage(cMessage *msg);
 		void handleOverlayWrite(PithosMsg *pithos_m);
 		void handleP2PMsg(cMessage *msg);

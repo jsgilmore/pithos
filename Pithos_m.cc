@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by opp_msgc 4.1 from Pithos.msg.
+// Generated file, do not edit! Created by opp_msgc 4.1 from applications/Pithos/Pithos.msg.
 //
 
 // Disable warnings about unused variables, empty switch stmts, etc:
@@ -34,7 +34,7 @@ EXECUTE_ON_STARTUP(
     cEnum *e = cEnum::find("PayloadTypes");
     if (!e) enums.getInstance()->add(e = new cEnum("PayloadTypes"));
     e->insert(WRITE, "WRITE");
-    e->insert(OVERLAY_WRITE, "OVERLAY_WRITE");
+    e->insert(OVERLAY_WRITE_REQ, "OVERLAY_WRITE_REQ");
     e->insert(INFORM, "INFORM");
     e->insert(INFORM_REQ, "INFORM_REQ");
 );
