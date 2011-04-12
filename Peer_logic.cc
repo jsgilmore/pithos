@@ -67,12 +67,6 @@ void Peer_logic::handleP2PMsg(cMessage *msg)
 		super_peer_index = msg->getArrivalGate()->getIndex();
 		EV << "A new super peer has been identified on gate " << super_peer_index << "\n";
 	}
-	else if (pithos_m->getPayloadType() == OVERLAY_WRITE_REQ)
-	{
-		if (super_peer_index != THIS)
-			EV << "An overlay write request was received, but this peer is not a super peer. The request will be ignored.\n";
-		else send(pithos_m->dup(), "sp_gate$o");
-	}
 	else error ("Illegal P2P message received");
 }
 

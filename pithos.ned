@@ -37,16 +37,16 @@ simple Storage
         @signal[qlen](type="int");
         @signal[qsize](type="int");
         @signal[queueingTime](type="simtime_t");
-        @statistic[qlen](title="queue length";record=vector,timeavg,max;interpolationmode=sample-hold);
-        @statistic[qsize](title="queue size";record=vector,timeavg,max;interpolationmode=sample-hold);
-        @statistic[queueingTime](title="queueing time at dequeue";unit=s;interpolationmode=none);
-        
+        @statistic[qlen](title="queue length"; record=vector,timeavg,max; interpolationmode=sample-hold);
+        @statistic[qsize](title="queue size"; record=vector,timeavg,max; interpolationmode=sample-hold);
+        @statistic[queueingTime](title="queueing time at dequeue"; unit=s; interpolationmode=none);
+
         @signal[OverlayObject](type="int");
         @signal[RootObject](type="int");
         @signal[ReplicaObject](type="int");
-        @statistic[OverlayObject](title="Overlay Objects";record=sum);
-        @statistic[RootObject](title="Root Objects";record=sum);
-        @statistic[ReplicaObject](title="Replica Objects";record=sum);
+        @statistic[OverlayObject](title="Overlay Objects"; record=sum);
+        @statistic[RootObject](title="Root Objects"; record=sum);
+        @statistic[ReplicaObject](title="Replica Objects"; record=sum);
     gates:
         output read;
         input write;
@@ -58,52 +58,76 @@ simple Peer_logic
         @class(Peer_logic);
         @display("i=block/cogwheel");
         @signal[busy](type="bool");
-        @statistic[busy](title="server busy state";record=vector,timeavg;interpolationmode=sample-hold);
+        @statistic[busy](title="server busy state"; record=vector,timeavg; interpolationmode=sample-hold);
         int network_size = 21;
         int replicas_g = 3;
         int replicas_sp = 2;
     gates:
-        output out[];
-        input in[];
+        inout comms_gate;
         output write;
         input read;
         input request;
-        inout sp_gate @loose;
 }
 
-simple Super_peer_logic extends BaseApp
+simple Super_peer_logic
 {
     parameters:
         @class(Super_peer_logic);
         @display("i=block/cogwheel");
         int network_size = 21;
         @signal[OverlayWrite](type="int");
-        @statistic[OverlayWrite](title="Overlay writes";record=sum);
+        @statistic[OverlayWrite](title="Overlay writes"; record=sum);
         int largestKey;
-	gates:
-	    inout overlay_gate[] @loose;
-	    inout peer_gate;
+    gates:
+        inout comms_gate;
 }
 
-module Peer
+simple Communicator extends BaseApp
+{
+    parameters:
+        @class(Communicator);
+        @display("i=block/join");
+        int sendPeriod @unit(s);   // how much time to wait between sending packets
+        int numToSend;             // how many packets will we send at the same time?
+        int largestKey;            // largest key we can pick
+    gates:
+        inout peer_gate;
+        inout sp_gate @loose;
+}
+
+module Peer like ITier
 {
     parameters:
         @display("i=device/pc");
     gates:
-        input in[];
-        output out[];
+        input udpIn;             // gate from the UDP layer
+        output udpOut;           // gate to the UDP layer
+        input from_lowerTier;    // gate from the lower tier
+        input from_upperTier;    // gate from the upper tier
+        output to_lowerTier;     // gate to the lower tier
+        output to_upperTier;     // gate to the upper tier
+        input trace_in;          // gate for trace file commands
+        input tcpIn;             // gate from the TCP layer
+        output tcpOut;           // gate to the TCP layer
     submodules:
         peer_logic: Peer_logic;
         storage: Storage;
         game: Game;
+        communicator: Communicator;
     connections:
         game.write --> peer_logic.request;
         peer_logic.write --> storage.write;
         storage.read --> peer_logic.read;
-        for i=0..sizeof(out)-1 {
-            peer_logic.out++ --> out[i];
-            in[i] --> peer_logic.in++;
-        }
+        communicator.peer_gate <--> peer_logic.comms_gate;
+
+        //Connections to the Oversim simulation modules
+        from_lowerTier --> communicator.from_lowerTier;
+        to_lowerTier <-- communicator.to_lowerTier;
+        udpIn --> communicator.udpIn;
+        udpOut <-- communicator.udpOut;
+        tcpIn --> communicator.tcpIn;
+        tcpOut <-- communicator.tcpOut;
+        trace_in --> communicator.trace_in;
 }
 
 module Super_peer like ITier
@@ -111,9 +135,6 @@ module Super_peer like ITier
     parameters:
         @display("i=device/pc_l");
     gates:
-        input in[];				 // gate to the local P2P group
-        output out[];			 // gate from the local P2P group
-        
         input udpIn;             // gate from the UDP layer
         output udpOut;           // gate to the UDP layer
         input from_lowerTier;    // gate from the lower tier
@@ -124,68 +145,28 @@ module Super_peer like ITier
         input tcpIn;             // gate from the TCP layer
         output tcpOut;           // gate to the TCP layer
     submodules:
-        peer_logic: Peer_logic;
+        peer_logic: Peer_logic {
+            @display("p=230,193");
+        }
         super_peer_logic: Super_peer_logic;
         storage: Storage;
         game: Game;
+        communicator: Communicator;
     connections allowunconnected:
         //Internal connection to the peer_logic, storage and game modules
-        peer_logic.sp_gate <--> super_peer_logic.peer_gate;
         game.write --> peer_logic.request;
         peer_logic.write --> storage.write;
         storage.read --> peer_logic.read;
-        
-        //Connections to the external local group peers
-        for i=0..sizeof(out)-1 {
-            peer_logic.out++ --> out[i];
-            in[i] --> peer_logic.in++;
-        }
+
+        communicator.peer_gate <--> peer_logic.comms_gate;
+        communicator.sp_gate <--> super_peer_logic.comms_gate;
 
 		//Connections to the Oversim simulation modules
-        from_lowerTier --> super_peer_logic.from_lowerTier;
-        to_lowerTier <-- super_peer_logic.to_lowerTier;
-        udpIn --> super_peer_logic.udpIn;
-        udpOut <-- super_peer_logic.udpOut;
-        tcpIn --> super_peer_logic.tcpIn;
-        tcpOut <-- super_peer_logic.tcpOut;
-        trace_in --> super_peer_logic.trace_in;
-}
-
-module Local_group like ITier
-{
-    parameters:
-        @display("i=block/network");
-    gates:
-        input udpIn;             // gate from the UDP layer
-        output udpOut;           // gate to the UDP layer
-        input from_lowerTier;    // gate from the lower tier
-        input from_upperTier;    // gate from the upper tier
-        output to_lowerTier;     // gate to the lower tier
-        output to_upperTier;     // gate to the upper tier
-        input trace_in;          // gate for trace file commands
-        input tcpIn;             // gate from the TCP layer
-        output tcpOut;           // gate to the TCP layer
-    submodules:
-        peer[20]: Peer;
-        super_peer: Super_peer;
-    connections allowunconnected:
-        //Connections to the Oversim simulation modules
-        from_lowerTier --> super_peer.from_lowerTier;
-        to_lowerTier <-- super_peer.to_lowerTier;
-        udpIn --> super_peer.udpIn;
-        udpOut <-- super_peer.udpOut;
-        tcpIn --> super_peer.tcpIn;
-        tcpOut <-- super_peer.tcpOut;
-        trace_in --> super_peer.trace_in;
-        
-        for j=0..18, for i=j..18
-        {
-            peer[j].out++ --> {  datarate = 384Kbps; } --> peer[i+1].in++;
-            peer[i+1].out++ --> {  datarate = 384Kbps; } --> peer[j].in++;
-        }
-        
-        for i=0..19 {
-            super_peer.out++ --> {  datarate = 384Kbps; } --> peer[i].in++;
-            peer[i].out++ --> {  datarate = 384Kbps; } --> super_peer.in++;
-        }
+        from_lowerTier --> communicator.from_lowerTier;
+        to_lowerTier <-- communicator.to_lowerTier;
+        udpIn --> communicator.udpIn;
+        udpOut <-- communicator.udpOut;
+        tcpIn --> communicator.tcpIn;
+        tcpOut <-- communicator.tcpOut;
+        trace_in --> communicator.trace_in;
 }

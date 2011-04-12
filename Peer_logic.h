@@ -17,7 +17,6 @@
 #define PEER_LOGIC_H_
 
 #include <omnetpp.h>
-#include <assert.h>
 
 #include "Pithos_m.h"
 #include "Message_m.h"

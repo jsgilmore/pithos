@@ -18,16 +18,14 @@
 
 #include <omnetpp.h>
 
-#include "BaseApp.h"	//Oversim base application definition
-#include "UnderlayConfigurator.h"
-
 #include "Pithos_m.h"
 #include "Message_m.h"
 #include "GameObject.h"
 #include "Overlay_msg_m.h"
 #include "Peer_logic.h"
+#include "OverlayKey.h"
 
-class Super_peer_logic : public BaseApp
+class Super_peer_logic : public cSimpleModule
 {
 	private:
 		cMessage *event;
@@ -41,12 +39,8 @@ class Super_peer_logic : public BaseApp
 		int network_size;
 		simsignal_t OverlayWriteSignal;
 
-		void initializeApp(int stage);                 // called when the module is being created
-		void finishApp();                              // called when the module is about to be destroyed
-		void handleTimerEvent(cMessage* msg);          // called when we received a timer message
-		void deliver(OverlayKey& key, cMessage* msg);  // called when we receive a message from the overlay
-		void handleUDPMessage(cMessage* msg);          // called when we receive a UDP message
-		CompType getThisCompType();
+		void initialize();                 // called when the module is being created
+		void finish();                              // called when the module is about to be destroyed
 
 		virtual void handleMessage(cMessage *msg);
 		void handleOverlayWrite(PithosMsg *pithos_m);

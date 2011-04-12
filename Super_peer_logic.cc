@@ -24,10 +24,8 @@ Super_peer_logic::~Super_peer_logic()
 
 }
 
-void Super_peer_logic::initializeApp(int stage)
+void Super_peer_logic::initialize()
 {
-	if (stage != MIN_STAGE_APP) return;
-
 	largestKey = par("largestKey");
 
 	event = new cMessage("event");
@@ -36,25 +34,15 @@ void Super_peer_logic::initializeApp(int stage)
 	OverlayWriteSignal = registerSignal("OverlayWrite");
 
 	scheduleAt(simTime(), event);
-
-	bindToPort(2000);
 }
 
-void Super_peer_logic::finishApp()
+void Super_peer_logic::finish()
 {
 
 }
 
 void Super_peer_logic::sp_identify()
 {
-	// if the simulator is still busy creating the network,
-	// let's wait a bit longer
-	if (underlayConfigurator->isInInitPhase())
-	{
-		EV << "Underlay is still in Init phase: waiting 0.01s\n";
-		scheduleAt(simTime()+0.01, event);
-		return;
-	}
 
 	PithosMsg *inform = new PithosMsg("inform_req");
 	inform->setPayloadType(INFORM_REQ);
@@ -67,10 +55,6 @@ void Super_peer_logic::handleOverlayWrite(PithosMsg *pithos_m)
 {
 	if (pithos_m->getPayloadType() == OVERLAY_WRITE)
 	{
-		// if the simulator is still busy creating the network,
-		// something has gone wrong
-		if (underlayConfigurator->isInInitPhase()) error("The underlay configurator was still in its init phase");
-
 		IPvXAddress *ip = new IPvXAddress("10.0.0.1");
 		TransportAddress *address = new TransportAddress(*ip, 2048);
 
@@ -84,9 +68,9 @@ void Super_peer_logic::handleOverlayWrite(PithosMsg *pithos_m)
 			overlay_m->setSenderAddress(*address); // set the sender address to our own
 			overlay_m->addObject(pithos_m->removeObject("GameObject")); // set the message length to 100 bytes
 
-			EV << thisNode.getIp() << ": Sending packet to " << randomKey << "!" << std::endl;
+			//EV << thisNode.getIp() << ": Sending packet to " << randomKey << "!" << std::endl;
 
-			callRoute(randomKey, overlay_m); // send it to the overlay
+			//callRoute(randomKey, overlay_m); // send it to the overlay
 		}
 	}
 	else error("Expected OVERLAY_WRITE from local peers, but unknown packet received");
@@ -99,7 +83,6 @@ void Super_peer_logic::handleMessage(cMessage *msg)
 	if (msg == event)	//It's important that this is the first if, because there exists no arrival gate if the message is an event.
 	{
 		sp_identify();	//Broadcast the index of this super peer to all peers
-		delete(msg);
 	}
 	else if (strcmp(msg->getArrivalGate()->getName(), "peer_gate$i") == 0)
 	{
@@ -111,27 +94,8 @@ void Super_peer_logic::handleMessage(cMessage *msg)
 		}
 		else error("Super peer received an unknown message");
 
-		delete(msg);
 	}
-	else BaseApp::handleMessage(msg);
-}
+	else error("Unknown message received at Super peer logic");
 
-CompType Super_peer_logic::getThisCompType()
-{
-    return TIER1_COMP;
-}
-
-void Super_peer_logic::handleTimerEvent(cMessage* msg)
-{
-
-}
-
-void Super_peer_logic::deliver(OverlayKey& key, cMessage* msg)
-{
-
-}
-
-void Super_peer_logic::handleUDPMessage(cMessage* msg)
-{
-
+	delete(msg);
 }
