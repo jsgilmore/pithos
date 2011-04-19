@@ -18,9 +18,12 @@
 
 #include <omnetpp.h>
 
+#include "BaseApp.h"
+
 #include "Pithos_m.h"
 #include "Message_m.h"
 #include "GameObject.h"
+#include "GlobalNodeListAccess.h"
 
 enum SP_indeces {
     UNKNOWN = -1,
@@ -33,8 +36,7 @@ class Peer_logic: public cSimpleModule
 		Peer_logic();
 		virtual ~Peer_logic();
 	protected:
-		int super_peer_index;
-		int network_size;
+		TransportAddress super_peer_address;
 		simsignal_t busySignal;
 
 		virtual void initialize();
@@ -46,7 +48,6 @@ class Peer_logic: public cSimpleModule
 		void GroupStore(PithosMsg *write, GameObject *go);
 		void OverlayStore(PithosMsg *write, GameObject *go);
 		void handleOverlayWrite(PithosMsg *pithos_m);
-		void handleSPMsg(cMessage *msg);
 };
 
 Define_Module(Peer_logic);

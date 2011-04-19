@@ -27,34 +27,37 @@
 
 #include "UnderlayConfigurator.h"
 #include "GlobalStatistics.h"
+#include "GlobalNodeListAccess.h"
 #include "BaseApp.h"
 
 #include "Pithos_m.h"
 
 class Communicator : public BaseApp
 {
-    // module parameters
-    simtime_t sendPeriod;     // we'll store the "sendPeriod" parameter here
-    int numToSend;            // we'll store the "numToSend" parameter here
-    int largestKey;           // we'll store the "largestKey" parameter here
+	private:
+		// module parameters
+		int largestKey;           // we'll store the "largestKey" parameter here
 
-    // statistics
-    int numSent;              //number of packets sent
-    int numReceived;          //number of packets received
+		// statistics
+		int numSent;              //number of packets sent
+		int numReceived;          //number of packets received
 
-    // our timer
-    cMessage *timerMsg;
+		// our timer
+		cMessage *timerMsg;
 
-    // application routines
-    void initializeApp(int stage);                 // called when the module is being created
-    void finishApp();                              // called when the module is about to be destroyed
-    void handleTimerEvent(cMessage* msg);          // called when we received a timer message
-    void deliver(OverlayKey& key, cMessage* msg);  // called when we receive a message from the overlay
-    void handleUDPMessage(cMessage* msg);          // called when we receive a UDP message
+		virtual void handleMessage(cMessage *msg);
 
-public:
-    Communicator() { timerMsg = NULL; };
-    ~Communicator() { cancelAndDelete(timerMsg); };
+		// application routines
+		void initializeApp(int stage);                 // called when the module is being created
+		void finishApp();                              // called when the module is about to be destroyed
+		void handleTimerEvent(cMessage* msg);          // called when we received a timer message
+		void deliver(OverlayKey& key, cMessage* msg);  // called when we receive a message from the overlay
+		void handleUDPMessage(cMessage* msg);          // called when we receive a UDP message
+		void handleSPMsg(cMessage *msg);
+
+	public:
+		Communicator() { timerMsg = NULL; };
+		~Communicator() { cancelAndDelete(timerMsg); };
 };
 
 

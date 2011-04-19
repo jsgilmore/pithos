@@ -34,7 +34,7 @@ void Game::initialize()
 	objectSize_av = par("avObjectSize");
 
 	event = new cMessage("event");
-	scheduleAt(simTime(), event);
+	scheduleAt(simTime()+par("wait_time"), event);
 }
 
 void Game::handleMessage(cMessage *msg)
@@ -51,7 +51,7 @@ void Game::handleMessage(cMessage *msg)
 		send(write_msg, "write");
 		write_msg = NULL;
 
-		if (simTime() < 0.2)	//This should ensure that the simulation ends.
+		if (simTime() < 30)	//This should ensure that the simulation ends.
 			scheduleAt(simTime()+exponential(writeTime_av), event);
 	}
 	else delete(msg);

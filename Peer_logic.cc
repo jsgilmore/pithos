@@ -26,12 +26,6 @@ Peer_logic::~Peer_logic()
 
 void Peer_logic::initialize()
 {
-	if (getParentModule()->findSubmodule("super_peer_logic") == -1)
-		super_peer_index = UNKNOWN;
-	else super_peer_index = THIS;
-
-	network_size = par("network_size");
-
 	//Initialise queue statistics collection
 	busySignal = registerSignal("busy");
 	emit(busySignal, 0);
@@ -64,29 +58,10 @@ void Peer_logic::handleP2PMsg(cMessage *msg)
 	}
 	else if (pithos_m->getPayloadType() == INFORM)
 	{
-		super_peer_index = msg->getArrivalGate()->getIndex();
-		EV << "A new super peer has been identified on gate " << super_peer_index << "\n";
+		super_peer_address = pithos_m->getSourceAddress();
+		EV << "A new super peer has been identified" << super_peer_address.getIp() << "\n";
 	}
 	else error ("Illegal P2P message received");
-}
-
-void Peer_logic::handleSPMsg(cMessage *msg)
-{
-	int i;
-	PithosMsg *pithos_m = check_and_cast<PithosMsg *>(msg);
-
-	if (pithos_m->getPayloadType() == INFORM_REQ)
-	{
-		pithos_m->setPayloadType(INFORM);
-		pithos_m->setName("inform");
-
-		for (i = 0 ; i < network_size-1 ; i++)
-		{
-			send(pithos_m->dup(), "out", i);
-		}
-		//The original message is deleted in the handMessage function.
-	}
-	else error("Peer logic received invalid packet from super peer logic");
 }
 
 void Peer_logic::handleMessage(cMessage *msg)
@@ -95,13 +70,9 @@ void Peer_logic::handleMessage(cMessage *msg)
 	{
 		handleRequest(msg);
 	}
-	else if (strcmp(msg->getArrivalGate()->getName(), "in") == 0)
+	else if (strcmp(msg->getArrivalGate()->getName(), "comms_gate$i") == 0)
 	{
 		handleP2PMsg(msg);
-	}
-	else if (strcmp(msg->getArrivalGate()->getName(), "sp_gate$i") == 0)
-	{
-		handleSPMsg(msg);
 	}
 	else error("Illegal message received");
 
@@ -110,17 +81,52 @@ void Peer_logic::handleMessage(cMessage *msg)
 
 void Peer_logic::GroupStore(PithosMsg *write, GameObject *go)
 {
-	int i;
+	int i, j;
 	simtime_t sendDelay;
 	int group_replicas = par("replicas_g");
-	int storage_node_index;
 	GameObject *go_dup;
 	PithosMsg *write_dup;
 
+	bool original_address;
+	TransportAddress *send_list = new TransportAddress[group_replicas];
+
+	int network_size = GlobalNodeListAccess().get()->getNumNodes();
+
+	char ip[16];
+	TransportAddress dest_adr;
+	IPvXAddress dest_ip;
+	int dest_port = 2000;	//TODO: Allow the user to change this port number
+	dest_adr.setPort(dest_port);
+
 	for (i = 0 ; i < group_replicas ; i++)
 	{
+		//FIXME: Edit this to handle IP overflows in the next sections
+		if (i>255)
+			error("IP exceeds network range");
+
+		//Duplicates the objects for sending
 		go_dup = go->dup();
 		write_dup = write->dup();
+
+		original_address = false;
+
+		//FIXME: Add a timeout parameter, when there are too few known nodes
+		while(!original_address)
+		{
+			//Set the dest IP dynamically
+			//TODO: Change this to use a list of IP addresses available on the network and connected to the storage
+			sprintf(ip, "1.0.0.%d", intuniform(0, network_size)+1);
+			dest_ip.set(ip);
+			dest_adr.setIp(dest_ip);
+
+			//Check all previous chosen addresses to determine whether this address is unique
+			original_address = true;
+			for (j = 0 ; j < i ; j++)
+			{
+				if (send_list[j] == dest_adr)
+					original_address = false;
+			}
+		}
 
 		if (i > 0) {
 			go_dup->setType(REPLICA);
@@ -128,20 +134,15 @@ void Peer_logic::GroupStore(PithosMsg *write, GameObject *go)
 		}
 
 		write_dup->addObject(go_dup);
+		write_dup->setDestinationAddress(dest_adr);
 
-		storage_node_index = intuniform(0, network_size-2);	//19. because there are 20 nodes and a super peer, which means 20 connections, which means 0-19 values.
+		send_list[i].setIp(dest_ip, dest_port);
 
-		if (gate("out", storage_node_index)->getTransmissionChannel()->isBusy())
-		{
-			sendDelay = gate("out", storage_node_index)->getTransmissionChannel()->getTransmissionFinishTime()-simTime();
-			sendDelayed(write_dup, sendDelay, "out", storage_node_index);
-			emit(busySignal, 1);
-		}
-		else {
-			send(write_dup, "out", storage_node_index);
-			emit(busySignal, 0);
-		}
+		send(write_dup, "comms_gate$o");		//Set sender address
+		emit(busySignal, 0);
 	}
+
+	delete[]send_list;
 }
 
 void Peer_logic::OverlayStore(PithosMsg *write, GameObject *go)
@@ -149,7 +150,7 @@ void Peer_logic::OverlayStore(PithosMsg *write, GameObject *go)
 	simtime_t sendDelay;
 	int overlay_replicas = par("replicas_sp");
 
-	if (super_peer_index == UNKNOWN)
+	if (super_peer_address.isUnspecified())
 	{
 		EV << "No super peer has been identified. The object will not be replicated in the Overlay\n";
 		delete(write);
@@ -157,29 +158,16 @@ void Peer_logic::OverlayStore(PithosMsg *write, GameObject *go)
 		return;
 	}
 
+	go->setType(OVERLAY);
+
 	write->setPayloadType(OVERLAY_WRITE_REQ);
 	write->setValue(overlay_replicas);
-	go->setType(OVERLAY);
 	write->setName("overlay_write");
+	write->setDestinationAddress(super_peer_address);
 	write->addObject(go);
 
-	if (super_peer_index == THIS)
-	{
-		send(write, "sp_gate$o");
-		emit(busySignal, 0);
-		return;
-	}
-
-	if (gate("out", super_peer_index)->getTransmissionChannel()->isBusy())
-	{
-		sendDelay = gate("out", super_peer_index)->getTransmissionChannel()->getTransmissionFinishTime()-simTime();
-		sendDelayed(write, sendDelay, "out", super_peer_index);
-		emit(busySignal, 1);
-	}
-	else {
-		send(write, "out", super_peer_index);
-		emit(busySignal, 0);
-	}
+	send(write, "comms_gate$o");		//Set address
+	emit(busySignal, 0);
 }
 
 void Peer_logic::sendObjectForStore(int64_t o_size)

@@ -22,7 +22,6 @@
 
 #include <string>
 
-#include "Communicator_m.h"
 #include "Communicator.h"
 
 Define_Module(Communicator);
@@ -39,8 +38,6 @@ void Communicator::initializeApp(int stage)
     if (stage != MIN_STAGE_APP) return;
 
     // copy the module parameter values to our own variables
-    sendPeriod = par("sendPeriod");
-    numToSend = par("numToSend");
     largestKey = par("largestKey");
 
     // initialize our statistics variables
@@ -53,7 +50,6 @@ void Communicator::initializeApp(int stage)
 
     // start our timer!
     timerMsg = new cMessage("MyApplication Timer");
-    scheduleAt(simTime() + sendPeriod, timerMsg);
 
     bindToPort(2000);
 }
@@ -75,43 +71,7 @@ void Communicator::finishApp()
 // handleTimerEvent is called when a timer event triggers
 void Communicator::handleTimerEvent(cMessage* msg)
 {
-    // is this our timer?
-    if (msg == timerMsg) {
-        // reschedule our message
-        scheduleAt(simTime() + sendPeriod, timerMsg);
 
-        // if the simulator is still busy creating the network,
-        // let's wait a bit longer
-        if (underlayConfigurator->isInInitPhase()) return;
-
-        if (strcmp(getParentModule()->getName(), "Super_peer") == 0)
-        {
-
-			for (int i = 0; i < numToSend; i++) {
-
-				// let's create a random key
-				OverlayKey randomKey(intuniform(1, largestKey));
-
-				CommunicatorMsg *myMessage; // the message we'll send
-				myMessage = new CommunicatorMsg();
-				myMessage->setType(MYMSG_PING); // set the message type to PING
-				myMessage->setSenderAddress(thisNode); // set the sender address to our own
-				myMessage->setByteLength(100); // set the message length to 100 bytes
-
-				numSent++; // update statistics
-
-				EV << thisNode.getIp() << ": Sending packet to "
-				   << randomKey << "!" << std::endl;
-
-				EV << "Message routed for super peer\n";
-				callRoute(randomKey, myMessage); // send it to the overlay
-			}
-
-        }
-    } else {
-        // unknown message types are discarded
-        delete msg;
-    }
 }
 
 // deliver() is called when we receive a message from the overlay.
@@ -133,8 +93,75 @@ void Communicator::handleUDPMessage(cMessage* msg)
 	if (pithos_m->getPayloadType() == OVERLAY_WRITE_REQ)
 	{
 		if (strcmp(getParentModule()->getName(), "Super_peer") == 0)
-			EV << "An overlay write request was received, but this peer is not a super peer. The request will be ignored.\n";
-		else send(msg, "sp_gate$o");
+			send(msg, "sp_gate$o");
+		else EV << "An overlay write request was received, but this peer is not a super peer. The request will be ignored.\n";
 	}
 	else send(msg, "peer_gate$o");
+}
+
+void Communicator::handleSPMsg(cMessage *msg)
+{
+	int i;
+	PithosMsg *pithos_m = check_and_cast<PithosMsg *>(msg);
+	int network_size = GlobalNodeListAccess().get()->getNumNodes();
+
+	PithosMsg *pithos_dup;
+
+	char ip[16];
+	IPvXAddress dest_ip;
+	TransportAddress dest_adr;
+
+	if (pithos_m->getPayloadType() == INFORM_REQ)
+	{
+		pithos_m->setPayloadType(INFORM);
+		pithos_m->setName("inform");
+		pithos_m->setSourceAddress(TransportAddress(thisNode.getIp(), thisNode.getPort()));
+
+
+		for (i = 0 ; i <  network_size ; i++)
+		{
+			pithos_dup = pithos_m->dup();
+			//Set the dest IP dynamically
+			if (i>255)
+				error("IP exceeds network range");
+			sprintf(ip, "1.0.0.%d", i+1);
+			dest_ip.set(ip);
+			dest_adr.setIp(dest_ip, 2000);
+
+			pithos_dup->setDestinationAddress(dest_adr);	//FIXME: Add address sending
+
+			sendMessageToUDP(dest_adr, pithos_dup);
+		}
+		//The original message is deleted in the handMessage function.
+	}
+	else error("Peer logic received invalid packet from super peer logic");
+}
+
+void Communicator::handleMessage(cMessage *msg)
+{
+	if (strcmp(msg->getArrivalGate()->getName(), "sp_gate$i") == 0)
+	{
+		handleSPMsg(msg);
+		delete(msg);
+	}
+	else if (strcmp(msg->getArrivalGate()->getName(), "peer_gate$i") == 0)
+	{
+		PithosMsg *pithos_m = check_and_cast<PithosMsg *>(msg);
+
+		if (pithos_m->getPayloadType() == OVERLAY_WRITE_REQ)
+		{
+			if (strcmp(getParentModule()->getName(), "Super_peer") == 0)
+			{
+				send(msg, "sp_gate$o");
+			} else {
+				sendMessageToUDP(pithos_m->getDestinationAddress(), pithos_m);	//The super peer logic should have added the super peer's dest address here
+			}
+		}
+		else if (pithos_m->getPayloadType() == WRITE)
+		{
+			sendMessageToUDP(pithos_m->getDestinationAddress(), pithos_m);
+		}
+		else error("Unknown message received from super_peer_logic");
+
+	} else BaseApp::handleMessage(msg);
 }

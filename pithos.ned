@@ -23,8 +23,9 @@ simple Game
     parameters:
         @class(Game);
         @display("i=block/source");
-        double avWriteTime @unit(s) = default(0.001s);	//0.1 ms average
+        double avWriteTime @unit(s) = default(0.2s);	//100 ms average
         double avObjectSize = default(1024);	//1 KB average
+        double wait_time @unit(s) = default(1s);
     gates:
         output write;
 }
@@ -59,7 +60,6 @@ simple Peer_logic
         @display("i=block/cogwheel");
         @signal[busy](type="bool");
         @statistic[busy](title="server busy state"; record=vector,timeavg; interpolationmode=sample-hold);
-        int network_size = 21;
         int replicas_g = 3;
         int replicas_sp = 2;
     gates:
@@ -78,6 +78,7 @@ simple Super_peer_logic
         @signal[OverlayWrite](type="int");
         @statistic[OverlayWrite](title="Overlay writes"; record=sum);
         int largestKey;
+        double wait_time @unit(s) = default(1s);
     gates:
         inout comms_gate;
 }
@@ -87,8 +88,6 @@ simple Communicator extends BaseApp
     parameters:
         @class(Communicator);
         @display("i=block/join");
-        int sendPeriod @unit(s);   // how much time to wait between sending packets
-        int numToSend;             // how many packets will we send at the same time?
         int largestKey;            // largest key we can pick
     gates:
         inout peer_gate;
@@ -114,7 +113,7 @@ module Peer like ITier
         storage: Storage;
         game: Game;
         communicator: Communicator;
-    connections:
+    connections allowunconnected:
         game.write --> peer_logic.request;
         peer_logic.write --> storage.write;
         storage.read --> peer_logic.read;

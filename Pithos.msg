@@ -13,12 +13,19 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-//
-// TODO generated message class
-//
+cplusplus {{
+#include <TransportAddress.h>
+}}
+
+
+// import the IP Address class
+class noncobject TransportAddress;
+
 packet PithosMsg {
     int value;
     int payloadType enum(PayloadTypes);
+    TransportAddress sourceAddress;
+    TransportAddress destinationAddress;
 }
 
 enum PayloadTypes
