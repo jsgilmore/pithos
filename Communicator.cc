@@ -78,63 +78,103 @@ void Communicator::handleTimerEvent(cMessage* msg)
 // Unknown packets can be safely deleted here.
 void Communicator::deliver(OverlayKey& key, cMessage* msg)
 {
-    // we are only expecting messages of type MyMessage, throw away any other
-	//CommunicatorMsg *myMsg = dynamic_cast<CommunicatorMsg*>(msg);
-
-	send(msg, "sp_gate$o");
+	//All messages received from the overlay, should be sent to the super peer
+    send(msg, "sp_gate$o");
 }
 
 // handleUDPMessage() is called when we receive a message from UDP.
 // Unknown packets can be safely deleted here.
 void Communicator::handleUDPMessage(cMessage* msg)
 {
-	PithosMsg *pithos_m = check_and_cast<PithosMsg *>(msg);
 
-	if (pithos_m->getPayloadType() == OVERLAY_WRITE_REQ)
+	numReceived++;
+
+	if (strcmp(msg->getClassName(), "groupPkt") == 0)
 	{
-		if (strcmp(getParentModule()->getName(), "Super_peer") == 0)
-			send(msg, "sp_gate$o");
-		else EV << "An overlay write request was received, but this peer is not a super peer. The request will be ignored.\n";
+		groupPkt *group_p = check_and_cast<groupPkt *>(msg);
+
+		if (group_p->getPayloadType() == OVERLAY_WRITE_REQ)
+		{
+			if (getParentModule()->getSubmodule("super_peer_logic") != NULL)
+				send(msg, "sp_gate$o");
+			else {
+				EV << "An overlay write request was received, but this peer (" << getParentModule()->getName() << ") is not a super peer. The request will be ignored.\n";
+				delete(msg);
+			}
+		}
+		else {
+			EV << "Received group packet of type " << group_p->getPayloadType() << endl;
+			send(msg, "peer_gate$o");
+		}
 	}
-	else send(msg, "peer_gate$o");
+	else if (strcmp(msg->getClassName(), "bootstrapPkt") == 0)
+	{
+		bootstrapPkt *boot_p = check_and_cast<bootstrapPkt *>(msg);
+
+		if (boot_p->getPayloadType() == SP_IP_REQ)
+		{
+			if (getParentModule()->getSubmodule("super_peer_logic") != NULL)
+				send(msg, "sp_gate$o");
+			else {
+				EV << "A super peer join request was received, but this peer (" << getParentModule()->getName() << ": " << getParentModule()->getIndex() << ") is not a super peer. The request will be ignored.\n";
+				delete(msg);
+			}
+		} else send(msg, "peer_gate$o");
+	}
+	else error("Communicator received unknown message from UDP");
 }
 
 void Communicator::handleSPMsg(cMessage *msg)
 {
-	int i;
-	PithosMsg *pithos_m = check_and_cast<PithosMsg *>(msg);
+	/*int i;
+	groupPkt *group_p = check_and_cast<groupPkt *>(msg);
 	int network_size = GlobalNodeListAccess().get()->getNumNodes();
 
-	PithosMsg *pithos_dup;
+	groupPkt *group_p_dup;
 
 	char ip[16];
 	IPvXAddress dest_ip;
 	TransportAddress dest_adr;
 
-	if (pithos_m->getPayloadType() == INFORM_REQ)
+	if (group_p->getPayloadType() == INFORM_REQ)
 	{
-		pithos_m->setPayloadType(INFORM);
-		pithos_m->setName("inform");
-		pithos_m->setSourceAddress(TransportAddress(thisNode.getIp(), thisNode.getPort()));
+		group_p->setPayloadType(INFORM);
+		group_p->setName("inform");
+		group_p->setSourceAddress(TransportAddress(thisNode.getIp(), thisNode.getPort()));
+		group_p->setByteLength(4+4+4);	//Type, Src IP as # and Dest IP as #
 
 
 		for (i = 0 ; i <  network_size ; i++)
 		{
-			pithos_dup = pithos_m->dup();
+			group_p_dup = group_p->dup();
 			//Set the dest IP dynamically
 			if (i>255)
 				error("IP exceeds network range");
-			sprintf(ip, "1.0.0.%d", i+1);
+			sprintf(ip, "1.0.0.%d", i+2);		//The IP address should start at 1, but also ignore the first IP, which is the directory server
 			dest_ip.set(ip);
 			dest_adr.setIp(dest_ip, 2000);
 
-			pithos_dup->setDestinationAddress(dest_adr);	//FIXME: Add address sending
+			group_p_dup->setDestinationAddress(dest_adr);	//FIXME: Add address sending
 
-			sendMessageToUDP(dest_adr, pithos_dup);
+			sendMessageToUDP(dest_adr, group_p_dup);
+
+			numSent++;
 		}
 		//The original message is deleted in the handMessage function.
 	}
-	else error("Peer logic received invalid packet from super peer logic");
+	else error("Peer logic received invalid packet from super peer logic");*/
+
+	error("The communicator is not expecting any message from the Super Peer logic at this time.");		//TODO: Remove this error when the Super peer starts to send again
+	delete(msg);
+}
+
+void Communicator::handlePeerMsg(cMessage *msg)
+{
+	Packet *pkt = check_and_cast<Packet *>(msg);
+
+	sendMessageToUDP(pkt->getDestinationAddress(), pkt);
+
+	numSent++;
 }
 
 void Communicator::handleMessage(cMessage *msg)
@@ -142,26 +182,9 @@ void Communicator::handleMessage(cMessage *msg)
 	if (strcmp(msg->getArrivalGate()->getName(), "sp_gate$i") == 0)
 	{
 		handleSPMsg(msg);
-		delete(msg);
 	}
 	else if (strcmp(msg->getArrivalGate()->getName(), "peer_gate$i") == 0)
 	{
-		PithosMsg *pithos_m = check_and_cast<PithosMsg *>(msg);
-
-		if (pithos_m->getPayloadType() == OVERLAY_WRITE_REQ)
-		{
-			if (strcmp(getParentModule()->getName(), "Super_peer") == 0)
-			{
-				send(msg, "sp_gate$o");
-			} else {
-				sendMessageToUDP(pithos_m->getDestinationAddress(), pithos_m);	//The super peer logic should have added the super peer's dest address here
-			}
-		}
-		else if (pithos_m->getPayloadType() == WRITE)
-		{
-			sendMessageToUDP(pithos_m->getDestinationAddress(), pithos_m);
-		}
-		else error("Unknown message received from super_peer_logic");
-
+		handlePeerMsg(msg);
 	} else BaseApp::handleMessage(msg);
 }

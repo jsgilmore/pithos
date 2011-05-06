@@ -21,19 +21,14 @@ Super_peer_logic::Super_peer_logic()
 
 Super_peer_logic::~Super_peer_logic()
 {
-	cancelAndDelete(event);
 }
 
 void Super_peer_logic::initialize()
 {
 	largestKey = par("largestKey");
 
-	event = new cMessage("event");
-
 	//Initialise queue statistics collection
 	OverlayWriteSignal = registerSignal("OverlayWrite");
-
-	scheduleAt(simTime()+par("wait_time"), event);
 }
 
 void Super_peer_logic::finish()
@@ -41,17 +36,7 @@ void Super_peer_logic::finish()
 
 }
 
-void Super_peer_logic::sp_identify()
-{
-
-	PithosMsg *inform = new PithosMsg("inform_req");
-	inform->setPayloadType(INFORM_REQ);
-	inform->setByteLength(sizeof(int));	//This is the size of the int sent in the packet
-
-	send(inform, "comms_gate$o");
-}
-
-void Super_peer_logic::handleOverlayWrite(PithosMsg *pithos_m)
+void Super_peer_logic::handleOverlayWrite(groupPkt *group_p)
 {
 	/*GameObject *go = (GameObject *)pithos_m->removeObject("GameObject");
 
@@ -76,27 +61,51 @@ void Super_peer_logic::handleOverlayWrite(PithosMsg *pithos_m)
 	EV << "Packet reached Super peer. That's all folks\n";
 }
 
+void Super_peer_logic::handleBootstrapPkt(cMessage *msg)
+{
+	/*bootstrapPkt *boot_req = check_and_cast<bootstrapPkt *>(msg);
+
+	EV << "Received bootstrap message from Node: " << boot_req->getSourceAddress() << endl;
+
+	bootstrapPkt *boot_ans = new bootstrapPkt();
+	boot_ans->setPayloadType(INFORM);
+	boot_ans->setName("inform");
+	boot_ans->setSourceAddress(boot_req->getDestinationAddress());
+	boot_ans->setByteLength(4+4+4);	//Type, Src IP as # and Dest IP as #
+	boot_ans->setDestinationAddress(boot_req->getSourceAddress());
+
+	boot_ans->setSuperPeerAdr(findAddress(boot_req->getLatitude(), boot_req->getLongitude()));
+
+	EV << "Directory server received an address request and returned " << boot_ans->getSuperPeerAdr() << " as a result\n";
+
+	sendMessageToUDP(boot_ans->getDestinationAddress(), boot_ans);*/
+
+	EV << "This section is not working yet. Well done for getting here!\n";
+
+	//The original message is deleted in the calling function.
+}
+
 void Super_peer_logic::handleMessage(cMessage *msg)
 {
-	if (msg == event)	//It's important that this is the first if, because there exists no arrival gate if the message is an event.
+	if (strcmp(msg->getArrivalGate()->getName(), "comms_gate$i") == 0)
 	{
-		sp_identify();	//Broadcast the index of this super peer to all peers
-		scheduleAt(simTime()+par("wait_time"), event);	//Reschedule the message to be broadcast to all peers, so that new peers might also learn of the super peer.
-		return;
-	}
-	else if (strcmp(msg->getArrivalGate()->getName(), "comms_gate$i") == 0)
-	{
-		PithosMsg *pithos_m = check_and_cast<PithosMsg *>(msg);
-
-		if (pithos_m->getPayloadType() == OVERLAY_WRITE_REQ)
+		if (strcmp(msg->getClassName(), "groupPkt") == 0)
 		{
-			handleOverlayWrite(pithos_m);
-		}
-		else {
-			EV << "Message type: " << pithos_m->getPayloadType() << " name: " << pithos_m->getName() << endl;
-			error("Super peer received an unknown message");
-		}
+			groupPkt *group_p = check_and_cast<groupPkt *>(msg);
 
+			if (group_p->getPayloadType() == OVERLAY_WRITE_REQ)
+			{
+				handleOverlayWrite(group_p);
+			}
+			else {
+				EV << "Message type: " << group_p->getPayloadType() << " name: " << group_p->getName() << endl;
+				error("Super peer received an unknown message");
+			}
+		}
+		else if (strcmp(msg->getClassName(), "bootstrapPkt") == 0)
+		{
+			handleBootstrapPkt(msg);
+		}
 	}
 	else {
 		char msg_str[100];

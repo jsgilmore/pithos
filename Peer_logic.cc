@@ -21,14 +21,23 @@ Peer_logic::Peer_logic()
 
 Peer_logic::~Peer_logic()
 {
-
+	//Event does not have to be deleted here, since it is deleted in handleMessage
 }
 
 void Peer_logic::initialize()
 {
+	strcpy(directory_ip, par("directory_ip"));
+	directory_port = par("directory_port");
+
 	//Initialise queue statistics collection
 	busySignal = registerSignal("busy");
 	emit(busySignal, 0);
+
+	event = new cMessage("event");
+	scheduleAt(simTime()+par("wait_time"), event);
+
+	latitude = uniform(0,100);		//Make this range changeable
+	longitude = uniform(0,100);		//Make this range changeable
 }
 
 void Peer_logic::handleRequest(cMessage *msg)
@@ -41,12 +50,15 @@ void Peer_logic::handleRequest(cMessage *msg)
 
 void Peer_logic::handleP2PMsg(cMessage *msg)
 {
-	PithosMsg *pithos_m = check_and_cast<PithosMsg *>(msg);
+	char err_str[50];
 
-	if (pithos_m->getPayloadType() == WRITE)
+	if ((strcmp(msg->getName(), "write") == 0) || (strcmp(msg->getName(), "replica_write") == 0))
 	{
+
+		groupPkt *group_p = check_and_cast<groupPkt *>(msg);
+
 		cMessage *storage_msg = new cMessage("storage");
-		GameObject *go = (GameObject *)pithos_m->removeObject("GameObject");
+		GameObject *go = (GameObject *)group_p->removeObject("GameObject");
 
 		if (go->getType() == ROOT)
 			EV << getName() << " " << getIndex() << " received root Game Object of size " << go->getSize() << "\n";
@@ -56,17 +68,48 @@ void Peer_logic::handleP2PMsg(cMessage *msg)
 		storage_msg->addObject(go);
 		send(storage_msg, "write");
 	}
-	else if (pithos_m->getPayloadType() == INFORM)
+	else if (strcmp(msg->getName(), "inform") == 0)
 	{
-		super_peer_address = pithos_m->getSourceAddress();
-		EV << "A new super peer has been identified" << super_peer_address.getIp() << "\n";
+		bootstrapPkt *boot_p = check_and_cast<bootstrapPkt *>(msg);
+
+		super_peer_address = boot_p->getSuperPeerAdr();
+		EV << "A new super peer has been identified at " << super_peer_address << endl;
 	}
-	else error ("Illegal P2P message received");
+	else {
+		sprintf(err_str, "Illegal P2P message received (%s)", msg->getName());
+		error (err_str);
+	}
+}
+
+void Peer_logic::joinGroup()
+{
+	bootstrapPkt *boot_p = new bootstrapPkt();
+	NodeHandle thisNode = ((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode();
+	TransportAddress *sourceAdr = new TransportAddress(thisNode.getIp(), thisNode.getPort());
+
+	IPAddress *dest_ip = new IPAddress(directory_ip);
+	TransportAddress *destAdr = new TransportAddress(*dest_ip, directory_port);
+
+	boot_p->setSourceAddress(*sourceAdr);
+	boot_p->setDestinationAddress(*destAdr);
+	boot_p->setPayloadType(SP_IP_REQ);
+	boot_p->setName("sp ip req");
+	boot_p->setLatitude(latitude);
+	boot_p->setLongitude(longitude);
+	boot_p->setByteLength(4+4+4+8+8);	//Src IP as #, Dest IP as #, Type, Lat, Long
+
+	send(boot_p, "comms_gate$o");
+
+	//TODO: Add resend or timer that checks whether the join request has been handled by the Directory.
 }
 
 void Peer_logic::handleMessage(cMessage *msg)
 {
-	if (strcmp(msg->getArrivalGate()->getName(), "request") == 0)
+	if (msg == event)
+	{
+		joinGroup();
+	}
+	else if (strcmp(msg->getArrivalGate()->getName(), "request") == 0)
 	{
 		handleRequest(msg);
 	}
@@ -79,13 +122,13 @@ void Peer_logic::handleMessage(cMessage *msg)
 	delete(msg);
 }
 
-void Peer_logic::GroupStore(PithosMsg *write, GameObject *go)
+void Peer_logic::GroupStore(groupPkt *write, GameObject *go)
 {
 	int i, j;
 	simtime_t sendDelay;
 	int group_replicas = par("replicas_g");
 	GameObject *go_dup;
-	PithosMsg *write_dup;
+	groupPkt *write_dup;
 
 	bool original_address;
 	TransportAddress *send_list = new TransportAddress[group_replicas];
@@ -115,7 +158,7 @@ void Peer_logic::GroupStore(PithosMsg *write, GameObject *go)
 		{
 			//Set the dest IP dynamically
 			//TODO: Change this to use a list of IP addresses available on the network and connected to the storage
-			sprintf(ip, "1.0.0.%d", intuniform(0, network_size)+1);
+			sprintf(ip, "1.0.0.%d", intuniform(2, network_size));		//The first IP is the directory server and does not expect any write messages
 			dest_ip.set(ip);
 			dest_adr.setIp(dest_ip);
 
@@ -132,6 +175,9 @@ void Peer_logic::GroupStore(PithosMsg *write, GameObject *go)
 			go_dup->setType(REPLICA);
 			write_dup->setName("replica_write");
 		}
+		else {
+			write_dup->setName("write");
+		}
 
 		write_dup->addObject(go_dup);
 		write_dup->setDestinationAddress(dest_adr);
@@ -145,7 +191,7 @@ void Peer_logic::GroupStore(PithosMsg *write, GameObject *go)
 	delete[]send_list;
 }
 
-void Peer_logic::OverlayStore(PithosMsg *write, GameObject *go)
+void Peer_logic::OverlayStore(groupPkt *write, GameObject *go)
 {
 	simtime_t sendDelay;
 	int overlay_replicas = par("replicas_sp");
@@ -162,7 +208,7 @@ void Peer_logic::OverlayStore(PithosMsg *write, GameObject *go)
 
 	write->setPayloadType(OVERLAY_WRITE_REQ);
 	write->setValue(overlay_replicas);
-	write->setName("overlay_write");
+	write->setName("overlay_write_req");
 	write->setDestinationAddress(super_peer_address);
 	write->addObject(go);
 
@@ -172,11 +218,11 @@ void Peer_logic::OverlayStore(PithosMsg *write, GameObject *go)
 
 void Peer_logic::sendObjectForStore(int64_t o_size)
 {
-	PithosMsg *write;
+	groupPkt *write;
 	GameObject *go;
 
 	//Create the packet that will house the game object
-	write = new PithosMsg("write");
+	write = new groupPkt();
 	write->setByteLength(o_size);
 	write->setPayloadType(WRITE);
 
@@ -187,5 +233,4 @@ void Peer_logic::sendObjectForStore(int64_t o_size)
 	GroupStore(write, go);
 
 	OverlayStore(write, go);	//Send the message to be stored on the specified number of replicas in the overlay.
-
 }

@@ -24,13 +24,19 @@
 #define MYAPPLICATION_H
 
 #include <omnetpp.h>
+#include <iostream>
+#include <exception>
 
 #include "UnderlayConfigurator.h"
 #include "GlobalStatistics.h"
 #include "GlobalNodeListAccess.h"
 #include "BaseApp.h"
 
-#include "Pithos_m.h"
+#include "packet_m.h"
+#include "groupPkt_m.h"
+#include "bootstrapPkt_m.h"
+
+
 
 class Communicator : public BaseApp
 {
@@ -54,6 +60,7 @@ class Communicator : public BaseApp
 		void deliver(OverlayKey& key, cMessage* msg);  // called when we receive a message from the overlay
 		void handleUDPMessage(cMessage* msg);          // called when we receive a UDP message
 		void handleSPMsg(cMessage *msg);
+		void handlePeerMsg(cMessage *msg);
 
 	public:
 		Communicator() { timerMsg = NULL; };

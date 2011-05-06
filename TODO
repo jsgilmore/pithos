@@ -1,0 +1,6 @@
+What still needs to be done:
+Complete the directory server that allows peers to learn of their super peer
+Add super peer functionality that allows it to inform peers of other peers in the group.
+Peers will then learn of other peers in their group from super peers and not by simulation rules.
+Investigate the possibility of rather using Vast to implement node discovery.
+Super peers might have to use vast to know what other super peers are in the network, to enable them to correctly join new peers to the network. Or some migration method is required.

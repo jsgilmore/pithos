@@ -18,17 +18,16 @@
 
 #include <omnetpp.h>
 
-#include "Pithos_m.h"
-#include "Message_m.h"
 #include "GameObject.h"
-#include "Overlay_msg_m.h"
 #include "Peer_logic.h"
 #include "OverlayKey.h"
+
+#include "Message_m.h"
+#include "groupPkt_m.h"
 
 class Super_peer_logic : public cSimpleModule
 {
 	private:
-		cMessage *event;
 		void sp_identify();
 
 		int largestKey;           // we'll store the "largestKey" parameter here for the Overlay
@@ -43,8 +42,9 @@ class Super_peer_logic : public cSimpleModule
 		void finish();                              // called when the module is about to be destroyed
 
 		virtual void handleMessage(cMessage *msg);
-		void handleOverlayWrite(PithosMsg *pithos_m);
+		void handleOverlayWrite(groupPkt *group_p);
 		void handleP2PMsg(cMessage *msg);
+		void handleBootstrapPkt(cMessage *msg);
 };
 
 Define_Module(Super_peer_logic);

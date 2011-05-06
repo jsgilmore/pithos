@@ -62,6 +62,9 @@ simple Peer_logic
         @statistic[busy](title="server busy state"; record=vector,timeavg; interpolationmode=sample-hold);
         int replicas_g = 3;
         int replicas_sp = 2;
+        string  directory_ip;
+        int  directory_port;
+        double wait_time @unit(s) = default(1s);
     gates:
         inout comms_gate;
         output write;
@@ -168,4 +171,38 @@ module Super_peer like ITier
         tcpIn --> communicator.tcpIn;
         tcpOut <-- communicator.tcpOut;
         trace_in --> communicator.trace_in;
+}
+
+simple Directory_logic extends BaseApp
+{
+    parameters:
+        @class(Directory_logic);
+        @display("i=block/cogwheel");
+}
+
+module Directory like ITier
+{
+    parameters:
+        @display("i=device/mainframe");
+    gates:
+        input udpIn;             // gate from the UDP layer
+        output udpOut;           // gate to the UDP layer
+        input from_lowerTier;    // gate from the lower tier
+        input from_upperTier;    // gate from the upper tier
+        output to_lowerTier;     // gate to the lower tier
+        output to_upperTier;     // gate to the upper tier
+        input trace_in;          // gate for trace file commands
+        input tcpIn;             // gate from the TCP layer
+        output tcpOut;           // gate to the TCP layer
+    submodules:
+        directory_logic : Directory_logic;
+    connections allowunconnected:
+        //Connections to the Oversim simulation modules
+        from_lowerTier --> directory_logic.from_lowerTier;
+        to_lowerTier <-- directory_logic.to_lowerTier;
+        udpIn --> directory_logic.udpIn;
+        udpOut <-- directory_logic.udpOut;
+        tcpIn --> directory_logic.tcpIn;
+        tcpOut <-- directory_logic.tcpOut;
+        trace_in --> directory_logic.trace_in;
 }
