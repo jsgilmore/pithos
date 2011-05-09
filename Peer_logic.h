@@ -58,7 +58,7 @@ class Peer_logic: public cSimpleModule
 		void GroupStore(groupPkt *write, GameObject *go);
 		void OverlayStore(groupPkt *write, GameObject *go);
 
-		void joinGroup();
+		void joinRequest(TransportAddress dest_adr);
 };
 
 Define_Module(Peer_logic);

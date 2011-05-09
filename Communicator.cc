@@ -111,7 +111,7 @@ void Communicator::handleUDPMessage(cMessage* msg)
 	{
 		bootstrapPkt *boot_p = check_and_cast<bootstrapPkt *>(msg);
 
-		if (boot_p->getPayloadType() == SP_IP_REQ)
+		if (boot_p->getPayloadType() == JOIN_REQ)
 		{
 			if (getParentModule()->getSubmodule("super_peer_logic") != NULL)
 				send(msg, "sp_gate$o");

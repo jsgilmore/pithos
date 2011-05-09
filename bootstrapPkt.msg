@@ -25,7 +25,7 @@ class noncobject Packet;
 
 enum BootstrapTypes
 {
-    SP_IP_REQ = 1;
+    JOIN_REQ = 1;
     INFORM = 2;
     ACCEPT = 3;
 };

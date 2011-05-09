@@ -24,6 +24,7 @@
 
 #include "Message_m.h"
 #include "groupPkt_m.h"
+#include "PeerData.h"
 
 class Super_peer_logic : public cSimpleModule
 {
@@ -31,6 +32,8 @@ class Super_peer_logic : public cSimpleModule
 		void sp_identify();
 
 		int largestKey;           // we'll store the "largestKey" parameter here for the Overlay
+
+		std::vector<PeerData> group_peers;
 	public:
 		Super_peer_logic();
 		virtual ~Super_peer_logic();

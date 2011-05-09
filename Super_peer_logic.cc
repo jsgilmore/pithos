@@ -63,24 +63,30 @@ void Super_peer_logic::handleOverlayWrite(groupPkt *group_p)
 
 void Super_peer_logic::handleBootstrapPkt(cMessage *msg)
 {
-	/*bootstrapPkt *boot_req = check_and_cast<bootstrapPkt *>(msg);
+	bootstrapPkt *boot_req = check_and_cast<bootstrapPkt *>(msg);
+	std::vector<PeerData> list_tosend = group_peers;
 
-	EV << "Received bootstrap message from Node: " << boot_req->getSourceAddress() << endl;
 
-	bootstrapPkt *boot_ans = new bootstrapPkt();
-	boot_ans->setPayloadType(INFORM);
-	boot_ans->setName("inform");
-	boot_ans->setSourceAddress(boot_req->getDestinationAddress());
-	boot_ans->setByteLength(4+4+4);	//Type, Src IP as # and Dest IP as #
-	boot_ans->setDestinationAddress(boot_req->getSourceAddress());
+	//Create the IP data entry for the requesting peer to be added to the group peers list.
+	groupPkt *group_p = new groupPkt();
 
-	boot_ans->setSuperPeerAdr(findAddress(boot_req->getLatitude(), boot_req->getLongitude()));
+	PeerData pi;
+	pi.setAddress(boot_req->getSourceAddress());
 
-	EV << "Directory server received an address request and returned " << boot_ans->getSuperPeerAdr() << " as a result\n";
+	//Set the values of the packet to be returned to the requesting peer.
+	//The type is set to JOIN_ACCEPT
+	//The value is the length of the peers list
+	//A list object is added externally to the packet
+	group_p->setPayloadType(JOIN_ACCEPT);
+	group_p->setValue(group_peers.size());
+	group_p->setByteLength(2*sizeof(int)+group_peers.size()*sizeof(int)*2);	//Value+Type+(IP+Port)*list_length
+	//group_p->addObject(&list_tosend);	//TODO: This vector might have to be integrated into the message class itself. Refer to section 5.2.7 of the Omnet manual.
 
-	sendMessageToUDP(boot_ans->getDestinationAddress(), boot_ans);*/
+
 
 	EV << "This section is not working yet. Well done for getting here!\n";
+
+	//group_peers.push_back()
 
 	//The original message is deleted in the calling function.
 }

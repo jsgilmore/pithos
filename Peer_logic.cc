@@ -74,6 +74,8 @@ void Peer_logic::handleP2PMsg(cMessage *msg)
 
 		super_peer_address = boot_p->getSuperPeerAdr();
 		EV << "A new super peer has been identified at " << super_peer_address << endl;
+
+		joinRequest(super_peer_address);
 	}
 	else {
 		sprintf(err_str, "Illegal P2P message received (%s)", msg->getName());
@@ -81,19 +83,16 @@ void Peer_logic::handleP2PMsg(cMessage *msg)
 	}
 }
 
-void Peer_logic::joinGroup()
+void Peer_logic::joinRequest(TransportAddress dest_adr)
 {
 	bootstrapPkt *boot_p = new bootstrapPkt();
 	NodeHandle thisNode = ((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode();
 	TransportAddress *sourceAdr = new TransportAddress(thisNode.getIp(), thisNode.getPort());
 
-	IPAddress *dest_ip = new IPAddress(directory_ip);
-	TransportAddress *destAdr = new TransportAddress(*dest_ip, directory_port);
-
 	boot_p->setSourceAddress(*sourceAdr);
-	boot_p->setDestinationAddress(*destAdr);
-	boot_p->setPayloadType(SP_IP_REQ);
-	boot_p->setName("sp ip req");
+	boot_p->setDestinationAddress(dest_adr);
+	boot_p->setPayloadType(JOIN_REQ);
+	boot_p->setName("join_req");
 	boot_p->setLatitude(latitude);
 	boot_p->setLongitude(longitude);
 	boot_p->setByteLength(4+4+4+8+8);	//Src IP as #, Dest IP as #, Type, Lat, Long
@@ -107,14 +106,20 @@ void Peer_logic::handleMessage(cMessage *msg)
 {
 	if (msg == event)
 	{
-		joinGroup();
+		//For the first join request, a request is sent to the well known directory server
+		IPAddress *dest_ip = new IPAddress(directory_ip);
+		TransportAddress *destAdr = new TransportAddress(*dest_ip, directory_port);
+
+		joinRequest(*destAdr);
 	}
 	else if (strcmp(msg->getArrivalGate()->getName(), "request") == 0)
 	{
+		//A storage request was received from the game or higher layer. This is data that should be stored in the network
 		handleRequest(msg);
 	}
 	else if (strcmp(msg->getArrivalGate()->getName(), "comms_gate$i") == 0)
 	{
+		//Data was received from the UDP layer by the communicator and has been referred to the Peer logic
 		handleP2PMsg(msg);
 	}
 	else error("Illegal message received");

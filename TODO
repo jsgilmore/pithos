@@ -4,3 +4,4 @@ Add super peer functionality that allows it to inform peers of other peers in th
 Peers will then learn of other peers in their group from super peers and not by simulation rules.
 Investigate the possibility of rather using Vast to implement node discovery.
 Super peers might have to use vast to know what other super peers are in the network, to enable them to correctly join new peers to the network. Or some migration method is required.
+One might then be looking at a two tiered VAST network, with M+1 overlays, where M is the number of groups in the system

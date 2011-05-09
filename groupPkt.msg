@@ -28,4 +28,5 @@ enum GroupTypes
 {
     WRITE = 1;		//A packet sent over the network, containing a game object to be stored.
     OVERLAY_WRITE_REQ = 2;
+    JOIN_ACCEPT = 3;
 };
