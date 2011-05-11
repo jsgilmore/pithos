@@ -63,30 +63,48 @@ void Super_peer_logic::handleOverlayWrite(groupPkt *group_p)
 
 void Super_peer_logic::handleBootstrapPkt(cMessage *msg)
 {
+	unsigned int i;
 	bootstrapPkt *boot_req = check_and_cast<bootstrapPkt *>(msg);
-	std::vector<PeerData> list_tosend = group_peers;
+	NodeHandle thisNode = ((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode();
+	TransportAddress *sourceAdr = new TransportAddress(thisNode.getIp(), thisNode.getPort());
 
+	EV << "Super peer received bootstrap request from " << boot_req->getSourceAddress() << ", sending list and updating group.\n";
 
-	//Create the IP data entry for the requesting peer to be added to the group peers list.
-	groupPkt *group_p = new groupPkt();
+	//IP data entry for the requesting peer to be added to the group peers list.
+	PeerData peer_dat;
 
-	PeerData pi;
-	pi.setAddress(boot_req->getSourceAddress());
+	//List packet that will be returned to the requesting peer
+	PeerListPkt *list_p = new PeerListPkt();
 
 	//Set the values of the packet to be returned to the requesting peer.
-	//The type is set to JOIN_ACCEPT
-	//The value is the length of the peers list
-	//A list object is added externally to the packet
-	group_p->setPayloadType(JOIN_ACCEPT);
-	group_p->setValue(group_peers.size());
-	group_p->setByteLength(2*sizeof(int)+group_peers.size()*sizeof(int)*2);	//Value+Type+(IP+Port)*list_length
-	//group_p->addObject(&list_tosend);	//TODO: This vector might have to be integrated into the message class itself. Refer to section 5.2.7 of the Omnet manual.
+	//Set the type and byte length
+	list_p->setName("join_accept");
+	list_p->setPayloadType(JOIN_ACCEPT);
+	list_p->setByteLength(2*sizeof(int)+sizeof(int)*2);	//Value+Type+(IP+Port)*list_length FIXME: The size needs to still be multiplied by the size of the peer list.
+	list_p->setSourceAddress(*sourceAdr);
+	list_p->setDestinationAddress(boot_req->getSourceAddress());
 
+	for (i = 0 ; i < group_peers.size() ; i++)
+	{
+		list_p->addToPeerList(group_peers.at(i));
+	}
+	send(list_p->dup(), "comms_gate$o");	//Send a copy of the peer list, so the original packet may be reused to inform the other nodes
 
+	peer_dat.setAddress(boot_req->getSourceAddress());
+	list_p->clearPeerList();	//This erases all data added to the peer list.
+	list_p->addToPeerList(peer_dat);
+	list_p->setByteLength(2*sizeof(int)+sizeof(int)*2);	//Value+Type+(IP+Port)
 
-	EV << "This section is not working yet. Well done for getting here!\n";
+	for (i = 0 ; i < group_peers.size() ; i++)
+	{
+		list_p->setDestinationAddress(((PeerData)group_peers.at(i)).getAddress());
 
-	//group_peers.push_back()
+		send(list_p->dup(), "comms_gate$o");
+	}
+	delete(list_p);
+
+	//Add the data of the requesting peer into the list.
+	group_peers.push_back(peer_dat);
 
 	//The original message is deleted in the calling function.
 }

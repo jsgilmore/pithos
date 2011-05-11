@@ -22,10 +22,12 @@
 #include "GlobalNodeListAccess.h"
 
 #include "GameObject.h"
+#include "PeerData.h"
 
 #include "Message_m.h"
 #include "groupPkt_m.h"
 #include "bootstrapPkt_m.h"
+#include "PeerListPkt.h"
 
 
 enum SP_indeces {
@@ -42,6 +44,8 @@ class Peer_logic: public cSimpleModule
 		int directory_port;
 		double latitude;
 		double longitude;
+
+		std::vector<PeerData> group_peers;
 	public:
 		Peer_logic();
 		virtual ~Peer_logic();

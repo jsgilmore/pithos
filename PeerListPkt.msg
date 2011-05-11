@@ -11,21 +11,26 @@
 // 
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see http://www.gnu.org/licenses/.
-// 
+//
 
 cplusplus {{
 #include "packet_m.h"
+#include "PeerData.h"
 }}
 
 class noncobject Packet;
+class noncobject PeerData;
 
-packet groupPkt extends Packet {
-    int value;
-    int payloadType enum(GroupTypes);
+packet PeerListPkt extends Packet
+{
+    @customize(true);
+    int size;
+    int payloadType enum(ListTypes);
+    
+    abstract PeerData peer_list[];
 }
 
-enum GroupTypes
+enum ListTypes
 {
-    WRITE = 1;		//A packet sent over the network, containing a game object to be stored.
-    OVERLAY_WRITE_REQ = 2;
+    JOIN_ACCEPT = 1;
 };

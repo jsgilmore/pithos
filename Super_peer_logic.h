@@ -23,7 +23,7 @@
 #include "OverlayKey.h"
 
 #include "Message_m.h"
-#include "groupPkt_m.h"
+#include "PeerListPkt.h"
 #include "PeerData.h"
 
 class Super_peer_logic : public cSimpleModule

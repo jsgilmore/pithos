@@ -126,46 +126,11 @@ void Communicator::handleUDPMessage(cMessage* msg)
 
 void Communicator::handleSPMsg(cMessage *msg)
 {
-	/*int i;
-	groupPkt *group_p = check_and_cast<groupPkt *>(msg);
-	int network_size = GlobalNodeListAccess().get()->getNumNodes();
+	Packet *pkt = check_and_cast<Packet *>(msg);
 
-	groupPkt *group_p_dup;
+	sendMessageToUDP(pkt->getDestinationAddress(), pkt);
 
-	char ip[16];
-	IPvXAddress dest_ip;
-	TransportAddress dest_adr;
-
-	if (group_p->getPayloadType() == INFORM_REQ)
-	{
-		group_p->setPayloadType(INFORM);
-		group_p->setName("inform");
-		group_p->setSourceAddress(TransportAddress(thisNode.getIp(), thisNode.getPort()));
-		group_p->setByteLength(4+4+4);	//Type, Src IP as # and Dest IP as #
-
-
-		for (i = 0 ; i <  network_size ; i++)
-		{
-			group_p_dup = group_p->dup();
-			//Set the dest IP dynamically
-			if (i>255)
-				error("IP exceeds network range");
-			sprintf(ip, "1.0.0.%d", i+2);		//The IP address should start at 1, but also ignore the first IP, which is the directory server
-			dest_ip.set(ip);
-			dest_adr.setIp(dest_ip, 2000);
-
-			group_p_dup->setDestinationAddress(dest_adr);	//FIXME: Add address sending
-
-			sendMessageToUDP(dest_adr, group_p_dup);
-
-			numSent++;
-		}
-		//The original message is deleted in the handMessage function.
-	}
-	else error("Peer logic received invalid packet from super peer logic");*/
-
-	error("The communicator is not expecting any message from the Super Peer logic at this time.");		//TODO: Remove this error when the Super peer starts to send again
-	delete(msg);
+	numSent++;
 }
 
 void Communicator::handlePeerMsg(cMessage *msg)

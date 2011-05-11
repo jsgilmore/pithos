@@ -77,6 +77,18 @@ void Peer_logic::handleP2PMsg(cMessage *msg)
 
 		joinRequest(super_peer_address);
 	}
+	else if (strcmp(msg->getName(), "join_accept") == 0)
+	{
+		PeerListPkt *list_p = check_and_cast<PeerListPkt *>(msg);
+		unsigned int i;
+
+		for ( i = 0 ; i < list_p->getPeer_listArraySize() ; i++)
+		{
+			group_peers.push_back(list_p->getPeer_list(i));
+		}
+
+		EV << "Added " << list_p->getPeer_listArraySize() << " new peers to the list.\n";
+	}
 	else {
 		sprintf(err_str, "Illegal P2P message received (%s)", msg->getName());
 		error (err_str);
@@ -129,43 +141,32 @@ void Peer_logic::handleMessage(cMessage *msg)
 
 void Peer_logic::GroupStore(groupPkt *write, GameObject *go)
 {
-	int i, j;
+	unsigned int i, j;
 	simtime_t sendDelay;
-	int group_replicas = par("replicas_g");
+	unsigned int group_replicas = par("replicas_g");
 	GameObject *go_dup;
 	groupPkt *write_dup;
 
 	bool original_address;
 	TransportAddress *send_list = new TransportAddress[group_replicas];
 
-	int network_size = GlobalNodeListAccess().get()->getNumNodes();
-
-	char ip[16];
 	TransportAddress dest_adr;
-	IPvXAddress dest_ip;
-	int dest_port = 2000;	//TODO: Allow the user to change this port number
-	dest_adr.setPort(dest_port);
+
+	//This ensures that an infinite while loop situation will never occur, but it also constrains the number of replicas to the number of known nodes
+	if (group_replicas > group_peers.size())
+			group_replicas = group_peers.size();
 
 	for (i = 0 ; i < group_replicas ; i++)
 	{
-		//FIXME: Edit this to handle IP overflows in the next sections
-		if (i>255)
-			error("IP exceeds network range");
-
 		//Duplicates the objects for sending
 		go_dup = go->dup();
 		write_dup = write->dup();
 
 		original_address = false;
 
-		//FIXME: Add a timeout parameter, when there are too few known nodes
 		while(!original_address)
 		{
-			//Set the dest IP dynamically
-			//TODO: Change this to use a list of IP addresses available on the network and connected to the storage
-			sprintf(ip, "1.0.0.%d", intuniform(2, network_size));		//The first IP is the directory server and does not expect any write messages
-			dest_ip.set(ip);
-			dest_adr.setIp(dest_ip);
+			dest_adr = ((PeerData)group_peers.at(intuniform(0, group_peers.size()-1))).getAddress();		//Choose a random peer in the group for the destination
 
 			//Check all previous chosen addresses to determine whether this address is unique
 			original_address = true;
@@ -187,7 +188,7 @@ void Peer_logic::GroupStore(groupPkt *write, GameObject *go)
 		write_dup->addObject(go_dup);
 		write_dup->setDestinationAddress(dest_adr);
 
-		send_list[i].setIp(dest_ip, dest_port);
+		send_list[i] = dest_adr;
 
 		send(write_dup, "comms_gate$o");		//Set sender address
 		emit(busySignal, 0);
