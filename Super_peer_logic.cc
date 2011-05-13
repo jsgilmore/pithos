@@ -38,27 +38,27 @@ void Super_peer_logic::finish()
 
 void Super_peer_logic::handleOverlayWrite(groupPkt *group_p)
 {
-	/*GameObject *go = (GameObject *)pithos_m->removeObject("GameObject");
+	GameObject *go = (GameObject *)group_p->removeObject("GameObject");
+	if (go == NULL)
+		error("No game object found attached to the message\n");
 
-	for (int i = 0; i < pithos_m->getValue(); i++)
+	//FIXME: The hash string should still be adapted to allow for multiple replicas in the overlay
+	for (int i = 0; i < group_p->getValue(); i++)
 	{
-		// let's create a random key
-		OverlayKey randomKey(intuniform(1, largestKey));
+		OverlayPkt *overlay_p = new OverlayPkt(); // the message we'll send
+		overlay_p->setType(WRITE); // set the message type to PING
+		overlay_p->setByteLength((8+4) + 4 + 20);	//Game object size and type + packet type + routing key
+		overlay_p->setName("overlay_write");
 
-		OverlayMsg *overlay_m = new OverlayMsg(); // the message we'll send
-		overlay_m->setType(WRITE); // set the message type to PING
-		overlay_m->addObject(go->dup());
+		overlay_p->addObject(go->dup());
 
-		EV << ((BaseApp *)getParentModule()->getSubmodule("Communicator"))->getThisNode().getIp() << ": Sending packet to " << randomKey << "!" << std::endl;
-
-
-		callRoute(randomKey, overlay_m); // send it to the overlay
+		send(overlay_p, "comms_gate$o"); // send it to the overlay
 	}
 	delete(go);
 
-	emit(OverlayWriteSignal, 1);*/
+	emit(OverlayWriteSignal, 1);
 
-	EV << "Packet reached Super peer. That's all folks\n";
+	EV << "Packet sent for storage in the overlay\n";
 }
 
 void Super_peer_logic::handleBootstrapPkt(cMessage *msg)
@@ -80,7 +80,7 @@ void Super_peer_logic::handleBootstrapPkt(cMessage *msg)
 	//Set the type and byte length
 	list_p->setName("join_accept");
 	list_p->setPayloadType(JOIN_ACCEPT);
-	list_p->setByteLength(2*sizeof(int)+sizeof(int)*2);	//Value+Type+(IP+Port)*list_length FIXME: The size needs to still be multiplied by the size of the peer list.
+	list_p->setByteLength(2*sizeof(int)+sizeof(int)*2*group_peers.size());	//Value+Type+(IP+Port)*list_length FIXME: The size needs to still be multiplied by the size of the peer list.
 	list_p->setSourceAddress(*sourceAdr);
 	list_p->setDestinationAddress(boot_req->getSourceAddress());
 

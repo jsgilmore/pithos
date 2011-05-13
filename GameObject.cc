@@ -31,6 +31,7 @@ GameObject& GameObject::operator=(const GameObject& other)
 		return *this;
 	cOwnedObject::operator=(other);
 
+
 	size = other.size;
 	type = other.type;
 
@@ -63,4 +64,14 @@ int GameObject::getType()
 void GameObject::setType(int o_type)
 {
 	type = o_type;
+}
+
+void GameObject::setObjectName(char *o_Name)
+{
+	strcpy(objectName, o_Name);
+}
+
+char * GameObject::getObjectName()
+{
+	return objectName;
 }

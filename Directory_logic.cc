@@ -36,11 +36,17 @@ void Directory_logic::initializeApp(int stage)
     if (stage != MIN_STAGE_APP) return;
 
     SP_element element;
+    sp_adr_list.reserve(20);	//The amount of memory to initially reserve for this vector
+
+    //TODO: Implement a mechanism whereby super peers register with the Directory server
     element.setAddress("1.0.0.2", 2000);
     element.setPosition(0.0, 0.0);
-    sp_adr_list.reserve(20);	//The amount of memory to initially reserve for this vector
     sp_adr_list.push_back(element);
+    EV << "Initialising directory server with a super peer at address " << element.getAddress().getIp() << endl;
 
+    element.setAddress("1.0.0.4", 2000);
+    element.setPosition(100.0, 100.0);
+    sp_adr_list.push_back(element);
     EV << "Initialising directory server with a super peer at address " << element.getAddress().getIp() << endl;
 
     bindToPort(2000);

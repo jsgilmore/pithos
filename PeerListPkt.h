@@ -40,17 +40,18 @@ class PeerListPkt : public PeerListPkt_Base
 	protected:
 		std::vector<PeerData> peer_list;
 	public:
-		PeerListPkt(const char *name=NULL, int kind=0)
-		{
+		PeerListPkt(const char *name=NULL, int kind=0) : PeerListPkt_Base(name, kind) {};
+		/*{
 			setName(name);
 			setKind(kind);
-		}
+		}*/
 
-		PeerListPkt(const PeerListPkt& other)	//TODO: Make sure this copy constructor correctly constructs the cPacket class
+		/*PeerListPkt(const PeerListPkt& other)	//TODO: Make sure this copy constructor correctly constructs the cPacket class
 		{
 			setName(other.getName());
 			operator=(other);
-		}
+		}*/
+		PeerListPkt(const PeerListPkt& other) : PeerListPkt_Base(other.getName()) { operator=(other); }
 
 		PeerListPkt& operator=(const PeerListPkt& other)
 		{

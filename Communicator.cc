@@ -48,9 +48,6 @@ void Communicator::initializeApp(int stage)
     WATCH(numSent);
     WATCH(numReceived);
 
-    // start our timer!
-    timerMsg = new cMessage("MyApplication Timer");
-
     bindToPort(2000);
 }
 
@@ -78,8 +75,10 @@ void Communicator::handleTimerEvent(cMessage* msg)
 // Unknown packets can be safely deleted here.
 void Communicator::deliver(OverlayKey& key, cMessage* msg)
 {
+	EV << "Message received over overlay!!!!!!!!!!!!!!!! (" << msg->getName() << ")\n";
 	//All messages received from the overlay, should be sent to the super peer
-    send(msg, "sp_gate$o");
+    //send(msg, "sp_gate$o");
+	delete(msg);
 }
 
 // handleUDPMessage() is called when we receive a message from UDP.
@@ -121,21 +120,59 @@ void Communicator::handleUDPMessage(cMessage* msg)
 			}
 		} else send(msg, "peer_gate$o");
 	}
+	else if (strcmp(msg->getClassName(), "PeerListPkt") == 0)
+	{
+		send(msg, "peer_gate$o");
+	}
 	else error("Communicator received unknown message from UDP");
 }
 
 void Communicator::handleSPMsg(cMessage *msg)
 {
-	Packet *pkt = check_and_cast<Packet *>(msg);
+	if (underlayConfigurator->isInInitPhase())
+	{
+		delete(msg);
+		error("Underlay configurator is still in init phase, extend wait time.\n");
+	}
 
-	sendMessageToUDP(pkt->getDestinationAddress(), pkt);
+	if (strcmp(msg->getName(), "join_accept") == 0)
+	{
+		Packet *pkt = check_and_cast<Packet *>(msg);
 
-	numSent++;
+		sendMessageToUDP(pkt->getDestinationAddress(), pkt);
+
+		numSent++;
+	}
+	else if (strcmp(msg->getName(), "overlay_write") == 0)
+	{
+		CSHA1 hash;
+		char hash_str[100];		//SHA-1 produces a 160 bit/20 byte hash
+
+		GameObject *go = (GameObject *)msg->getObject("GameObject");
+		cPacket *pkt = check_and_cast<cPacket *>(msg);
+
+		//Create a hash of the game object's name
+		hash.Update((unsigned char *)go->getObjectName(), strlen(go->getObjectName()));
+		hash.Final();
+		hash.ReportHash(hash_str, CSHA1::REPORT_HEX);
+
+		OverlayKey nameKey(hash_str, 16);
+
+		EV << thisNode.getIp() << ": Sending packet to " << nameKey << "!" << std::endl;
+
+		callRoute(nameKey, pkt);
+	}
 }
 
 void Communicator::handlePeerMsg(cMessage *msg)
 {
 	Packet *pkt = check_and_cast<Packet *>(msg);
+
+	if (underlayConfigurator->isInInitPhase())
+	{
+		delete(msg);
+		error("Underlay configurator is still in init phase, extend wait time.\n");
+	}
 
 	sendMessageToUDP(pkt->getDestinationAddress(), pkt);
 

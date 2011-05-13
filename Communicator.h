@@ -26,17 +26,17 @@
 #include <omnetpp.h>
 #include <iostream>
 #include <exception>
+#include <SHA1.h>
 
 #include "UnderlayConfigurator.h"
 #include "GlobalStatistics.h"
 #include "GlobalNodeListAccess.h"
 #include "BaseApp.h"
 
+#include "GameObject.h"
 #include "packet_m.h"
 #include "groupPkt_m.h"
 #include "bootstrapPkt_m.h"
-
-
 
 class Communicator : public BaseApp
 {
@@ -48,8 +48,6 @@ class Communicator : public BaseApp
 		int numSent;              //number of packets sent
 		int numReceived;          //number of packets received
 
-		// our timer
-		cMessage *timerMsg;
 
 		virtual void handleMessage(cMessage *msg);
 
@@ -63,8 +61,8 @@ class Communicator : public BaseApp
 		void handlePeerMsg(cMessage *msg);
 
 	public:
-		Communicator() { timerMsg = NULL; };
-		~Communicator() { cancelAndDelete(timerMsg); };
+		Communicator() {};
+		~Communicator() {};
 };
 
 

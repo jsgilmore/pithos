@@ -45,14 +45,17 @@ class Peer_logic: public cSimpleModule
 		double latitude;
 		double longitude;
 
+		TransportAddress super_peer_address;
+		simsignal_t busySignal;
+
 		std::vector<PeerData> group_peers;
+
+		// statistics
+		int numSentForStore;              //number of packets sent
 	public:
 		Peer_logic();
 		virtual ~Peer_logic();
 	protected:
-		TransportAddress super_peer_address;
-		simsignal_t busySignal;
-
 		virtual void initialize();
 		virtual void handleMessage(cMessage *msg);
 

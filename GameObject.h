@@ -26,7 +26,8 @@ enum ObjectTypes {
 
 class GameObject : public cOwnedObject
 {
-	protected:
+	private:
+		char objectName[41];
 		int64_t size;
 		int type;
 	public:
@@ -41,6 +42,8 @@ class GameObject : public cOwnedObject
 		void setSize(int64_t o_size);
 		int getType();
 		void setType(int o_type);
+		void setObjectName(char *o_Name);
+		char *getObjectName();
 };
 
 #endif /* GO_H_ */

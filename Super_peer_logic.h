@@ -25,6 +25,7 @@
 #include "Message_m.h"
 #include "PeerListPkt.h"
 #include "PeerData.h"
+#include "overlayPkt_m.h"
 
 class Super_peer_logic : public cSimpleModule
 {

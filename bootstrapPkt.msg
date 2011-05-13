@@ -27,7 +27,6 @@ enum BootstrapTypes
 {
     JOIN_REQ = 1;
     INFORM = 2;
-    ACCEPT = 3;
 };
 
 packet bootstrapPkt extends Packet{

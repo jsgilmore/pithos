@@ -33,6 +33,11 @@ void Peer_logic::initialize()
 	busySignal = registerSignal("busy");
 	emit(busySignal, 0);
 
+	// initialize our statistics variables
+	numSentForStore = 0;
+	// tell the GUI to display our variables
+	WATCH(numSentForStore);
+
 	event = new cMessage("event");
 	scheduleAt(simTime()+par("wait_time"), event);
 
@@ -97,6 +102,9 @@ void Peer_logic::handleP2PMsg(cMessage *msg)
 
 void Peer_logic::joinRequest(TransportAddress dest_adr)
 {
+	if (dest_adr.isUnspecified())
+		error("Destination address is unspecified when requesting a join.\n");
+
 	bootstrapPkt *boot_p = new bootstrapPkt();
 	NodeHandle thisNode = ((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode();
 	TransportAddress *sourceAdr = new TransportAddress(thisNode.getIp(), thisNode.getPort());
@@ -226,6 +234,7 @@ void Peer_logic::sendObjectForStore(int64_t o_size)
 {
 	groupPkt *write;
 	GameObject *go;
+	char name[41];
 
 	//Create the packet that will house the game object
 	write = new groupPkt();
@@ -235,8 +244,14 @@ void Peer_logic::sendObjectForStore(int64_t o_size)
 	go = new GameObject("GameObject");
 	go->setSize(o_size);
 
+	sprintf(name, "Game %d, Object %d, size %lld", getParentModule()->getIndex(), numSentForStore, o_size);
+	go->setObjectName(name);
+
+
 	//Send the message to be stored on the specified number of replicas in the group.
 	GroupStore(write, go);
 
 	OverlayStore(write, go);	//Send the message to be stored on the specified number of replicas in the overlay.
+
+	numSentForStore++;
 }

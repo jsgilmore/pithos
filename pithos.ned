@@ -25,7 +25,7 @@ simple Game
         @display("i=block/source");
         double avWriteTime @unit(s) = default(0.2s);	//100 ms average
         double avObjectSize = default(1024);	//1 KB average
-        double wait_time @unit(s) = default(1s);
+        double wait_time @unit(s) = default(5s);
     gates:
         output write;
 }
@@ -61,10 +61,10 @@ simple Peer_logic
         @signal[busy](type="bool");
         @statistic[busy](title="server busy state"; record=vector,timeavg; interpolationmode=sample-hold);
         int replicas_g = 3;
-        int replicas_sp = 2;
+        int replicas_sp = 1;
         string  directory_ip;
         int  directory_port;
-        double wait_time @unit(s) = default(1s);
+        double wait_time @unit(s) = default(5s);
     gates:
         inout comms_gate;
         output write;
@@ -81,7 +81,7 @@ simple Super_peer_logic
         @signal[OverlayWrite](type="int");
         @statistic[OverlayWrite](title="Overlay writes"; record=sum);
         int largestKey;
-        double wait_time @unit(s) = default(1s);
+        double wait_time @unit(s) = default(5s);
     gates:
         inout comms_gate;
 }
