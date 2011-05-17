@@ -89,11 +89,12 @@ simple Super_peer_logic
         @signal[OverlayWrite](type="int");
         @signal[GroupSize](type="int");
         @signal[OverlayDelivered](type="int");
-        
+        @signal[overlaysStoreFail](type="int");
         
         @statistic[OverlayWrite](title="Overlay writes"; record=sum);
         @statistic[GroupSize](title="Group size"; record=sum);
         @statistic[OverlayDelivered](title="Delivered to Overlay"; record=sum);
+        @statistic[overlaysStoreFail](title="Overlay store failures"; record=sum);
     gates:
         inout comms_gate;
 }

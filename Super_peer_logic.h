@@ -43,6 +43,8 @@ class Super_peer_logic : public cSimpleModule
 		simsignal_t groupSizeSignal;
 		simsignal_t OverlayWriteSignal;
 		simsignal_t OverlayDeliveredSignal;
+
+		simsignal_t overlaysStoreFailSignal;
 	public:
 		Super_peer_logic();
 		virtual ~Super_peer_logic();

@@ -33,6 +33,8 @@ void Super_peer_logic::initialize()
 	groupSizeSignal = registerSignal("GroupSize");
 	OverlayDeliveredSignal =  registerSignal("OverlayDelivered");
 
+	overlaysStoreFailSignal =  registerSignal("overlaysStoreFail");
+
 	latitude = uniform(0,100);		//Make this range changeable
 	longitude = uniform(0,100);		//Make this range changeable
 
@@ -122,15 +124,23 @@ void Super_peer_logic::GroupStore(overlayPkt *overlay_p)
 {
 	TransportAddress dest_adr;
 	GameObject *go = (GameObject *)overlay_p->removeObject("GameObject");
-	groupPkt *group_p = new groupPkt();
+	groupPkt *group_p;
 
 	NodeHandle thisNode = ((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode();
-	TransportAddress *sourceAdr = new TransportAddress(thisNode.getIp(), thisNode.getPort());
+	TransportAddress *sourceAdr;
 
-	dest_adr = ((PeerData)group_peers.at(intuniform(0, group_peers.size()-1))).getAddress();		//Choose a random peer in the group for the destination
+	if (group_peers.size() > 0)
+		dest_adr = ((PeerData)group_peers.at(intuniform(0, group_peers.size()-1))).getAddress();		//Choose a random peer in the group for the destination
+	else {
+		emit(overlaysStoreFailSignal, 1);
+		return;
+	}
 
 	go->setType(OVERLAY);
 
+	sourceAdr = new TransportAddress(thisNode.getIp(), thisNode.getPort());
+
+	group_p = new groupPkt();
 	group_p->setSourceAddress(*sourceAdr);
 	group_p->setDestinationAddress(dest_adr);
 	group_p->setPayloadType(WRITE);

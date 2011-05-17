@@ -24,6 +24,7 @@ class Game : public cSimpleModule
 {
 	private:
 		simtime_t writeTime_av;
+		simtime_t wait_time;
 		double objectSize_av;
 		cMessage *event;
 	public:
