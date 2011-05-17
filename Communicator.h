@@ -23,6 +23,8 @@
 #ifndef MYAPPLICATION_H
 #define MYAPPLICATION_H
 
+#define SHA1_WIPE_VARIABLES
+
 #include <omnetpp.h>
 #include <iostream>
 #include <exception>
@@ -41,9 +43,6 @@
 class Communicator : public BaseApp
 {
 	private:
-		// module parameters
-		int largestKey;           // we'll store the "largestKey" parameter here
-
 		// statistics
 		int numSent;              //number of packets sent
 		int numReceived;          //number of packets received
@@ -57,8 +56,13 @@ class Communicator : public BaseApp
 		void handleTimerEvent(cMessage* msg);          // called when we received a timer message
 		void deliver(OverlayKey& key, cMessage* msg);  // called when we receive a message from the overlay
 		void handleUDPMessage(cMessage* msg);          // called when we receive a UDP message
+
 		void handleSPMsg(cMessage *msg);
 		void handlePeerMsg(cMessage *msg);
+		void overlayStore(cMessage *msg);
+		void sendPacket(cMessage *msg);
+
+		void handlePkt(Packet *packet, int sp_type);
 
 	public:
 		Communicator() {};

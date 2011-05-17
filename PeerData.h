@@ -24,7 +24,12 @@ class PeerData
 		TransportAddress address;
 	public:
 		PeerData();
+		PeerData(const PeerData& other);
 		virtual ~PeerData();
+		PeerData& operator=(const PeerData& other);
+		bool operator==(const PeerData &other) const;
+		bool operator!=(const PeerData &other) const;
+
 		void setAddress(TransportAddress adr);
 		void setAddress(const char* ip_str, int port);
 		TransportAddress getAddress();

@@ -6,7 +6,7 @@ enum OverlayTypes
 }
 
 // now we declare the message
-packet OverlayPkt
+packet overlayPkt
 {
     int type enum(OverlayTypes);      	// message type
 }

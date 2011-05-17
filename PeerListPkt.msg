@@ -25,12 +25,6 @@ packet PeerListPkt extends Packet
 {
     @customize(true);
     int size;
-    int payloadType enum(ListTypes);
     
     abstract PeerData peer_list[];
 }
-
-enum ListTypes
-{
-    JOIN_ACCEPT = 1;
-};

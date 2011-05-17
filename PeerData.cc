@@ -20,6 +20,11 @@ PeerData::PeerData() {
 
 }
 
+PeerData::PeerData(const PeerData& other)
+{
+	operator=(other);
+}
+
 PeerData::~PeerData() {
 	// TODO Auto-generated destructor stub
 }
@@ -28,6 +33,27 @@ void PeerData::setAddress(TransportAddress adr)
 {
 	address = adr;
 }
+
+PeerData& PeerData::operator=(const PeerData& other)
+{
+	if (&other==this)
+		return *this;
+
+	address = other.address;
+
+	return *this;
+}
+
+bool PeerData::operator==(const PeerData &other) const
+{
+	if (address == other.address)
+		return true;
+	else return false;
+}
+
+bool PeerData::operator!=(const PeerData &other) const {
+   return !(*this == other);
+ }
 
 void PeerData::setAddress(const char* ip_str, int port)
 {

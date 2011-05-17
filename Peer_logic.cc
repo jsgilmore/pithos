@@ -29,6 +29,8 @@ void Peer_logic::initialize()
 	strcpy(directory_ip, par("directory_ip"));
 	directory_port = par("directory_port");
 
+	groupSizeSignal = registerSignal("GroupSize");
+
 	//Initialise queue statistics collection
 	busySignal = registerSignal("busy");
 	emit(busySignal, 0);
@@ -51,6 +53,39 @@ void Peer_logic::handleRequest(cMessage *msg)
 	EV << getParentModule()->getName() << " " << getParentModule()->getIndex() << " received store request of size " << m->getValue() << "\n";
 
 	sendObjectForStore(m->getValue());
+}
+
+void Peer_logic::addPeers(cMessage *msg)
+{
+	PeerListPkt *list_p = check_and_cast<PeerListPkt *>(msg);
+	PeerData *peer_dat;
+	unsigned int i;
+	bool found;
+
+	for ( i = 0 ; i < list_p->getPeer_listArraySize() ; i++)
+	{
+		peer_dat = &(list_p->getPeer_list(i));
+		found = false;
+
+		//First check whether this peer is already known
+		for (unsigned int j = 0 ; j < group_peers.size() ; j++)
+		{
+			if (group_peers.at(j) == *peer_dat)
+			{
+				found = true;
+				break;
+			}
+		}
+
+		//If the peer is not known, add it to the peer list
+		if (!found)
+		{
+			group_peers.push_back(*peer_dat);
+			emit(groupSizeSignal, 1);	//For every node sent back, our perceived group size increases by one.
+		}
+	}
+
+	EV << "Added " << list_p->getPeer_listArraySize() << " new peers to the list.\n";
 }
 
 void Peer_logic::handleP2PMsg(cMessage *msg)
@@ -80,19 +115,15 @@ void Peer_logic::handleP2PMsg(cMessage *msg)
 		super_peer_address = boot_p->getSuperPeerAdr();
 		EV << "A new super peer has been identified at " << super_peer_address << endl;
 
+		cancelAndDelete(event);		//We've received the data from the directory server, so we can stop harassing them now
+
 		joinRequest(super_peer_address);
+
+		emit(groupSizeSignal, 1);	//The peer's perceived group size is one larger, because itself is part of the group it is in
 	}
 	else if (strcmp(msg->getName(), "join_accept") == 0)
 	{
-		PeerListPkt *list_p = check_and_cast<PeerListPkt *>(msg);
-		unsigned int i;
-
-		for ( i = 0 ; i < list_p->getPeer_listArraySize() ; i++)
-		{
-			group_peers.push_back(list_p->getPeer_list(i));
-		}
-
-		EV << "Added " << list_p->getPeer_listArraySize() << " new peers to the list.\n";
+		addPeers(msg);
 	}
 	else {
 		sprintf(err_str, "Illegal P2P message received (%s)", msg->getName());
@@ -131,20 +162,25 @@ void Peer_logic::handleMessage(cMessage *msg)
 		TransportAddress *destAdr = new TransportAddress(*dest_ip, directory_port);
 
 		joinRequest(*destAdr);
+
+		scheduleAt(simTime()+2, event);
 	}
 	else if (strcmp(msg->getArrivalGate()->getName(), "request") == 0)
 	{
 		//A storage request was received from the game or higher layer. This is data that should be stored in the network
 		handleRequest(msg);
+		delete(msg);
 	}
 	else if (strcmp(msg->getArrivalGate()->getName(), "comms_gate$i") == 0)
 	{
 		//Data was received from the UDP layer by the communicator and has been referred to the Peer logic
 		handleP2PMsg(msg);
+		delete(msg);
 	}
-	else error("Illegal message received");
-
-	delete(msg);
+	else {
+		error("Illegal message received");
+		delete(msg);
+	}
 }
 
 void Peer_logic::GroupStore(groupPkt *write, GameObject *go)
@@ -247,6 +283,7 @@ void Peer_logic::sendObjectForStore(int64_t o_size)
 	sprintf(name, "Game %d, Object %d, size %lld", getParentModule()->getIndex(), numSentForStore, o_size);
 	go->setObjectName(name);
 
+	EV << "Object to be sent: " << go->getObjectName() << endl;
 
 	//Send the message to be stored on the specified number of replicas in the group.
 	GroupStore(write, go);

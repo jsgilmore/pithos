@@ -21,11 +21,4 @@ class noncobject Packet;
 
 packet groupPkt extends Packet {
     int value;
-    int payloadType enum(GroupTypes);
 }
-
-enum GroupTypes
-{
-    WRITE = 1;		//A packet sent over the network, containing a game object to be stored.
-    OVERLAY_WRITE_REQ = 2;
-};

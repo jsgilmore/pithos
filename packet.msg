@@ -24,4 +24,16 @@ class noncobject TransportAddress;
 packet Packet {
     TransportAddress sourceAddress;
     TransportAddress destinationAddress;
+    
+    int payloadType enum(PacketTypes);
 }
+
+enum PacketTypes
+{
+    INFORM = 1;
+    WRITE = 2;		//A packet sent over the network, containing a game object to be stored.
+    OVERLAY_WRITE_REQ = 3;
+    SUPER_PEER_ADD = 4;
+    JOIN_REQ = 5;
+    JOIN_ACCEPT = 6;
+};

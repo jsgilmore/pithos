@@ -35,19 +35,9 @@ void Directory_logic::initializeApp(int stage)
 
     if (stage != MIN_STAGE_APP) return;
 
-    SP_element element;
+    superPeerNumSignal = registerSignal("SuperPeerNum");
+
     sp_adr_list.reserve(20);	//The amount of memory to initially reserve for this vector
-
-    //TODO: Implement a mechanism whereby super peers register with the Directory server
-    element.setAddress("1.0.0.2", 2000);
-    element.setPosition(0.0, 0.0);
-    sp_adr_list.push_back(element);
-    EV << "Initialising directory server with a super peer at address " << element.getAddress().getIp() << endl;
-
-    element.setAddress("1.0.0.4", 2000);
-    element.setPosition(100.0, 100.0);
-    sp_adr_list.push_back(element);
-    EV << "Initialising directory server with a super peer at address " << element.getAddress().getIp() << endl;
 
     bindToPort(2000);
 }
@@ -69,6 +59,12 @@ void Directory_logic::handleTimerEvent(cMessage* msg)
 void Directory_logic::deliver(OverlayKey& key, cMessage* msg)
 {
 	delete(msg);
+}
+
+bool Directory_logic::superPeersExist()
+{
+	if (sp_adr_list.size() > 0) return true;
+	else return false;
 }
 
 TransportAddress Directory_logic::findAddress(double lati, double longi)
@@ -97,15 +93,13 @@ TransportAddress Directory_logic::findAddress(double lati, double longi)
 	}
 
 	if (place == -1)
-		error("No super peer found to match IP");
+		error("No super peers present. Check first next time");
 
 	return ((SP_element)sp_adr_list.at(place)).getAddress();
 }
 
-void Directory_logic::handleBootstrapPkt(cMessage *msg)
+void Directory_logic::handleJoinReq(bootstrapPkt *boot_req)
 {
-	bootstrapPkt *boot_req = check_and_cast<bootstrapPkt *>(msg);
-
 	EV << "Received bootstrap message from Node: " << boot_req->getSourceAddress() << endl;
 
 	bootstrapPkt *boot_ans = new bootstrapPkt();
@@ -124,13 +118,36 @@ void Directory_logic::handleBootstrapPkt(cMessage *msg)
 	//The original message is deleted in the calling function.
 }
 
+void Directory_logic::handleSuperPeerAdd(bootstrapPkt *boot_req)
+{
+	SP_element super_peer;
+
+	super_peer.setAddress(boot_req->getSourceAddress());
+	super_peer.setPosition(boot_req->getLatitude(), boot_req->getLongitude());
+
+	sp_adr_list.push_back(super_peer);
+
+	emit(superPeerNumSignal, 1);
+
+	EV << "Received super peer information from Node: " << boot_req->getSourceAddress() << endl;
+
+	//The original message is deleted in the calling function.
+}
+
 // handleUDPMessage() is called when we receive a message from UDP.
 // Unknown packets can be safely deleted here.
 void Directory_logic::handleUDPMessage(cMessage* msg)
 {
-	if (strcmp(msg->getClassName(), "bootstrapPkt") == 0)
+	bootstrapPkt *boot_req = check_and_cast<bootstrapPkt *>(msg);
+
+	if (boot_req->getPayloadType() == JOIN_REQ)
 	{
-		handleBootstrapPkt(msg);
+		if (superPeersExist())
+			handleJoinReq(boot_req);
+	}
+	else if (boot_req->getPayloadType() == SUPER_PEER_ADD)
+	{
+		handleSuperPeerAdd(boot_req);
 	}
 	else EV << "The directory server received an unknown message type, ignoring\n";
 

@@ -30,17 +30,24 @@
 class Super_peer_logic : public cSimpleModule
 {
 	private:
-		void sp_identify();
+		cMessage *event;
 
-		int largestKey;           // we'll store the "largestKey" parameter here for the Overlay
+		double latitude;
+		double longitude;
+		char directory_ip[16];
+		int directory_port;
 
 		std::vector<PeerData> group_peers;
+
+		//Statistics
+		simsignal_t groupSizeSignal;
+		simsignal_t OverlayWriteSignal;
+		simsignal_t OverlayDeliveredSignal;
 	public:
 		Super_peer_logic();
 		virtual ~Super_peer_logic();
 	protected:
 		int network_size;
-		simsignal_t OverlayWriteSignal;
 
 		void initialize();                 // called when the module is being created
 		void finish();                              // called when the module is about to be destroyed
@@ -49,6 +56,8 @@ class Super_peer_logic : public cSimpleModule
 		void handleOverlayWrite(groupPkt *group_p);
 		void handleP2PMsg(cMessage *msg);
 		void handleBootstrapPkt(cMessage *msg);
+		void GroupStore(overlayPkt *overlay_p);
+		void addSuperPeer();
 };
 
 Define_Module(Super_peer_logic);

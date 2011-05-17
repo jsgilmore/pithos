@@ -25,7 +25,7 @@ simple Game
         @display("i=block/source");
         double avWriteTime @unit(s) = default(0.2s);	//100 ms average
         double avObjectSize = default(1024);	//1 KB average
-        double wait_time @unit(s) = default(5s);
+        double wait_time @unit(s);
     gates:
         output write;
 }
@@ -58,13 +58,17 @@ simple Peer_logic
     parameters:
         @class(Peer_logic);
         @display("i=block/cogwheel");
+        
         @signal[busy](type="bool");
+        @signal[GroupSize](type="int");
         @statistic[busy](title="server busy state"; record=vector,timeavg; interpolationmode=sample-hold);
+        @statistic[GroupSize](title="Group size"; record=sum);
+        
         int replicas_g = 3;
         int replicas_sp = 1;
         string  directory_ip;
         int  directory_port;
-        double wait_time @unit(s) = default(5s);
+        double wait_time @unit(s);
     gates:
         inout comms_gate;
         output write;
@@ -77,11 +81,19 @@ simple Super_peer_logic
     parameters:
         @class(Super_peer_logic);
         @display("i=block/cogwheel");
-        int network_size = 21;
+        double wait_time @unit(s);
+        
+        string  directory_ip;
+        int  directory_port;
+        
         @signal[OverlayWrite](type="int");
+        @signal[GroupSize](type="int");
+        @signal[OverlayDelivered](type="int");
+        
+        
         @statistic[OverlayWrite](title="Overlay writes"; record=sum);
-        int largestKey;
-        double wait_time @unit(s) = default(5s);
+        @statistic[GroupSize](title="Group size"; record=sum);
+        @statistic[OverlayDelivered](title="Delivered to Overlay"; record=sum);
     gates:
         inout comms_gate;
 }
@@ -91,7 +103,6 @@ simple Communicator extends BaseApp
     parameters:
         @class(Communicator);
         @display("i=block/join");
-        int largestKey;            // largest key we can pick
     gates:
         inout peer_gate;
         inout sp_gate @loose;
@@ -184,6 +195,10 @@ module Directory like ITier
 {
     parameters:
         @display("i=device/mainframe");
+        
+        @signal[SuperPeerNum](type="int");
+        
+        @statistic[SuperPeerNum](title="Number of Super Peers"; record=sum);
     gates:
         input udpIn;             // gate from the UDP layer
         output udpOut;           // gate to the UDP layer

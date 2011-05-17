@@ -23,15 +23,8 @@ cplusplus {{
 class noncobject TransportAddress;
 class noncobject Packet;
 
-enum BootstrapTypes
-{
-    JOIN_REQ = 1;
-    INFORM = 2;
-};
-
 packet bootstrapPkt extends Packet{
     TransportAddress superPeerAdr;
-    int payloadType enum(BootstrapTypes);
     double latitude;
     double longitude;
 }

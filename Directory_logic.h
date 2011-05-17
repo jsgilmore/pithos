@@ -32,14 +32,20 @@ class Directory_logic : public BaseApp
 	private:
 		std::vector<SP_element> sp_adr_list;			//The list that holds the combination of Super Peer IPs and their positions in the world
 
+		//Statistics
+		simsignal_t superPeerNumSignal;
+
 	protected:
 		void initializeApp(int stage);                 // called when the module is being created
 		void finishApp();                              // called when the module is about to be destroyed
 		void handleTimerEvent(cMessage* msg);          // called when we received a timer message
 		void deliver(OverlayKey& key, cMessage* msg);  // called when we receive a message from the overlay
 		void handleUDPMessage(cMessage* msg);          // called when we receive a UDP message
-		void handleBootstrapPkt(cMessage *msg);
+
+		void handleJoinReq(bootstrapPkt *boot_req);
 		TransportAddress findAddress(double lati, double longi);
+		void handleSuperPeerAdd(bootstrapPkt *boot_req);
+		bool superPeersExist();
 
 	public:
 		Directory_logic();

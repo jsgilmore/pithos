@@ -37,9 +37,6 @@ void Communicator::initializeApp(int stage)
 
     if (stage != MIN_STAGE_APP) return;
 
-    // copy the module parameter values to our own variables
-    largestKey = par("largestKey");
-
     // initialize our statistics variables
     numSent = 0;
     numReceived = 0;
@@ -75,10 +72,25 @@ void Communicator::handleTimerEvent(cMessage* msg)
 // Unknown packets can be safely deleted here.
 void Communicator::deliver(OverlayKey& key, cMessage* msg)
 {
-	EV << "Message received over overlay!!!!!!!!!!!!!!!! (" << msg->getName() << ")\n";
 	//All messages received from the overlay, should be sent to the super peer
-    //send(msg, "sp_gate$o");
-	delete(msg);
+    send(msg, "sp_gate$o");
+}
+
+void Communicator::handlePkt(Packet *packet, int sp_type)
+{
+	if (packet->getPayloadType() == sp_type)
+	{
+		if (getParentModule()->getSubmodule("super_peer_logic") != NULL)
+			send(packet, "sp_gate$o");
+		else {
+			EV << "A super peer packet type was received, but this peer (" << getParentModule()->getIndex() << ") is not a super peer. The request will be ignored.\n";
+			delete(packet);
+		}
+	}
+	else {
+		EV << "Received packet of type " << packet->getPayloadType() << endl;
+		send(packet, "peer_gate$o");
+	}
 }
 
 // handleUDPMessage() is called when we receive a message from UDP.
@@ -90,41 +102,61 @@ void Communicator::handleUDPMessage(cMessage* msg)
 
 	if (strcmp(msg->getClassName(), "groupPkt") == 0)
 	{
-		groupPkt *group_p = check_and_cast<groupPkt *>(msg);
+		Packet *packet = check_and_cast<Packet *>(msg);
 
-		if (group_p->getPayloadType() == OVERLAY_WRITE_REQ)
-		{
-			if (getParentModule()->getSubmodule("super_peer_logic") != NULL)
-				send(msg, "sp_gate$o");
-			else {
-				EV << "An overlay write request was received, but this peer (" << getParentModule()->getName() << ") is not a super peer. The request will be ignored.\n";
-				delete(msg);
-			}
-		}
-		else {
-			EV << "Received group packet of type " << group_p->getPayloadType() << endl;
-			send(msg, "peer_gate$o");
-		}
+		handlePkt(packet, OVERLAY_WRITE_REQ);
 	}
 	else if (strcmp(msg->getClassName(), "bootstrapPkt") == 0)
 	{
-		bootstrapPkt *boot_p = check_and_cast<bootstrapPkt *>(msg);
+		Packet *packet = check_and_cast<Packet *>(msg);
 
-		if (boot_p->getPayloadType() == JOIN_REQ)
-		{
-			if (getParentModule()->getSubmodule("super_peer_logic") != NULL)
-				send(msg, "sp_gate$o");
-			else {
-				EV << "A super peer join request was received, but this peer (" << getParentModule()->getName() << ": " << getParentModule()->getIndex() << ") is not a super peer. The request will be ignored.\n";
-				delete(msg);
-			}
-		} else send(msg, "peer_gate$o");
+		handlePkt(packet, JOIN_REQ);
 	}
 	else if (strcmp(msg->getClassName(), "PeerListPkt") == 0)
 	{
 		send(msg, "peer_gate$o");
 	}
 	else error("Communicator received unknown message from UDP");
+}
+
+void Communicator::overlayStore(cMessage *msg)
+{
+	CSHA1 hash;
+	char hash_str[41];		//SHA-1 produces a 160 bit/20 byte hash
+
+	for (int i = 0 ; i < 50 ; i++)	//The string has to be cleared for the OverlayKey constructor to correctly handle it.
+		hash_str[i] = 0;
+
+	GameObject *go = (GameObject *)msg->getObject("GameObject");
+	cPacket *pkt = check_and_cast<cPacket *>(msg);
+
+	EV << "Sending object with name: " << go->getObjectName() << endl;
+
+	//Create a hash of the game object's name
+	hash.Update((unsigned char *)go->getObjectName(), strlen(go->getObjectName()));
+	hash.Final();
+	hash.ReportHash(hash_str, CSHA1::REPORT_HEX);
+
+	OverlayKey nameKey(hash_str, 16);
+
+	EV << thisNode.getIp() << ": Sending packet to " << nameKey << "!" << std::endl;
+
+	callRoute(nameKey, pkt);
+}
+
+void Communicator::sendPacket(cMessage *msg)
+{
+	Packet *pkt = check_and_cast<Packet *>(msg);
+
+	if (pkt->getDestinationAddress().isUnspecified())
+	{
+		delete(msg);
+		error("Communicator cannot send a packet over UDP with an unspecified destination address.\n");
+	}
+
+	sendMessageToUDP(pkt->getDestinationAddress(), pkt);
+
+	numSent++;
 }
 
 void Communicator::handleSPMsg(cMessage *msg)
@@ -135,48 +167,22 @@ void Communicator::handleSPMsg(cMessage *msg)
 		error("Underlay configurator is still in init phase, extend wait time.\n");
 	}
 
-	if (strcmp(msg->getName(), "join_accept") == 0)
+	if (strcmp(msg->getName(), "overlay_write") == 0)
 	{
-		Packet *pkt = check_and_cast<Packet *>(msg);
-
-		sendMessageToUDP(pkt->getDestinationAddress(), pkt);
-
-		numSent++;
+		overlayStore(msg);
 	}
-	else if (strcmp(msg->getName(), "overlay_write") == 0)
-	{
-		CSHA1 hash;
-		char hash_str[100];		//SHA-1 produces a 160 bit/20 byte hash
-
-		GameObject *go = (GameObject *)msg->getObject("GameObject");
-		cPacket *pkt = check_and_cast<cPacket *>(msg);
-
-		//Create a hash of the game object's name
-		hash.Update((unsigned char *)go->getObjectName(), strlen(go->getObjectName()));
-		hash.Final();
-		hash.ReportHash(hash_str, CSHA1::REPORT_HEX);
-
-		OverlayKey nameKey(hash_str, 16);
-
-		EV << thisNode.getIp() << ": Sending packet to " << nameKey << "!" << std::endl;
-
-		callRoute(nameKey, pkt);
-	}
+	else sendPacket(msg);
 }
 
 void Communicator::handlePeerMsg(cMessage *msg)
 {
-	Packet *pkt = check_and_cast<Packet *>(msg);
-
 	if (underlayConfigurator->isInInitPhase())
 	{
 		delete(msg);
 		error("Underlay configurator is still in init phase, extend wait time.\n");
 	}
 
-	sendMessageToUDP(pkt->getDestinationAddress(), pkt);
-
-	numSent++;
+	sendPacket(msg);
 }
 
 void Communicator::handleMessage(cMessage *msg)

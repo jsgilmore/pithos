@@ -46,12 +46,13 @@ class Peer_logic: public cSimpleModule
 		double longitude;
 
 		TransportAddress super_peer_address;
-		simsignal_t busySignal;
 
 		std::vector<PeerData> group_peers;
 
 		// statistics
 		int numSentForStore;              //number of packets sent
+		simsignal_t busySignal;
+		simsignal_t groupSizeSignal;
 	public:
 		Peer_logic();
 		virtual ~Peer_logic();
@@ -66,6 +67,7 @@ class Peer_logic: public cSimpleModule
 		void OverlayStore(groupPkt *write, GameObject *go);
 
 		void joinRequest(TransportAddress dest_adr);
+		void addPeers(cMessage *msg);
 };
 
 Define_Module(Peer_logic);

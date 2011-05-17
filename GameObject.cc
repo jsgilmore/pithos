@@ -34,6 +34,7 @@ GameObject& GameObject::operator=(const GameObject& other)
 
 	size = other.size;
 	type = other.type;
+	strcpy(objectName, other.objectName);
 
 	return *this;
 }

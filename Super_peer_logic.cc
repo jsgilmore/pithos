@@ -25,10 +25,19 @@ Super_peer_logic::~Super_peer_logic()
 
 void Super_peer_logic::initialize()
 {
-	largestKey = par("largestKey");
+	strcpy(directory_ip, par("directory_ip"));
+	directory_port = par("directory_port");
 
 	//Initialise queue statistics collection
 	OverlayWriteSignal = registerSignal("OverlayWrite");
+	groupSizeSignal = registerSignal("GroupSize");
+	OverlayDeliveredSignal =  registerSignal("OverlayDelivered");
+
+	latitude = uniform(0,100);		//Make this range changeable
+	longitude = uniform(0,100);		//Make this range changeable
+
+	event = new cMessage("event");
+	scheduleAt(simTime()+par("wait_time"), event);
 }
 
 void Super_peer_logic::finish()
@@ -45,8 +54,8 @@ void Super_peer_logic::handleOverlayWrite(groupPkt *group_p)
 	//FIXME: The hash string should still be adapted to allow for multiple replicas in the overlay
 	for (int i = 0; i < group_p->getValue(); i++)
 	{
-		OverlayPkt *overlay_p = new OverlayPkt(); // the message we'll send
-		overlay_p->setType(WRITE); // set the message type to PING
+		overlayPkt *overlay_p = new overlayPkt(); // the message we'll send
+		overlay_p->setType(OVERLAY_WRITE); // set the message type to PING
 		overlay_p->setByteLength((8+4) + 4 + 20);	//Game object size and type + packet type + routing key
 		overlay_p->setName("overlay_write");
 
@@ -109,9 +118,64 @@ void Super_peer_logic::handleBootstrapPkt(cMessage *msg)
 	//The original message is deleted in the calling function.
 }
 
+void Super_peer_logic::GroupStore(overlayPkt *overlay_p)
+{
+	TransportAddress dest_adr;
+	GameObject *go = (GameObject *)overlay_p->removeObject("GameObject");
+	groupPkt *group_p = new groupPkt();
+
+	NodeHandle thisNode = ((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode();
+	TransportAddress *sourceAdr = new TransportAddress(thisNode.getIp(), thisNode.getPort());
+
+	dest_adr = ((PeerData)group_peers.at(intuniform(0, group_peers.size()-1))).getAddress();		//Choose a random peer in the group for the destination
+
+	go->setType(OVERLAY);
+
+	group_p->setSourceAddress(*sourceAdr);
+	group_p->setDestinationAddress(dest_adr);
+	group_p->setPayloadType(WRITE);
+	group_p->setName("write");
+	group_p->setByteLength(4+4+4 + go->getSize());	//Src IP as #, Dest IP as #, Type, Game Object size
+	group_p->addObject(go);
+
+	send(group_p, "comms_gate$o");		//Set sender address
+
+	//The original message is deleted in the calling function.
+}
+
+void Super_peer_logic::addSuperPeer()
+{
+	IPAddress *dest_ip = new IPAddress(directory_ip);
+	TransportAddress *dest_adr = new TransportAddress(*dest_ip, directory_port);
+
+	if (dest_adr->isUnspecified())
+		error("Destination address is unspecified when trying to add this Super peer.\n");
+
+	bootstrapPkt *boot_p = new bootstrapPkt();
+	NodeHandle thisNode = ((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode();
+	TransportAddress *sourceAdr = new TransportAddress(thisNode.getIp(), thisNode.getPort());
+
+	boot_p->setSourceAddress(*sourceAdr);
+	boot_p->setDestinationAddress(*dest_adr);
+	boot_p->setPayloadType(SUPER_PEER_ADD);
+	boot_p->setName("super_peer_add");
+	boot_p->setLatitude(latitude);
+	boot_p->setLongitude(longitude);
+	boot_p->setByteLength(4+4+4+8+8);	//Src IP as #, Dest IP as #, Type, Lat, Long
+
+	send(boot_p, "comms_gate$o");
+
+	//TODO: Add resend or timer that checks whether the join request has been handled by the Directory.
+}
+
 void Super_peer_logic::handleMessage(cMessage *msg)
 {
-	if (strcmp(msg->getArrivalGate()->getName(), "comms_gate$i") == 0)
+	if (msg == event)
+	{
+		//Add the information of this super peer to the directory server
+		addSuperPeer();
+	}
+	else if (strcmp(msg->getArrivalGate()->getName(), "comms_gate$i") == 0)
 	{
 		if (strcmp(msg->getClassName(), "groupPkt") == 0)
 		{
@@ -129,6 +193,16 @@ void Super_peer_logic::handleMessage(cMessage *msg)
 		else if (strcmp(msg->getClassName(), "bootstrapPkt") == 0)
 		{
 			handleBootstrapPkt(msg);
+
+			emit(groupSizeSignal, 1);
+		}
+		else if (strcmp(msg->getName(), "overlay_write") == 0)	//Note that getName is used here and not getClassName
+		{
+			overlayPkt *overlay_p = check_and_cast<overlayPkt *>(msg);
+
+			GroupStore(overlay_p);
+
+			emit(OverlayDeliveredSignal, 1);
 		}
 	}
 	else {
