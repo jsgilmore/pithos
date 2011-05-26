@@ -162,8 +162,6 @@ void Peer_logic::joinRequest(TransportAddress dest_adr)
 	boot_p->setByteLength(4+4+4+8+8);	//Src IP as #, Dest IP as #, Type, Lat, Long
 
 	send(boot_p, "comms_gate$o");
-
-	//TODO: Add resend or timer that checks whether the join request has been handled by the Directory.
 }
 
 void Peer_logic::handleMessage(cMessage *msg)
@@ -176,7 +174,7 @@ void Peer_logic::handleMessage(cMessage *msg)
 
 		joinRequest(*destAdr);
 
-		scheduleAt(simTime()+2, event);
+		scheduleAt(simTime()+1, event);		//TODO: make the 1 second wait time a configuration variable that may be set
 	}
 	else if (strcmp(msg->getArrivalGate()->getName(), "game$i") == 0)
 	{
@@ -196,7 +194,7 @@ void Peer_logic::handleMessage(cMessage *msg)
 	}
 }
 
-void Peer_logic::GroupStore(groupPkt *write, GameObject *go, TransportAddress *send_list)
+void Peer_logic::GroupStore(groupPkt *write, GameObject *go, std::vector<TransportAddress> send_list)
 {
 	unsigned int i, j;
 	simtime_t sendDelay;
@@ -232,7 +230,7 @@ void Peer_logic::GroupStore(groupPkt *write, GameObject *go, TransportAddress *s
 			original_address = true;
 			for (j = 0 ; j < i ; j++)
 			{
-				if (send_list[j] == dest_adr)
+				if (send_list.at(j) == dest_adr)
 					original_address = false;
 			}
 		}
@@ -248,7 +246,7 @@ void Peer_logic::GroupStore(groupPkt *write, GameObject *go, TransportAddress *s
 		write_dup->addObject(go_dup);
 		write_dup->setDestinationAddress(dest_adr);
 
-		send_list[i] = dest_adr;
+		send_list.push_back(dest_adr);
 
 		send(write_dup, "comms_gate$o");		//Set sender address
 		emit(busySignal, 0);
@@ -257,7 +255,7 @@ void Peer_logic::GroupStore(groupPkt *write, GameObject *go, TransportAddress *s
 	delete(write);
 }
 
-void Peer_logic::OverlayStore(GameObject *go, TransportAddress *send_list)
+void Peer_logic::OverlayStore(GameObject *go, std::vector<TransportAddress> send_list)
 {
 	simtime_t sendDelay;
 	int overlay_replicas = par("replicas_sp");
@@ -266,10 +264,11 @@ void Peer_logic::OverlayStore(GameObject *go, TransportAddress *send_list)
 	TransportAddress *sourceAdr = new TransportAddress(thisNode.getIp(), thisNode.getPort());
 
 	PeerListPkt *overlay_write = new PeerListPkt();
-	overlay_write->setByteLength(4+4+4+4+8+go->getSize()+0);	//Source address, dest address, type, value, object name ID, object size, storage peer addresses TODO: Add peer address lengths
+	overlay_write->setByteLength(4+4+4+4+8+go->getSize()+(send_list.size()*4));	//Source address, dest address, type, value, object name ID, object size, storage peer addresses
 
 	if (super_peer_address.isUnspecified())
 	{
+		//TODO: This error condition should be logged
 		EV << "No super peer has been identified. The object will not be replicated in the Overlay\n";
 		delete(overlay_write);
 		delete(go);
@@ -285,18 +284,26 @@ void Peer_logic::OverlayStore(GameObject *go, TransportAddress *send_list)
 	overlay_write->setDestinationAddress(super_peer_address);
 	overlay_write->addObject(go);
 
+	//Add the addresses of the other peers that have stored the data to the message
+	for (unsigned int i = 0 ; i < send_list.size() ; i++)
+	{
+		PeerData peer_d;
+		peer_d.setAddress(send_list.at(i));
+		overlay_write->setPeer_list(i, peer_d);
+	}
+
 	send(overlay_write, "comms_gate$o");		//Set address
 	emit(busySignal, 0);
 }
 
+//TODO: This branch of functions can be implemented much more elegantly
 void Peer_logic::sendObjectForStore(int64_t o_size)
 {
 	groupPkt *write;
 	GameObject *go;
 	char name[41];
 
-	unsigned int group_replicas = par("replicas_g");
-	TransportAddress *send_list = new TransportAddress[group_replicas];
+	std::vector<TransportAddress> send_list;
 
 	NodeHandle thisNode = ((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode();
 	TransportAddress *sourceAdr = new TransportAddress(thisNode.getIp(), thisNode.getPort());
@@ -322,6 +329,4 @@ void Peer_logic::sendObjectForStore(int64_t o_size)
 	OverlayStore(go, send_list);	//Send the message to be stored on the specified number of replicas in the overlay.
 
 	numSentForStore++;
-
-	delete[]send_list;
 }

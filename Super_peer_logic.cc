@@ -55,12 +55,15 @@ void Super_peer_logic::handleOverlayWrite(PeerListPkt *plist_p)
 	if (go == NULL)
 		error("No game object found attached to the message\n");
 
+	//Log the file name and what peers it is stored on
+
+	//Send the game objects into the overlay
 	//FIXME: The hash string should still be adapted to allow for multiple replicas in the overlay
 	for (int i = 0; i < plist_p->getValue(); i++)
 	{
 		overlay_p = new overlayPkt(); // the message we'll send
-		overlay_p->setType(OVERLAY_WRITE); // set the message type to PING
-		overlay_p->setByteLength((8+4) + 4 + 20);	//Game object size and type + packet type + routing key
+		overlay_p->setType(OVERLAY_WRITE); // set the message type to OVERLAY_WRITE
+		overlay_p->setByteLength((go->getSize()+4) + 4 + 20);	//Game object size and type + packet type + routing key
 		overlay_p->setName("overlay_write");
 
 		overlay_p->addObject(go->dup());

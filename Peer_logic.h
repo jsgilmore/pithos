@@ -65,8 +65,8 @@ class Peer_logic: public cSimpleModule
 		void sendObjectForStore(int64_t o_size);
 		void handleP2PMsg(cMessage *msg);
 		void handleRequest(cMessage *msg);
-		void GroupStore(groupPkt *write, GameObject *go, TransportAddress *send_list);
-		void OverlayStore(GameObject *go, TransportAddress *send_list);
+		void GroupStore(groupPkt *write, GameObject *go, std::vector<TransportAddress> send_list);
+		void OverlayStore(GameObject *go, std::vector<TransportAddress> send_list);
 
 		void joinRequest(TransportAddress dest_adr);
 		void addPeers(cMessage *msg);
