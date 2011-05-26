@@ -26,8 +26,9 @@ simple Game
         double avWriteTime @unit(s) = default(0.2s);	//100 ms average
         double avObjectSize = default(1024);	//1 KB average
         double wait_time @unit(s);
+        double generation_time @unit(s);
     gates:
-        output write;
+        inout gate;
 }
 
 simple Storage
@@ -41,6 +42,16 @@ simple Storage
         @statistic[qlen](title="queue length"; record=vector,timeavg,max; interpolationmode=sample-hold);
         @statistic[qsize](title="queue size"; record=vector,timeavg,max; interpolationmode=sample-hold);
         @statistic[queueingTime](title="queueing time at dequeue"; unit=s; interpolationmode=none);
+        @statistic[storeTime](title="time taken to store an object"; record=histogram, vector,timeavg; interpolationmode=sample-hold);
+        
+        @signal[storeTime](type="simtime_t");
+        @signal[rootStoreTime](type="simtime_t");
+        @signal[replicaStoreTime](type="simtime_t");
+        @signal[overlayStoreTime](type="simtime_t");
+        @statistic[storeTime](title="time taken to store a root object"; record=histogram, vector,timeavg; interpolationmode=sample-hold);
+        @statistic[rootStoreTime](title="time taken to store a replica object"; record=histogram, vector,timeavg; interpolationmode=sample-hold);
+        @statistic[replicaStoreTime](title="time taken to store an overlay object"; record=histogram, vector,timeavg; interpolationmode=sample-hold);
+        @statistic[overlayStoreTime](title="time taken to store an object"; record=histogram, vector,timeavg; interpolationmode=sample-hold);
 
         @signal[OverlayObject](type="int");
         @signal[RootObject](type="int");
@@ -61,8 +72,13 @@ simple Peer_logic
         
         @signal[busy](type="bool");
         @signal[GroupSize](type="int");
+        @signal[GroupSendFail](type="int");
+        @signal[JoinTime](type="simtime_t");
+        
+        @statistic[JoinTime](title="group join time"; record=last);
         @statistic[busy](title="server busy state"; record=vector,timeavg; interpolationmode=sample-hold);
         @statistic[GroupSize](title="Group size"; record=sum);
+        @statistic[GroupSendFail](title="Group send fails"; record=sum);
         
         int replicas_g = 3;
         int replicas_sp = 1;
@@ -73,7 +89,7 @@ simple Peer_logic
         inout comms_gate;
         output write;
         input read;
-        input request;
+        inout game;
 }
 
 simple Super_peer_logic
@@ -90,9 +106,11 @@ simple Super_peer_logic
         @signal[GroupSize](type="int");
         @signal[OverlayDelivered](type="int");
         @signal[overlaysStoreFail](type="int");
+        @signal[JoinTime](type="simtime_t");
         
+        @statistic[JoinTime](title="group join time"; record=vector);
         @statistic[OverlayWrite](title="Overlay writes"; record=sum);
-        @statistic[GroupSize](title="Group size"; record=sum);
+        @statistic[GroupSize](title="Group size"; record=vector,max; interpolationmode=sample-hold);
         @statistic[OverlayDelivered](title="Delivered to Overlay"; record=sum);
         @statistic[overlaysStoreFail](title="Overlay store failures"; record=sum);
     gates:
@@ -129,7 +147,7 @@ module Peer like ITier
         game: Game;
         communicator: Communicator;
     connections allowunconnected:
-        game.write --> peer_logic.request;
+        game.gate <--> peer_logic.game;
         peer_logic.write --> storage.write;
         storage.read --> peer_logic.read;
         communicator.peer_gate <--> peer_logic.comms_gate;
@@ -168,7 +186,7 @@ module Super_peer like ITier
         communicator: Communicator;
     connections allowunconnected:
         //Internal connection to the peer_logic, storage and game modules
-        game.write --> peer_logic.request;
+        game.gate <--> peer_logic.game;
         peer_logic.write --> storage.write;
         storage.read --> peer_logic.read;
 
@@ -190,16 +208,18 @@ simple Directory_logic extends BaseApp
     parameters:
         @class(Directory_logic);
         @display("i=block/cogwheel");
+        
+        @signal[SuperPeerNum](type="int");
+        @signal[noSuperPeers](type="int");
+        
+        @statistic[SuperPeerNum](title="Number of Super Peers"; record=sum);
+        @statistic[noSuperPeers](title="Number of times when no Super Peers were present"; record=sum);
 }
 
 module Directory like ITier
 {
     parameters:
         @display("i=device/mainframe");
-        
-        @signal[SuperPeerNum](type="int");
-        
-        @statistic[SuperPeerNum](title="Number of Super Peers"; record=sum);
     gates:
         input udpIn;             // gate from the UDP layer
         output udpOut;           // gate to the UDP layer

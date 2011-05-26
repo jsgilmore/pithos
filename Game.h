@@ -25,6 +25,8 @@ class Game : public cSimpleModule
 	private:
 		simtime_t writeTime_av;
 		simtime_t wait_time;
+		simtime_t join_time;
+		simtime_t generationTime;
 		double objectSize_av;
 		cMessage *event;
 	public:
@@ -33,6 +35,7 @@ class Game : public cSimpleModule
 	protected:
 		virtual void initialize();
 		virtual void handleMessage(cMessage *msg);
+		void sendRequest();
 };
 
 Define_Module(Game);

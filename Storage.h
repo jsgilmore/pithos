@@ -38,6 +38,12 @@ class Storage : public cSimpleModule
 		simsignal_t overlayObjectsSignal;
 		simsignal_t rootObjectsSignal;
 		simsignal_t replicaObjectsSignal;
+
+		simsignal_t storeTimeSignal;
+		simsignal_t rootStoreTimeSignal;
+		simsignal_t replicaStoreTimeSignal;
+		simsignal_t overlayStoreTimeSignal;
+
 		virtual void initialize();
 		virtual void handleMessage(cMessage *msg);
 };

@@ -38,7 +38,7 @@ enum SP_indeces {
 class Peer_logic: public cSimpleModule
 {
 	private:
-	cMessage *event;
+		cMessage *event;
 
 		char directory_ip[16];
 		int directory_port;
@@ -53,6 +53,8 @@ class Peer_logic: public cSimpleModule
 		int numSentForStore;              //number of packets sent
 		simsignal_t busySignal;
 		simsignal_t groupSizeSignal;
+		simsignal_t joinTimeSignal;
+		simsignal_t groupSendFailSignal;
 	public:
 		Peer_logic();
 		virtual ~Peer_logic();
@@ -63,8 +65,8 @@ class Peer_logic: public cSimpleModule
 		void sendObjectForStore(int64_t o_size);
 		void handleP2PMsg(cMessage *msg);
 		void handleRequest(cMessage *msg);
-		void GroupStore(groupPkt *write, GameObject *go);
-		void OverlayStore(groupPkt *write, GameObject *go);
+		void GroupStore(groupPkt *write, GameObject *go, TransportAddress *send_list);
+		void OverlayStore(GameObject *go, TransportAddress *send_list);
 
 		void joinRequest(TransportAddress dest_adr);
 		void addPeers(cMessage *msg);

@@ -24,7 +24,7 @@ class noncobject PeerData;
 packet PeerListPkt extends Packet
 {
     @customize(true);
-    int size;
     
+    int value;
     abstract PeerData peer_list[];
 }

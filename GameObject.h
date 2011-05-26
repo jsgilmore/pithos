@@ -30,6 +30,7 @@ class GameObject : public cOwnedObject
 		char objectName[41];
 		int64_t size;
 		int type;
+		simtime_t creationTime;
 	public:
 		GameObject(const char *name=NULL, int type=ROOT);
 		GameObject(const GameObject& other);
@@ -44,6 +45,8 @@ class GameObject : public cOwnedObject
 		void setType(int o_type);
 		void setObjectName(char *o_Name);
 		char *getObjectName();
+		void setCreationTime(simtime_t time);
+		simtime_t getCreationTime();
 };
 
 #endif /* GO_H_ */

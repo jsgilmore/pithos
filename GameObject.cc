@@ -35,6 +35,7 @@ GameObject& GameObject::operator=(const GameObject& other)
 	size = other.size;
 	type = other.type;
 	strcpy(objectName, other.objectName);
+	creationTime = other.creationTime;
 
 	return *this;
 }
@@ -75,4 +76,14 @@ void GameObject::setObjectName(char *o_Name)
 char * GameObject::getObjectName()
 {
 	return objectName;
+}
+
+void GameObject::setCreationTime(simtime_t time)
+{
+	creationTime = time;
+}
+
+simtime_t GameObject::getCreationTime()
+{
+	return creationTime;
 }

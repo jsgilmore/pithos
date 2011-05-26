@@ -31,6 +31,12 @@ void Storage::initialize()
 	//Initialise queue statistics collection
 	qlenSignal = registerSignal("qlen");
 	qsizeSignal = registerSignal("qsize");
+
+	storeTimeSignal = registerSignal("storeTime");
+	rootStoreTimeSignal = registerSignal("rootStoreTime");
+	replicaStoreTimeSignal = registerSignal("replicaStoreTime");
+	overlayStoreTimeSignal = registerSignal("overlayStoreTime");
+
 	queueingTimeSignal = registerSignal("queueingTime");
 	emit(qlenSignal, storage.length());
 	emit(qsizeSignal, getStorageBytes());
@@ -42,12 +48,16 @@ void Storage::initialize()
 
 void Storage::handleMessage(cMessage *msg)
 {
+	simtime_t delay;
 	if (!(msg->hasObject("GameObject")))
 		error("Storage received a message with no game object attached");
 
 	GameObject *go = (GameObject *)msg->removeObject("GameObject");
+	delay = simTime() - go->getCreationTime();
 
-	EV << getName() << " " << getIndex() << " received write command of size " << go->getSize() << "\n";
+	EV << getName() << " " << getIndex() << " received write command of size " << go->getSize() << " with delay " << go->getCreationTime() << "\n";
+
+	emit(storeTimeSignal, delay);
 
 	storage.insert(go);
 
@@ -55,11 +65,20 @@ void Storage::handleMessage(cMessage *msg)
 	emit(qsizeSignal, getStorageBytes());
 
 	if (go->getType() == ROOT)
+	{
 		emit(rootObjectsSignal, 1);
+		emit(rootStoreTimeSignal, delay);
+	}
 	else if (go->getType() == REPLICA)
+	{
 		emit(replicaObjectsSignal, 1);
+		emit(replicaStoreTimeSignal, delay);
+	}
 	else if (go->getType() == OVERLAY)
+	{
 		emit(overlayObjectsSignal, 1);
+		emit(overlayStoreTimeSignal, delay);
+	}
 	else error("The game object type was incorrectly set");
 
 	delete(msg);

@@ -21,6 +21,7 @@
 #include "GameObject.h"
 #include "Peer_logic.h"
 #include "OverlayKey.h"
+#include "ObjectInfo.h"
 
 #include "Message_m.h"
 #include "PeerListPkt.h"
@@ -38,11 +39,13 @@ class Super_peer_logic : public cSimpleModule
 		int directory_port;
 
 		std::vector<PeerData> group_peers;
+		std::vector<ObjectInfo> object_list;
 
 		//Statistics
 		simsignal_t groupSizeSignal;
 		simsignal_t OverlayWriteSignal;
 		simsignal_t OverlayDeliveredSignal;
+		simsignal_t joinTimeSignal;
 
 		simsignal_t overlaysStoreFailSignal;
 	public:
@@ -55,7 +58,7 @@ class Super_peer_logic : public cSimpleModule
 		void finish();                              // called when the module is about to be destroyed
 
 		virtual void handleMessage(cMessage *msg);
-		void handleOverlayWrite(groupPkt *group_p);
+		void handleOverlayWrite(PeerListPkt *plist_p);
 		void handleP2PMsg(cMessage *msg);
 		void handleBootstrapPkt(cMessage *msg);
 		void GroupStore(overlayPkt *overlay_p);

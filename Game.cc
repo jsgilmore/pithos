@@ -31,27 +31,53 @@ void Game::initialize()
 	writeTime_av = par("avWriteTime");
 	objectSize_av = par("avObjectSize");
 	wait_time = par("wait_time");
+	generationTime = par("generation_time");
 
 	event = new cMessage("event");
-	scheduleAt(simTime()+wait_time, event);
+}
+
+void Game::sendRequest()
+{
+	char msgName [20];
+	int64_t filesize = exponential(objectSize_av);
+	Message *write_msg = new Message("storReq");
+	sprintf(msgName, "store_req-%d", getParentModule()->getIndex());
+	write_msg->setName(msgName);
+	write_msg->setValue(filesize);
+	write_msg->setPayloadType(STORE_REQ);
+	send(write_msg, "gate$o");
+	write_msg = NULL;
 }
 
 void Game::handleMessage(cMessage *msg)
 {
+	//This module is only connected to the peer_logic module, so we know exactly what we can expect to receive.
+	//This module can receive two types of messages, but they have the same effect. An event that was scheduled can be received, but a cMessage is also expected from the peer_logic module to initiate request generation.
+	//This message is received
 	if (msg == event)
 	{
-		char msgName [20];
-		int64_t filesize = exponential(objectSize_av);
-		Message *write_msg = new Message("storReq");
-		sprintf(msgName, "store_req-%d", getParentModule()->getIndex());
-		write_msg->setName(msgName);
-		write_msg->setValue(filesize);
-		write_msg->setPayloadType(STORE_REQ);
-		send(write_msg, "write");
-		write_msg = NULL;
+		if (simTime() < generationTime + wait_time + join_time)	//This should ensure that the simulation ends.
+		{
+			sendRequest();
 
-		if (simTime() < 30 + wait_time)	//This should ensure that the simulation ends.
 			scheduleAt(simTime()+exponential(writeTime_av), event);
+		}
 	}
-	else delete(msg);
+	else if (strcmp(msg->getName(), "request_start") == 0)
+	{
+		join_time = simTime() - wait_time;		//Adding join time gives every game module the same time to send successful requests
+
+		if (!event->isScheduled())
+		{
+			if (simTime() < generationTime + wait_time + join_time)
+			{
+				sendRequest();
+
+				scheduleAt(simTime()+exponential(writeTime_av), event);
+			}
+		} else error("Duplicate request start messages received");
+
+		delete(msg);
+	}
+	else error("Game received unknown message\n");
 }

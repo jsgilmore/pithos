@@ -73,6 +73,7 @@ void Communicator::handleTimerEvent(cMessage* msg)
 void Communicator::deliver(OverlayKey& key, cMessage* msg)
 {
 	//All messages received from the overlay, should be sent to the super peer
+	//OVERLAY_WRITE is handled here
     send(msg, "sp_gate$o");
 }
 
@@ -97,24 +98,28 @@ void Communicator::handlePkt(Packet *packet, int sp_type)
 // Unknown packets can be safely deleted here.
 void Communicator::handleUDPMessage(cMessage* msg)
 {
-
+	Packet *packet = check_and_cast<Packet *>(msg);
 	numReceived++;
 
-	if (strcmp(msg->getClassName(), "groupPkt") == 0)
-	{
-		Packet *packet = check_and_cast<Packet *>(msg);
-
-		handlePkt(packet, OVERLAY_WRITE_REQ);
-	}
-	else if (strcmp(msg->getClassName(), "bootstrapPkt") == 0)
-	{
-		Packet *packet = check_and_cast<Packet *>(msg);
-
-		handlePkt(packet, JOIN_REQ);
-	}
-	else if (strcmp(msg->getClassName(), "PeerListPkt") == 0)
+	if (packet->getPayloadType() == WRITE)
 	{
 		send(msg, "peer_gate$o");
+	}
+	else if (packet->getPayloadType() == INFORM)
+	{
+		send(msg, "peer_gate$o");
+	}
+	else if (packet->getPayloadType() == JOIN_ACCEPT)
+	{
+		send(msg, "peer_gate$o");
+	}
+	else if (packet->getPayloadType() == JOIN_REQ)
+	{
+		send(msg, "sp_gate$o");
+	}
+	else if (packet->getPayloadType() == OVERLAY_WRITE_REQ)
+	{
+		send(msg, "sp_gate$o");
 	}
 	else error("Communicator received unknown message from UDP");
 }

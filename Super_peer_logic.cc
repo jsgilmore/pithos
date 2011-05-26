@@ -32,6 +32,7 @@ void Super_peer_logic::initialize()
 	OverlayWriteSignal = registerSignal("OverlayWrite");
 	groupSizeSignal = registerSignal("GroupSize");
 	OverlayDeliveredSignal =  registerSignal("OverlayDelivered");
+	joinTimeSignal = registerSignal("JoinTime");
 
 	overlaysStoreFailSignal =  registerSignal("overlaysStoreFail");
 
@@ -47,16 +48,17 @@ void Super_peer_logic::finish()
 
 }
 
-void Super_peer_logic::handleOverlayWrite(groupPkt *group_p)
+void Super_peer_logic::handleOverlayWrite(PeerListPkt *plist_p)
 {
-	GameObject *go = (GameObject *)group_p->removeObject("GameObject");
+	overlayPkt *overlay_p;
+	GameObject *go = (GameObject *)plist_p->removeObject("GameObject");
 	if (go == NULL)
 		error("No game object found attached to the message\n");
 
 	//FIXME: The hash string should still be adapted to allow for multiple replicas in the overlay
-	for (int i = 0; i < group_p->getValue(); i++)
+	for (int i = 0; i < plist_p->getValue(); i++)
 	{
-		overlayPkt *overlay_p = new overlayPkt(); // the message we'll send
+		overlay_p = new overlayPkt(); // the message we'll send
 		overlay_p->setType(OVERLAY_WRITE); // set the message type to PING
 		overlay_p->setByteLength((8+4) + 4 + 20);	//Game object size and type + packet type + routing key
 		overlay_p->setName("overlay_write");
@@ -133,6 +135,7 @@ void Super_peer_logic::GroupStore(overlayPkt *overlay_p)
 		dest_adr = ((PeerData)group_peers.at(intuniform(0, group_peers.size()-1))).getAddress();		//Choose a random peer in the group for the destination
 	else {
 		emit(overlaysStoreFailSignal, 1);
+		delete(go);
 		return;
 	}
 
@@ -175,6 +178,8 @@ void Super_peer_logic::addSuperPeer()
 
 	send(boot_p, "comms_gate$o");
 
+	emit(joinTimeSignal, simTime());
+
 	//TODO: Add resend or timer that checks whether the join request has been handled by the Directory.
 }
 
@@ -187,16 +192,16 @@ void Super_peer_logic::handleMessage(cMessage *msg)
 	}
 	else if (strcmp(msg->getArrivalGate()->getName(), "comms_gate$i") == 0)
 	{
-		if (strcmp(msg->getClassName(), "groupPkt") == 0)
+		if (strcmp(msg->getClassName(), "PeerListPkt") == 0)
 		{
-			groupPkt *group_p = check_and_cast<groupPkt *>(msg);
+			PeerListPkt *plist_p = check_and_cast<PeerListPkt *>(msg);
 
-			if (group_p->getPayloadType() == OVERLAY_WRITE_REQ)
+			if (plist_p->getPayloadType() == OVERLAY_WRITE_REQ)
 			{
-				handleOverlayWrite(group_p);
+				handleOverlayWrite(plist_p);
 			}
 			else {
-				EV << "Message type: " << group_p->getPayloadType() << " name: " << group_p->getName() << endl;
+				EV << "Message type: " << plist_p->getPayloadType() << " name: " << plist_p->getName() << endl;
 				error("Super peer received an unknown message");
 			}
 		}
@@ -204,7 +209,7 @@ void Super_peer_logic::handleMessage(cMessage *msg)
 		{
 			handleBootstrapPkt(msg);
 
-			emit(groupSizeSignal, 1);
+			emit(groupSizeSignal, group_peers.size());
 		}
 		else if (strcmp(msg->getName(), "overlay_write") == 0)	//Note that getName is used here and not getClassName
 		{
@@ -213,7 +218,7 @@ void Super_peer_logic::handleMessage(cMessage *msg)
 			GroupStore(overlay_p);
 
 			emit(OverlayDeliveredSignal, 1);
-		}
+		} else error("Super peer received unknown message from communicator");
 	}
 	else {
 		char msg_str[100];

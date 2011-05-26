@@ -36,6 +36,7 @@ void Directory_logic::initializeApp(int stage)
     if (stage != MIN_STAGE_APP) return;
 
     superPeerNumSignal = registerSignal("SuperPeerNum");
+    noSuperPeersSignal = registerSignal("noSuperPeers");
 
     sp_adr_list.reserve(20);	//The amount of memory to initially reserve for this vector
 
@@ -144,6 +145,7 @@ void Directory_logic::handleUDPMessage(cMessage* msg)
 	{
 		if (superPeersExist())
 			handleJoinReq(boot_req);
+		else emit(noSuperPeersSignal, 1);
 	}
 	else if (boot_req->getPayloadType() == SUPER_PEER_ADD)
 	{

@@ -34,6 +34,7 @@ class Directory_logic : public BaseApp
 
 		//Statistics
 		simsignal_t superPeerNumSignal;
+		simsignal_t noSuperPeersSignal;
 
 	protected:
 		void initializeApp(int stage);                 // called when the module is being created
