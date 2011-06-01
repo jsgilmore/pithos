@@ -107,7 +107,11 @@ simple Super_peer_logic
         @signal[OverlayDelivered](type="int");
         @signal[overlaysStoreFail](type="int");
         @signal[JoinTime](type="simtime_t");
+        @signal[StoreNumber](type="int");
+        @signal[OverlayNumber](type="int");
         
+        @statistic[OverlayNumber](title="Number of overlay files in the group"; record=sum);
+        @statistic[StoreNumber](title="Number of root/replica files in the group"; record=sum);
         @statistic[JoinTime](title="group join time"; record=vector);
         @statistic[OverlayWrite](title="Overlay writes"; record=sum);
         @statistic[GroupSize](title="Group size"; record=vector,max; interpolationmode=sample-hold);

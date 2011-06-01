@@ -318,7 +318,8 @@ void Peer_logic::sendObjectForStore(int64_t o_size)
 	go->setSize(o_size);
 	go->setCreationTime(simTime());
 
-	sprintf(name, "Game %d, Object %d, size %lld", getParentModule()->getIndex(), numSentForStore, o_size);
+	sprintf(name, "Game %d, Object %d, size %lld", getParentModule()->getIndex(), numSentForStore, o_size);	//TODO: Replace this line with the random name generation
+	//sprintf(name, "%lf", uniform(0, 10000));		//This is to test whether the SHA-1 hash in fact produces a uniform random output
 	go->setObjectName(name);
 
 	EV << "Object to be sent: " << go->getObjectName() << endl;

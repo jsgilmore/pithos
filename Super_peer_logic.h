@@ -46,6 +46,8 @@ class Super_peer_logic : public cSimpleModule
 		simsignal_t OverlayWriteSignal;
 		simsignal_t OverlayDeliveredSignal;
 		simsignal_t joinTimeSignal;
+		simsignal_t storeNumberSignal;
+		simsignal_t overlayNumberSignal;
 
 		simsignal_t overlaysStoreFailSignal;
 	public:

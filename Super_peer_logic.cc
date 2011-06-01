@@ -33,6 +33,8 @@ void Super_peer_logic::initialize()
 	groupSizeSignal = registerSignal("GroupSize");
 	OverlayDeliveredSignal =  registerSignal("OverlayDelivered");
 	joinTimeSignal = registerSignal("JoinTime");
+	storeNumberSignal  = registerSignal("StoreNumber");
+	overlayNumberSignal = registerSignal("OverlayNumber");
 
 	overlaysStoreFailSignal =  registerSignal("overlaysStoreFail");
 
@@ -56,6 +58,18 @@ void Super_peer_logic::handleOverlayWrite(PeerListPkt *plist_p)
 		error("No game object found attached to the message\n");
 
 	//Log the file name and what peers it is stored on
+	ObjectInfo object_info;
+	object_info.setObjectName(go->getObjectName());
+	object_info.setSize(go->getSize());
+
+	for (unsigned int i = 0 ; i < plist_p->getPeer_listArraySize() ; i++)
+	{
+		object_info.addAddress((PeerData(plist_p->getPeer_list(i)).getAddress()));
+	}
+
+	object_list.push_back(object_info);
+
+	emit(storeNumberSignal, 1);
 
 	//Send the game objects into the overlay
 	//FIXME: The hash string should still be adapted to allow for multiple replicas in the overlay
@@ -130,6 +144,7 @@ void Super_peer_logic::GroupStore(overlayPkt *overlay_p)
 	TransportAddress dest_adr;
 	GameObject *go = (GameObject *)overlay_p->removeObject("GameObject");
 	groupPkt *group_p;
+	ObjectInfo object_info;
 
 	NodeHandle thisNode = ((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode();
 	TransportAddress *sourceAdr;
@@ -141,6 +156,13 @@ void Super_peer_logic::GroupStore(overlayPkt *overlay_p)
 		delete(go);
 		return;
 	}
+
+	//Log the file name and what peers it is stored on
+	object_info.setObjectName(go->getObjectName());
+	object_info.setSize(go->getSize());
+	object_info.addAddress(dest_adr);
+	object_list.push_back(object_info);
+	emit(overlayNumberSignal, 1);
 
 	go->setType(OVERLAY);
 
