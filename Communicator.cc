@@ -111,6 +111,7 @@ void Communicator::handleUDPMessage(cMessage* msg)
 	}
 	else if (packet->getPayloadType() == JOIN_ACCEPT)
 	{
+		//joinOverlay ();		//Since this super peer is now aware of other peers and therefore has storage capacity, join the overlay.
 		send(msg, "peer_gate$o");
 	}
 	else if (packet->getPayloadType() == JOIN_REQ)

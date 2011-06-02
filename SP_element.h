@@ -27,10 +27,10 @@ class SP_element
 	public:
 		SP_element();
 		virtual ~SP_element();
-		void setAddress(TransportAddress adr);
-		void setAddress(const char* ip, int port);
+		void setAddress(const TransportAddress &adr);
+		void setAddress(const char* ip, const int &port);
 		TransportAddress getAddress();
-		void setPosition(double lati, double longi);
+		void setPosition(const double &lati, const double &longi);
 		double getLattitude();
 		double getLongitude();
 

@@ -68,7 +68,7 @@ bool Directory_logic::superPeersExist()
 	else return false;
 }
 
-TransportAddress Directory_logic::findAddress(double lati, double longi)
+TransportAddress Directory_logic::findAddress(const double &lati, const double &longi)
 {
 	unsigned int i;
 	double nearest_dist = 10000;	//TODO: Use a parameter that specifies the maximum distance in a given virtual world

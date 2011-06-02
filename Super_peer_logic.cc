@@ -96,7 +96,7 @@ void Super_peer_logic::handleBootstrapPkt(cMessage *msg)
 	unsigned int i;
 	bootstrapPkt *boot_req = check_and_cast<bootstrapPkt *>(msg);
 	NodeHandle thisNode = ((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode();
-	TransportAddress *sourceAdr = new TransportAddress(thisNode.getIp(), thisNode.getPort());
+	TransportAddress sourceAdr(thisNode.getIp(), thisNode.getPort());
 
 	EV << "Super peer received bootstrap request from " << boot_req->getSourceAddress() << ", sending list and updating group.\n";
 
@@ -111,7 +111,7 @@ void Super_peer_logic::handleBootstrapPkt(cMessage *msg)
 	list_p->setName("join_accept");
 	list_p->setPayloadType(JOIN_ACCEPT);
 	list_p->setByteLength(2*sizeof(int)+sizeof(int)*2*group_peers.size());	//Value+Type+(IP+Port)*list_length FIXME: The size needs to still be multiplied by the size of the peer list.
-	list_p->setSourceAddress(*sourceAdr);
+	list_p->setSourceAddress(sourceAdr);
 	list_p->setDestinationAddress(boot_req->getSourceAddress());
 
 	for (i = 0 ; i < group_peers.size() ; i++)
@@ -147,7 +147,7 @@ void Super_peer_logic::GroupStore(overlayPkt *overlay_p)
 	ObjectInfo object_info;
 
 	NodeHandle thisNode = ((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode();
-	TransportAddress *sourceAdr;
+	TransportAddress sourceAdr(thisNode.getIp(), thisNode.getPort());
 
 	if (group_peers.size() > 0)
 		dest_adr = ((PeerData)group_peers.at(intuniform(0, group_peers.size()-1))).getAddress();		//Choose a random peer in the group for the destination
@@ -166,10 +166,8 @@ void Super_peer_logic::GroupStore(overlayPkt *overlay_p)
 
 	go->setType(OVERLAY);
 
-	sourceAdr = new TransportAddress(thisNode.getIp(), thisNode.getPort());
-
 	group_p = new groupPkt();
-	group_p->setSourceAddress(*sourceAdr);
+	group_p->setSourceAddress(sourceAdr);
 	group_p->setDestinationAddress(dest_adr);
 	group_p->setPayloadType(WRITE);
 	group_p->setName("write");
@@ -183,18 +181,18 @@ void Super_peer_logic::GroupStore(overlayPkt *overlay_p)
 
 void Super_peer_logic::addSuperPeer()
 {
-	IPAddress *dest_ip = new IPAddress(directory_ip);
-	TransportAddress *dest_adr = new TransportAddress(*dest_ip, directory_port);
+	IPAddress dest_ip(directory_ip);
+	TransportAddress dest_adr(dest_ip, directory_port);
 
-	if (dest_adr->isUnspecified())
+	if (dest_adr.isUnspecified())
 		error("Destination address is unspecified when trying to add this Super peer.\n");
 
 	bootstrapPkt *boot_p = new bootstrapPkt();
-	NodeHandle thisNode = ((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode();
-	TransportAddress *sourceAdr = new TransportAddress(thisNode.getIp(), thisNode.getPort());
+	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
+	TransportAddress sourceAdr(thisNode->getIp(), thisNode->getPort());
 
-	boot_p->setSourceAddress(*sourceAdr);
-	boot_p->setDestinationAddress(*dest_adr);
+	boot_p->setSourceAddress(sourceAdr);
+	boot_p->setDestinationAddress(dest_adr);
 	boot_p->setPayloadType(SUPER_PEER_ADD);
 	boot_p->setName("super_peer_add");
 	boot_p->setLatitude(latitude);

@@ -53,7 +53,7 @@ int64_t GameObject::getSize()
 	return size;
 }
 
-void GameObject::setSize(int64_t o_size)
+void GameObject::setSize(const int64_t &o_size)
 {
 	size = o_size;
 }
@@ -63,12 +63,12 @@ int GameObject::getType()
 	return type;
 }
 
-void GameObject::setType(int o_type)
+void GameObject::setType(const int &o_type)
 {
 	type = o_type;
 }
 
-void GameObject::setObjectName(char *o_Name)
+void GameObject::setObjectName(const char *o_Name)
 {
 	strcpy(objectName, o_Name);
 }
@@ -78,7 +78,7 @@ char * GameObject::getObjectName()
 	return objectName;
 }
 
-void GameObject::setCreationTime(simtime_t time)
+void GameObject::setCreationTime(const simtime_t &time)
 {
 	creationTime = time;
 }

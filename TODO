@@ -5,3 +5,19 @@ Peers will then learn of other peers in their group from super peers and not by 
 Investigate the possibility of rather using Vast to implement node discovery.
 Super peers might have to use vast to know what other super peers are in the network, to enable them to correctly join new peers to the network. Or some migration method is required.
 One might then be looking at a two tiered VAST network, with M+1 overlays, where M is the number of groups in the system
+
+Valgrind leak check summary with many news and few deletes:
+LEAK SUMMARY:
+==4470==    definitely lost: 2,435,692 bytes in 55,724 blocks
+==4470==    indirectly lost: 7,634,965 bytes in 9,482 blocks
+==4470==      possibly lost: 5,491,343 bytes in 443 blocks
+==4470==    still reachable: 4,284 bytes in 154 blocks
+==4470==         suppressed: 0 bytes in 0 blocks
+
+Valgrind leak check summary with mostly static objects and const *
+==7228== LEAK SUMMARY:
+==7228==    definitely lost: 140,808 bytes in 3,422 blocks
+==7228==    indirectly lost: 7,471,576 bytes in 9,454 blocks
+==7228==      possibly lost: 5,649,172 bytes in 372 blocks
+==7228==    still reachable: 4,240 bytes in 153 blocks
+==7228==         suppressed: 0 bytes in 0 blocks

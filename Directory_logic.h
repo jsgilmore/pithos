@@ -44,7 +44,7 @@ class Directory_logic : public BaseApp
 		void handleUDPMessage(cMessage* msg);          // called when we receive a UDP message
 
 		void handleJoinReq(bootstrapPkt *boot_req);
-		TransportAddress findAddress(double lati, double longi);
+		TransportAddress findAddress(const double &lati, const double &longi);
 		void handleSuperPeerAdd(bootstrapPkt *boot_req);
 		bool superPeersExist();
 

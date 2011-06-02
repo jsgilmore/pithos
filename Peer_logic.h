@@ -68,7 +68,7 @@ class Peer_logic: public cSimpleModule
 		void GroupStore(groupPkt *write, GameObject *go, std::vector<TransportAddress> send_list);
 		void OverlayStore(GameObject *go, std::vector<TransportAddress> send_list);
 
-		void joinRequest(TransportAddress dest_adr);
+		void joinRequest(const TransportAddress &dest_adr);
 		void addPeers(cMessage *msg);
 };
 

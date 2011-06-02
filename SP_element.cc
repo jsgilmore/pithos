@@ -24,12 +24,12 @@ SP_element::~SP_element() {
 	// TODO Auto-generated destructor stub
 }
 
-void SP_element::setAddress(TransportAddress adr)
+void SP_element::setAddress(const TransportAddress &adr)
 {
 	address = adr;
 }
 
-void SP_element::setAddress(const char* ip_str, int port)
+void SP_element::setAddress(const char* ip_str, const int &port)
 {
 	IPvXAddress ip;
 
@@ -42,7 +42,7 @@ TransportAddress SP_element::getAddress()
 	return address;
 }
 
-void SP_element::setPosition(double lati, double longi)
+void SP_element::setPosition(const double &lati, const double &longi)
 {
 	latitude = lati;
 	longitude = longi;

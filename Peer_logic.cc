@@ -144,16 +144,16 @@ void Peer_logic::handleP2PMsg(cMessage *msg)
 	}
 }
 
-void Peer_logic::joinRequest(TransportAddress dest_adr)
+void Peer_logic::joinRequest(const TransportAddress &dest_adr)
 {
 	if (dest_adr.isUnspecified())
 		error("Destination address is unspecified when requesting a join.\n");
 
 	bootstrapPkt *boot_p = new bootstrapPkt();
-	NodeHandle thisNode = ((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode();
-	TransportAddress *sourceAdr = new TransportAddress(thisNode.getIp(), thisNode.getPort());
+	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
+	TransportAddress sourceAdr(thisNode->getIp(), thisNode->getPort());
 
-	boot_p->setSourceAddress(*sourceAdr);
+	boot_p->setSourceAddress(sourceAdr);
 	boot_p->setDestinationAddress(dest_adr);
 	boot_p->setPayloadType(JOIN_REQ);
 	boot_p->setName("join_req");
@@ -169,10 +169,10 @@ void Peer_logic::handleMessage(cMessage *msg)
 	if (msg == event)
 	{
 		//For the first join request, a request is sent to the well known directory server
-		IPAddress *dest_ip = new IPAddress(directory_ip);
-		TransportAddress *destAdr = new TransportAddress(*dest_ip, directory_port);
+		IPAddress dest_ip(directory_ip);
+		TransportAddress destAdr(dest_ip, directory_port);
 
-		joinRequest(*destAdr);
+		joinRequest(destAdr);
 
 		scheduleAt(simTime()+1, event);		//TODO: make the 1 second wait time a configuration variable that may be set
 	}
@@ -260,8 +260,8 @@ void Peer_logic::OverlayStore(GameObject *go, std::vector<TransportAddress> send
 	simtime_t sendDelay;
 	int overlay_replicas = par("replicas_sp");
 
-	NodeHandle thisNode = ((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode();
-	TransportAddress *sourceAdr = new TransportAddress(thisNode.getIp(), thisNode.getPort());
+	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
+	TransportAddress sourceAdr(thisNode->getIp(), thisNode->getPort());
 
 	PeerListPkt *overlay_write = new PeerListPkt();
 	overlay_write->setByteLength(4+4+4+4+8+go->getSize()+(send_list.size()*4));	//Source address, dest address, type, value, object name ID, object size, storage peer addresses
@@ -278,7 +278,7 @@ void Peer_logic::OverlayStore(GameObject *go, std::vector<TransportAddress> send
 	go->setType(OVERLAY);
 
 	overlay_write->setPayloadType(OVERLAY_WRITE_REQ);
-	overlay_write->setSourceAddress(*sourceAdr);
+	overlay_write->setSourceAddress(sourceAdr);
 	overlay_write->setValue(overlay_replicas);
 	overlay_write->setName("overlay_write_req");
 	overlay_write->setDestinationAddress(super_peer_address);
@@ -305,14 +305,14 @@ void Peer_logic::sendObjectForStore(int64_t o_size)
 
 	std::vector<TransportAddress> send_list;
 
-	NodeHandle thisNode = ((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode();
-	TransportAddress *sourceAdr = new TransportAddress(thisNode.getIp(), thisNode.getPort());
+	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
+	TransportAddress sourceAdr(thisNode->getIp(), thisNode->getPort());
 
 	//Create the packet that will house the game object
 	write = new groupPkt();
 	write->setByteLength(4+4+4+8+o_size);	//Source address, dest address, type, object name ID and object size
 	write->setPayloadType(WRITE);
-	write->setSourceAddress(*sourceAdr);
+	write->setSourceAddress(sourceAdr);
 
 	go = new GameObject("GameObject");
 	go->setSize(o_size);

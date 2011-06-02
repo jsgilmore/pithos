@@ -40,12 +40,12 @@ class GameObject : public cOwnedObject
 		virtual std::string info();
 
 		int64_t getSize();
-		void setSize(int64_t o_size);
+		void setSize(const int64_t &o_size);
 		int getType();
-		void setType(int o_type);
-		void setObjectName(char *o_Name);
+		void setType(const int &o_type);
+		void setObjectName(const char *o_Name);
 		char *getObjectName();
-		void setCreationTime(simtime_t time);
+		void setCreationTime(const simtime_t &time);
 		simtime_t getCreationTime();
 };
 
