@@ -243,7 +243,6 @@ Applications}]: Games
 %A.1.0 [\textbf{Introductory and Survey}], C.2.d [\textbf{Distributed Systems}]: Distributed applications, J.8.g [\textbf{Internet Applications}]:
 %Games
 %\end{IEEEkeywords}
-
 % make the title area
 \maketitle
 
@@ -323,7 +322,7 @@ survey, the differences between this paper and the included survey are discussed
 
 The remainder of this paper is structured as follows: the field of P2P MMOGs is introduced in Section \ref{p2p_network_architectures}, which contains
 an introduction to P2P overlays, the major advantages of P2P MMOGs and the key challenges that P2P MMOGs face. An introduction to some classic
-consistency models, currently used in computers games, are introduced in Section \ref{classic_models}. Section \ref{related_work} discusses some
+consistency models, currently used in computer games, are introduced in Section \ref{classic_models}. Section \ref{related_work} discusses some
 related surveys that have been completed in the field of P2P MMOGs and P2P applications in general. Section \ref{p2p_mmog_state_persistency} contains
 an analysis of different types of distributed storage for MMOGs. The section defines characteristics against which all storage schemes are evaluated.
 For each type of storage some key architectures are compared and conclusions and recommendations are made.
@@ -351,7 +350,7 @@ overlays. For a detailed comparison between the two types that also deals with m
 \cite{Castro_structured_overlay_myths}.
 
 With unstructured approaches, one is never assured that a data item will be retrieved, even if that data item is present in the network. If many
-duplicates of a data item is contained in the network, this becomes less of a problem, since it is assumed that the request will be routed to some
+duplicates of a data item are contained in the network, this becomes less of a problem, since it is assumed that the request will be routed to some
 set of nodes that do  possess the item.
 
 An unstructured architecture works well for content sharing and Voice over Internet Protocol (VoIP) networks, for example: P2P TV, BitTorrent,
@@ -363,10 +362,10 @@ overlays are not considered adequate as a basis for P2P MMOGs, where all data it
 proposed that provide for efficient routing and reliable retrieval of data items. Some of these well known overlays are: CAN \cite{CAN}, Chord
 \cite{chord}, Tapestry \cite{tapestry} and Pastry \cite{pastry}.
 
-The basic idea of a structured overlay is that all nodes are identified by unique identifiers (IDs), which are hashes to a circular key space. Any
-node in the overlay network is then able to efficiently route a query with a given ID, to a node with an ID closest to the given ID. An accurate
-comparison is that unstructured overlays are good at finding ``hay'', while structured overlays are good at finding ``needles''
-\cite{Rodrigues_acm_comms_p2p}.
+The basic idea of a structured overlay is that all nodes are identified by unique identifiers (IDs). A popular method to create the IDs is to use
+hashes to a circular key space. Any node in the overlay network is then able to efficiently route a query with a given ID, to a node with an ID
+closest to the given ID. An accurate comparison is that unstructured overlays are good at finding ``hay'', while structured overlays are good at
+finding ``needles'' \cite{Rodrigues_acm_comms_p2p}.
 
 \subsection{Advantages}
 \label{p2p_advantages}
@@ -389,40 +388,25 @@ Latency is also improved, because it is now possible to directly communicate bet
 is also no single server that has to process game events. Game events need only be processed by other peers who find the specific events of interest.
 The distribution of the load as well as direct communication will further reduce latency. Game events are defined in Section \ref{terminology}.
 
-Table \ref{tab_archs} summarises the differences between the three architectures as discussed thus far. From this architecture and the previous
-discussion, it can be seen that the P2P architecture has a large number of advantages over a classic C/S architecture, but that there are challenges
-that have to be addressed. These include methods to administer the system when there is no centralised form of control, security issues arising from
-the decentralised nature of the architecture and the required P2P bandwidth and latencies.
-%
-\begin{table*}[htbp]
-\centering
-\begin{tabular}{|r|c|c|c|}
-\hline
-Property & Client/Server & Client/Multi-Server & Peer-to-Peer\\
-\hline
-Administration & Low & Medium & High\\
-Security & High & High & Low\\
-Robustness & Low & Medium & High\\
-Scalability & Low & Medium & High\\
-Provider cost & High & Very high & Low\\
-Latency & High & High & Low\\
-Server bandwidth & High & High & Low\\
-Peer bandwidth & Low & Low & High\\
-Peak transient load handling & Bad & Medium & Good\\
-\hline
-\end{tabular}
-\caption{Differences between Client/Server, Client/Multi-Server and Peer-to-Peer architectures} \label{tab_archs}
-\end{table*}
-
 \subsection{Key challenges}
 \label{key_challenges}
+
+%State persistency, compared to state consistency
+A key challenge with any networked game is how to maintain state consistency between root and replica objects. A root objects is the authoritive
+version of an object and the replica object is usually a local non-authoritive version. Root objects are usually found on the server and replica
+objects are found in the local object cache of client. The method by which the states between root and replica objects are updated is called the
+consistency model. Solving the state consistency problem for P2P MMOGs is one of the major development challenges.
 
 A recent article has identified six key challenges of P2P systems: Interest Management, Game Event Dissemination, Non-player Character (NPC) Host
 Allocation, Game State Persistency, Cheating Mitigation and Incentive Mechanisms \cite{Fan_deisgn_issues_p2p}. A brief overview of these challenges
 will be introduced below.
 
+Of the six challenges mentioned, Interest Management, Game Event Dissemination and Game State Persistency all form part of State Consistency, with
+some aspects of Cheating Mitigation also a part of State Consistency. Also part of both state consistency and cheating mitigation is event ordering,
+which deals with how to ensure that the system remains causal \cite{GauthierDickey_low_latency_event_ordering}.
+
 Another challenge for P2P systems is the required peer bandwidth. In a paper by Miller and Crowcroft, a packet simulator was created to determine the
-amount of required bandwidth and effective latency, if a game such as World of Warcraft were to be implemented using P2P technologies
+required bandwidth and effective latency, if a game such as World of Warcraft were to be implemented using P2P technologies
 \cite{Miller_p2p_infeasability}. Their simulation results indicate that today's networks are not able to host P2P MMOGs, with the required bandwidth
 and latency constraints. Such a significant result requires verification, but at the least, it shows that reducing bandwidth and latencies for P2P
 MMOGs should be a primary design requirement.
@@ -515,11 +499,16 @@ really enforce the provisioning of resources. A player who does not want to prov
 incentive to provide resources.
 
 Another issue with incentive schemes is that sometimes players might have insufficient resources. Such players should be aided by other players with
-sufficient resources and not be disallowed to play the game. When limited resources are taken into account, the issue of reporting a false amount of
-available resources becomes a problem. A peer that has sufficient resources might report insufficient resources, to avoid penalties. It is evident
+sufficient resources and not be disallowed to play the game. When limited resources are taken into account, the issue of reporting a false quantity
+of available resources becomes a problem. A peer that has sufficient resources might report insufficient resources, to avoid penalties. It is evident
 that more research is required in this field.
 
 \subsubsection{Distributed computation}
+
+Non-Player Characters (NPCs) are characters that are not controlled by any human player, but are rather controlled by some artificial intelligence
+routine or script executing on some host machine. These characters represent the traders and monsters in MMOGs and usually contain sets of rules that
+determine how they should interact with Player Characters (PCs) as well as their own state information. An NPC's state can be how much money and
+items it has to trade or how much health it still has after being attacked by a player.
 
 In the original NPC host allocation classification by Fan, both NPC state and computational routines are combined into a single category
 \cite{Fan_phd}. In the classification presented below, NPC state forms part of normal game state persistency, since NPC objects are game objects like
@@ -528,7 +517,7 @@ the distribution of all in game computational elements.
 
 Some game objects require computational power to function. An example of this is the Artificial Intelligence routines of NPCs or the computation of
 physics effects on in-game objects. Some architectures assume that the computational requirements will be fulfilled where the object state is hosted
-\cite{solipsis}, but other schemes exist that allows for the CPU power to be distributed amongst peers. One such scheme makes use of a ``job board''
+\cite{solipsis}, but other schemes exist that allow for the CPU power to be distributed amongst peers. One such scheme makes use of a ``job board''
 like mechanism, where tasks are advertised on specialised super peers. Other peers monitor these super peers and may elect to perform the advertised
 tasks \cite{fan_mediator_paper}.
 
@@ -539,24 +528,21 @@ P2P MMOGs, Lu Fan had this to say about state persistency: ``Game state persiste
 infrastructures are designed to support file sharing, and seldom fulfil the performance and security requirements of a MMOG. \ldots the persistency
 area is still immature with many problems waiting to be investigated.'' \cite{Fan_phd}.
 
+State persistency is treated as a sub domain of state consistency, in that state persistency models define where and how the root or authoritive
+objects are stored. It is assumed that replica objects are always stored in the primary memory of the clients that immediately require the
+information contained in the root object.
+
 The issue of game state persistency in P2P MMOGs is the focus of this paper and the remainder of the paper will deal exclusively with this subject.
-However, before the different storage types are reviewed, some classic C/S models are presented for comparison with the
+However, before the different storage types are reviewed, some classic C/S models are presented for comparison with the fully distributed model.
 
 \section{Classic consistency models}
 \label{classic_models}
-
-A consistency model deals with how data are stored and distributed throughout the system and is based on an underlying network model. The network
-model is usually either C/S or P2P.
 
 A game object exists in two forms: the root object and the replica object. Root objects are the objects traditionally housed on the Server in the C/S
 based MMOGs. All clients obtain replicas of these objects and duplicate them locally in order to perform low latency computations. An example would
 be an NPC monster. When players perceive the monster in the virtual world, a duplicate of the NPC objects is sent to the user's computer for display
 purposes. When another player attacks the NPC, the change in health will be computed at the server and an update is then sent in order to ensure
 consistency between the root objects and the replica object.
-
-The method by which the states between root and replica objects are updated is called the consistency model. State persistency, which deals with how
-and where objects are stored, usually forms part of the consistency model because the consistency model also deals with object states. Because of
-this reason, some knowledge is required of the classic consistency models, in order to evaluate P2P state persistency models.
 
 \subsection{Terminology}
 \label{terminology}
@@ -584,15 +570,11 @@ and ``game object''.
     space, as well as CPU power. Game objects can also produce events, which should be sent to other objects. When this definition is used,
     NPC objects may be classified as a specific type of a game object, which forms part of the global game state.
 
-\subsection{P2P and C/S consistency models}
-\label{p2p_cs_models}
-
 As an introduction to consistency models, an overview of the two common models, currently used in computer games will be described. The models used
 in P2P MMOGs are all permutations of these two basic models. The two models are based on the two different network models. These are the P2P-based
 model, also called the event-based model \cite{p2p_cm_aoe}, and the C/S-based model, also called update-based model \cite{unreal_networking}.
 
-\subsubsection{Event-based (P2P)}
-\label{classic_cs_event_based}
+\subsection{Event-based (Fully distributed)} \label{classic_cs_event_based}
 
 \begin{figure*}[htbp]
 \centering \subfloat[Event-based (peer-to-peer)]{\label{fig_p2p_cm}
@@ -602,10 +584,10 @@ model, also called the event-based model \cite{p2p_cm_aoe}, and the C/S-based mo
 \caption{Consistency models}
 \end{figure*}
 %
-Figure \ref{fig_p2p_cm} shows the P2P model. In this model the complete game state is stored on each peer. Any event that a peer generates is sent to
-all other peers. These events are used as inputs to the game logic, which creates updates, which are then used to update the global game state at
-each peer. The event-based model works well for strategy games, and was implemented in Age of Empires \cite{p2p_cm_aoe} and Starcraft
-\cite{starcraft_network_model}.
+Figure \ref{fig_p2p_cm} shows the fully distributed model. The state persistency model for this consistency model is that the complete game state is
+stored on each peer. Any event that a peer generates is sent to all other peers. These events are used as inputs to the game logic, which creates
+updates, which are then used to update the global game state at each peer. The event-based model works well for strategy games, and was implemented
+in Age of Empires \cite{p2p_cm_aoe} and Starcraft \cite{starcraft_network_model}.
 
 The order in which updates are received should be the same for all peers, otherwise the game states of different peers may become inconsistent.
 Usually some kind of lockstep technique is used to solve this issue \cite{pessimistic_lock_step}. The issue with lockstep is that it reduces the
@@ -616,16 +598,16 @@ latencies, the event-based model can provide for an high-degree of responsivenes
 server hop required for communications.
 
 The issue with the event-based model is that it is not scalable, since all peers should connect to all other peers and every event is transmitted to
-everyone. This means that as $N$, the number of peers in the network, increases, the amount of traffic increases with a factor of $N^2$. The security
-issues of the P2P network model, on which this consistency model is based, are also present. Slowdown is also experienced by all players if one
-player's latency is below par, since the lockstep mechanism has to wait for all events to be received for that round to conclude.
+everyone. This means that as $N$, the number of peers in the network increases, the traffic increases with a factor of $N^2$. The security issues of
+the P2P network model, on which this consistency model is based, are also present. Slowdown is also experienced by all players if one player's
+latency is below par, since the lockstep mechanism has to wait for all events to be received for that round to conclude.
 
-\subsubsection{Update-based (C/S)}
+\subsection{Update-based (C/S)}
 
-An alternative to the event-based model is the update-based model, shown in Figure \ref{fig_cs_cm}. This model is based on the C/S network model. An
-authoritative global game state is housed on the server and a non-authoritative local game state is housed on all clients for display purposes. No
-real game logic is housed at the clients, only on the server. All clients send events to the server, which applies the game logic and sends updates
-to the clients, while also updating its own game state.
+An alternative to the event-based model is the update-based model, shown in Figure \ref{fig_cs_cm}. This model is based on the C/S network model. The
+persistency model here is that an authoritative global game state is housed on the server and a non-authoritative local game state is housed on all
+clients for display purposes. No real game logic is housed at the clients, only on the server. All clients send events to the server, which applies
+the game logic and sends updates to the clients, while also updating its own game state.
 
 This approach greatly assists with security, as clients cannot influence the state of any other clients and every client's state depends on updates
 received from the server. The server state is also termed authoritative, because if there is a conflict, the server state is always the state to
@@ -646,9 +628,9 @@ zone-based \cite{Hu_voronoi_IM}.
 
 \subsubsection{Sharding}
 
-The method by which the game world is duplicated over multiple servers, with players connecting to one of these servers is termed ``sharding''.
-Clients are not able to interact or communicate with players on other shards, which reduces game immersion. This method does, however, allow for a
-more scalable system as maximum load is fixed.
+The consistency model that is exemplified by having a state persistency model where the game state (world) is duplicated over multiple servers, with
+players connecting to one of these servers is termed ``sharding''. Clients are not able to interact or communicate with players on other shards,
+which reduces game immersion. This method does, however, allow for a more scalable system as maximum load is fixed.
 
 Players are not able to enter a shard if that shard has reached its capacity. In the past, this has caused unhappiness amongst players, since popular
 shards could be difficult to log in to. Players are also reluctant to move to a new shard, because a lot of time is invested in their characters in
@@ -658,6 +640,13 @@ approach, with players forced into a specific C/S environment.
 
 Another examples of this model is Blizzard's World of Warcraft, where many copies exist of the same game world. Specific details of the network
 architecture of WoW have not been made available by Blizzard.
+
+The benefit of sharding and why it is currently the most popular method of distributing game worlds is its ease of implementation and the reduction
+of content designer load. Because no inter-server communication is required and no server migration is supported, this method greatly simplifies the
+server design process. Another benefit of sharding is that it allows for a relatively small game world to support many players because of the
+duplication of the worlds. This reduces the load on level designers and content designers, who now have to populate a much smaller world with
+content. When the game goes live, the single world is replicated multiple times, which means that much less game content can satisfy a much larger
+number of players than would have been possible if all players shared the same virtual world.
 
 \subsubsection{Replication-based}
 %Redundant
@@ -672,22 +661,23 @@ different worlds.
 
 \subsubsection{Object-based}
 %Object based
-The object-based method distributes all in-game objects amongst the servers \cite{object_based_consistency1}, \cite{object_based_consistency2},
-\cite{object_based_consistency3}. For an MMOG, most of these objects are expected to be player objects. The advantage of this method is that the
-system load is fixed for a certain player population and that the load is equally distributed amongst all servers. This allows for more accurate
-prediction and provisioning of resources, but still does not handle transient loads well.
+The state persistency model of the object-based consistency model distributes all in-game objects amongst the servers
+\cite{object_based_consistency1}, \cite{object_based_consistency2}, \cite{object_based_consistency3}. For an MMOG, most of these objects are expected
+to be player objects. The advantage of this method is that the system load is fixed for a certain player population and that the load is equally
+distributed amongst all servers. This allows for more accurate prediction and provisioning of resources, but still does not handle transient loads
+well.
 
 Another issue is inter-server communications for this architecture. The inter-server communications are random and also more than the inter-server
-communications for a region based system. The reason for this is that the amount of player interaction increases with a decrease in the distance
+communications for a region based system. The reason for this is that the number of player interactions increase with a decrease in the distance
 between the players. Players playing together move together, chat and interact with NPCs together. For a region based model, all player-neighbour
 interactions remain local to the server.
 
 \subsubsection{Zone/Region-based}
 %Zone-based
-The zone-based method divides the virtual world into zones or regions, which are hosted on different servers \cite{zone_based_stat},
-\cite{zone_based_dyn}. Busy regions are hosted on their own servers, while multiple quiet regions are hosted on a single server. This is termed the
-static region approach \cite{zone_based_stat}. The issue of the static region approach is that it does not scale well when one region is suddenly
-populated with players. This type of behaviour happens quite regularly and is known as flocking \cite{flocking}.
+The state persistency model of the zone-based consistency model divides the virtual world into zones or regions, which are hosted on different
+servers \cite{zone_based_stat}, \cite{zone_based_dyn}. Busy regions are hosted on their own servers, while multiple quiet regions are hosted on a
+single server. This is termed the static region approach \cite{zone_based_stat}. The issue of the static region approach is that it does not scale
+well when one region is suddenly populated with players. This type of behaviour happens quite regularly and is known as flocking \cite{flocking}.
 
 When players find something of interest in a region, many players will flock to that region. In-game events and festivals are also becoming popular
 and these events also cause flocking to the region where the event is held. The solution to these effects have been over provisioning of resources to
@@ -705,7 +695,7 @@ In this section we discuss related surveys on P2P MMOGs. This will set the conte
 
 In 2007 Schiele et al. published the paper: ``Requirements of Peer-to-Peer-based Massively Multiplayer Online Gaming''
 \cite{Schiele_p2p_requirements}. This paper presents a broad overview of some key requirements that P2P MMOGs should possess, to function correctly
-under any load for any amount of time. These are: distribution, consistency, self-organisation, persistency, availability, interactivity,
+under any load for any period of time. These are: distribution, consistency, self-organisation, persistency, availability, interactivity,
 scalability, security, efficiency and maintainability. The focus of this paper is on the persistency requirement identified in the paper by Schiele.
 
 In 2005, Hasan et al. published the manuscript: ``A Survey of Peer-to-Peer Storage Techniques for Distributed File Systems''
@@ -755,19 +745,21 @@ system, this survey deals specifically with the area of P2P MMOGs and more speci
 \section{Peer-to-Peer MMOG state persistency models}
 \label{p2p_mmog_state_persistency}
 
-This section identifies state persistency techniques used in P2P MMOGs, since very little work has been done in this field. State persistency is
-treated as a sub domain of state consistency, in that state persistency models define where and how the root or authoritive objects are stored. It is
-assumed that replica objects are always stored in the primary memory of the clients that immediately require the information contained in the root
-object.
+This section identifies state persistency techniques used in P2P MMOGs. To achieve state persistency in P2P MMOGs, a type of distributed storage is
+required. Two classic distributed storage architectures are the Network File System (NFS) \cite{NFS4_protocol} and Coda
+\cite{Kistler_Coda_disconnected}. There are, however, some major differences between the requirements of a P2P state persistency model and the
+classic distributed file storage model. Firstly, NFS and Coda still require servers. One of the main advantages of P2P MMOGs is that servers are, for
+the most part, not required. The other requirement is low latency file storage and retrieval, which NFS and Coda also do not address. Conflicts are
+also an issue with the Coda system, which allows multiple nodes to modify the same object. The requirement of disconnected operation is also not
+applicable to most interactive online games, where a player has to stay connected to the world, to be able to interact with it. Despite the many
+differences, the divergent applications share some of the same requirements, including: scalability, reliability, security and responsiveness.
 
-To achieve state persistency in P2P MMOGs, a type of distributed storage is required. Two classic distributed storage architectures are Network File
-System (NFS) \cite{NFS4_protocol} and Coda \cite{Kistler_Coda_disconnected}. There are, however, some major differences between the requirements of a
-P2P state persistency model and the classic distributed file storage model. Firstly, NFS and Coda still require servers. One of the main advantages
-of P2P MMOGs is that servers are, for the most part, not required. The other requirement is low latency file storage and retrieval, which NFS and
-Coda also do not address. Conflicts are also an issue with the Coda system, which allows multiple nodes to modify the same object. The requirement of
-disconnected operation is also not applicable to interactive online games, where a player has to stay connected to the world, to be able to interact
-with it. Despite the many differences, there are, however, many similarities. The divergent applications share some of the same issues and
-requirements, including the shared requirements for: scalability, reliability, security and responsiveness.
+One area where disconnected operation might be of interest to game state persistency is in the area of mobile gaming. A major challenge for mobile
+games is the large variances in network latency. Such networks require games that are resistent to network jitter. One approach has been proposed in
+\cite{Chandler_disconnected_games}, where every game clients serialises its game state and distributes this game state to all other clients. Each
+client then creates some target game state from all received game states as well as its own state. The game client then attempts to manipulate all
+NPCs in the game in order to achieve the target game state. The target game state is constantly updated and thus remains a moving target. This is a
+new type of consistency model with many research opportunities.
 
 %Overview of three approaches
 Four approaches have been identified by which state persistency is achieved in P2P MMOGs: \emph{super peer storage}, \emph{overlay storage},
@@ -777,8 +769,8 @@ Four approaches have been identified by which state persistency is achieved in P
 %Individual storage
 Two other types of storage sometimes described in P2P MMOGs papers are \emph{centralised storage} and \emph{individual storage}. Centralised storage
 is storage in a centralised database, the same as for a C/S MMOG \cite{badumna_engine}, \cite{rooney_centralised_storage},
-\cite{hybrid_p2p_cs_centralised}. Centralised storage for an MMOG requires the same large expensive servers and high bandwidth amounts as required by
-a classic C/S architecture and therefore does not fit into the P2P MMOG paradigm. For this reason, centralised storage will not be evaluated in this
+\cite{hybrid_p2p_cs_centralised}. Centralised storage for an MMOG requires the same large expensive servers and high bandwidth as required by a
+classic C/S architecture and therefore does not fit into the P2P MMOG paradigm. For this reason, centralised storage will not be evaluated in this
 paper.
 
 %Centralised storage
@@ -790,15 +782,15 @@ in this survey, however, individual storage can be regarded as a subset of dista
 
 \begin{table*}[htbp]
 \centering
-\begin{tabular}{|r|c|c|c|c|l|}
+\begin{tabular}{|r|c|c|c|c|c|l|}
 \hline
-Storage type & Reliability & Responsiveness & Security & Fairness & Examples\\
+Storage type & Reliability & Responsiveness & Security & Fairness & Complexity & Examples\\
 \hline
-Super Peer & Medium & High & Low & Low & \cite{knutsson_p2p_first}\\
-Overlay & High & Low & Medium & High & \cite{Douglas05enablingmassively}, \cite{using_freenet_storage},
+Super Peer & Medium & High & Low & Low & Very Simple & \cite{knutsson_p2p_first}\\
+Overlay & High & Low & Medium & High & Simple & \cite{Douglas05enablingmassively}, \cite{using_freenet_storage},
 \cite{Fan_phd}, \cite{past_storage_focus}\\
-Hybrid & High & High & Low & Low & \cite{zoned_federation}, \cite{hybrid_storage1}\\
-Distance-based & Medium & High & Low & Medium & \cite{Buyukkaya_voronoi_state_management}, \cite{Hu_voronoi_IM},
+Hybrid & High & High & Low & Low & Complex & \cite{zoned_federation}, \cite{hybrid_storage1}\\
+Distance-based & Medium & High & Low & Medium & Very Complex & \cite{Buyukkaya_voronoi_state_management}, \cite{Hu_voronoi_IM},
 \cite{colyseus_distance_based}, \cite{solipsis}\\
 \hline
 \end{tabular}
@@ -810,7 +802,9 @@ Table \ref{tab_storage} presents a characterisation of current storage systems a
 shown is that architectures that differentiate between different types of data, are theoretically better suited to the MMOG application. The example
 of such an architecture is the hybrid architecture, which also seems to fare better, when compared to other storage techniques. Table
 \ref{tab_storage} also provides some references that act as examples of the different storage types mentioned. These example architectures will be
-discussed in detail in the sections to follow.
+discussed in detail in the sections to follow. The purpose of the complexity category in Table \ref{tab_storage} it to provide a measure of how
+difficult it is to implement the different types of storage. In the following sections the reasons for the classification should become clear. It
+should be noted that implementing overlay storage with all possible optimisations such as caching will increase the complexity.
 
 \subsection{Characteristics}
 \label{key_challenges_cm}
@@ -849,17 +843,13 @@ i.e. what is the variance of the number of files contained on each node, or on b
 each node. A lower variance will point to a fairer data persistency scheme.
 
 \subsubsection{Reliability}
+
 For the storage to be reliable, it must be impossible for data to be lost, and stored data should always be available when a node requests it.
-
 Reliability encompasses both robustness and availability. Robustness means that the data should be resilient to network churn and availability means
-that data should be available to any node in the network, with the correct permissions. To measure robustness, nodes have to leave the network at
-different rates and the loss of storage for different rates of churn have to be measured.
-
-It can then be determined what the churn threshold is for the network, to maintain all data at a certain rate of churn. This will be a function of
-the number of redundant objects in the storage system, as reliability can usually be increased with increased redundancy. What should be measured is
-how well the system performs for a specific number of replicas used.
+that data should be available to any node in the network, with the correct permissions.
 
 \subsubsection{Responsiveness}
+
 To ensure system responsiveness, data must be stored or retrieved in real-time. With real-time, it is meant that data should be available within a
 certain time frame that would ensure correct functionality of the MMOG requiring it. The variance in data retrieval times should be small.
 Responsiveness can be measured by the time it takes for an object to be available for reading, anywhere in the network, after having been written.
@@ -870,12 +860,9 @@ How long it takes to read or write data to the storage network can also be measu
 
 The storing system should store data securely. It should not be possible for data to be altered in ways that are inconsistent with the game rules. It
 should also be possible to identify nodes that alter the data in a malicious way. This also adds the requirement that nodes should be authenticated
-in the storage system and that only authorised nodes should be able to alter data.
-
-Security is the combination of a number of objectives: Authentication, Authorisation, Data Integrity, Confidentiality, Availability, Trust, Privacy
-and Identity Management \cite{distributed_systems_security}. When comparing different state persistency techniques, it should first be established
-which of these objectives are the scheme a threat to. The number of objectives addressed, if addressed in industry standard ways, is already a
-measure of the security of the system.
+in the storage system and that only authorised nodes should be able to alter data. Security is the combination of a number of objectives:
+Authentication, Authorisation, Data Integrity, Confidentiality, Availability, Trust, Privacy and Identity Management
+\cite{distributed_systems_security}.
 
 For a state persistency model to address the security objectives of authentication, authorisation, confidentiality, trust, privacy and identity
 management, a certification scheme with public and private key encryption is required. Such a scheme allows for the identification of users, and by
@@ -965,36 +952,6 @@ which redundant region coordinators are maintained in \cite{knutsson_p2p_first},
 current coordinator. This means that if the main coordinator fails, all data will automatically be routed to the backup, because of the feature of
 DHTs. This method is similar to how reliability is achieved in overlay storage as described in Section \ref{overlay_storage_reliability}.
 
-\subsubsection{Summary and recommendations}
-
-To summarise, super peer storage makes use of regional super peers to store all primary object states for a particular region. The advantages of
-super peer storage are:
-%
-\begin{enumerate}
-    \item This type of state persistency is fairly easy to implement.
-    \item If all super peers are reliable, the storage will also be reliable.
-    \item The storage is as responsive as with C/S architectures, since a peer requiring data is always one hop away from a super peer possessing
-        the data.
-\end{enumerate}
-
-The disadvantages are:
-%
-\begin{enumerate}
-    \item Security is a concern for this storage method. The primary reason being that a single peer has access to the object states of an entire
-        region.
-    \item Super peer storage is unfair, since only a small percentage of peers in the network are selected for super peers and required to
-        contribute resources.
-    \item Super peers might become overloaded, which would increase the latency of storage operations and degrade overall performance.
-    \item If super peers are promoted from normal, unreliable peers, this type of storage requires replication mechanisms, to ensure robustness
-        to network churn. The architectures reviewed did not implement such mechanisms.
-\end{enumerate}
-
-No recent mention could be found of researchers implementing super peer storage for P2P MMOGs. This could mean that there has been very little
-evolution in super peer storage and that super peer storage is currently less mature than other storage schemes. Super peer storage might still be
-used for small independent casual games, such as online board games, where a group of friends can implicitly trust each other or where the risk of
-cheating is at a minimum. The reason why this storage method is recommended for games from independent developers, is because the scheme is easy to
-implement and will not require much resources when used for small games.
-
 \subsection{Overlay storage}
 \label{overlay_storage}
 
@@ -1003,10 +960,6 @@ which basically encompasses any P2P distributed storage currently in use. Some e
 can be found in \cite{Hasan_distributed_storage_survey}. The reasoning is that any P2P distributed storage can be used to only store game files.
 Therefore, distributed storage is used as a distributed database for game files. Whether this is an optimal solution will be discussed in the
 remainder of the section.
-
-%Also discuss Oceanstore and maybe Freenet
-%Reference "A Survey of Peer-to-Peer Storage Techniques for Distributed File Systems" by Ragib Hasan, Zahid Anwar, William Yurcik, Larry Brumbaugh and Roy Campbell
-
 
 \subsubsection{Reliability}
 \label{overlay_storage_reliability}
@@ -1048,9 +1001,9 @@ comparing with the received hashes.
 \subsubsection{Fairness}
 
 Overlay storage is fair, as all nodes share file data and requests equally. The system might be made fairer by taking into account the heterogeneity
-of peers. Peers do not all possess the same amount of resources, something which a truly fair system should take into account. The difficulty with
-using such a scheme is that peers can be made to report incorrect resource information in order to reduce their resource donation requirement. This
-is where incentive mechanisms have to be investigated as well as ways to ensure correct resource reporting.
+of peers. Peers do not all possess the same resources, something which a truly fair system should take into account. The difficulty with using such a
+scheme is that peers can be made to report incorrect resource information in order to reduce their resource donation requirement. This is where
+incentive mechanisms have to be investigated as well as ways to ensure correct resource reporting.
 
 \subsubsection{Existing architectures}
 
@@ -1095,52 +1048,14 @@ This means that the success of the caching mechanism is directly related to the 
 from being cached.
 
 The article on caching in PAST shows a significant reduction in network delay when caching is used. Going from an average of more than two hops, down
-to one hop for a network utilisation of 50\%. It is, however, not clear how this will change when 60,000 nodes are used, instead of the 2250 nodes
-used in the presented experiment. The number of 60,000 nodes is based on the number of concurrent player experienced in Eve Online, a popular science
-fiction MMORPG \cite{eve_pcu}. It is also important to note that these hops are Pastry overlay hops and not IP level hops. One Pastry hop can contain
-a multitude of IP level hops, depending on the organisation of the overlay network.
+to one hop for a network utilisation of 50\%. It is, however, not clear how this will change when many more nodes are used, instead of the 2250 nodes
+used in the presented experiment. It is also important to note that these hops are Pastry overlay hops and not IP level hops. One Pastry hop can
+contain a multitude of IP level hops.
 
 The main difference between the implementation by Douglas et al. and the PAST implementations, is that the former supports range queries on spatial
 data, which allows for a set of objects to be returned, queried by their virtual in-game position. With PAST, the exact ID of an object is required
 before it may be retrieved. Using PAST is the simplest means by which game state persistency may be implemented, but PAST is not necessarily the
 application best suited to game state persistency. There exists a need for more research into appropriate state persistency mechanisms for P2P MMOGs.
-
-\subsubsection{Summary and recommendations}
-
-The term ``overlay storage'' encompasses any distributed storage scheme, based on some P2P overlay. The advantages of such a scheme are:
-%
-\begin{enumerate}
-    \item The storage can be made very reliable, using replication and erasure codes.
-    \item Thus far, it is the most secure form of storage, because no authoritative peer is required to maintain object states. Because a true
-        peer-to-peer relationship remains, voting schemes might also be implemented to validate data that peers provide.
-    \item The storage is very fair, since all data stored are distributed amongst all peers in the network.
-\end{enumerate}
-
-The disadvantages are:
-%
-\begin{enumerate}
-    \item The main disadvantage of overlay storage is its unresponsiveness, because of its average time of $\OO{\log(N)}$ to retrieve a data
-        item.
-%    \item Another disadvantage of pure overlay storage is the maintenance of storage consistency.
-\end{enumerate}
-
-%Overlay storage - reason
-Overlay storage is a popular storage method, currently used by most P2P MMOG architectures. This is believed to be more as a consequence of the use
-of Scribe \cite{scribe} than any inherit benefit to P2P MMOGs \cite{past_storage_focus}. This is also the motivation used in Chapter 4 of
-\cite{Fan_phd}, where the Mediator architecture is described. The reason for using overlay storage in so many implementations seem to be merely the
-availability of PAST, after having already decided to use Scribe. In other words, researchers use Scribe for ALM, Scribe runs on Pastry, and PAST is
-then a readily available overlay storage implementation which also runs on Pastry. The implementation of state persistency, however, does not need to
-be linked with the event dissemination scheme. A P2P overlay may be used for event dissemination, and another method can be used to ensure state
-persistency.
-
-Overlay storage is currently a mature storage scheme i.t.o. security, robustness and fairness, but its applicability to games is still uncertain.
-More data is required to determine what the latency requirements are for online games i.t.o. storage and whether overlays can meet these levels of
-responsiveness. No such studies could be found. Without such studies, overlay storage might still be applicable to games where data do not have to be
-committed to storage in real-time. Such games might implement state persistency in primary memory and use overlay storage as a long term backup
-method.
-
-Overlay storage will place some restrictions on certain game mechanics, but it is possible that games could be designed around these restrictions.
-The primary restriction being that data cannot be immediately retrieved from storage.
 
 \subsection{Hybrid region-based storage}
 \label{hybrid_storage}
@@ -1184,7 +1099,7 @@ the overlay. Another issue is the time delay between data received from a super 
 
 The issue of unfairness is also still present in hybrid storage. The system is fairer in that all nodes share the load of the overlay storage, but
 there still exists the unfairness of the super peer storage. As all data exists in both the overlay storage as well as the super peer storage, the
-system is as unfair as super peer storage, because the same amount of data as in super peer storage is not being distributed evenly amongst all
+system is as unfair as super peer storage, because the same quantity of data as in super peer storage is not being distributed evenly amongst all
 nodes.
 
 \subsubsection{Existing architectures}
@@ -1213,33 +1128,8 @@ specific player is in the game and existential data are data that should be avai
 Categorising data by how long and under which circumstances the data should exist, may assist in the design of the storage model. Since ephemeral
 data does not have to exist after the player has left the game, it may be stored in primary memory. Participatory data might also be stored on the
 player's computer, but security issues will have to be kept in mind. Existential data will have to be stored somewhere other than on the player's
-computer, since other player will require the data, even in the absence of the player that might have left the game. GauthierDickey et al. did not
+computer, since other players will require the data, even in the absence of the player that might have left the game. GauthierDickey et al. did not
 explore how their data classification scheme might be translated into a state persistency model.
-
-\subsubsection{Summary and recommendations}
-
-Hybrid region-based storage is basically a combination of super peer and overlay storage techniques. This scheme, however, combines the best and
-worst of these two types of storage. The advantages of the scheme are:
-%
-\begin{enumerate}
-    \item There exists a high level of reliability, because of the presence of the backup overlay storage.
-    \item The system is very responsive due to the use of super peer storage.
-\end{enumerate}
-
-The disadvantages are:
-%
-\begin{enumerate}
-    \item The system is not secure, since super peers still have control of the data and because peers have to access the data through super
-        peers to achieve the desired level of responsiveness.
-    \item The system is also not fair. Even though all game states are distributed in the overlay, super peers are still required to store
-        another copy of the game world, extra to the data stored in the overlay.
-\end{enumerate}
-
-Hybrid region-based storage has all the advantages of super peer storage, but with the additional reliability of overlay storage. For this reason, it
-is recommended that any game requiring high levels of reliability and responsiveness use hybrid storage, instead of super peer storage. This storage
-type currently seems to be the most mature storage type, but the security issue limits the scope of games that might be implemented. For this reason,
-this storage type is still only usable for small independent MMOGs, where the risk of cheating is reduced by the social pressures of a small
-community, where all players no each other and play together frequently.
 
 \subsection{Distance-based storage}
 \label{distance_based_storage}
@@ -1275,9 +1165,7 @@ Multiple player interactions are, however, not as big an issue as others have su
 being used by a player is also hosted on that player's node. If another player requires use of a remotely hosted object, that player may still
 interact with the object, where the host node is now acting as a server to that player. This means that every player hosting an object becomes a
 server for that object. In the case where a player interacts with an object hosted locally, there is no object latency. In the case where a player
-accesses a remotely hosted object, there is only one hop latency, the same as with a C/S or super peer application. The advantage, however, is that
-the total server load for all objects is distributed amongst all peers, which means that each peer should have to handle less queries than with the
-super peer storage approach. This might protect peers from becoming overloaded and improve latency.
+accesses a remotely hosted object, there is only one hop latency, the same as with a C/S or super peer application.
 
 Issues with this approach stem from the fact the players are constantly moving. When players move, the objects in their regions change. Objects,
 therefore, have to be constantly handed over from one peer to another, which might cause significant network traffic. An object in transit might also
@@ -1353,7 +1241,7 @@ A thesis by Chang also describes the Voronoi approach in more detail and how to 
 \cite{Chang_Voronoi_state_management_masters}. What distinguishes this work from the others is the implementation of a load balancing mechanism. When
 peers get overloaded, another, more powerful peer is chosen as an Aggregator. The Aggregator assumes responsibility for a larger area that
 encompasses multiple peers. This scheme will reduce the load on peers with minimal resources, but it is uncertain how this would reduce load when
-peers with an average amount of resources in an area become overloaded.
+peers with an average number of resources in an area become overloaded.
 
 The works by Buyukkaya and Abdallah, Hu et al., and Chang form part of the VAST project, which is being created to be a fully functional P2P overlay
 architecture, using Voronoi diagrams as its basis \cite{VAST}. The reason why state persistency in Voronoi-based P2P MMOGs architectures are mostly
@@ -1361,7 +1249,88 @@ distance-based approaches, is because the Voronoi diagram immediately identifies
 objects that peer has to host. Architectures not making use of Voronoi diagrams still require some other mechanism to identify which objects which
 peers should host.
 
-\subsubsection{Summary and recommendations}
+\subsection{Summary and recommendations}
+
+To summarise, super peer storage makes use of regional super peers to store all primary object states for a particular region. The advantages of
+super peer storage are:
+%
+\begin{enumerate}
+    \item This type of state persistency is fairly easy to implement.
+    \item If all super peers are reliable, the storage will also be reliable.
+    \item The storage is as responsive as with C/S architectures, since a peer requiring data is always one hop away from a super peer possessing
+        the data.
+\end{enumerate}
+
+The disadvantages are:
+%
+\begin{enumerate}
+    \item Security is a concern for this storage method. The primary reason being that a single peer has access to the object states of an entire
+        region.
+    \item Super peer storage is unfair, since only a small percentage of peers in the network are selected for super peers and required to
+        contribute resources.
+    \item Super peers might become overloaded, which would increase the latency of storage operations and degrade overall performance.
+    \item If super peers are promoted from normal, unreliable peers, this type of storage requires replication mechanisms, to ensure robustness
+        to network churn. The architectures reviewed did not implement such mechanisms.
+\end{enumerate}
+
+No recent mention could be found of researchers implementing super peer storage for P2P MMOGs. This could mean that there has been very little
+evolution in super peer storage and that super peer storage is currently less mature than other storage schemes. Super peer storage might still be
+used for small independent casual games, such as online board games, where a group of friends can implicitly trust each other or where the risk of
+cheating is at a minimum. The reason why this storage method is recommended for games from independent developers, is because the scheme is easy to
+implement and will not require many resources when used for small games.
+
+The term ``overlay storage'' encompasses any distributed storage scheme, based on some P2P overlay. A disadvantage of overlay storage is its
+unresponsiveness, because of its average time of $\OO{\log(N)}$ to retrieve a data item. The advantages of such a scheme are:
+%
+\begin{enumerate}
+    \item The storage can be made very reliable, using replication and erasure codes.
+    \item Thus far, it is the most secure form of storage, because no authoritative peer is required to maintain object states. Because a true
+        peer-to-peer relationship remains, voting schemes might also be implemented to validate data that peers provide.
+    \item The storage is very fair, since all data stored are distributed amongst all peers in the network.
+\end{enumerate}
+
+%Overlay storage - reason
+Overlay storage is a popular storage method, currently used by most P2P MMOG architectures. This is believed to be more as a consequence of the use
+of Scribe \cite{scribe} than any inherit benefit to P2P MMOGs \cite{past_storage_focus}. This is also the motivation used in Chapter 4 of
+\cite{Fan_phd}, where the Mediator architecture is described. The reason for using overlay storage in so many implementations seem to be merely the
+availability of PAST, after having already decided to use Scribe. In other words, researchers use Scribe for ALM, Scribe runs on Pastry, and PAST is
+then a readily available overlay storage implementation which also runs on Pastry. The implementation of state persistency, however, does not need to
+be linked with the event dissemination scheme. A P2P overlay may be used for event dissemination, and another method can be used to ensure state
+persistency.
+
+Overlay storage is currently a mature storage scheme i.t.o. security, robustness and fairness, but its applicability to games is still uncertain.
+More data is required to determine what the latency requirements are for online games i.t.o. storage and whether overlays can meet these levels of
+responsiveness. No such studies could be found. Without such studies, overlay storage might still be applicable to games where data do not have to be
+committed to storage in real-time. Such games might implement state persistency in primary memory and use overlay storage as a long term backup
+method.
+
+Overlay storage will place some restrictions on certain game mechanics, but it is possible that games could be designed around these restrictions.
+The primary restriction being that data cannot be immediately retrieved from storage.
+
+
+
+Hybrid region-based storage is basically a combination of super peer and overlay storage techniques. This scheme, however, combines the best and
+worst of these two types of storage. The advantages of the scheme are:
+%
+\begin{enumerate}
+    \item There exists a high level of reliability, because of the presence of the backup overlay storage.
+    \item The system is very responsive due to the use of super peer storage.
+\end{enumerate}
+
+The disadvantages are:
+%
+\begin{enumerate}
+    \item The system is not secure, since super peers still have control of the data and because peers have to access the data through super
+        peers to achieve the desired level of responsiveness.
+    \item The system is also not fair. Even though all game states are distributed in the overlay, super peers are still required to store
+        another copy of the game world, extra to the data stored in the overlay.
+\end{enumerate}
+
+Hybrid region-based storage has all the advantages of super peer storage, but with the additional reliability of overlay storage. For this reason, it
+is recommended that any game requiring high levels of reliability and responsiveness use hybrid storage, instead of super peer storage. This storage
+type currently seems to be the most mature storage type, but the security issue limits the scope of games that might be implemented. For this reason,
+this storage type is still only usable for small independent MMOGs, where the risk of cheating is reduced by the social pressures of a small
+community, where all players no each other and play together frequently.
 
 In summary, distance based storage stores an object on a node that is closest to that object. The advantages of this storage method are:
 %
@@ -1397,8 +1366,6 @@ specifically geared towards data persistency in P2P MMOGs, that meet all the cha
 This survey was written, because of an identified need for a concise summary of the field of P2P MMOG game state persistency. Many techniques used in
 the past were used because of the ease with which they could be integrated into a P2P MMOG. The purpose of this survey is to identify those
 techniques and to stimulate further research, using empirical methods to compare the different storage techniques used.
-
-%None of the schemes are applicable to large MMOGs, well indie stuff.
 
 %\newpage
 %\IEEEtriggeratref{43} %Balance the bibliography
