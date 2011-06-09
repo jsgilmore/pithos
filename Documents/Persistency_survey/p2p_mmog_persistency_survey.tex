@@ -367,6 +367,8 @@ hashes to a circular key space. Any node in the overlay network is then able to 
 closest to the given ID. An accurate comparison is that unstructured overlays are good at finding ``hay'', while structured overlays are good at
 finding ``needles'' \cite{Rodrigues_acm_comms_p2p}.
 
+%TODO: Add something about the effect of the hashing and why it's important
+
 \subsection{Advantages}
 \label{p2p_advantages}
 
@@ -401,9 +403,17 @@ A recent article has identified six key challenges of P2P systems: Interest Mana
 Allocation, Game State Persistency, Cheating Mitigation and Incentive Mechanisms \cite{Fan_deisgn_issues_p2p}. A brief overview of these challenges
 will be introduced below.
 
-Of the six challenges mentioned, Interest Management, Game Event Dissemination and Game State Persistency all form part of State Consistency, with
-some aspects of Cheating Mitigation also a part of State Consistency. Also part of both state consistency and cheating mitigation is event ordering,
-which deals with how to ensure that the system remains causal \cite{GauthierDickey_low_latency_event_ordering}.
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=0cm 0cm 10cm 3cm, width=\columnwidth]{Component_VEN}
+ \caption{VEN diagram showing the relationship between different characteristics}
+ \label{fig_component_ven}
+\end{figure}
+%
+As shown in Figure \ref{fig_component_ven}, of the six challenges mentioned, Interest Management, Game Event Dissemination and Game State Persistency
+all form part of State Consistency, with some aspects of Cheating Mitigation also a part of State Consistency. Also part of both state consistency
+and cheating mitigation is event ordering, which deals with how to ensure that the system remains causal
+\cite{GauthierDickey_low_latency_event_ordering}.
 
 Another challenge for P2P systems is the required peer bandwidth. In a paper by Miller and Crowcroft, a packet simulator was created to determine the
 required bandwidth and effective latency, if a game such as World of Warcraft were to be implemented using P2P technologies
@@ -1249,29 +1259,13 @@ distance-based approaches, is because the Voronoi diagram immediately identifies
 objects that peer has to host. Architectures not making use of Voronoi diagrams still require some other mechanism to identify which objects which
 peers should host.
 
-\subsection{Summary and recommendations}
+\subsection{Recommendations}
 
-To summarise, super peer storage makes use of regional super peers to store all primary object states for a particular region. The advantages of
-super peer storage are:
-%
-\begin{enumerate}
-    \item This type of state persistency is fairly easy to implement.
-    \item If all super peers are reliable, the storage will also be reliable.
-    \item The storage is as responsive as with C/S architectures, since a peer requiring data is always one hop away from a super peer possessing
-        the data.
-\end{enumerate}
+For a summarised comparison of the different features of the different storage types, please refer to Table \ref{tab_storage}.
 
-The disadvantages are:
-%
-\begin{enumerate}
-    \item Security is a concern for this storage method. The primary reason being that a single peer has access to the object states of an entire
-        region.
-    \item Super peer storage is unfair, since only a small percentage of peers in the network are selected for super peers and required to
-        contribute resources.
-    \item Super peers might become overloaded, which would increase the latency of storage operations and degrade overall performance.
-    \item If super peers are promoted from normal, unreliable peers, this type of storage requires replication mechanisms, to ensure robustness
-        to network churn. The architectures reviewed did not implement such mechanisms.
-\end{enumerate}
+The different storage types vary greatly in implementation complexity as also shown in Table \ref{tab_storage}. The simplest type of storage to use
+is super peer storage, but because of the many issues present, this is not recommended. Only when one is sure that the super peers will not be
+overloaded should this storage method be used. There might still be some customers who are unhappy that a few have to serve data to the many.
 
 No recent mention could be found of researchers implementing super peer storage for P2P MMOGs. This could mean that there has been very little
 evolution in super peer storage and that super peer storage is currently less mature than other storage schemes. Super peer storage might still be
@@ -1279,82 +1273,34 @@ used for small independent casual games, such as online board games, where a gro
 cheating is at a minimum. The reason why this storage method is recommended for games from independent developers, is because the scheme is easy to
 implement and will not require many resources when used for small games.
 
-The term ``overlay storage'' encompasses any distributed storage scheme, based on some P2P overlay. A disadvantage of overlay storage is its
-unresponsiveness, because of its average time of $\OO{\log(N)}$ to retrieve a data item. The advantages of such a scheme are:
-%
-\begin{enumerate}
-    \item The storage can be made very reliable, using replication and erasure codes.
-    \item Thus far, it is the most secure form of storage, because no authoritative peer is required to maintain object states. Because a true
-        peer-to-peer relationship remains, voting schemes might also be implemented to validate data that peers provide.
-    \item The storage is very fair, since all data stored are distributed amongst all peers in the network.
-\end{enumerate}
+For developers who are looking for a simple yet fairly robust storage system to start using in their project, PAST overlay storage is recommended.
+PAST can be used for games that do not require low latency data access and would allow for lazy updating of the database. These games will be
+lightweight casual and social games. But, depending on the game implementation itself, this storage type might also be used for smaller hardcore
+games. Overlay storage will place some restrictions on certain game mechanics, but it is possible that games could be designed around these
+restrictions. The primary restriction being that data cannot be immediately retrieved or stored from or to storage.
 
-%Overlay storage - reason
-Overlay storage is a popular storage method, currently used by most P2P MMOG architectures. This is believed to be more as a consequence of the use
-of Scribe \cite{scribe} than any inherit benefit to P2P MMOGs \cite{past_storage_focus}. This is also the motivation used in Chapter 4 of
-\cite{Fan_phd}, where the Mediator architecture is described. The reason for using overlay storage in so many implementations seem to be merely the
-availability of PAST, after having already decided to use Scribe. In other words, researchers use Scribe for ALM, Scribe runs on Pastry, and PAST is
-then a readily available overlay storage implementation which also runs on Pastry. The implementation of state persistency, however, does not need to
-be linked with the event dissemination scheme. A P2P overlay may be used for event dissemination, and another method can be used to ensure state
-persistency.
-
-Overlay storage is currently a mature storage scheme i.t.o. security, robustness and fairness, but its applicability to games is still uncertain.
-More data is required to determine what the latency requirements are for online games i.t.o. storage and whether overlays can meet these levels of
-responsiveness. No such studies could be found. Without such studies, overlay storage might still be applicable to games where data do not have to be
-committed to storage in real-time. Such games might implement state persistency in primary memory and use overlay storage as a long term backup
-method.
-
-Overlay storage will place some restrictions on certain game mechanics, but it is possible that games could be designed around these restrictions.
-The primary restriction being that data cannot be immediately retrieved from storage.
-
-
-
-Hybrid region-based storage is basically a combination of super peer and overlay storage techniques. This scheme, however, combines the best and
-worst of these two types of storage. The advantages of the scheme are:
-%
-\begin{enumerate}
-    \item There exists a high level of reliability, because of the presence of the backup overlay storage.
-    \item The system is very responsive due to the use of super peer storage.
-\end{enumerate}
-
-The disadvantages are:
-%
-\begin{enumerate}
-    \item The system is not secure, since super peers still have control of the data and because peers have to access the data through super
-        peers to achieve the desired level of responsiveness.
-    \item The system is also not fair. Even though all game states are distributed in the overlay, super peers are still required to store
-        another copy of the game world, extra to the data stored in the overlay.
-\end{enumerate}
+PAST is also not the only overlay storage type that can be used, Freenet and Oceanstore are alternatives and any other overlay storage that is based
+on a DHT overlay could conceivably be used. Storage based on DHT overlays is still a viable research field and future implementations will improve on
+the present systems.
 
 Hybrid region-based storage has all the advantages of super peer storage, but with the additional reliability of overlay storage. For this reason, it
-is recommended that any game requiring high levels of reliability and responsiveness use hybrid storage, instead of super peer storage. This storage
-type currently seems to be the most mature storage type, but the security issue limits the scope of games that might be implemented. For this reason,
-this storage type is still only usable for small independent MMOGs, where the risk of cheating is reduced by the social pressures of a small
-community, where all players no each other and play together frequently.
+is recommended that any game presently requiring high levels of reliability and responsiveness use hybrid storage, instead of super peer or overlay
+storage. This storage type currently seems to be the only type applicable to games that require responsive and reliable storage.
 
-In summary, distance based storage stores an object on a node that is closest to that object. The advantages of this storage method are:
-%
-\begin{enumerate}
-    \item Distance-based storage is at worst as responsive as C/S storage or super peer storage and at best as responsive as local storage.
-    \item Distance-based storage is relatively fair, since all nodes store all data. Load balancing techniques might be required to support nodes
-        near high numbers of objects.
-\end{enumerate}
+%Implementation complexity of hybrid storage
+That said, no existing implementations could be found that implement this type of storage for public use. The consequence is that someone who wishes
+to use this storage will mostly have to implement it. This can be done by starting out with super peer storage and using a publicly available overlay
+storage to augment the super peer storage.
 
-Some disadvantages are:
-%
-\begin{enumerate}
-    \item Distance based storage is not yet reliable, since no replication schemes have been investigated to support a network with churn.
-    \item Security is also a concern for distance-based storage, for the same reason as super peer storage. It might even be more of a concern,
-        since the nodes hosting objects have an incentive to manipulate those objects.
-\end{enumerate}
-
-Distance based storage is still fairly immature, but shows a lot of promise. Even though the storage is not yet reliable, it could conceivably be
-possible to add overlay storage as a backup to the system and thereby add reliability. If voting techniques can be used to update game state, some of
-the security issues might also be solved. With these two issues addressed, the high farness of the storage makes it an excellent candidate to power
-the P2P MMOGs of the future.
+Distance based storage is still fairly immature, but shows a lot of promise. No publicly available implementation could be found for this type of
+storage. Where this type of storage was used, it was explained as distance based storage, but most of the details were left out. This storage is,
+therefore, not a candidate as a storage technique for developers that are merely looking for a storage system to use presently. This type of storage
+does, however, provide a lot of opportunities for research.
 
 \section{Conclusion}
 
+\subsection{Summary}
+%Paper summary
 After providing an overview of the classic C/S and C/MS state persistency techniques, this survey classified P2P MMOG state persistency techniques
 into super peer based, overlay based, distance based and hybrid storage. The advantages and disadvantages of each method were discussed after
 identifying key challenges that state persistency techniques have to solve. These challenges are: Reliability, Security, Fairness and Responsiveness.
@@ -1363,9 +1309,65 @@ We conclude that there exists no single state persistency architecture, currentl
 reviewed meet the requirements of a real-time distributed application, such as an MMOG. What is required is a state persistency architecture,
 specifically geared towards data persistency in P2P MMOGs, that meet all the challenges of the application.
 
+%Reason for paper
 This survey was written, because of an identified need for a concise summary of the field of P2P MMOG game state persistency. Many techniques used in
 the past were used because of the ease with which they could be integrated into a P2P MMOG. The purpose of this survey is to identify those
 techniques and to stimulate further research, using empirical methods to compare the different storage techniques used.
+
+\subsection{Future work}
+%How to address storage challenges
+One of three paths may be followed in order to create a storage type that is suitable to modern hardcore MMOGs. The first would be to take a look at
+the deficiencies mentioned in the different storage types and to then improve one of these types. The other path is what was seen with hybrid
+storage, where multiple types of storage are combined in order to form a new and improved storage type. The third path would be to create a new
+storage type, based on some novel insight into the ways in which games are designed.
+
+%What are some of the challenges of the different storage types
+What follows is a discussion on what work is required in order to improve the current storage types and attempts to define the gaps present that
+should still be solved by future researchers. For super peer storage to become viable, a means is required to secure the data stored in the super
+peers and ensure that no super peer is able to access the data stored. If this issue is solved, the fairness issue still exists, but might be
+allowable depending on the type of application.
+
+%Overlay storage - reason
+Overlay storage is a popular storage method in the literature. This is believed to be more as a consequence of the use of Scribe \cite{scribe} than
+any inherit benefit to P2P MMOGs \cite{past_storage_focus}. This is also the motivation used in Chapter 4 of \cite{Fan_phd}, where the Mediator
+architecture is described. The reason for using overlay storage in so many implementations seem to be merely the availability of PAST, after having
+already decided to use Scribe. In other words, researchers use Scribe for ALM, Scribe runs on Pastry, and PAST is then a readily available overlay
+storage implementation which also runs on Pastry. The implementation of state persistency, however, does not need to be linked with the event
+dissemination scheme. A P2P overlay may be used for event dissemination, and another method can be used to ensure state persistency.
+
+The applicability of PAST to MMOGs is still unknown and further research is required as to the applicability of PAST. It is possible that PAST is not
+at all suited to MMOGs and this possibility has not been explored in literature. This paper showed that while PAST is regularly used in P2P MMOGs, it
+is not because of the applicability of PAST to P2P MMOGs.
+
+One type of hybrid storage was investigated in this paper, namely overlay/super peer storage, since this is a hybrid type currently seen in P2P
+MMOGs. Other hybrid types should also be investigated, for example a distance based/overlay storage hybrid might improve the reliability of distance
+based storage. Multi-tiered storage might also be of interest, where players or areas are grouped in some way. One type of storage might then be
+implemented amongst the members of a group, with another storage type implemented over all groups. Such a storage type might improve responsiveness
+amongst group members, while adding reliability because of an inter-group backup mechanism.
+
+Distance-based storage still seems immature, with many open questions. Currently, distance-based storage is based on Voronoi diagrams, which seem
+promising. But Voronoi diagrams only provide for a means to identify which objects should be under a specific node's control. Object migration, which
+will occur frequently in this type of storage should still be addressed. The number of migrations should be kept to a minimum to ensure responsive
+access to all stored objects.
+
+The storage is also not yet reliable, but it could be possible to add overlay storage as a backup to the system and thereby add reliability. If
+voting techniques can be used to update game state, some of the security issues might also be solved. With these two issues addressed, the high
+degree of fairness of distance-based storage makes it an excellent candidate to power the P2P MMOGs of the future.
+
+%Performance comparison of storage
+An empirical comparison of the performances of the different storage types is also required. It is believed that the metrics presented in this paper
+could provide a common basis to use in comparing the different storage types.
+
+%Need for storage characteristics
+Research is still required into the characteristics of data stored by MMOGs. This includes how regularly game objects are stored as well as the sizes
+of these objects. It is also expected that different read and write patterns exist for different types of game objects. These patterns should be
+explored in order to determine what the required performance is for P2P MMOGs storage mechanisms. It is recommended that C/S MMOG storage patterns
+initially be investigated to provide a benchmark of the required storage performance for a mature MMOGs. The storage patterns for a C/S compared to
+P2P MMOGs might be different. The storage patterns amongst different MMOGs might also differ greatly, but for an immature field any data is better
+than no data. More data is also required to determine what the latency requirements are for online games i.t.o. storage and whether the storage types
+discussed can meet these levels of responsiveness. No such studies could be found.
+
+In conclusion, this paper describes a possible new research field with many open questions still to be answered.
 
 %\newpage
 %\IEEEtriggeratref{43} %Balance the bibliography
