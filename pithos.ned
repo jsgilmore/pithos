@@ -18,7 +18,7 @@ package oversim.applications.Pithos;
 import oversim.common.BaseApp;
 import oversim.common.ITier;
 
-simple Game
+simple Game extends BaseApp
 {
     parameters:
         @class(Game);
@@ -27,8 +27,27 @@ simple Game
         double avObjectSize = default(1024);	//1 KB average
         double wait_time @unit(s);
         double generation_time @unit(s);
+}
+
+module GameModule like ITier
+{
     gates:
-        inout gate;
+        input from_lowerTier;    // gate from the lower tier
+        input from_upperTier;    // gate from the upper tier
+        input udpIn;    // gate from the UDP layer
+        input trace_in;    // gate for trace file commands
+        input tcpIn;             // gate from the TCP layer
+        output tcpOut;           // gate to the TCP layer
+        output to_lowerTier;    // gate to the lower tier
+        output to_upperTier;    // gate to the upper tier
+        output udpOut;    // gate to the UDP layer
+
+    submodules:
+        game: Game;
+    connections allowunconnected:
+        from_lowerTier --> game.from_lowerTier;
+        to_lowerTier <-- game.to_lowerTier;
+        trace_in --> game.trace_in;
 }
 
 simple Storage
@@ -42,16 +61,16 @@ simple Storage
         @statistic[qlen](title="queue length"; record=vector,timeavg,max; interpolationmode=sample-hold);
         @statistic[qsize](title="queue size"; record=vector,timeavg,max; interpolationmode=sample-hold);
         @statistic[queueingTime](title="queueing time at dequeue"; unit=s; interpolationmode=none);
-        @statistic[storeTime](title="time taken to store an object"; record=histogram, vector,timeavg; interpolationmode=sample-hold);
-        
+        @statistic[storeTime](title="time taken to store an object"; record=histogram,vector,timeavg; interpolationmode=sample-hold);
+
         @signal[storeTime](type="simtime_t");
         @signal[rootStoreTime](type="simtime_t");
         @signal[replicaStoreTime](type="simtime_t");
         @signal[overlayStoreTime](type="simtime_t");
-        @statistic[storeTime](title="time taken to store a root object"; record=histogram, vector,timeavg; interpolationmode=sample-hold);
-        @statistic[rootStoreTime](title="time taken to store a replica object"; record=histogram, vector,timeavg; interpolationmode=sample-hold);
-        @statistic[replicaStoreTime](title="time taken to store an overlay object"; record=histogram, vector,timeavg; interpolationmode=sample-hold);
-        @statistic[overlayStoreTime](title="time taken to store an object"; record=histogram, vector,timeavg; interpolationmode=sample-hold);
+        @statistic[storeTime](title="time taken to store a root object"; record=histogram,vector,timeavg; interpolationmode=sample-hold);
+        @statistic[rootStoreTime](title="time taken to store a replica object"; record=histogram,vector,timeavg; interpolationmode=sample-hold);
+        @statistic[replicaStoreTime](title="time taken to store an overlay object"; record=histogram,vector,timeavg; interpolationmode=sample-hold);
+        @statistic[overlayStoreTime](title="time taken to store an object"; record=histogram,vector,timeavg; interpolationmode=sample-hold);
 
         @signal[OverlayObject](type="int");
         @signal[RootObject](type="int");
@@ -69,27 +88,28 @@ simple Peer_logic
     parameters:
         @class(Peer_logic);
         @display("i=block/cogwheel");
-        
+
         @signal[busy](type="bool");
         @signal[GroupSize](type="int");
         @signal[GroupSendFail](type="int");
         @signal[JoinTime](type="simtime_t");
-        
+
         @statistic[JoinTime](title="group join time"; record=last);
         @statistic[busy](title="server busy state"; record=vector,timeavg; interpolationmode=sample-hold);
         @statistic[GroupSize](title="Group size"; record=sum);
         @statistic[GroupSendFail](title="Group send fails"; record=sum);
-        
+
         int replicas_g = 3;
         int replicas_sp = 1;
-        string  directory_ip;
-        int  directory_port;
+        string directory_ip;
+        int directory_port;
         double wait_time @unit(s);
     gates:
         inout comms_gate;
         output write;
         input read;
-        inout game;
+        input from_upperTier;    // gate from the upper tier
+        output to_upperTier;     // gate to the upper tier
 }
 
 simple Super_peer_logic
@@ -98,10 +118,10 @@ simple Super_peer_logic
         @class(Super_peer_logic);
         @display("i=block/cogwheel");
         double wait_time @unit(s);
-        
-        string  directory_ip;
-        int  directory_port;
-        
+
+        string directory_ip;
+        int directory_port;
+
         @signal[OverlayWrite](type="int");
         @signal[GroupSize](type="int");
         @signal[OverlayDelivered](type="int");
@@ -109,7 +129,7 @@ simple Super_peer_logic
         @signal[JoinTime](type="simtime_t");
         @signal[StoreNumber](type="int");
         @signal[OverlayNumber](type="int");
-        
+
         @statistic[OverlayNumber](title="Number of overlay files in the group"; record=sum);
         @statistic[StoreNumber](title="Number of root/replica files in the group"; record=sum);
         @statistic[JoinTime](title="group join time"; record=vector);
@@ -128,6 +148,8 @@ simple Communicator extends BaseApp
         @display("i=block/join");
     gates:
         inout peer_gate;
+        output toPeer_fromUpper;
+        input fromPeer_toUpper;
         inout sp_gate @loose;
 }
 
@@ -148,17 +170,19 @@ module Peer like ITier
     submodules:
         peer_logic: Peer_logic;
         storage: Storage;
-        game: Game;
         communicator: Communicator;
     connections allowunconnected:
-        game.gate <--> peer_logic.game;
         peer_logic.write --> storage.write;
         storage.read --> peer_logic.read;
         communicator.peer_gate <--> peer_logic.comms_gate;
+        communicator.toPeer_fromUpper --> peer_logic.from_upperTier;
+        communicator.fromPeer_toUpper <-- peer_logic.to_upperTier;
 
         //Connections to the Oversim simulation modules
         from_lowerTier --> communicator.from_lowerTier;
         to_lowerTier <-- communicator.to_lowerTier;
+        from_upperTier --> communicator.from_upperTier;
+        to_upperTier <-- communicator.to_upperTier;
         udpIn --> communicator.udpIn;
         udpOut <-- communicator.udpOut;
         tcpIn --> communicator.tcpIn;
@@ -181,25 +205,25 @@ module Super_peer like ITier
         input tcpIn;             // gate from the TCP layer
         output tcpOut;           // gate to the TCP layer
     submodules:
-        peer_logic: Peer_logic {
-            @display("p=230,193");
-        }
+        peer_logic: Peer_logic;
         super_peer_logic: Super_peer_logic;
         storage: Storage;
-        game: Game;
         communicator: Communicator;
     connections allowunconnected:
         //Internal connection to the peer_logic, storage and game modules
-        game.gate <--> peer_logic.game;
         peer_logic.write --> storage.write;
         storage.read --> peer_logic.read;
 
         communicator.peer_gate <--> peer_logic.comms_gate;
         communicator.sp_gate <--> super_peer_logic.comms_gate;
+        communicator.toPeer_fromUpper --> peer_logic.from_upperTier;
+        communicator.fromPeer_toUpper <-- peer_logic.to_upperTier;
 
 		//Connections to the Oversim simulation modules
         from_lowerTier --> communicator.from_lowerTier;
         to_lowerTier <-- communicator.to_lowerTier;
+        from_upperTier --> communicator.from_upperTier;
+        to_upperTier <-- communicator.to_upperTier;
         udpIn --> communicator.udpIn;
         udpOut <-- communicator.udpOut;
         tcpIn --> communicator.tcpIn;
@@ -212,10 +236,10 @@ simple Directory_logic extends BaseApp
     parameters:
         @class(Directory_logic);
         @display("i=block/cogwheel");
-        
+
         @signal[SuperPeerNum](type="int");
         @signal[noSuperPeers](type="int");
-        
+
         @statistic[SuperPeerNum](title="Number of Super Peers"; record=sum);
         @statistic[noSuperPeers](title="Number of times when no Super Peers were present"; record=sum);
 }
@@ -235,7 +259,7 @@ module Directory like ITier
         input tcpIn;             // gate from the TCP layer
         output tcpOut;           // gate to the TCP layer
     submodules:
-        directory_logic : Directory_logic;
+        directory_logic: Directory_logic;
     connections allowunconnected:
         //Connections to the Oversim simulation modules
         from_lowerTier --> directory_logic.from_lowerTier;

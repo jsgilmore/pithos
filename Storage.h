@@ -19,7 +19,6 @@
 #include <omnetpp.h>
 #include <assert.h>
 
-#include "Message_m.h"
 #include "GameObject.h"
 
 class Storage : public cSimpleModule

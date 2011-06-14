@@ -68,6 +68,33 @@ void Communicator::handleTimerEvent(cMessage* msg)
 
 }
 
+void Communicator::handleUpperMessage (cMessage *msg)
+{
+	send(msg, "toPeer_fromUpper");		//This is the storage request from the game module
+}
+
+bool Communicator::handleRpcCall(BaseCallMessage *msg)
+{
+
+    // There are many macros to simplify the handling of RPCs. The full list is in <OverSim>/src/common/RpcMacros.h.
+
+    // start a switch
+    RPC_SWITCH_START(msg);
+
+    // enters the following block if the message is of type MyNeighborCall (note the shortened parameter!)
+    RPC_ON_CALL(DHTputCAPI) {
+    	DHTputCAPICall* capiPutMsg = (DHTputCAPICall*)msg;          // get Call message
+
+    }
+
+    // end the switch
+    RPC_SWITCH_END();
+
+    // return whether we handled the message or not.
+    // don't delete unhandled messages!
+    return RPC_HANDLED;
+}
+
 // deliver() is called when we receive a message from the overlay.
 // Unknown packets can be safely deleted here.
 void Communicator::deliver(OverlayKey& key, cMessage* msg)
@@ -111,7 +138,6 @@ void Communicator::handleUDPMessage(cMessage* msg)
 	}
 	else if (packet->getPayloadType() == JOIN_ACCEPT)
 	{
-		//joinOverlay ();		//Since this super peer is now aware of other peers and therefore has storage capacity, join the overlay.
 		send(msg, "peer_gate$o");
 	}
 	else if (packet->getPayloadType() == JOIN_REQ)
@@ -200,5 +226,9 @@ void Communicator::handleMessage(cMessage *msg)
 	else if (strcmp(msg->getArrivalGate()->getName(), "peer_gate$i") == 0)
 	{
 		handlePeerMsg(msg);
+	}
+	else if (strcmp(msg->getArrivalGate()->getName(), "fromPeer_toUpper") == 0)
+	{
+		send(msg, "to_upperTier");
 	} else BaseApp::handleMessage(msg);
 }

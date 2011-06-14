@@ -49,14 +49,6 @@ void Peer_logic::initialize()
 	longitude = uniform(0,100);		//Make this range changeable
 }
 
-void Peer_logic::handleRequest(cMessage *msg)
-{
-	Message *m = check_and_cast<Message *>(msg);
-	EV << getParentModule()->getName() << " " << getParentModule()->getIndex() << " received store request of size " << m->getValue() << "\n";
-
-	sendObjectForStore(m->getValue());
-}
-
 void Peer_logic::addPeers(cMessage *msg)
 {
 	PeerListPkt *list_p = check_and_cast<PeerListPkt *>(msg);
@@ -69,8 +61,8 @@ void Peer_logic::addPeers(cMessage *msg)
 	//This is also the time when we record that we've successfully joined a group (When we've joined a super peer and we know of other peers in the group).
 	if ((group_peers.size() == 0) && (list_p->getPeer_listArraySize() > 0))
 	{
-		cMessage *request_start = new cMessage("request_start");
-		send(request_start, "game$o");
+		cPacket *request_start = new cPacket("request_start");
+		send(request_start, "to_upperTier");
 
 		emit(joinTimeSignal, joinTime);
 	}
@@ -144,54 +136,45 @@ void Peer_logic::handleP2PMsg(cMessage *msg)
 	}
 }
 
-void Peer_logic::joinRequest(const TransportAddress &dest_adr)
+void Peer_logic::OverlayStore(GameObject *go, std::vector<TransportAddress> send_list)
 {
-	if (dest_adr.isUnspecified())
-		error("Destination address is unspecified when requesting a join.\n");
+	simtime_t sendDelay;
+	int overlay_replicas = par("replicas_sp");
 
-	bootstrapPkt *boot_p = new bootstrapPkt();
 	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
 	TransportAddress sourceAdr(thisNode->getIp(), thisNode->getPort());
 
-	boot_p->setSourceAddress(sourceAdr);
-	boot_p->setDestinationAddress(dest_adr);
-	boot_p->setPayloadType(JOIN_REQ);
-	boot_p->setName("join_req");
-	boot_p->setLatitude(latitude);
-	boot_p->setLongitude(longitude);
-	boot_p->setByteLength(4+4+4+8+8);	//Src IP as #, Dest IP as #, Type, Lat, Long
+	PeerListPkt *overlay_write = new PeerListPkt();
+	overlay_write->setByteLength(4+4+4+4+8+go->getSize()+(send_list.size()*4));	//Source address, dest address, type, value, object name ID, object size, storage peer addresses
 
-	send(boot_p, "comms_gate$o");
-}
-
-void Peer_logic::handleMessage(cMessage *msg)
-{
-	if (msg == event)
+	if (super_peer_address.isUnspecified())
 	{
-		//For the first join request, a request is sent to the well known directory server
-		IPAddress dest_ip(directory_ip);
-		TransportAddress destAdr(dest_ip, directory_port);
+		//TODO: This error condition should be logged
+		EV << "No super peer has been identified. The object will not be replicated in the Overlay\n";
+		delete(overlay_write);
+		delete(go);
+		return;
+	}
 
-		joinRequest(destAdr);
+	go->setType(OVERLAY);
 
-		scheduleAt(simTime()+1, event);		//TODO: make the 1 second wait time a configuration variable that may be set
-	}
-	else if (strcmp(msg->getArrivalGate()->getName(), "game$i") == 0)
+	overlay_write->setPayloadType(OVERLAY_WRITE_REQ);
+	overlay_write->setSourceAddress(sourceAdr);
+	overlay_write->setValue(overlay_replicas);
+	overlay_write->setName("overlay_write_req");
+	overlay_write->setDestinationAddress(super_peer_address);
+	overlay_write->addObject(go);
+
+	//Add the addresses of the other peers that have stored the data to the message
+	for (unsigned int i = 0 ; i < send_list.size() ; i++)
 	{
-		//A storage request was received from the game or higher layer. This is data that should be stored in the network
-		handleRequest(msg);
-		delete(msg);
+		PeerData peer_d;
+		peer_d.setAddress(send_list.at(i));
+		overlay_write->setPeer_list(i, peer_d);
 	}
-	else if (strcmp(msg->getArrivalGate()->getName(), "comms_gate$i") == 0)
-	{
-		//Data was received from the UDP layer by the communicator and has been referred to the Peer logic
-		handleP2PMsg(msg);
-		delete(msg);
-	}
-	else {
-		error("Illegal message received");
-		delete(msg);
-	}
+
+	send(overlay_write, "comms_gate$o");		//Set address
+	emit(busySignal, 0);
 }
 
 void Peer_logic::GroupStore(groupPkt *write, GameObject *go, std::vector<TransportAddress> send_list)
@@ -255,47 +238,6 @@ void Peer_logic::GroupStore(groupPkt *write, GameObject *go, std::vector<Transpo
 	delete(write);
 }
 
-void Peer_logic::OverlayStore(GameObject *go, std::vector<TransportAddress> send_list)
-{
-	simtime_t sendDelay;
-	int overlay_replicas = par("replicas_sp");
-
-	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
-	TransportAddress sourceAdr(thisNode->getIp(), thisNode->getPort());
-
-	PeerListPkt *overlay_write = new PeerListPkt();
-	overlay_write->setByteLength(4+4+4+4+8+go->getSize()+(send_list.size()*4));	//Source address, dest address, type, value, object name ID, object size, storage peer addresses
-
-	if (super_peer_address.isUnspecified())
-	{
-		//TODO: This error condition should be logged
-		EV << "No super peer has been identified. The object will not be replicated in the Overlay\n";
-		delete(overlay_write);
-		delete(go);
-		return;
-	}
-
-	go->setType(OVERLAY);
-
-	overlay_write->setPayloadType(OVERLAY_WRITE_REQ);
-	overlay_write->setSourceAddress(sourceAdr);
-	overlay_write->setValue(overlay_replicas);
-	overlay_write->setName("overlay_write_req");
-	overlay_write->setDestinationAddress(super_peer_address);
-	overlay_write->addObject(go);
-
-	//Add the addresses of the other peers that have stored the data to the message
-	for (unsigned int i = 0 ; i < send_list.size() ; i++)
-	{
-		PeerData peer_d;
-		peer_d.setAddress(send_list.at(i));
-		overlay_write->setPeer_list(i, peer_d);
-	}
-
-	send(overlay_write, "comms_gate$o");		//Set address
-	emit(busySignal, 0);
-}
-
 //TODO: This branch of functions can be implemented much more elegantly
 void Peer_logic::sendObjectForStore(int64_t o_size)
 {
@@ -330,4 +272,62 @@ void Peer_logic::sendObjectForStore(int64_t o_size)
 	OverlayStore(go, send_list);	//Send the message to be stored on the specified number of replicas in the overlay.
 
 	numSentForStore++;
+}
+
+void Peer_logic::handleRequest(cMessage *msg)
+{
+	groupPkt *m = check_and_cast<groupPkt *>(msg);
+	EV << getParentModule()->getName() << " " << getParentModule()->getIndex() << " received store request of size " << m->getValue() << "\n";
+
+	sendObjectForStore(m->getValue());
+}
+
+void Peer_logic::joinRequest(const TransportAddress &dest_adr)
+{
+	if (dest_adr.isUnspecified())
+		error("Destination address is unspecified when requesting a join.\n");
+
+	bootstrapPkt *boot_p = new bootstrapPkt();
+	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
+	TransportAddress sourceAdr(thisNode->getIp(), thisNode->getPort());
+
+	boot_p->setSourceAddress(sourceAdr);
+	boot_p->setDestinationAddress(dest_adr);
+	boot_p->setPayloadType(JOIN_REQ);
+	boot_p->setName("join_req");
+	boot_p->setLatitude(latitude);
+	boot_p->setLongitude(longitude);
+	boot_p->setByteLength(4+4+4+8+8);	//Src IP as #, Dest IP as #, Type, Lat, Long
+
+	send(boot_p, "comms_gate$o");
+}
+
+void Peer_logic::handleMessage(cMessage *msg)
+{
+	if (msg == event)
+	{
+		//For the first join request, a request is sent to the well known directory server
+		IPAddress dest_ip(directory_ip);
+		TransportAddress destAdr(dest_ip, directory_port);
+
+		joinRequest(destAdr);
+
+		scheduleAt(simTime()+1, event);		//TODO: make the 1 second wait time a configuration variable that may be set
+	}
+	else if (strcmp(msg->getArrivalGate()->getName(), "from_upperTier") == 0)
+	{
+		//A storage request was received from the game or higher layer. This is data that should be stored in the network
+		handleRequest(msg);
+		delete(msg);
+	}
+	else if (strcmp(msg->getArrivalGate()->getName(), "comms_gate$i") == 0)
+	{
+		//Data was received from the UDP layer by the communicator and has been referred to the Peer logic
+		handleP2PMsg(msg);
+		delete(msg);
+	}
+	else {
+		error("Illegal message received");
+		delete(msg);
+	}
 }

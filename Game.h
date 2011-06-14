@@ -17,10 +17,11 @@
 #define GAME_H_
 
 #include <omnetpp.h>
+#include <BaseApp.h>
 
-#include "Message_m.h"
+#include "groupPkt_m.h"
 
-class Game : public cSimpleModule
+class Game : public BaseApp
 {
 	private:
 		simtime_t writeTime_av;
@@ -33,8 +34,13 @@ class Game : public cSimpleModule
 		Game();
 		virtual ~Game();
 	protected:
-		virtual void initialize();
-		virtual void handleMessage(cMessage *msg);
+		// application routines
+		void initializeApp(int stage);                 // called when the module is being created
+		void finishApp();                              // called when the module is about to be destroyed
+		void handleTimerEvent(cMessage* msg);          // called when we received a timer message
+		void handleLowerMessage (cMessage *msg);
+		void deliver(OverlayKey& key, cMessage* msg);  // called when we receive a message from the overlay
+
 		void sendRequest();
 };
 

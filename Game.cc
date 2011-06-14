@@ -26,8 +26,10 @@ Game::~Game() {
 	cancelAndDelete(event);
 }
 
-void Game::initialize()
+void Game::initializeApp(int stage)
 {
+	if (stage != MIN_STAGE_APP) return;
+
 	writeTime_av = par("avWriteTime");
 	objectSize_av = par("avObjectSize");
 	wait_time = par("wait_time");
@@ -36,24 +38,13 @@ void Game::initialize()
 	event = new cMessage("event");
 }
 
-void Game::sendRequest()
+void Game::finishApp()
 {
-	char msgName [20];
-	int64_t filesize = exponential(objectSize_av);
-	Message *write_msg = new Message("storReq");
-	sprintf(msgName, "store_req-%d", getParentModule()->getIndex());
-	write_msg->setName(msgName);
-	write_msg->setValue(filesize);
-	write_msg->setPayloadType(STORE_REQ);
-	send(write_msg, "gate$o");
-	write_msg = NULL;
+
 }
 
-void Game::handleMessage(cMessage *msg)
+void Game::handleTimerEvent(cMessage* msg)
 {
-	//This module is only connected to the peer_logic module, so we know exactly what we can expect to receive.
-	//This module can receive two types of messages, but they have the same effect. An event that was scheduled can be received, but a cMessage is also expected from the peer_logic module to initiate request generation.
-	//This message is received
 	if (msg == event)
 	{
 		if (simTime() < generationTime + wait_time + join_time)	//This should ensure that the simulation ends.
@@ -62,8 +53,12 @@ void Game::handleMessage(cMessage *msg)
 
 			scheduleAt(simTime()+exponential(writeTime_av), event);
 		}
-	}
-	else if (strcmp(msg->getName(), "request_start") == 0)
+	} else error("Game received unknown timer message\n");
+}
+
+void Game::handleLowerMessage (cMessage *msg)
+{
+	if (strcmp(msg->getName(), "request_start") == 0)
 	{
 		join_time = simTime() - wait_time;		//Adding join time gives every game module the same time to send successful requests
 
@@ -80,4 +75,22 @@ void Game::handleMessage(cMessage *msg)
 		delete(msg);
 	}
 	else error("Game received unknown message\n");
+}
+
+void Game::deliver(OverlayKey& key, cMessage* msg)
+{
+	error("Game module received overlay message, which should be impossible");
+	return;	//We're not expecting anything here
+}
+
+void Game::sendRequest()
+{
+	char msgName [20];
+	int64_t filesize = exponential(objectSize_av);
+	groupPkt *write_pkt = new groupPkt();
+	sprintf(msgName, "store_req-%d", getParentModule()->getIndex());
+	write_pkt->setName(msgName);
+	write_pkt->setValue(filesize);
+	write_pkt->setPayloadType(STORE_REQ);
+	send(write_pkt, "to_lowerTier");
 }

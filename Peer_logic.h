@@ -24,7 +24,6 @@
 #include "GameObject.h"
 #include "PeerData.h"
 
-#include "Message_m.h"
 #include "groupPkt_m.h"
 #include "bootstrapPkt_m.h"
 #include "PeerListPkt.h"

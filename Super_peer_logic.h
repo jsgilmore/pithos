@@ -23,7 +23,6 @@
 #include "OverlayKey.h"
 #include "ObjectInfo.h"
 
-#include "Message_m.h"
 #include "PeerListPkt.h"
 #include "PeerData.h"
 #include "overlayPkt_m.h"

@@ -56,6 +56,8 @@ class Communicator : public BaseApp
 		void handleTimerEvent(cMessage* msg);          // called when we received a timer message
 		void deliver(OverlayKey& key, cMessage* msg);  // called when we receive a message from the overlay
 		void handleUDPMessage(cMessage* msg);          // called when we receive a UDP message
+		void handleUpperMessage (cMessage *msg);
+		bool handleRpcCall(BaseCallMessage *msg);
 
 		void handleSPMsg(cMessage *msg);
 		void handlePeerMsg(cMessage *msg);

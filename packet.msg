@@ -36,4 +36,5 @@ enum PacketTypes
     SUPER_PEER_ADD = 4;
     JOIN_REQ = 5;
     JOIN_ACCEPT = 6;
+    STORE_REQ = 7;
 };
