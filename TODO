@@ -21,3 +21,35 @@ Valgrind leak check summary with mostly static objects and const *
 ==7228==      possibly lost: 5,649,172 bytes in 372 blocks
 ==7228==    still reachable: 4,240 bytes in 153 blocks
 ==7228==         suppressed: 0 bytes in 0 blocks
+
+The Pithos configuration should be stored:
+
+[Config Pithos]
+description = Combined Peer/ Super peer network
+**.churnGeneratorTypes = "oversim.common.NoChurn oversim.common.NoChurn oversim.common.NoChurn"
+
+**-0[*].overlayType = "oversim.applications.i3.OverlayDummyModules"
+**-0[*].tier1Type = "oversim.applications.Pithos.Directory"
+**.churnGenerator[0].targetOverlayTerminalNum = 1
+**.churnGenerator[0].initPhaseCreationInterval = 0.001s
+
+**-1[*].numTiers = 2
+**-1[*].overlayType = "oversim.overlay.chord.ChordModules"
+**-1[*].tier1Type = "oversim.applications.Pithos.Super_peer"
+**-1[*].tier2Type = "oversim.applications.Pithos.GameModule"
+**-1[*].neighborCache.enableNeighborCache = true
+**.churnGenerator[1].targetOverlayTerminalNum = 15
+**.churnGenerator[1].initPhaseCreationInterval = 0.001s
+
+**-2[*].numTiers = 2
+**-2[*].overlayType = "oversim.applications.i3.OverlayDummyModules"
+**-2[*].tier1Type = "oversim.applications.Pithos.Peer"
+**-2[*].tier2Type = "oversim.applications.Pithos.GameModule"
+**.churnGenerator[2].targetOverlayTerminalNum = 300
+**.churnGenerator[2].initPhaseCreationInterval = 0.1s
+**.directory_ip = "1.0.0.1"
+**.directory_port = 2000
+**.wait_time = 1000s
+**.generation_time = 30s
+
+sim-time-limit = 20000s
