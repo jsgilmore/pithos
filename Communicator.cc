@@ -83,8 +83,21 @@ bool Communicator::handleRpcCall(BaseCallMessage *msg)
 
     // enters the following block if the message is of type MyNeighborCall (note the shortened parameter!)
     RPC_ON_CALL(DHTputCAPI) {
+    	groupPkt *write_pkt;
     	DHTputCAPICall* capiPutMsg = (DHTputCAPICall*)msg;          // get Call message
+    	char *size_str = new char[capiPutMsg->getValue().size()];
+    	double filesize;
 
+    	copy (capiPutMsg->getValue().begin(), capiPutMsg->getValue().end(), size_str);
+    	filesize = atof(size_str);
+
+    	write_pkt = new groupPkt();
+    	write_pkt->setName(capiPutMsg->getName());
+    	write_pkt->setValue(filesize);
+    	write_pkt->setPayloadType(STORE_REQ);
+    	send(write_pkt, "toPeer_fromUpper");
+
+		delete(size_str);
     }
 
     // end the switch

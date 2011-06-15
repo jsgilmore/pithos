@@ -20,5 +20,5 @@ cplusplus {{
 class noncobject Packet;
 
 packet groupPkt extends Packet {
-    int value;
+    double value;
 }

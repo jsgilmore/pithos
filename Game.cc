@@ -86,11 +86,18 @@ void Game::deliver(OverlayKey& key, cMessage* msg)
 void Game::sendRequest()
 {
 	char msgName [20];
-	int64_t filesize = exponential(objectSize_av);
-	groupPkt *write_pkt = new groupPkt();
-	sprintf(msgName, "store_req-%d", getParentModule()->getIndex());
-	write_pkt->setName(msgName);
-	write_pkt->setValue(filesize);
-	write_pkt->setPayloadType(STORE_REQ);
-	send(write_pkt, "to_lowerTier");
+	char size_str [20];		//19 characters for 64 bit integer (9223372036854775807) + 1 for \0
+
+	double filesize = exponential(objectSize_av);
+	sprintf(size_str, "%lf", filesize);
+
+
+	DHTputCAPICall* dhtPutMsg = new DHTputCAPICall();
+	dhtPutMsg->setName(msgName);
+	//dhtPutMsg->setKey(key);
+	dhtPutMsg->setValue(size_str);
+	//dhtPutMsg->setTtl(ttl);
+	//dhtPutMsg->setIsModifiable(true);
+
+	sendInternalRpcCall(TIER1_COMP, dhtPutMsg);
 }
