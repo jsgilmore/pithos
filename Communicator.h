@@ -40,6 +40,8 @@
 #include "groupPkt_m.h"
 #include "bootstrapPkt_m.h"
 
+#include "DHTMessage_m.h"
+
 class Communicator : public BaseApp
 {
 	private:
@@ -57,14 +59,18 @@ class Communicator : public BaseApp
 		void deliver(OverlayKey& key, cMessage* msg);  // called when we receive a message from the overlay
 		void handleUDPMessage(cMessage* msg);          // called when we receive a UDP message
 		void handleUpperMessage (cMessage *msg);
+
 		bool handleRpcCall(BaseCallMessage *msg);
+		void handlePutRequest(DHTPutCall* dhtMsg);
+		void handleGetRequest(DHTGetCall* dhtMsg);
+		void handleGetCAPIRequest(DHTgetCAPICall* capiGetMsg);
+		void handlePutCAPIRequest(DHTputCAPICall* capiPutMsg);
+		void handleDumpDhtRequest(DHTdumpCall* call);
 
 		void handleSPMsg(cMessage *msg);
 		void handlePeerMsg(cMessage *msg);
 		void overlayStore(cMessage *msg);
 		void sendPacket(cMessage *msg);
-
-		void handlePkt(Packet *packet, int sp_type);
 
 	public:
 		Communicator() {};

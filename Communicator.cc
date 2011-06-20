@@ -73,33 +73,72 @@ void Communicator::handleUpperMessage (cMessage *msg)
 	send(msg, "toPeer_fromUpper");		//This is the storage request from the game module
 }
 
+void Communicator::handlePutRequest(DHTPutCall* dhtMsg)
+{
+	//TODO: Add functionality to handle this RPC call
+	return;
+}
+
+void Communicator::handleGetRequest(DHTGetCall* dhtMsg)
+{
+	//TODO: Add functionality to handle this RPC call
+	return;
+}
+
+void Communicator::handleGetCAPIRequest(DHTgetCAPICall* capiGetMsg)
+{
+	//TODO: Add functionality to handle this RPC call
+	return;
+}
+
+void Communicator::handlePutCAPIRequest(DHTputCAPICall* capiPutMsg)
+{
+	DHTputCAPIResponse* capiPutRespMsg;		//This should be added when the below code is included
+	groupPkt *write_pkt;
+	char *size_str = new char[capiPutMsg->getValue().size()];
+	double filesize;
+
+	//Convert the binary data into a double defining the file size to be stored
+	copy (capiPutMsg->getValue().begin(), capiPutMsg->getValue().end(), size_str);
+	filesize = atof(size_str);
+
+	//Create a group packet that is sent to the peer_logic module to initiate the store mechanism
+	write_pkt = new groupPkt();
+	write_pkt->setName(capiPutMsg->getName());
+	write_pkt->setValue(filesize);
+	write_pkt->setPayloadType(STORE_REQ);
+	send(write_pkt, "toPeer_fromUpper");
+
+	//Respond to the RPC call with a success message
+	//TODO: Include this when there is a chance that a store might fail
+	capiPutRespMsg = new DHTputCAPIResponse();
+	capiPutRespMsg->setIsSuccess(true);
+	sendRpcResponse(capiPutMsg, capiPutRespMsg);
+	//delete(capiPutMsg);	//TODO: This should be removed when the above code is included
+
+	delete [] size_str;
+}
+
+void Communicator::handleDumpDhtRequest(DHTdumpCall* call)
+{
+	//TODO: Add functionality to handle this RPC call
+	return;
+}
+
 bool Communicator::handleRpcCall(BaseCallMessage *msg)
 {
 
     // There are many macros to simplify the handling of RPCs. The full list is in <OverSim>/src/common/RpcMacros.h.
 
-    // start a switch
+    // start an RPC switch
     RPC_SWITCH_START(msg);
-
-    // enters the following block if the message is of type MyNeighborCall (note the shortened parameter!)
-    RPC_ON_CALL(DHTputCAPI) {
-    	groupPkt *write_pkt;
-    	DHTputCAPICall* capiPutMsg = (DHTputCAPICall*)msg;          // get Call message
-    	char *size_str = new char[capiPutMsg->getValue().size()];
-    	double filesize;
-
-    	copy (capiPutMsg->getValue().begin(), capiPutMsg->getValue().end(), size_str);
-    	filesize = atof(size_str);
-
-    	write_pkt = new groupPkt();
-    	write_pkt->setName(capiPutMsg->getName());
-    	write_pkt->setValue(filesize);
-    	write_pkt->setPayloadType(STORE_REQ);
-    	send(write_pkt, "toPeer_fromUpper");
-
-		delete(size_str);
-    }
-
+		// RPCs between nodes
+		RPC_DELEGATE(DHTPut, handlePutRequest);
+		RPC_DELEGATE(DHTGet, handleGetRequest);
+		// internal RPCs
+		RPC_DELEGATE(DHTputCAPI, handlePutCAPIRequest);		//If we received a put request from Tier 2
+		RPC_DELEGATE(DHTgetCAPI, handleGetCAPIRequest);		//If we received a get request from Tier 2
+		RPC_DELEGATE(DHTdump, handleDumpDhtRequest);
     // end the switch
     RPC_SWITCH_END();
 
@@ -115,23 +154,6 @@ void Communicator::deliver(OverlayKey& key, cMessage* msg)
 	//All messages received from the overlay, should be sent to the super peer
 	//OVERLAY_WRITE is handled here
     send(msg, "sp_gate$o");
-}
-
-void Communicator::handlePkt(Packet *packet, int sp_type)
-{
-	if (packet->getPayloadType() == sp_type)
-	{
-		if (getParentModule()->getSubmodule("super_peer_logic") != NULL)
-			send(packet, "sp_gate$o");
-		else {
-			EV << "A super peer packet type was received, but this peer (" << getParentModule()->getIndex() << ") is not a super peer. The request will be ignored.\n";
-			delete(packet);
-		}
-	}
-	else {
-		EV << "Received packet of type " << packet->getPayloadType() << endl;
-		send(packet, "peer_gate$o");
-	}
 }
 
 // handleUDPMessage() is called when we receive a message from UDP.
