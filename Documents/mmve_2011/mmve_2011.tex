@@ -220,32 +220,30 @@ today's Client/Server (C/S) based MMVEs. Some key issues have to be solved befor
 researchers have been addressing these challenges.
 
 %Key challenges and focus
-A recent article has identified six key challenges of P2P systems: Interest Management, Game Event Dissemination, Non-player Character (NPC) Host
+Recently, six key challenges of P2P systems have been identified: Interest Management, Game Event Dissemination, Non-player Character (NPC) Host
 Allocation, Game State Persistency, Cheating Mitigation and Incentive Mechanisms \cite{Fan_deisgn_issues_p2p}. Most of the challenges mentioned have
 received significant attention from the research community, except for state persistency.
 
-The focus of this paper is exclusively on one of the key challenges present in P2P MMVEs, namely: state persistency. The implementation of state
-persistency in P2P MMVEs allows for the storage of game data. The fact that game data must now be distributed amongst various peers in the network
-creates challenges not usually present in classic C/S MMVEs.
+State persistency defines how object states should be stored. This allows for storing anything from a user's position to the state of the virtual
+market in an MMVE. For a P2P MMVE, game data must be distributed amongst various peers in the network. This creates challenges not usually present in
+classic C/S MMVEs. The focus of this paper is exclusively on state persistency in P2P MMVEs.
 
 %Current techniques not perfect
-This paper shows that none of the approaches to state persistency has thus far been sufficient to meet the storage requirements of MMVEs of today.
-All storage models are evaluated according to the identified requirements of scalability, fairness, reliability, responsiveness and security.
+The paper first attempts to group state persistency mechanisms found in the literature. The paper then shows that none of the approaches to state
+persistency has thus far been sufficient to meet the storage requirements of MMVEs of today. All storage models are evaluated according to the
+identified requirements of scalability, fairness, reliability, responsiveness and security.
 
 %Propose multi-tiered model
 Because current state persistency models do not address all the requirements of modern MMVEs, a novel hybrid multi-tiered state persistency model is
-proposed that is based on grouping players in some logical way and allowing for responsive interaction between players in the same group, with lower
-levels of responsiveness between groups.
+proposed, called Pithos, that is based on grouping players in some logical way and allowing for responsive interaction between players in the same
+group, with lower levels of responsiveness between groups. The supposition is that players have more interest in other object and player states close
+to them than far from them.
 
 %Implementation
 The proposed multi-tiered model is currently being implemented in Oversim, a peer-to-peer simulation environment based in Omnet++. The model allows
 for the measurement of the requirements of scalability, fairness, reliability and responsiveness. Furthermore, it allows for the comparison of the
-current model with other state persistency models. Multiple P2P routing overlays have already been implemented in Oversim, which makes it possible
-for the substitution of different overlays and comparing the results.
-
-%Promising preliminary results
-Initial results seem promising, with the implemented model functioning as expected. The system shows to be very responsive when storing data within a
-group and as responsive as storing data in an overlay when storing data between groups.
+current model with other state persistency models. Initial results seem promising, with the implemented model functioning as expected. The system
+shows to be very responsive when storing data within a group and as responsive as storing data in an overlay when storing data between groups.
 
 %Summary
 Section \ref{current_models} groups storage models found in the literature and describes the advantages and disadvantages of each group. The section
@@ -268,11 +266,18 @@ storage}, \emph{distance-based storage} and \emph{hybrid storage}. Requirements 
 measured. These are: scalability, fairness, reliability, responsiveness and security.
 
 %Scalability
+For an MMVE state persistency architecture to be scalable, it should be able to support large, typically thousands of users. In the paper,
+scalability it not handled as some separate entity, but rather all other requirements are evaluated in terms of a system of thousands of users.
 %Reliability
+Reliability is defined to mean that a file in the storage system may neither be lost, nor not be available when a user requests it.
 %Fairness
 For a system to be fair, the responsibility of storage should be equally shared amongst all users. Ideally, a fair scheme should take the
 heterogeneity of peers into account. This ensures that costs due to bandwidth and storage are shared amongst all users.
 %Responsiveness
+Responsiveness is a requirement that has not really been part of file storage systems in the past. Usually, it doesn't matter much how low it takes
+to resolve a file storage or request, just that the file is stored or retrieved. Sizes of files are usually large and so the time storage and
+retrieval operations take are usually bound by the bandwidth. For games, it is believed that responsive object storage is a key requirement to
+promote responsive gameplay and robust recovery mechanisms.
 %Security
 
 To clarify what type of objects are stored in these types, only the root objects, also called the authoritive objects, are considered for storage. It
@@ -466,6 +471,8 @@ of players. Dynamic regioning splits an overpopulated region which will allow fo
 \subsection{Distance-based}
 \label{distance_based}
 
+%Why distance based and grouping might help for saving game data
+
 \subsection{Certification Authority}
 
 Use secure node ID assignments, by making use of a Certification Authority, or designing the system in such a way that a peer cannot select or report
@@ -481,12 +488,12 @@ protocols as well as the layered architecture, which simplifies testing with dif
 
 \subsection{Oversim architecture}
 
-\begin{figure*}[htbp]
+\begin{figure}[htbp]
  \centering
  \includegraphics[width=\columnwidth]{Oversim_arch}
  \caption{Oversim architecture set up to use two tiers}
  \label{fig_oversim_arch}
-\end{figure*}
+\end{figure}
 %
 Figure \ref{fig_oversim_arch} shows the layered Oversim architecture as displayed in Omnet++. The Oversim architecture consists of a network,
 overlay, tier 1, tier 2 and tier 3 layers. The network layer implements TCP and UDP. Here it is possible to use a simple underlay network, where
@@ -508,9 +515,9 @@ that contain the Pithos code, written in C++.
 
 \begin{figure*}[htbp]
 \centering \subfloat[Peer)]{\label{fig_peer}
-\includegraphics[width=0.815\columnwidth]{tier1_peer}}
+\includegraphics[width=0.652\columnwidth]{tier1_peer}}
  \subfloat[Super Peer]{\label{fig_super_peer}
-\includegraphics[width=\columnwidth]{tier1_super_peer}}
+\includegraphics[width=0.8\columnwidth]{tier1_super_peer}}
 \caption{Tier 1 modules}
 \end{figure*}
 
@@ -520,18 +527,130 @@ modules. Figure \ref{fig_super_peer} shows the Super Peer compound module, consi
 simple modules. The same modules are present in both Super Peers and Peers, because Super Peers are seen as Peers with extra intelligence. Any Peer
 can theoretically become a Super Peer by just creating a Super Peer Logic module for itself.
 
-When a Super Peer is created, it registers its IP address and position within the virtual world with the Directory Server. When a peer joins the
-network it sends its position to the directory server and receives a super peer IP that is closest in return. A joining peer then sends a request to
-join a group
+The Storage component allows for the storage and retrieval of all game objects sent to it and records all relevant statistics, for example how many
+objects are stored, their sizes and how long an object took to store.
 
-\subsection{Network setup}
+The peer logic module contains the peer intelligence. This includes joining a group, sending a store request, requesting that the storage module
+stores a game object and requesting that the super peer replicate an object in the overlay.
+
+The super peer logic contain the super peer intelligence. A super peer contains this module in addition to a peer logic module. The super peer logic
+includes accepting a joining peer and informing other peers of the join. Replicating data in the overlay and handling all inter group store and
+retrieve requests.
+
+The communicator module is required to interface with the Oversim architecture. This module is responsible for routing all messages from the
+different simple module to either UDP or the overlay. The reason why this module is required is because the Oversim architecture requires a single
+module to route messages to and receive messages from.
+
+\subsection{Functionality}
+
+In the results shown, Pastry was used as an overlay, Pithos as the tier 1 application and another ``game'' application was used as the tier 2
+application. The purpose of the game application is to drive the simulation with put and get requests. Pastry was chosen because of many articles
+referencing Pastry as the overlay used for overlay storage. It is important to note that because of Oversim's layered architecture, Pithos can work
+and has been additionally tested with Chord and Kademlia. The ideal choice of overlay is a question for future research and testing.
+
+In the tier 1 layer, a specific number of peers, super peers and a single directory server is created at the start of the simulation. Every node is
+allowed to fully initialise before it starts to generate and respond to store and retrieve requests. For the results shown in Section \ref{results},
+14999 peer, 499 super peers and 1 directory server were used to give a total of 15000 simulated nodes. This limit is established by the number of
+node coordinates in the Oversim coordinates file.
+
+When a Super Peer is created, it registers its IP address and position within the virtual world with the Directory Server. When a peer joins the
+network it sends its position to the directory server and receives a super peer IP that is closest in return. The peer then sends a join request to
+the received super peer IP. The super peer can accept the request or reply with another super peer IP that it deems more appropriate. The super peer
+also sends a list of all peer IPs that are currently part of the group to the joining peer. In addition, the super peer updates its group peers with
+the IP of the joining node.
+
+After a specific node has joined a group, it informs the game module and the game module then starts to generate store and retrieve requests. These
+requests are received by the tier 1 peer logic module and handled. Pithos implements data replication to enable it to handle node churn. If a node
+leaves the network and stops to transmit pong messages, the migration mechanism will detect this and replicate the file on another node. Replication
+exists intra as well as inter group.
 
 \subsection{Future work}
+
+The simulation does not yet support nodes leaving the network. The migration mechanism should still be implemented before rigourous testing under
+heavy network churn will become a possibility.
+
+%Don't send complete files
 
 %Use KBRTestApp
 
 \section{Preliminary results}
 \label{results}
+
+For preliminary results, two requirements were measured. These were responsiveness and fairness. Responsiveness is defined as how long it takes to
+store and retrieve a node from the network. Fairness is defined as the variance in the number of files or bytes stored on the different nodes.
+
+The responsiveness is compared to Pastry routing times.
+
+\subsection{Responsiveness}
+
+Firstly, we evaluate the responsiveness of the storage system. In the storage system, we expect two levels of responsiveness. We expect a certain
+level of responsiveness for intra group communications and a certain level of responsiveness for inter group communications. Because we expect intra
+group communications to appear more often, we can calculate an average response time which is determined by the percentage of intra group requests,
+compared to inter group requests.
+
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=1.5cm 1.3cm 25.5cm 19.7cm, width=\columnwidth]{request_time_distribution}
+ \caption{Time distribution of overlay and root/replica objects}
+ \label{fig_pithos_response}
+\end{figure}
+%
+Figure \ref{fig_pithos_response} shows the distribution of mean storage request times over all nodes in the network for the different types of
+storage present in the network. One can see that the intra group root and replica objects are stored much faster than the overlay objects in the
+network. Specifically, intra group object are stored in a mean time of 0.0878 s, while inter group objects are stored in a mean time of 0.3284 s,
+3.74 times slower than intra group stores.
+
+There seem to be multiple distributions of root and replica nodes spaced equally apart. The supposition is that these represent the physical hops in
+the underlaying architecture. One should remember that a group neighbour is not also a neighbour in the physical network and can be many hops apart.
+
+From Figure \ref{fig_pithos_response} it is evident that if only overlay storage is used, the storage and retrieval times will be much higher.
+
+To exactly compare Pithos with overlay storage, the percentage of intra group requests compared to inter group requests should first be known.
+%Insert other Matlab responsiveness calculations
+
+\subsection{Fairness}
+
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=1.5cm 1.8cm 26.5cm 20cm, width=\columnwidth]{RootRepObjects}
+ \caption{Root/Replica object number distribution}
+ \label{fig_pithos_response}
+\end{figure}
+
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=1.5cm 1.2cm 27cm 19.7cm, width=\columnwidth]{OverlayObjects}
+ \caption{Overlay object number distribution}
+ \label{fig_pithos_response}
+\end{figure}
+
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=1.5cm 1.2cm 27cm 19.7cm, width=\columnwidth]{Objects}
+ \caption{Combined object number distribution}
+ \label{fig_pithos_response}
+\end{figure}
+
+Figure \ref{} shows the fairness achieved by mapping file hashes to nodes with the closest IDs. This has the effect of mapping one set of uniform
+random numbers onto another set of uniform random numbers, where the two sets are statistically independent. This mapping produces a bernoulli
+distribution in the following way:
+
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=1.5cm 1cm 27cm 19.5cm, width=\columnwidth]{ObjectsByGroupSize}
+ \caption{Average number of overlay objects stored by group size}
+ \label{fig_pithos_response}
+\end{figure}
+
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=2cm 1cm 27.5cm 19.5cm, width=\columnwidth]{ObjectsByJoinTime}
+ \caption{Average number of overlay objects stored by join time}
+ \label{fig_pithos_response}
+\end{figure}
+
+%Statistics proof of distribution for constant area and mention that the area is not constant and that adds some jitter to the distribution.
+%Note on where the average values come from: 300 and 150 objects per node and 30 nodes per group
 
 \section{Conclusion}
 \label{conclusion}
@@ -540,6 +659,9 @@ join a group
 
 \subsection{Future work}
 
+%Complete implementation
+%Reliability and security
+%Driver data
 
 %\newpage
 % use section* for acknowledgement
