@@ -455,11 +455,15 @@ write operations within the group. On the second tier, which is the inter group 
 \subsubsection{Grouping}
 
 %Speak more concretely of grouping algorithms
-At the core of the architecture will be how peers are grouped. One method by which peers might be grouped is merely to use peer proximity and
-movement and thereby define groups as groups of users in the virtual world. The architecture will then make use of the flocking behaviour of players
-to dynamically group players into flocks or clusters \cite{flocking}. The main idea of flocking is that players move around in groups, rather than
-randomly on their own. Because of the flocking behaviour of players, dynamic groups or regions that move with groups of players may be a better fit
-than static or even dynamic regions that operate on areas of the virtual world and not on how groups of players actually cluster.
+At the core of the architecture is how peers are grouped. Two approaches are being evaluated to group peers, one is by using distributed clustering
+techniques, for example affinity propagation \cite{affinity_propagation}, the other is by using dynamic regioning techniques, for example spatial
+publish subscribe.
+
+One method by which peers might be grouped is merely to use peer proximity and movement and thereby define groups as groups of users in the virtual
+world. The architecture will then make use of the flocking behaviour of players to dynamically group players into flocks or clusters \cite{flocking}.
+The main idea of flocking is that players move around in groups, rather than randomly on their own. Because of the flocking behaviour of players,
+dynamic groups or regions that move with groups of players may be a better fit than static or even dynamic regions that operate on areas of the
+virtual world and not on how groups of players actually cluster.
 
 Because a fully distributed architecture is not scalable, group sizes should also not exceed some threshold. This threshold complicates group
 construction, because groups are already constructed according to position in the virtual world.
@@ -476,6 +480,10 @@ network it sends its position to the directory server and receives a super peer 
 the received super peer IP. The super peer can accept the request or reply with another super peer IP that it deems more appropriate. The super peer
 also sends a list of all peer IPs that are currently part of the group to the joining peer. In addition, the super peer updates its group peers with
 the IP of the joining node.
+
+Here it is possible to use a simple underlay network, where nodes are positioned on Euclidean space and latencies are calculated according to the
+distances between nodes or to use a modified version of the INET framework found in Omnet++, which attempts to accurately model latency effects and
+the various complexities of the underlying network.
 
 \subsubsection{Store and retrieve with replication}
 
@@ -515,82 +523,6 @@ moving towards each other also have to be identified and the grouping might have
 work has been done to group players in a distributed fashion in virtual worlds. Further research is required into grouping algorithms to determine
 their usability in virtual worlds under user churn.
 
-\section{Implementation}
-\label{implementation}
-
-Pithos is being implemented in Oversim \cite{OverSim_2007}, running on Omnet++. Oversim was chosen because of the variety of already implemented
-protocols as well as the layered architecture, which simplifies testing with different overlays and comparing with different storage types.
-
-\subsection{Oversim architecture}
-
-\begin{figure}[htbp]
- \centering
- \includegraphics[width=\columnwidth]{Oversim_arch}
- \caption{Oversim architecture set up to use two tiers}
- \label{fig_oversim_arch}
-\end{figure}
-%
-Figure \ref{fig_oversim_arch} shows the layered Oversim architecture as displayed in Omnet++. The Oversim architecture consists of a network,
-overlay, tier 1, tier 2 and tier 3 layers. The network layer implements TCP and UDP. Here it is possible to use a simple underlay network, where
-nodes are positioned on Euclidean space and latencies are calculated according to the distances between nodes or to use a modified version of the
-INET framework found in Omnet++, which attempts to accurately model latency effects and the various complexities of the underlying network.
-
-The overlay layer contains the P2P overlay. Some overlays already implemented in Oversim include: Chord, Gia, Kademlia, Pastry, Quon and Vast.
-
-The different tiers used in Oversim form the application layer of the OSI protocol stack, with tier 1 being the layer closest to the overly layer,
-followed by tiers 2 and 3.
-
-Pithos is developed as a tier 1 application, driven by a ``game'' module, which is implemented as a tier 2 application. The idea is that one can
-empirically test different storage architectures by driving them with the same driver application and having them use the same overlay.
-
-\subsection{Components}
-
-Pithos consists of a few compound components that make up the architecture. Each compound component in turn consists of various simple components
-that contain the Pithos code, written in C++.
-
-\begin{figure*}[htbp]
-\centering \subfloat[Peer)]{\label{fig_peer}
-\includegraphics[width=0.652\columnwidth]{tier1_peer}}
- \subfloat[Super Peer]{\label{fig_super_peer}
-\includegraphics[width=0.8\columnwidth]{tier1_super_peer}}
-\caption{Tier 1 modules}
-\end{figure*}
-
-The compound component types contained in Pithos are Super Peers, Peers and the Directory Server. The directory server only consists out of the
-Directory Logic simple module. Figure \ref{fig_peer} shows the Peer compound module, consisting of Peer Logic, Storage and Communicator simple
-modules. Figure \ref{fig_super_peer} shows the Super Peer compound module, consisting of Super Peer Logic, Peer Logic, Storage and Communicator
-simple modules. The same modules are present in both Super Peers and Peers, because Super Peers are seen as Peers with extra intelligence. Any Peer
-can theoretically become a Super Peer by just creating a Super Peer Logic module for itself.
-
-The Storage component allows for the storage and retrieval of all game objects sent to it and records all relevant statistics, for example how many
-objects are stored, their sizes and how long an object took to store.
-
-The peer logic module contains the peer intelligence. This includes joining a group, sending a store request, requesting that the storage module
-stores a game object and requesting that the super peer replicate an object in the overlay.
-
-The super peer logic contain the super peer intelligence. A super peer contains this module in addition to a peer logic module. The super peer logic
-includes accepting a joining peer and informing other peers of the join. Replicating data in the overlay and handling all inter group store and
-retrieve requests.
-
-The communicator module is required to interface with the Oversim architecture. This module is responsible for routing all messages from the
-different simple module to either UDP or the overlay. The reason why this module is required is because the Oversim architecture requires a single
-module to route messages to and receive messages from.
-
-\subsection{Functionality}
-
-In the results shown, Pastry was used as an overlay, Pithos as the tier 1 application and another ``game'' application was used as the tier 2
-application. The purpose of the game application is to drive the simulation with put and get requests. Pastry was chosen because of many articles
-referencing Pastry as the overlay used for overlay storage. It is important to note that because of Oversim's layered architecture, Pithos can work
-and has been additionally tested with Chord and Kademlia. The ideal choice of overlay is a question for future research and testing.
-
-In the tier 1 layer, a specific number of peers, super peers and a single directory server is created at the start of the simulation. Every node is
-allowed to fully initialise before it starts to generate and respond to store and retrieve requests. For the results shown in Section \ref{results},
-14999 peer, 499 super peers and 1 directory server were used to give a total of 15000 simulated nodes. This limit is established by the number of
-node coordinates in the Oversim coordinates file.
-
-After a specific node has joined a group, it informs the game module and the game module then starts to generate store and retrieve requests. These
-requests are received by the tier 1 peer logic module and handled.
-
 \subsection{Future work}
 
 The simulation does not yet support nodes leaving the network. The migration mechanism should still be implemented before rigourous testing under
@@ -607,6 +539,20 @@ For preliminary results, two requirements were measured. These were responsivene
 store and retrieve a node from the network. Fairness is defined as the variance in the number of files or bytes stored on the different nodes.
 
 The responsiveness is compared to Pastry routing times.
+
+\subsection{Test setup}
+In the results shown, Pastry was used as an overlay, Pithos as the tier 1 application and another ``game'' application was used as the tier 2
+application. The purpose of the game application is to drive the simulation with put and get requests. Pastry was chosen because of many articles
+referencing Pastry as the overlay used for overlay storage. It is important to note that because of Oversim's layered architecture, Pithos can work
+and has been additionally tested with Chord and Kademlia. The ideal choice of overlay is a question for future research and testing.
+
+In the tier 1 layer, a specific number of peers, super peers and a single directory server is created at the start of the simulation. Every node is
+allowed to fully initialise before it starts to generate and respond to store and retrieve requests. For the results shown in Section \ref{results},
+14999 peer, 499 super peers and 1 directory server were used to give a total of 15000 simulated nodes. This limit is established by the number of
+node coordinates in the Oversim coordinates file.
+
+After a specific node has joined a group, it informs the game module and the game module then starts to generate store and retrieve requests. These
+requests are received by the tier 1 peer logic module and handled.
 
 \subsection{Responsiveness}
 
@@ -642,12 +588,6 @@ To exactly compare Pithos with overlay storage, the percentage of intra group re
  \label{fig_pithos_response}
 \end{figure}
 
-\begin{figure}[htbp]
- \centering
- \includegraphics[clip=true, viewport=2cm 1cm 27cm 19.5cm, width=\columnwidth]{Hops_vsNodes_4GroupFrac}
- \caption{Time distribution of overlay and root/replica objects}
- \label{fig_pithos_response}
-\end{figure}
 
 \subsection{Fairness}
 
