@@ -740,14 +740,14 @@ Four approaches have been identified by which state persistency is achieved in P
 \emph{distance-based storage} and \emph{hybrid storage}. These four storage architectures are detailed in Sections \ref{super_peer_storage},
 \ref{overlay_storage}, \ref{hybrid_storage} and \ref{distance_based_storage}.
 
-%Individual storage
+%Centralised storage
 Two other types of storage sometimes described in P2P MMOGs papers are \emph{centralised storage} and \emph{individual storage}. Centralised storage
 is storage in a centralised database, the same as for a C/S MMOG \cite{badumna_engine}, \cite{rooney_centralised_storage},
 \cite{hybrid_p2p_cs_centralised}. Centralised storage for an MMOG requires the same large expensive servers and high bandwidth as required by a
 classic C/S architecture and therefore does not fit into the P2P MMOG paradigm. For this reason, centralised storage will not be evaluated in this
 paper.
 
-%Centralised storage
+%Individual storage
 With individual storage, player data are stored on a player's own computer \cite{individual_storage1}, \cite{cheat_proof_playout}. These
 architectures do not address the storage of NPC state or mutable objects. These objects cannot be as easily mapped to a single node in the network as
 player state can and therefore require a mapping mechanism to decide where to host these objects. Individual storage will not be explicitly discussed

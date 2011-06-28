@@ -276,9 +276,12 @@ heterogeneity of peers into account. This ensures that costs due to bandwidth an
 %Responsiveness
 Responsiveness is a requirement that has not really been part of file storage systems in the past. Usually, it doesn't matter much how low it takes
 to resolve a file storage or request, just that the file is stored or retrieved. Sizes of files are usually large and so the time storage and
-retrieval operations take are usually bound by the bandwidth. For games, it is believed that responsive object storage is a key requirement to
-promote responsive gameplay and robust recovery mechanisms.
+retrieval operations take are usually constrained by the available bandwidth. For games, it is believed that responsive object storage is a key
+requirement to promote responsive gameplay and robust recovery mechanisms. Especially because it is expected that game objects are in general much
+smaller than the files, which normal storage systems are designed for.
 %Security
+Data security is a major issue for distributed storage, because data are stored on users' machines who should not necessarily be able to access and
+alter the data stored.
 
 To clarify what type of objects are stored in these types, only the root objects, also called the authoritive objects, are considered for storage. It
 is still assumed that replica objects that are used by players to render the world are locally stored and that these objects derive their states from
@@ -338,7 +341,14 @@ distributed storage currently in use. Some examples and a comparison of differen
 distributed storage is used as a distributed database for game files.
 
 %Advantages/Disadvantages
+The main advantages of overlay storage is its reliability and fairness. Because data are distributed across all nodes, overlay storage is the fairest
+storage system reviewed. Because data are hosted by many nodes, redundancy may be used to make the system reliable. Because of the distance based
+routing mechanism used in most P2P overlays, redundancy is easily implemented by placing replica data at a node's overlay neighbours. Overlay storage
+can also be made reasonably secure, because it is possible to leverage the redundancy mentioned and multiple routing paths present in the overlay.
 
+The main disadvantage of overlay storage is responsiveness. The routing time in overlay storage is of order $O(\log(N))$, where N is the total number
+of nodes in the network. This can be considered an efficient routing time in general, but for real-time applications that require real-time access to
+data, this routing complexity is not considered ideal.
 
 \subsection{Hybrid storage}
 
@@ -349,34 +359,39 @@ be backed up for long term, redundant and secure storage. The hybrid region-base
 storage as will be discussed in the following sections.
 
 %Advantages/Disadvantages
+Hybrid storage combines some of the features present in overlay and super peer storage to have the advantages of high reliability and responsiveness.
+Reliability is achieved from redundancy present in overlay storage and responsiveness is achieved by the direct access peers have to their respective
+super peer.
 
+Hybrid storage still partly suffers from the security issues present in super peer storage, but overlay storage allows for replication which creates
+reference objects to which the super peer objects might be compared. Checking every super peer object against the corresponding overlay object will,
+however negate any advantages received from super peer storage in terms of responsiveness.
+
+Hybrid storage still suffers from the lack of fairness present in super peer storage. Although data are distributed amongst all nodes for overlay
+storage, there still exists super peer nodes that also possess all data present in the network, making the storage almost as unfair as super peer
+storage.
 
 \subsection{Distance-based storage}
 
 %Description
 Distance based approaches, such as the Voronoi storage approaches \cite{Buyukkaya_voronoi_state_management}, \cite{Hu_voronoi_IM} and some more
 general approaches \cite{colyseus_distance_based}, \cite{solipsis}, store object data on the peer closest to the object in the virtual world. Some
-distance metric is used to determine on which node an object should be stored.
-
-individual storage \cite{individual_storage1}, \cite{cheat_proof_playout}
-
-\begin{figure}[htbp]
- \centering
- \includegraphics[width=0.7\columnwidth]{voronoi_diagram}
- \caption{Voronoi Diagram \cite{Buyukkaya_voronoi_state_management}}
- \label{fig_voronoi_diagram}
-\end{figure}
-%
-Given a set of points, the Voronoi diagram of the set of points is the partition of the plane, which associates a region around every point in such a
-way that all other points contained in the region are closer to the centre point than any other point in the set. Figure \ref{fig_voronoi_diagram}
-shows a Voronoi diagram, where the lines define the region boundaries, the dots define the players, which make up the set of points for which the
-diagram was calculated, the plus signs represent mutable objects and the circle represents the AoI of a central point in the set.
-
-For the Voronoi approaches, described in more detail in Section \ref{distance_based_existing_archs}, a node controls and hosts all objects within its
-Voronoi region. The reasoning is that there is a high probability that the player closest to the object is also the player using the object. Examples
-of this are where a player is trading or fighting with an NPC.
+distance metric is used to determine on which node an object should be stored. In some systems, only player states are considered for storage
+\cite{individual_storage1}, \cite{cheat_proof_playout}. This storage is termed individual storage and is considered as a subset of distance storage,
+which also allows for non-player objects to be stored.
 
 %Advantages/Disadvantages
+Responsiveness is considered to be the main advantage of distance-based storage. It is considered that the player that is close to an object has more
+interest in that object than a player that is far away. This means that the player with the most interest in an object will be most likely to be
+locally hosting that object. This is not always the case, but for cases where the player hosting the object has to serve that object to another
+player, the system is still as responsive as super peer and normal C/S-based storage. Distance-based storage can also be made reliable by
+implementing some replication and migration mechanisms or implementing it as a distance-based overlay storage hybrid. Such implementation have not
+been presented in the literature reviewed.
+
+Two issues with distance-based storage are security, and to a lesser degree, fairness. Security is a major concern, since data are by design, stored
+on nodes with the most interest in it. This means that a node that stores data has the most interest to be able to modify that data in contravention
+of the virtual environment rules. Although all nodes share all objects in the virtual world, some nodes might have to store more data than others
+depending on user density in the virtual world and on how many objects are close to the different nodes.
 
 \subsection{Centralised storage}
 
@@ -388,9 +403,6 @@ Some P2P MMVEs use centralised storage, where all peers store data in a centrali
 This type of storage suffers from all the scalability and single point of failure issues present in a centralised system. Consequently, most of the
 advantages of P2P MMVEs are forgone by this type of storage. When compared to the requirements mentioned in Section \ref{current_models}, centralised
 storage suffers from fairness and reliability issues.
-
-%Advantages/Disadvantages
-
 
 \subsection{Summary and comparison}
 
@@ -409,7 +421,7 @@ such an implementation.
 While the system is not yet complete, some promising preliminary results are also shown. These results show the improvements in terms of
 responsiveness and fairness achieved.
 
-\section{Pithos: the proposed state persistency model}
+\section{Pithos: the proposed state persistency architecture}
 \label{proposed_model}
 
 In this section ``Pithos'', the proposed P2P MMVE state persistency architecture is described. The architecture uses hybrid techniques, grouping and
@@ -420,8 +432,10 @@ possesses fewer disadvantages than any of the models used. It is supposed that o
 of any of the models used, if the models are carefully chosen.
 
 Secondly, responsiveness is greatly increased in a fully distributed model, where there is no intermediate server that relays all information. It
-was, however, also observed that fully distributed architectures are not scalable because of the number of messages being $O(N^2)$, where $N$ is the
-number of nodes in the network.
+was, however, also observed that fully distributed architectures are not scalable because of the number of messages scaling by an $O(N^2)$, where $N$
+is the number of nodes in the network.
+
+\subsection{Architecture}
 
 \begin{figure}[htbp]
  \centering
@@ -430,55 +444,76 @@ number of nodes in the network.
  \label{fig_pithos}
 \end{figure}
 %
-Figure \ref{fig_pithos} shows the structure of Pithos. The figure shows groups of fully connected peers (blue, grey and red), where all groups are
-connected to each other in an P2P overlay through super peers (red). Backup peers are also present (grey), to take over responsibility if a super
-peer leaves a group.
+Figure \ref{fig_pithos} shows the Pithos architecture. The figure shows groups of fully connected peers (blue and red), where all groups are
+connected to each other in an P2P overlay through super peers (red). This section described the general architecture of Pithos, the following
+sections then describe how each of the requirements of fairness, reliability, responsiveness and security are achieved in Pithos.
 
-\subsection{Multi-tiered}
+Pithos groups peers in some way to form a two tiered storage model. The first tier is a storage model at group level and the second is a model over
+all groups. On the first tier, which is the intra group level, a fully distributed storage system is used to allow for highly responsive read and
+write operations within the group. On the second tier, which is the inter group level, overlay routing is used to store data between groups.
 
-Pithos groups peers in some way, described in Section \ref{grouping}, to form a two tiered storage model. The first tier is a storage model at group
-level and the second is a model over all groups. On the first tier, which is the intra group level, a fully distributed storage system is used to
-allow for highly responsive read and write operations within the group. On the second tier, which is the inter group level, overlay routing is used
-to store data between groups.
+\subsubsection{Grouping}
 
-\subsection{Grouping}
-\label{grouping}
-
+%Speak more concretely of grouping algorithms
 At the core of the architecture will be how peers are grouped. One method by which peers might be grouped is merely to use peer proximity and
 movement and thereby define groups as groups of users in the virtual world. The architecture will then make use of the flocking behaviour of players
 to dynamically group players into flocks or clusters \cite{flocking}. The main idea of flocking is that players move around in groups, rather than
 randomly on their own. Because of the flocking behaviour of players, dynamic groups or regions that move with groups of players may be a better fit
 than static or even dynamic regions that operate on areas of the virtual world and not on how groups of players actually cluster.
 
-If players are grouped more intelligently, less traffic will have to flow between groups, which will reduce the number of queries to the DHT, which
-in turn will improve the latency of the overall system. Using groups or flocks would, therefore, compliment this technique.
-
-The issue with such a system would be how to uniquely identify a group and how the identification would be applied when groups merge or split. Groups
-moving towards each other also have to be identified and the grouping might have to be able to maintain two groups moving through each other.
-
 Because a fully distributed architecture is not scalable, group sizes should also not exceed some threshold. This threshold complicates group
-construction, because groups are already constructed according to position in the virtual world. Splitting groups might not be optimal, because the
-supposition is that players close to each other require responsive access to each other's data as described in Section \ref{distance_based}. A
-preferred solution might be to split groups into another tier using a grouped region approach. This will allow groups to remain scalable by allowing
-for a inter group region communications method based on group-region super peers.
-
-Little work has been done to group players in a distributed fashion in virtual worlds \cite{}. Further research is required into grouping algorithms
-to determine their usability in virtual worlds under user churn.
+construction, because groups are already constructed according to position in the virtual world.
 
 As an alternative to geographic grouping, dynamic regioning might also be used to group players. Where every dynamic region will constitute a group
 of players. Dynamic regioning splits an overpopulated region which will allow for sufficient bounding of the amount of players in the group.
 
-\subsection{Distance-based}
+%Speak about Spatial Publish Subscribe
+
+\subsubsection{Joining}
+
+When a Super Peer is created, it registers its IP address and position within the virtual world with the Directory Server. When a peer joins the
+network it sends its position to the directory server and receives a super peer IP that is closest in return. The peer then sends a join request to
+the received super peer IP. The super peer can accept the request or reply with another super peer IP that it deems more appropriate. The super peer
+also sends a list of all peer IPs that are currently part of the group to the joining peer. In addition, the super peer updates its group peers with
+the IP of the joining node.
+
+\subsubsection{Store and retrieve with replication}
+
+Pithos implements data replication to enable it to handle node churn. If a node leaves the network and stops to transmit pong messages, the migration
+mechanism will detect this and replicate the file on another node. Replication exists intra as well as inter group.
+
+\subsubsection{Secure node ID assignments}
+
+\subsection{Responsiveness}
+
+If players are grouped more intelligently, less traffic will have to flow between groups, which will reduce the number of queries to the DHT, which
+in turn will improve the latency of the overall system. Using groups or flocks would, therefore, compliment this technique.
+
+%\subsection{Distance-based}
 \label{distance_based}
 
 %Why distance based and grouping might help for saving game data
 
-\subsection{Certification Authority}
+\subsection{Reliability}
+
+%\subsection{Bootstrap mechanism}
+
+\subsection{Fairness}
+
+
+\subsection{Security}
+
+%\subsection{Certification Authority}
 
 Use secure node ID assignments, by making use of a Certification Authority, or designing the system in such a way that a peer cannot select or report
 it's own node ID.
 
-\subsection{Bootstrap mechanism}
+\subsection{Future work}
+
+The issue with such a system would be how to uniquely identify a group and how the identification would be applied when groups merge or split. Groups
+moving towards each other also have to be identified and the grouping might have to be able to maintain two groups moving through each other. Little
+work has been done to group players in a distributed fashion in virtual worlds. Further research is required into grouping algorithms to determine
+their usability in virtual worlds under user churn.
 
 \section{Implementation}
 \label{implementation}
@@ -553,16 +588,8 @@ allowed to fully initialise before it starts to generate and respond to store an
 14999 peer, 499 super peers and 1 directory server were used to give a total of 15000 simulated nodes. This limit is established by the number of
 node coordinates in the Oversim coordinates file.
 
-When a Super Peer is created, it registers its IP address and position within the virtual world with the Directory Server. When a peer joins the
-network it sends its position to the directory server and receives a super peer IP that is closest in return. The peer then sends a join request to
-the received super peer IP. The super peer can accept the request or reply with another super peer IP that it deems more appropriate. The super peer
-also sends a list of all peer IPs that are currently part of the group to the joining peer. In addition, the super peer updates its group peers with
-the IP of the joining node.
-
 After a specific node has joined a group, it informs the game module and the game module then starts to generate store and retrieve requests. These
-requests are received by the tier 1 peer logic module and handled. Pithos implements data replication to enable it to handle node churn. If a node
-leaves the network and stops to transmit pong messages, the migration mechanism will detect this and replicate the file on another node. Replication
-exists intra as well as inter group.
+requests are received by the tier 1 peer logic module and handled.
 
 \subsection{Future work}
 
@@ -601,12 +628,26 @@ network. Specifically, intra group object are stored in a mean time of 0.0878 s,
 3.74 times slower than intra group stores.
 
 There seem to be multiple distributions of root and replica nodes spaced equally apart. The supposition is that these represent the physical hops in
-the underlaying architecture. One should remember that a group neighbour is not also a neighbour in the physical network and can be many hops apart.
+the underlaying architecture.
 
 From Figure \ref{fig_pithos_response} it is evident that if only overlay storage is used, the storage and retrieval times will be much higher.
 
 To exactly compare Pithos with overlay storage, the percentage of intra group requests compared to inter group requests should first be known.
 %Insert other Matlab responsiveness calculations
+
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=2cm 1cm 27cm 19.5cm, width=\columnwidth]{Hops_vsGroupFrac_4n}
+ \caption{Time distribution of overlay and root/replica objects}
+ \label{fig_pithos_response}
+\end{figure}
+
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=2cm 1cm 27cm 19.5cm, width=\columnwidth]{Hops_vsNodes_4GroupFrac}
+ \caption{Time distribution of overlay and root/replica objects}
+ \label{fig_pithos_response}
+\end{figure}
 
 \subsection{Fairness}
 
