@@ -257,7 +257,7 @@ Section \ref{results} presents some preliminary results.
 %
 Section \ref{conclusion} concludes with a summary of the paper and a discussion on possible future work.
 
-\section{Current state persistency models}
+\section{Distributed state persistency models}
 \label{current_models}
 
 %Overview of four approaches
@@ -372,6 +372,7 @@ storage, there still exists super peer nodes that also possess all data present 
 storage.
 
 \subsection{Distance-based storage}
+\label{classic_distance_based}
 
 %Description
 Distance based approaches, such as the Voronoi storage approaches \cite{Buyukkaya_voronoi_state_management}, \cite{Hu_voronoi_IM} and some more
@@ -392,17 +393,6 @@ Two issues with distance-based storage are security, and to a lesser degree, fai
 on nodes with the most interest in it. This means that a node that stores data has the most interest to be able to modify that data in contravention
 of the virtual environment rules. Although all nodes share all objects in the virtual world, some nodes might have to store more data than others
 depending on user density in the virtual world and on how many objects are close to the different nodes.
-
-\subsection{Centralised storage}
-
-%Description
-Some P2P MMVEs use centralised storage, where all peers store data in a centralised database \cite{badumna_engine},
-\cite{rooney_centralised_storage}, \cite{hybrid_p2p_cs_centralised}.
-
-%Advantages/Disadvantages
-This type of storage suffers from all the scalability and single point of failure issues present in a centralised system. Consequently, most of the
-advantages of P2P MMVEs are forgone by this type of storage. When compared to the requirements mentioned in Section \ref{current_models}, centralised
-storage suffers from fairness and reliability issues.
 
 \subsection{Summary and comparison}
 
@@ -435,8 +425,6 @@ Secondly, responsiveness is greatly increased in a fully distributed model, wher
 was, however, also observed that fully distributed architectures are not scalable because of the number of messages scaling by an $O(N^2)$, where $N$
 is the number of nodes in the network.
 
-\subsection{Architecture}
-
 \begin{figure}[htbp]
  \centering
  \includegraphics[clip=true, viewport=7.5cm 2.5cm 26cm 20cm, width=0.7\columnwidth]{CDHT_layout}
@@ -452,69 +440,168 @@ Pithos groups peers in some way to form a two tiered storage model. The first ti
 all groups. On the first tier, which is the intra group level, a fully distributed storage system is used to allow for highly responsive read and
 write operations within the group. On the second tier, which is the inter group level, overlay routing is used to store data between groups.
 
-\subsubsection{Grouping}
+\subsection{Grouping}
 
 %Speak more concretely of grouping algorithms
 At the core of the architecture is how peers are grouped. Two approaches are being evaluated to group peers, one is by using distributed clustering
-techniques, for example affinity propagation \cite{affinity_propagation}, the other is by using dynamic regioning techniques, for example spatial
-publish subscribe.
+techniques, for example affinity propagation \cite{affinity_propagation}, the other is by using dynamic regioning techniques, for example
+self-organising spatial publish subscribe (SOSPS) \cite{self_organising_sps_post}.
 
-One method by which peers might be grouped is merely to use peer proximity and movement and thereby define groups as groups of users in the virtual
-world. The architecture will then make use of the flocking behaviour of players to dynamically group players into flocks or clusters \cite{flocking}.
-The main idea of flocking is that players move around in groups, rather than randomly on their own. Because of the flocking behaviour of players,
-dynamic groups or regions that move with groups of players may be a better fit than static or even dynamic regions that operate on areas of the
-virtual world and not on how groups of players actually cluster.
+Distributed clustering techniques will make use of the flocking behaviour of players to dynamically group players into flocks or clusters
+\cite{flocking}. The main idea of flocking is that players move around in groups, rather than randomly on their own. Because of the flocking
+behaviour of players, dynamic groups or regions that move with groups of players may be a better fit than static or even dynamic regions that operate
+on areas of the virtual world and not on how groups of players actually cluster. Because a fully distributed architecture is not scalable, player
+density within groups should remain constant. This means that groups should merge or split as the player density in them change.
 
-Because a fully distributed architecture is not scalable, group sizes should also not exceed some threshold. This threshold complicates group
-construction, because groups are already constructed according to position in the virtual world.
+Affinity propagation clusters nodes using a similarity matrix to find similar nodes. The similarity matrix may contain any type of quantity and can
+contain player positions. Affinity propagation will then group nodes depending on their location in a virtual world. This algorithm is ideally suited
+to P2P applications, since it is a distributed clustering algorithm based on message passing.
 
-As an alternative to geographic grouping, dynamic regioning might also be used to group players. Where every dynamic region will constitute a group
-of players. Dynamic regioning splits an overpopulated region which will allow for sufficient bounding of the amount of players in the group.
+As an alternative to clustering, dynamic regioning might also be used to group players. SOSPS is a new and promising development in dynamic
+regioning. SOSPS creates dynamic regions based on a Voronoi overlay network \cite{voronoi_diagrams_survey}. Near constant player density is achieved
+by increasing and decreasing the area sizes. This system is based on VON, a distributed Voronoi overlay network designed for MMVEs \cite{VON_VAST}.
 
-%Speak about Spatial Publish Subscribe
+\subsection{Store and retrieve with replication}
+\label{store_retrieve}
 
-\subsubsection{Joining}
+The process of storing a file in Pithos is as follows:
+\begin{enumerate}
+\item A peer receives a store request from the higher game layer, along with the object that should be stored.
+\item The storing peer then replicates the object $k$ times.
+\item For each object, the storing peer selects a single peer from its list of group peers by sampling from a uniformly random distribution.
+\item Each object is then sent to the selected peer for storage.
+\item The storing peer also sends an update message to all group peers to inform them of the new object available in the group and on which peers
+    the object is stored.
+\item The storing peer then sends an additional replica of the object to the super peer, along with a value ($l$) specifying how many overlay
+    replicas are required.
+\item The group super peer generates a SHA-1 hash over the object data and uses this as the destination ID to route the overlay object to.
+\item The destination super peer received the overlay object and resends it to $l$ of its overlay neighbours.
+\item At each destination super peer, the super peer selects a single node in its group from a uniform random distribution where the overlay
+    object is then sent to and stored.
+\end{enumerate}
 
-When a Super Peer is created, it registers its IP address and position within the virtual world with the Directory Server. When a peer joins the
-network it sends its position to the directory server and receives a super peer IP that is closest in return. The peer then sends a join request to
-the received super peer IP. The super peer can accept the request or reply with another super peer IP that it deems more appropriate. The super peer
-also sends a list of all peer IPs that are currently part of the group to the joining peer. In addition, the super peer updates its group peers with
-the IP of the joining node.
+Currently, Pithos sends the object along with a store request to the group super peer, where the group super peer then forwards that object to
+another super peer and that super peer then sends the object to a group peer for storage. A future improvement might be to only send signalling
+messages to the nodes in the forwarding path that indicate that a source node has an object to store. When the signalling message then arrives at the
+different destination nodes, they can contact the source node directly and obtain the object from that node. This will reduce the amount of bandwidth
+consumed by the storage operation.
 
-Here it is possible to use a simple underlay network, where nodes are positioned on Euclidean space and latencies are calculated according to the
-distances between nodes or to use a modified version of the INET framework found in Omnet++, which attempts to accurately model latency effects and
-the various complexities of the underlying network.
-
-\subsubsection{Store and retrieve with replication}
+The process of retrieving a file from Pithos is as follows:
+\begin{enumerate}
+\item A peer receives a retrieve request from the higher game layer that contains the object ID generated from the SHA-1 hash.
+\item The peer then searches for the object in its list of group objects.
+\item If the object is available in the group, the object is requested from the peer containing it and sent up to the game layer.
+\item If the object is not available in the group, an object request is sent to the group super peer.
+\item The group super peer requests the object by ID, forwards the received object to the requesting peer where the requesting peer then sends
+    the object to the game layer.
+\end{enumerate}
 
 Pithos implements data replication to enable it to handle node churn. If a node leaves the network and stops to transmit pong messages, the migration
 mechanism will detect this and replicate the file on another node. Replication exists intra as well as inter group.
 
-\subsubsection{Secure node ID assignments}
+\subsection{Secure storage and node ID assignments}
+\label{secure_ids}
+
+In order to design a secure distributed storage system, one requirement for the P2P overlay is that nodes should not be able to select their own IDs
+or it will not be possible to secure the system against attack. Node IDs should rather be assigned securely by some certification authority
+\cite{secure_overlay_routing}.
+
+To this end Pithos implements its own certification authority to assign node IDs securely and promote security in the P2P overlay. A certification
+server exists that handle ID requests from nodes. The server assigns IDs to nodes and provides the node with a signed certificate that it may use to
+store data.
+
+Whenever objects are stored or updated in the storage network, nodes have to sign the object with their certificate to enable the tracking of object
+changes throughout the life of the object. This system is very different from classic distributed file storage designs that advocate anonymity in
+storage. The fact that all changes can be tracked to a specific node will simplify the task of eliminating player cheating.
+
+Other security safeguards exist that have to be implemented in the P2P overlay in order to create a secure system. Secure node ID assignments are
+mentioned here, since this cannot be implemented in the overlay used, but has to be implemented in the higher layer application (Pithos) making use
+of a P2P overlay (Pastry, Chord, Kademlia).
+
+\subsection{Distance-based storage} \label{distance_based}
+
+For Pithos to perform well as an MMVE storage architecture, intra-group data requests should be preferred to inter-group data requests. This
+requirement, combined with the fact that the grouping algorithm geographically groups players, lends Pithos to a storage system based on
+distance-based storage. The assumption made is much the same as the one made for interest management, that players have a limit area of interest and
+require interaction with a limited number of objects within range.
+
+The design is then to implement distance-based storage, but on a group level rather than an individual level. This means that objects are stored on
+the nearest group of players, rather than the nearest player. It is supposed that such an approach will also alleviate many of the challenges present
+with distance-based storage as discussed in the following subsections.
+
+With group-based distance-based storage, it is assumed that because peers now store objects closest to the group, the objects that they are
+interested in will most likely be stored within their own group. What follows is that most data requests should be intra-group requests. The overlay
+storage component ensures that nodes that require data not stored within their group are still able to access the data.
+
+\section{Pithos evaluation}
+
+This section evaluates the Pithos design according to the requirements set out in Section \ref{current_models} of responsiveness, reliability,
+fairness, security and scalability.
 
 \subsection{Responsiveness}
 
-If players are grouped more intelligently, less traffic will have to flow between groups, which will reduce the number of queries to the DHT, which
-in turn will improve the latency of the overall system. Using groups or flocks would, therefore, compliment this technique.
+Responsiveness is achieved by allowing players to store data within their group and presenting them with direct access to data anywhere in the group.
+It is assumed that player requests will be for data that are mostly contained within their groups, thereby prioritising the faster intra group
+communications as opposed to the slower overlay communications. It should be noted that because group storage is faster than overlay storage, any
+percentage of intra-group messages will improve the responsiveness of the system beyond that of overlay storage.
 
-%\subsection{Distance-based}
-\label{distance_based}
+If players are grouped intelligently and group migration does not occur often, less traffic will have to flow between groups, which will reduce the
+number of queries to the DHT, which in turn will improve the latency of the overall system.
 
-%Why distance based and grouping might help for saving game data
-
-\subsection{Reliability}
-
-%\subsection{Bootstrap mechanism}
+Some preliminary results on the responsiveness of Pithos is presented in Section \ref{responsiveness_results}.
 
 \subsection{Fairness}
 
+Two areas of fairness are explored in the Pithos storage system. The one is group object fairness and the other is overlay object fairness. Group
+objects are stored by peers storing objects within their own group, overlay objects are stored by the super peer in the overlay. From the storage
+description of Section \ref{store_retrieve}, it is evident that overlay objects are also stored amongst all nodes in the network and that peers
+contain a mixture of overlay and group objects.
+
+To evaluate the fairness, we evaluate the standard deviation of the number of objects stored per peer. To make the storage of group objects fair,
+every node in a group can by picked at a probability sampled from a integer uniform distribution, where the maximum value of the distribution is the
+number of nodes in the group. This selection mechanism produces objects distributed normally around some average as can be seen from the preliminary
+results presented in Section \ref{fairness_results}.
+
+The mapping of overlay objects to nodes are done differently. Because P2P overlays use distance-based routing, objects are stored on the node with an
+ID that is closest to the ID of the file stored. This storage method in effect maps objects to nodes, where every node covers a different area of the
+key space. The distribution of objects for this type of storage is less fair than group storage, with a higher standard deviation and longer tail.
+
+It should however be noted that distribution of overlay objects are just as fair as for any overlay storage technique and much fairer than a super
+peer storage technique. Some preliminary results on the fairness of overlay storage is also presented in Section \ref{fairness_results}.
+
+\subsection{Reliability}
+
+The Pithos replication and migration mechanisms should ensure reliable storage. Objects are replicated and can be migrated to new nodes if a player
+has left the network. As long as files can be migrated faster than what it would take for all replicas to leave the network, the system will remain
+reliable. One also doesn't expect high levels of churn in an MMVE, with typical sessions lasting for one or two hours before a user leaves the world.
+
+The group-based distance-based architecture of Pithos also improves reliability in that data are now more resistant to churn because grouping allows
+for migration. This method provides a concrete method by which distance-based storage can be made reliable, something that has not been found in the
+literature.
 
 \subsection{Security}
 
-%\subsection{Certification Authority}
+It is believed that the secure node ID assignments and storage certification described in Section \ref{secure_ids} greatly improves the security of
+Pithos over other architectures that have thus far been presented. In fact, very little storage architectures address the security issues present in
+state persistency for P2P MMVEs.
 
-Use secure node ID assignments, by making use of a Certification Authority, or designing the system in such a way that a peer cannot select or report
-it's own node ID.
+Another advantage of the group-based distance-based storage presented here is that the security issue mentioned in Section
+\ref{classic_distance_based} is much less of a concern. Because data are now stored on the nearest groups and not the nearest players, it makes it
+much more difficult to cheat. This is achieved by the group replication mechanism as well as the possibility to add hash checking to the retrieval
+process. An object can now be retrieved from one group peer and hashes can be requested from other group peers. The hashes can be compared to a hash
+of the file received, which would enable a requesting node to determine whether a file has been altered.
+
+Also, because all file updates must be signed by a certificate and every node is uniquely identified by its certificate, the malicious node can be
+tracked and dealt with.
+
+\subsection{Scalability}
+
+The protocols used in Pithos have been designed with scalability in mind. The issue of group sizes becoming to large have been addressed and ways
+have been proposed by which player density in groups can be kept constant. This will ensure that traffic in groups remain constant. The other
+component used is the P2P overlay, which is by design scalable.
+
+That said, the amount of network traffic present should still be measured, this can however only be done after the amount and characteristics of the
+storage traffic is known for an MMVE.
 
 \subsection{Future work}
 
@@ -522,8 +609,6 @@ The issue with such a system would be how to uniquely identify a group and how t
 moving towards each other also have to be identified and the grouping might have to be able to maintain two groups moving through each other. Little
 work has been done to group players in a distributed fashion in virtual worlds. Further research is required into grouping algorithms to determine
 their usability in virtual worlds under user churn.
-
-\subsection{Future work}
 
 The simulation does not yet support nodes leaving the network. The migration mechanism should still be implemented before rigourous testing under
 heavy network churn will become a possibility.
@@ -535,31 +620,47 @@ heavy network churn will become a possibility.
 \section{Preliminary results}
 \label{results}
 
-For preliminary results, two requirements were measured. These were responsiveness and fairness. Responsiveness is defined as how long it takes to
-store and retrieve a node from the network. Fairness is defined as the variance in the number of files or bytes stored on the different nodes.
+Pithos is currently still a work in progress, but for preliminary results the requirements of responsiveness and fairness were measured.
+Responsiveness is defined as how long it takes to store and retrieve a node from the network. Fairness is defined as the standard deviation in the
+number of files or bytes stored on the different nodes.
 
 The responsiveness is compared to Pastry routing times.
 
 \subsection{Test setup}
-In the results shown, Pastry was used as an overlay, Pithos as the tier 1 application and another ``game'' application was used as the tier 2
-application. The purpose of the game application is to drive the simulation with put and get requests. Pastry was chosen because of many articles
-referencing Pastry as the overlay used for overlay storage. It is important to note that because of Oversim's layered architecture, Pithos can work
-and has been additionally tested with Chord and Kademlia. The ideal choice of overlay is a question for future research and testing.
 
-In the tier 1 layer, a specific number of peers, super peers and a single directory server is created at the start of the simulation. Every node is
-allowed to fully initialise before it starts to generate and respond to store and retrieve requests. For the results shown in Section \ref{results},
-14999 peer, 499 super peers and 1 directory server were used to give a total of 15000 simulated nodes. This limit is established by the number of
-node coordinates in the Oversim coordinates file.
+Pithos is being implemented in Oversim \cite{OverSim_2007}, running on Omnet++. Oversim was chosen because of the variety of already implemented
+protocols as well as the layered architecture, which simplifies testing with different overlays and comparing with different storage types.
+
+In the results shown, Pastry was used as the P2P overlay and Pithos was driven by a \emph{game} module. After a node has joined a group, the game
+module starts to generate store and retrieve requests. Pastry was chosen because of many articles referencing Pastry as the overlay used for overlay
+storage. It should be noted that because of Oversim's layered architecture, Pithos can work and has been additionally tested with the Chord and
+Kademlia overlays. The ideal choice of overlay is a question for future research and testing.
+
+For the results shown in Section \ref{results}, 14999 peers, 499 super peers and a single directory server are created at the start of the
+simulation. The directory server publishes super peer information, which allows a peer to join the group nearest to it. Because of the way Pithos is
+structured, each super peer node is also a peer node, which then gives a total of 15000 Oversim nodes. This limit is established by the number of
+node coordinates in the Oversim coordinates file, but can later be expanded when a larger coordinates file is found.
 
 After a specific node has joined a group, it informs the game module and the game module then starts to generate store and retrieve requests. These
-requests are received by the tier 1 peer logic module and handled.
+requests are received by Pithos and handled. Pithos was configured to store two group replicas and one overlay replica for every root object stored
+to give a ratio of group storage to overlay storage of 3:1.
 
 \subsection{Responsiveness}
+\label{responsiveness_results}
 
 Firstly, we evaluate the responsiveness of the storage system. In the storage system, we expect two levels of responsiveness. We expect a certain
-level of responsiveness for intra group communications and a certain level of responsiveness for inter group communications. Because we expect intra
-group communications to appear more often, we can calculate an average response time which is determined by the percentage of intra group requests,
-compared to inter group requests.
+level of responsiveness for intra group communications and a certain level of responsiveness for inter group communications.
+
+We can calculate an average response time which is determined by the percentage of intra group requests, compared to inter group requests as follows:
+%
+\begin{equation}\label{expected_response_time}
+    E[T_{\textrm{resp}}] = \left(P(g)\left(E\left[T_{\textrm{group}}\right]\right) + \left(1 - P(g)\right)\left(E\left[T_{\textrm{overlay}}\right]\right)\right)
+\end{equation}
+%
+, where $E[T_{\textrm{resp}}]$, the expected value of the overall system response time is given by $P(g)$, the probability that a message is routed
+within a group, $E\left[T_{\textrm{group}}\right]$, the expected value of the root and replica message distribution as shown in Figure
+\ref{fig_pithos_response} and $E\left[T_{\textrm{overlay}}\right]$, the expected value of the overly message distribution also shown in Figure
+\ref{fig_pithos_response}.
 
 \begin{figure}[htbp]
  \centering
@@ -570,65 +671,135 @@ compared to inter group requests.
 %
 Figure \ref{fig_pithos_response} shows the distribution of mean storage request times over all nodes in the network for the different types of
 storage present in the network. One can see that the intra group root and replica objects are stored much faster than the overlay objects in the
-network. Specifically, intra group object are stored in a mean time of 0.0878 s, while inter group objects are stored in a mean time of 0.3284 s,
-3.74 times slower than intra group stores.
+network. Specifically, intra group object are stored with an expected time of $E\left[T_{\textrm{group}}\right] =  0.0878 s$, while inter group
+objects are stored with an expected time of $E\left[T_{\textrm{overlay}}\right] = 0.3284 s$, 3.74 times slower than intra group storage.
 
 There seem to be multiple distributions of root and replica nodes spaced equally apart. The supposition is that these represent the physical hops in
 the underlaying architecture.
 
-From Figure \ref{fig_pithos_response} it is evident that if only overlay storage is used, the storage and retrieval times will be much higher.
+From Figure \ref{fig_pithos_response} it is evident that if only overlay storage is used, the storage and retrieval times will be much higher. To
+exactly compare Pithos with overlay storage, the percentage of intra group requests ($P(g)$) should first be known. At this time there is no way to
+know what this percentage is, but the responsiveness can be calculated as a function of $P(g)$. From Equation \eqref{expected_response_time}, if
+there are no intra-group messages in the system ($P(g) = 0$), the system performs as well as overlay storage. For any $P(g) > 0$, the system performs
+better than overlay storage.
 
-To exactly compare Pithos with overlay storage, the percentage of intra group requests compared to inter group requests should first be known.
-%Insert other Matlab responsiveness calculations
+The responsiveness of Pithos will of course depend on the number of nodes in the network ($N$). This is because the number of routing hops in a P2P
+overlay is dependant on $N$, specifically for Pastry \cite{storage_and_chaching_PAST}:
+%
+\begin{equation}\label{pastry_hops}
+    E[H_{\textrm{pastry}}] = \log_{2^b}\left(N\right)
+\end{equation}
+%
+, where $E[H_{\textrm{pastry}}]$ is the expected number of Pastry hops and $b$ is a network parameter that is usually chosen $b = 4$. From this, it
+is possible to calculate a theoretical performance for Pithos and compare that with a theoretical performance of overlay storage.
+
+As with Equation \eqref{expected_response_time}, a weighted hop average will be used to calculate expected hops for both Pithos and overlay storage
+for various numbers of nodes as follows:
+%
+\begin{equation}\label{expected_response_time}
+    E[H] = P(g)\left(E\left[H_{\textrm{group}}\right]\right) + \left(1 - P(g)\right)\left(E\left[H_{\textrm{overlay}}\right]\right)
+\end{equation}
+%
+, where $E[H]$ is the expected number of Pithos hops, $E\left[H_{\textrm{group}}\right]$ is the expected number of group hops and
+$E\left[H_{\textrm{overlay}}\right]$ is the expected number of overly hops. In Pithos, the expected number of group hops is
+$E\left[H_{\textrm{group}}\right] = 1$, because in a fully connected group any node is always one hop away from any other node.
+
+To find the value of $E\left[H_{\textrm{overlay}}\right]$, one has to look at how many hops an overlay messages required in Pithos. A message store
+request is generated on a group peer. That group peer forwards the message to its group super peer, which is always a single hop away. The super peer
+then forwards the message to another super peer in $\log_{16}(M)$ hops, from Equation \eqref{pastry_hops}, where $M$ is the number of super peers in
+the network. From the destination super peer, another hop is required to send the message to the destination group peer. This gives
+%
+\begin{equation}\label{group_hops}
+    E\left[H_{\textrm{group}}\right] = 1 + \log_{16}(M) + 1.
+\end{equation}
+%
+Equation \eqref{expected_response_time} then becomes:
+%
+\begin{equation}\label{expected_response_time_exp}
+    E[H] = P(g) + \left(1 - P(g)\right)\left(2 + \log_{16}\left(M\right)\right).
+\end{equation}
 
 \begin{figure}[htbp]
  \centering
  \includegraphics[clip=true, viewport=2cm 1cm 27cm 19.5cm, width=\columnwidth]{Hops_vsGroupFrac_4n}
  \caption{Time distribution of overlay and root/replica objects}
- \label{fig_pithos_response}
+ \label{fig_hop_compare}
 \end{figure}
+%
+Figure \ref{fig_hop_compare} compares the expected number of Pithos hops with the expected number of overlay hops as a function of intra-group
+probability ($P(g)$) for numbers of nodes ($N$). The overlay hops were calculated from Equation \eqref{pastry_hops}, while the Pithos hops were
+calculated from Equation \eqref{expected_response_time_exp}. For the Pithos graphs, an average number of 50 peers per group was used to determine the
+number of super peers.
 
+Figure \ref{fig_hop_compare} shows that for a low value of $P(g)$, overlay storage performs better than Pithos because of the additional two hops
+present in Pithos. For 10,000 nodes Pithos starts to perform better then overlay storage when $P(g) > 0.2$. This is considered a low value for
+$P(g)$, because of the distance-based design of Pithos that attempts to maximise the value for $P(g)$. It should be noted that Pithos also seems more
+scalable than overlay storage, since the threshold value for $P(g)$ becomes lesser, the more nodes there are in the network.
 
 \subsection{Fairness}
+\label{fairness_results}
 
 \begin{figure}[htbp]
  \centering
  \includegraphics[clip=true, viewport=1.5cm 1.8cm 26.5cm 20cm, width=\columnwidth]{RootRepObjects}
  \caption{Root/Replica object number distribution}
- \label{fig_pithos_response}
+ \label{fig_group_objects}
 \end{figure}
+%
+To measure fairness, the object distributions over the nodes in the network are investigated. Figure \ref{fig_group_objects} shows the distribution
+of group objects over nodes in the network. The figure shows how many nodes store how many objects. From this figure it is evident that the object
+distribution forms a normal distribution. The distribution has a mean of 302 objects per node and a standard deviation of 51 objects per node or
+17\%.
 
 \begin{figure}[htbp]
  \centering
  \includegraphics[clip=true, viewport=1.5cm 1.2cm 27cm 19.7cm, width=\columnwidth]{OverlayObjects}
  \caption{Overlay object number distribution}
- \label{fig_pithos_response}
+ \label{fig_overlay_objects}
 \end{figure}
+%
+Figure \ref{fig_overlay_objects} shows the distribution of overlay objects in Pithos. The distribution has a mean of 153 objects per node and a
+standard deviation of 189 objects per node or 124\%. Comparing group storage to overlay storage, it is also evident that group storage is much fairer
+than overlay storage, if the standard deviation is taken as a measure of fairness. This shows that designing a hybrid system which prefers group
+storage to overlay storage, one is also designing a fairer system than overlay storage. It should be again noted here that super peer storage is not
+being considered, because of its complete lack of fairness.
+
+The reason why overlay storage is not particularly fair is not at first evident. At first glance, one might think that mapping one uniform
+distribution (the file ID hashes) to another uniform distribution (the node ID hashes) in a distance-based manner would produce a system where the
+number of files per node is roughly balanced \cite{storage_and_chaching_PAST}. This is not the case. The key is that uniformly distributed does not
+mean evenly distributed. In other words, if numbers are sampled from a uniform random distribution, the differences between consecutive numbers will
+not be at all similar. This shows that although overlay storage distributed files over all nodes, the number of files per node can vary greatly.
 
 \begin{figure}[htbp]
  \centering
  \includegraphics[clip=true, viewport=1.5cm 1.2cm 27cm 19.7cm, width=\columnwidth]{Objects}
  \caption{Combined object number distribution}
- \label{fig_pithos_response}
+ \label{fig_objects}
 \end{figure}
-
-Figure \ref{} shows the fairness achieved by mapping file hashes to nodes with the closest IDs. This has the effect of mapping one set of uniform
-random numbers onto another set of uniform random numbers, where the two sets are statistically independent. This mapping produces a bernoulli
-distribution in the following way:
+%
+Figure \ref{fig_objects} shows the combined object distribution of Pithos. The distribution has a mean of 453 objects per node and a standard
+deviation of 200 objects per node or 44\%. The overall fairness of Pithos is thus significantly better than the fairness of overlay storage.
 
 \begin{figure}[htbp]
  \centering
  \includegraphics[clip=true, viewport=1.5cm 1cm 27cm 19.5cm, width=\columnwidth]{ObjectsByGroupSize}
  \caption{Average number of overlay objects stored by group size}
- \label{fig_pithos_response}
+ \label{fig_objects_by_groupsize}
 \end{figure}
+%
+Figure \ref{fig_objects_by_groupsize} shows the average number of objects stored by group size. The figure shows that the number of group objects
+stored in any size of group remains the same. The number of overlay objects, however, increases exponentially with a decrease in group size. This can
+be explained by looking at how overlay objects are distributed within the network. %Reason
 
 \begin{figure}[htbp]
  \centering
  \includegraphics[clip=true, viewport=2cm 1cm 27.5cm 19.5cm, width=\columnwidth]{ObjectsByJoinTime}
  \caption{Average number of overlay objects stored by join time}
- \label{fig_pithos_response}
+ \label{fig_objects_by_jointime}
 \end{figure}
+%
+%Description
+%Reason
 
 %Statistics proof of distribution for constant area and mention that the area is not constant and that adds some jitter to the distribution.
 %Note on where the average values come from: 300 and 150 objects per node and 30 nodes per group
