@@ -741,28 +741,35 @@ scalable than overlay storage, since the threshold value for $P(g)$ becomes less
 
 \begin{figure}[htbp]
  \centering
- \includegraphics[clip=true, viewport=1.5cm 1.8cm 26.5cm 20cm, width=\columnwidth]{RootRepObjects}
+ \includegraphics[clip=true, viewport=1cm 0.5cm 28.5cm 20cm, width=\columnwidth]{RootRepOverlayObjects}
  \caption{Root/Replica object number distribution}
- \label{fig_group_objects}
+ \label{fig_group_overlay_objects}
 \end{figure}
 %
-To measure fairness, the object distributions over the nodes in the network are investigated. Figure \ref{fig_group_objects} shows the distribution
-of group objects over nodes in the network. The figure shows how many nodes store how many objects. From this figure it is evident that the object
-distribution forms a normal distribution. The distribution has a mean of 302 objects per node and a standard deviation of 51 objects per node or
-17\%.
+%\begin{figure}[htbp]
+% \centering
+% \includegraphics[clip=true, viewport=1.5cm 1.8cm 26.5cm 20cm, width=\columnwidth]{RootRepObjects}
+% \caption{Root/Replica object number distribution}
+% \label{fig_group_objects}
+%\end{figure}
+%
+To measure fairness, the object distributions over the nodes in the network are investigated. Figure \ref{fig_group_overlay_objects} (top) shows the
+distribution of group objects over nodes in the network. The figure shows how many nodes store how many objects. From this figure it is evident that
+the object distribution forms a normal distribution. The distribution has a mean of 302 objects per node and a standard deviation of 51 objects per
+node.
 
-\begin{figure}[htbp]
- \centering
- \includegraphics[clip=true, viewport=1.5cm 1.2cm 27cm 19.7cm, width=\columnwidth]{OverlayObjects}
- \caption{Overlay object number distribution}
- \label{fig_overlay_objects}
-\end{figure}
+%\begin{figure}[htbp]
+% \centering
+% \includegraphics[clip=true, viewport=1.5cm 1.2cm 27cm 19.7cm, width=\columnwidth]{OverlayObjects}
+% \caption{Overlay object number distribution}
+% \label{fig_overlay_objects}
+%\end{figure}
 %
-Figure \ref{fig_overlay_objects} shows the distribution of overlay objects in Pithos. The distribution has a mean of 153 objects per node and a
-standard deviation of 189 objects per node or 124\%. Comparing group storage to overlay storage, it is also evident that group storage is much fairer
-than overlay storage, if the standard deviation is taken as a measure of fairness. This shows that designing a hybrid system which prefers group
-storage to overlay storage, one is also designing a fairer system than overlay storage. It should be again noted here that super peer storage is not
-being considered, because of its complete lack of fairness.
+Figure \ref{fig_group_overlay_objects} (bottom) shows the distribution of overlay objects in Pithos. The distribution has a mean of 153 objects per
+node and a standard deviation of 189 objects per node. Comparing group storage to overlay storage, it is also evident that group storage is much
+fairer than overlay storage, if the standard deviation is taken as a measure of fairness. This shows that designing a hybrid system which prefers
+group storage to overlay storage, one is also designing a fairer system than overlay storage. It should be again noted here that super peer storage
+is not being considered, because of its complete lack of fairness.
 
 The reason why overlay storage is not particularly fair is not at first evident. At first glance, one might think that mapping one uniform
 distribution (the file ID hashes) to another uniform distribution (the node ID hashes) in a distance-based manner would produce a system where the
@@ -772,7 +779,7 @@ not be at all similar. This shows that although overlay storage distributed file
 
 \begin{figure}[htbp]
  \centering
- \includegraphics[clip=true, viewport=1.5cm 1.2cm 27cm 19.7cm, width=\columnwidth]{Objects}
+ \includegraphics[clip=true, viewport=1cm 5cm 29cm 14.5cm, width=\columnwidth]{Objects}
  \caption{Combined object number distribution}
  \label{fig_objects}
 \end{figure}
@@ -780,29 +787,45 @@ not be at all similar. This shows that although overlay storage distributed file
 Figure \ref{fig_objects} shows the combined object distribution of Pithos. The distribution has a mean of 453 objects per node and a standard
 deviation of 200 objects per node or 44\%. The overall fairness of Pithos is thus significantly better than the fairness of overlay storage.
 
+%\begin{figure}[htbp]
+% \centering
+% \includegraphics[clip=true, viewport=1.5cm 1cm 27cm 19.5cm, width=\columnwidth]{ObjectsByGroupSize}
+% \caption{Average number of overlay objects stored by group size}
+% \label{fig_objects_by_groupsize}
+%\end{figure}
+%
 \begin{figure}[htbp]
  \centering
- \includegraphics[clip=true, viewport=1.5cm 1cm 27cm 19.5cm, width=\columnwidth]{ObjectsByGroupSize}
- \caption{Average number of overlay objects stored by group size}
- \label{fig_objects_by_groupsize}
+ \includegraphics[clip=true, viewport=0.5cm 0.5cm 29cm 20.5cm, width=\columnwidth]{ObjectsByJtGs}
+ \caption{Average number of overlay objects stored by group size and join time}
+ \label{fig_objects_by_groupsize_jointime}
 \end{figure}
 %
-Figure \ref{fig_objects_by_groupsize} shows the average number of objects stored by group size. The figure shows that the number of group objects
-stored in any size of group remains the same. The number of overlay objects, however, increases exponentially with a decrease in group size. This can
-be explained by looking at how overlay objects are distributed within the network. %Reason
+Figure \ref{fig_objects_by_groupsize_jointime} (top) shows the average number of objects stored by group size. The figure shows that the number of
+group objects stored in any size of group remains the same. The number of overlay objects, however, increases exponentially with a decrease in group
+size. The overlay storage discrepancy can be explained by looking at how overlay objects are distributed within the network. When an overlay object
+is stored, any group can be chosen and the object is then stored on a node within that group. If there are two groups that are chosen an equal number
+of times, but the one group contains less nodes, each node in that group will have to store more data.
 
-\begin{figure}[htbp]
- \centering
- \includegraphics[clip=true, viewport=2cm 1cm 27.5cm 19.5cm, width=\columnwidth]{ObjectsByJoinTime}
- \caption{Average number of overlay objects stored by join time}
- \label{fig_objects_by_jointime}
-\end{figure}
+Group storage functions somewhat differently. Because every node in the simulations generates the same amount of data, smaller groups have less nodes
+to store data on, but these groups also generate less data, therefore the ratio remains constant.
+
+%\begin{figure}[htbp]
+% \centering
+% \includegraphics[clip=true, viewport=2cm 1cm 27.5cm 19.5cm, width=\columnwidth]{ObjectsByJoinTime}
+% \caption{Average number of overlay objects stored by join time}
+% \label{fig_objects_by_jointime}
+%\end{figure}
 %
-%Description
-%Reason
+Figure \ref{fig_objects_by_groupsize_jointime} (bottom) shows the average number of objects stored by join time. Join time is defined as the time at
+which a certain node joined another non-empty group or the time when the joined group contained more than one node. From this figure it is evident
+that nodes that have existed in the network for a longer period of time store more root and replica objects. With overlay objects, only a slight
+decrease over time is perceived with a much greater variance present in the data.
 
-%Statistics proof of distribution for constant area and mention that the area is not constant and that adds some jitter to the distribution.
-%Note on where the average values come from: 300 and 150 objects per node and 30 nodes per group
+For the number of root and replica objects stored on a node to decrease over time makes sense, since nodes that have been in the network longer would
+have been requested to store more data. Why the number of overlay objects do not follow this pattern is thought to be as a result of how the Pastry
+key space functions. When more overlay objects are added to the network, the amount of key space covered by the older nodes decrease, which means
+that the number of requests that older nodes are required to serve also decreases over time and reduces the effect seen in root and replica storage.
 
 \section{Conclusion}
 \label{conclusion}
