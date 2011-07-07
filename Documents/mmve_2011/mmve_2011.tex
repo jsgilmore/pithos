@@ -346,7 +346,7 @@ peer storage is not fair or secure, overlay storage is not responsive, hybrid ov
 not secure and not yet reliable.
 
 It should also be noted that most of these storage types are not mature. In the referenced papers, they were mentioned as a means by which
-persistency might be achieved. But none of the papers, save for PAST \cite{PAST_storage}, presented concrete designs and results.
+persistency might be achieved. But none of the papers, save for PAST \cite{storage_and_chaching_PAST}, presented concrete designs and results.
 
 This shows that not only is a storage type required that improves upon previous storage types, but a concrete design and implementation is also
 required that uncovers unforeseen issues that might arise when implementing P2P MMVEs. The following section attempt to provide such a design.
@@ -479,14 +479,15 @@ requirements, only preliminary results for responsiveness and fairness is presen
 \subsection{Test setup}
 \label{test_setup}
 
-Pithos is being implemented in Oversim \cite{OverSim_2007}, running on Omnet++. Oversim was chosen because of the variety of already implemented
-protocols as well as the layered architecture, which simplifies testing with different overlays and comparing with different storage types.
+Pithos is being implemented in Oversim, running on Omnet++. Oversim was chosen because of the variety of already implemented protocols as well as the
+layered architecture, which simplifies testing with different overlays and comparison with different storage types.
 
 In the results shown, Pastry was used as the P2P overlay and Pithos was driven by a \emph{game} module. After a node has joined a group, the game
-module starts to generate store and retrieve requests. Pithos was configured to store two group replicas and one overlay replica for every root
-object stored to give a ratio of group storage to overlay storage of 3:1.
+module starts to generate store and retrieve requests at a mean rate of 100 ms and a mean size of 1 KB, both sampled from exponential distributions.
+Pithos was configured to store two group replicas and one overlay replica for every root object stored to give a ratio of group storage to overlay
+storage of 3:1. The choice of these values is discussed in Section \ref{future_work}.
 
-For the results shown in Section \ref{results}, 14999 peers, 499 super peers and a single directory server are created at the start of the
+For the results shown in Section \ref{results}, 14999 peers, 4999 super peers and a single directory server are created at the start of the
 simulation. The directory server publishes super peer information, which allows a peer to join the group nearest to it. Because of the way Pithos is
 structured, each super peer node is also a peer node, which then gives a total of 15000 Oversim nodes.
 
@@ -508,21 +509,23 @@ routed within a group, $E\left[T_{\textrm{group}}\right]$, the expected value of
 
 \begin{figure}[htbp]
  \centering
- \includegraphics[clip=true, viewport=2cm 5cm 27cm 14.5cm, width=\columnwidth]{request_time_distribution}
+ \includegraphics[clip=true, viewport=1cm 0.5cm 29cm 20.5cm, width=\columnwidth]{StoreTimes}
  \caption{Time distribution of overlay and root/replica objects}
  \label{fig_pithos_response}
 \end{figure}
 %
-Figure \ref{fig_pithos_response} shows the distribution of mean storage request times over all nodes in the network for the different types of
-storage present in the network. One can see that the intra-group root and replica objects are stored much faster ($E\left[T_{\textrm{group}}\right] =
-0.0878 s$) than the overlay objects in the network ($E\left[T_{\textrm{overlay}}\right] = 0.3284 s$).
+Figure \ref{fig_pithos_response} (top) shows the distribution of mean storage request times over all nodes in the Pithos network for the different
+storage types. One can see that the intra-group root and replica objects are stored much faster ($E\left[T_{\textrm{group}}\right] = 0.0878 s$) than
+the overlay objects in the network ($E\left[T_{\textrm{overlay}}\right] = 0.3284 s$).
 
-From Figure \ref{fig_pithos_response} it is evident that if only overlay storage is used, the storage and retrieval times will be much higher. To
-exactly compare Pithos with overlay storage, the percentage of intra-group requests ($P(g)$) should first be known. At this time there is no way to
-know what this percentage is, but the responsiveness can be calculated as a function of $P(g)$.
+From Figure \ref{fig_pithos_response} (top) it is evident that if only overlay storage is used, the storage and retrieval times will be much higher.
+Figure \ref{fig_pithos_response} (bottom) presents the responsiveness of a pure Pastry network of 14999 nodes, using the \verb.KBRTestApp.
+application and Pastry overlay in Oversim. The Pastry network has a mean routing time of 0.12 s. To exactly compare Pithos with overlay storage, the
+percentage of intra-group requests ($P(g)$) should first be known. At this time there is no way to know what this percentage is, but the
+responsiveness can be calculated as a function of $P(g)$.
 
 The responsiveness of Pithos will depend on the responsiveness of Pastry, where the expected number of Pastry hops are given by
-\cite{storage_and_chaching_PAST}!:
+\cite{storage_and_chaching_PAST}:
 %
 \begin{equation}\label{pastry_hops}
     E[H_{\textrm{pastry}}] = \log_{2^b}\left(N\right)
@@ -604,32 +607,6 @@ distance-based manner of overlay storage would produce a system where the number
 Figure \ref{fig_objects} shows the combined object distribution of Pithos, with a mean and standard deviation of 453 and 200 objects per node
 respectively. This shows that the fairness of Pithos is currently dominated by the fairness of Pastry and that Pithos is as fair as overlay storage.
 
-\begin{figure}[htbp]
- \centering
- \includegraphics[clip=true, viewport=0cm 1cm 28.5cm 21cm, width=\columnwidth]{ObjectsByJtGs}
- \caption{Average number of overlay objects stored by group size and join time}
- \label{fig_objects_by_groupsize_jointime}
-\end{figure}
-%
-Figure \ref{fig_objects_by_groupsize_jointime} (top) shows the average number of objects stored by group size. The figure shows that the number of
-group objects stored in any size of group remains the same. The number of overlay objects, however, increases exponentially with a decrease in group
-size. The overlay storage discrepancy can be explained by looking at how overlay objects are distributed within the network. When an overlay object
-is stored, any group can be chosen and the object is then stored on a node within that group. If there are two groups that are chosen an equal number
-of times, the group with less nodes will have to store more data.
-
-Group storage functions somewhat differently. Because every node in the simulation generates the same amount of data, smaller groups have less nodes
-to store data on, but these groups also generate less data, therefore the ratio remains constant.
-
-Figure \ref{fig_objects_by_groupsize_jointime} (bottom) shows the average number of objects stored by join time. Join time is defined as the time at
-which a certain node joined the network. From this figure it is evident that nodes that have existed in the network for a longer period of time store
-more root and replica objects. With overlay objects, only a slight decrease over time is perceived with a much greater variance present in the data.
-
-For the number of root and replica objects stored on a node to decrease over time makes sense, since nodes that have been in the network longer would
-have been requested to store more data. Why the number of overlay objects do not follow this pattern is thought to be as a result of how the Pastry
-key space functions. When more overlay objects are added to the network, the amount of key space covered by the older nodes decrease, which means
-that the number of requests that older nodes are required to serve also decreases over time and reduces the effect present with root and replica
-storage.
-
 \section{Conclusion}
 \label{conclusion}
 
@@ -641,20 +618,23 @@ all its key design aspects. For preliminary results, the requirements of respons
 Pithos was found to be more responsive than overlay storage and as fair.
 
 \subsection{Future work}
+\label{future_work}
 
 %Complete implementation
 For future work, we plan to complete the Pithos architecture and compare all requirements with all identified storage types. The simulation does not
 yet support network churn. A migration mechanism should still be implemented before testing under churn can be done. Various improvements to the
-current Pithos architecture can also be made. This includes using signalling to store files as described in Section \ref{store_retrieve} and
-improving fairness as a function of time for older network nodes.
+current Pithos architecture can also be made. This includes using signalling to store files as described in Section \ref{store_retrieve} as well as
+further improving fairness and responsiveness in Pithos.
 
 A key aspect of completing Pithos will be how players are grouped. Future research will focus on player behaviour, clustering algorithms and dynamic
 regioning approaches. The different clustering techniques should be compared and the most applicable one will be chosen to drive Pithos.
 
+
 %Driver data
 A model of data storage and retrieval requests are also required for a typical MMVE. This should include object sizes stored, how regularly these
 objects are stored and what latency requirements exist for object retrieval. It is assumed that this will be very dependant on the specific MMVE and
-therefore different storage parameters should also be identified.
+therefore different storage parameters should also be identified. So although values used in this paper might be artificial, the comparisons of
+responsiveness and fairness were still made between two systems with the same artificial values.
 
 
 %\newpage
