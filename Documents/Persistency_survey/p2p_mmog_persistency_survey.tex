@@ -358,7 +358,7 @@ An unstructured architecture works well for content sharing and Voice over Inter
 Gnutella and Skype. The reason for this is the high level of duplication in these networks, especially for popular content. It is also easier to
 perform keyword searches in unstructured networks and the overlay requires less maintenance.
 
-Because there is not assurance that a data item might be retrieved from an unstructured network, especially when that item is scarce, unstructured
+Because there is no assurance that a data item might be retrieved from an unstructured network, especially when that item is scarce, unstructured
 overlays are not considered adequate as a basis for P2P MMOGs, where all data items must be available at all times.
 
 Structured overlays have been proposed that provide for efficient routing and reliable retrieval of data items. Some of these well known overlays
@@ -396,7 +396,7 @@ The distribution of the load as well as direct communication will further reduce
 \label{key_challenges}
 
 %State persistency, compared to state consistency
-A key challenge with any networked game is how to maintain state consistency between root and replica objects. A root objects is the authoritive
+A key challenge with any networked game is how to maintain state consistency between root and replica objects. A root object is the authoritive
 version of an object and the replica object is usually a local non-authoritive version. Root objects are usually found on the server and replica
 objects are found in the local object cache of clients. The method by which the states between root and replica objects are updated is called the
 consistency model. Solving the state consistency problem for P2P MMOGs is one of the major development challenges.
@@ -413,8 +413,8 @@ will be introduced below.
 \end{figure}
 %
 As shown in Figure \ref{fig_component_ven}, of the six challenges mentioned, Interest Management, Game Event Dissemination and Game State Persistency
-all form part of State Consistency, with some aspects of Cheating Mitigation also a part of State Consistency. Also part of state consistencyis event
-ordering, which deals with how to ensure that the system remains causal \cite{GauthierDickey_low_latency_event_ordering}.
+all form part of State Consistency, with some aspects of Cheating Mitigation also a part of State Consistency. Also part of state consistency is
+event ordering, which deals with how to ensure that the system remains causal \cite{GauthierDickey_low_latency_event_ordering}.
 
 Another challenge for P2P systems is the required peer bandwidth. In a paper by Miller and Crowcroft, a packet simulator was created to determine the
 required bandwidth and effective latency, if a game such as World of Warcraft were to be implemented using P2P technologies
@@ -443,10 +443,10 @@ direction and velocity of movement cannot change instantaneously and are bounded
 
 \subsubsection{Event dissemination}
 
-Event dissemination deals with how information is sent to peers after interest management has determined which information should be sent. In
-consistency terms, it determined how events and updates are distributed in the network. The first application of event dissemination for online games
-can be found in \cite{first_GED}. Recently, ALM and unicast techniques of event dissemination have become popular, depending on the grain of the
-event dissemination. ALM is used, instead of router level multicast, because of a lack of general support for this technology at the router level
+Event dissemination deals with how information is sent to peers after interest management determines which information should be sent. In consistency
+terms, it determined how events and updates are distributed in the network. The first application of event dissemination for online games can be
+found in \cite{first_GED}. Recently, ALM and unicast techniques of event dissemination have become popular, depending on the grain of the event
+dissemination. ALM is used, instead of router level multicast, because of a lack of general support for this technology at the router level
 \cite{ip_multicast_deployment_issues}.
 
 \subsubsection{Cheating mitigation}
@@ -554,7 +554,7 @@ distributed model, also called the event-based model \cite{p2p_cm_aoe}, and the 
 \subsection{Event-based (Fully distributed)} \label{classic_cs_event_based}
 
 \begin{figure*}[htbp]
-\centering \subfloat[Event-based (peer-to-peer)]{\label{fig_p2p_cm}
+\centering \subfloat[Event-based (fully distributed)]{\label{fig_p2p_cm}
 \includegraphics[clip=true, viewport= 2.5cm 0.5cm 19cm 15cm, width=\columnwidth]{CS_P2P_CMs}}
  \subfloat[Update-based (client/server)]{\label{fig_cs_cm}
 \includegraphics[clip=true, viewport= 2.5cm 15cm 19cm 30cm, width=\columnwidth]{CS_P2P_CMs}}
@@ -589,8 +589,8 @@ the game logic and sends updates to the clients, while also updating its own gam
 This approach greatly assists with security, as clients cannot influence the state of any other clients and every client's state depends on updates
 received from the server. The server state is also termed authoritative, because if there is a conflict, the server state is always the state to
 which the system is expected to return. All the security advantages of the C/S model also apply to this consistency model. Another reason why the
-update based model is successful is because it is more scalable then the pure P2P model. More hardware can be used to build a more powerful server,
-which can handle more clients. Computer clusters and large server are, however, costly to obtain and maintain.
+update based model is successful is because it is more scalable then the fully distributed model. More hardware can be used to build a more powerful
+server, which can handle more clients. Computer clusters and large server are, however, costly to obtain and maintain.
 
 The update-based model is used in many, if not all, MMOGs currently in operation. This includes games like World of Warcraft, Eve Online and Ultima
 Online, to name just a few.
@@ -1282,7 +1282,7 @@ This survey was written, because of an identified need for a concise summary of 
 the past were used because of the ease with which they could be integrated into a P2P MMOG. The purpose of this survey is to identify those
 techniques and to stimulate further research, using empirical methods to compare the different storage techniques used.
 
-\subsection{Future work}
+\subsection{Prospective research directions}
 %How to address storage challenges
 One of three paths may be followed in order to create a storage type that is suitable to modern hardcore MMOGs. The first would be to take a look at
 the deficiencies mentioned in the different storage types and to then improve one of these types. The other path is what was seen with hybrid
@@ -1345,8 +1345,8 @@ In conclusion, this paper describes a possible new research field with many open
   \section*{Acknowledgment}
 \fi
 
-The financial assistance of MIH and the National Research Foundation (NRF) towards this research is hereby acknowledged. Opinions expressed and
-conclusions arrived at, are those of the author and are not necessarily to be attributed to MIH or the NRF.
+The financial assistance of MIH towards this research is hereby acknowledged. Opinions expressed and conclusions arrived at, are those of the author
+and are not necessarily to be attributed to MIH.
 
 %\newpage
 %\IEEEtriggeratref{43} %Balance the bibliography
