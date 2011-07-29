@@ -13,7 +13,7 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package oversim.applications.Pithos;
+package oversim.applications.pithos;
 
 import oversim.common.BaseApp;
 import oversim.common.ITier;
@@ -41,7 +41,6 @@ module GameModule like ITier
         output to_lowerTier;    // gate to the lower tier
         output to_upperTier;    // gate to the upper tier
         output udpOut;    // gate to the UDP layer
-
     submodules:
         game: Game;
     connections allowunconnected:
@@ -83,31 +82,63 @@ simple Storage
         input write;
 }
 
+simple GroupStorage
+{
+    parameters:
+        @class(GroupStorage);
+        @display("i=abstract/cache");
+        
+        @signal[GroupSize](type="int");
+        @signal[GroupSendFail](type="int");
+        
+        @statistic[GroupSize](title="Group size"; record=last);
+        @statistic[GroupSendFail](title="Group send fails"; record=sum);
+        
+        int replicas = 3;
+    gates:
+        inout comms_gate;
+        
+        output read;
+        input write;
+}
+
+simple OverlayStorage
+{
+    parameters:
+        @class(OverlayStorage);
+        @display("i=abstract/cache");
+        
+        int replicas = 1;
+    gates:
+        inout comms_gate;
+        
+        output read;
+        input write;
+}
+
 simple Peer_logic
 {
     parameters:
         @class(Peer_logic);
         @display("i=block/cogwheel");
 
-        @signal[busy](type="bool");
-        @signal[GroupSize](type="int");
-        @signal[GroupSendFail](type="int");
         @signal[JoinTime](type="simtime_t");
 
         @statistic[JoinTime](title="group join time"; record=last);
-        @statistic[busy](title="server busy state"; record=vector,timeavg; interpolationmode=sample-hold);
-        @statistic[GroupSize](title="Group size"; record=sum);
-        @statistic[GroupSendFail](title="Group send fails"; record=sum);
 
-        int replicas_g = 3;
-        int replicas_sp = 1;
         string directory_ip;
         int directory_port;
         double wait_time @unit(s);
     gates:
         inout comms_gate;
+        
         output write;
         input read;
+        output group_write;
+        input group_read;
+        output overlay_write;
+        input overlay_read;
+        
         input from_upperTier;    // gate from the upper tier
         output to_upperTier;     // gate to the upper tier
 }
@@ -139,6 +170,7 @@ simple Super_peer_logic
         @statistic[overlaysStoreFail](title="Overlay store failures"; record=sum);
     gates:
         inout comms_gate;
+        inout overlay_gate;
 }
 
 simple Communicator extends BaseApp
@@ -147,10 +179,13 @@ simple Communicator extends BaseApp
         @class(Communicator);
         @display("i=block/join");
     gates:
+        inout gs_gate;
+        inout os_gate;
         inout peer_gate;
         output toPeer_fromUpper;
         input fromPeer_toUpper;
-        inout sp_gate @loose;
+        inout sp_group_gate @loose;
+        inout sp_overlay_gate @loose;
 }
 
 module Peer like ITier
@@ -169,14 +204,23 @@ module Peer like ITier
         output tcpOut;           // gate to the TCP layer
     submodules:
         peer_logic: Peer_logic;
-        storage: Storage;
+        storage : Storage;
+        group_storage: GroupStorage;
+        overlay_storage: OverlayStorage;
         communicator: Communicator;
     connections allowunconnected:
         peer_logic.write --> storage.write;
         storage.read --> peer_logic.read;
+        peer_logic.group_write --> group_storage.write;
+        group_storage.read --> peer_logic.group_read;
+        peer_logic.overlay_write --> overlay_storage.write;
+        overlay_storage.read --> peer_logic.overlay_read;
+        
         communicator.peer_gate <--> peer_logic.comms_gate;
         communicator.toPeer_fromUpper --> peer_logic.from_upperTier;
         communicator.fromPeer_toUpper <-- peer_logic.to_upperTier;
+        communicator.gs_gate <--> group_storage.comms_gate;
+        communicator.os_gate <--> overlay_storage.comms_gate;
 
         //Connections to the Oversim simulation modules
         from_lowerTier --> communicator.from_lowerTier;
@@ -207,17 +251,24 @@ module Super_peer like ITier
     submodules:
         peer_logic: Peer_logic;
         super_peer_logic: Super_peer_logic;
-        storage: Storage;
+        group_storage: GroupStorage;
+        overlay_storage: OverlayStorage;
         communicator: Communicator;
     connections allowunconnected:
         //Internal connection to the peer_logic, storage and game modules
-        peer_logic.write --> storage.write;
-        storage.read --> peer_logic.read;
+        peer_logic.group_write --> group_storage.write;
+        group_storage.read --> peer_logic.group_read;
+        peer_logic.overlay_write --> overlay_storage.write;
+        overlay_storage.read --> peer_logic.overlay_read;
+        
 
         communicator.peer_gate <--> peer_logic.comms_gate;
-        communicator.sp_gate <--> super_peer_logic.comms_gate;
+        communicator.sp_group_gate <--> super_peer_logic.comms_gate;
+        communicator.sp_overlay_gate <--> super_peer_logic.overlay_gate;
         communicator.toPeer_fromUpper --> peer_logic.from_upperTier;
         communicator.fromPeer_toUpper <-- peer_logic.to_upperTier;
+        communicator.gs_gate <--> group_storage.comms_gate;
+        communicator.os_gate <--> overlay_storage.comms_gate;
 
 		//Connections to the Oversim simulation modules
         from_lowerTier --> communicator.from_lowerTier;

@@ -43,7 +43,7 @@ class PeerListPkt : public PeerListPkt_Base
 		//PeerListPkt(const char *name=NULL, int kind=0) : PeerListPkt_Base(name, kind) {};
 		PeerListPkt(const char *name=NULL, int kind=0)
 		{
-			Packet::Packet(name, kind);
+			Packet(name, kind);
 		}
 
 		PeerListPkt(const PeerListPkt& other)	//TODO: Make sure this copy constructor correctly constructs the cPacket class

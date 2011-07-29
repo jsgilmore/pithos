@@ -13,12 +13,29 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-cplusplus {{
-#include "packet_m.h"
-}}
+#ifndef OVERLAYSTORAGE_H_
+#define OVERLAYSTORAGE_H_
 
-class noncobject Packet;
+#include <omnetpp.h>
 
-packet groupPkt extends Packet {
-    long value;
-}
+#include "BaseApp.h"
+#include "Peer_logic.h"
+
+#include "groupPkt_m.h"
+#include "GameObject.h"
+
+class OverlayStorage : public cSimpleModule
+{
+	public:
+		OverlayStorage();
+		virtual ~OverlayStorage();
+	private:
+		void store(GameObject *go);
+	protected:
+		virtual void initialize();
+		virtual void handleMessage(cMessage *msg);
+};
+
+Define_Module(OverlayStorage);
+
+#endif /* OVERLAYSTORAGE_H_ */

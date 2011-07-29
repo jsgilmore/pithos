@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by opp_msgc 4.1 from applications/Pithos/Message.msg.
+// Generated file, do not edit! Created by opp_msgc 4.1 from applications/pithos/Message.msg.
 //
 
 // Disable warnings about unused variables, empty switch stmts, etc:

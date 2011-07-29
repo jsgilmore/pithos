@@ -29,14 +29,6 @@ void Peer_logic::initialize()
 	strcpy(directory_ip, par("directory_ip"));
 	directory_port = par("directory_port");
 
-	groupSizeSignal = registerSignal("GroupSize");
-	groupSendFailSignal = registerSignal("GroupSendFail");
-	joinTimeSignal = registerSignal("JoinTime");
-
-	//Initialise queue statistics collection
-	busySignal = registerSignal("busy");
-	emit(busySignal, 0);
-
 	// initialize our statistics variables
 	numSentForStore = 0;
 	// tell the GUI to display our variables
@@ -49,55 +41,25 @@ void Peer_logic::initialize()
 	longitude = uniform(0,100);		//Make this range changeable
 }
 
-void Peer_logic::addPeers(cMessage *msg)
+bool Peer_logic::hasSuperPeer()
 {
-	PeerListPkt *list_p = check_and_cast<PeerListPkt *>(msg);
-	PeerData *peer_dat;
-	unsigned int i;
-	bool found;
-	simtime_t joinTime = simTime();
+	if (super_peer_address.isUnspecified())
+		return false;
+	else return true;
+}
 
-	//If we didn't know of any peers in our group and we've now been informed of some, inform the game module to start producing requests
-	//This is also the time when we record that we've successfully joined a group (When we've joined a super peer and we know of other peers in the group).
-	if ((group_peers.size() == 0) && (list_p->getPeer_listArraySize() > 0))
-	{
-		cPacket *request_start = new cPacket("request_start");
-		send(request_start, "to_upperTier");
-
-		emit(joinTimeSignal, joinTime);
-	}
-
-	for ( i = 0 ; i < list_p->getPeer_listArraySize() ; i++)
-	{
-		peer_dat = &(list_p->getPeer_list(i));
-		found = false;
-
-		//First check whether this peer is already known
-		for (unsigned int j = 0 ; j < group_peers.size() ; j++)
-		{
-			if (group_peers.at(j) == *peer_dat)
-			{
-				found = true;
-				break;
-			}
-		}
-
-		//If the peer is not known, add it to the peer list
-		if (!found)
-		{
-			group_peers.push_back(*peer_dat);
-			emit(groupSizeSignal, 1);	//For every node sent back, our perceived group size increases by one.
-		}
-	}
-
-	EV << "Added " << list_p->getPeer_listArraySize() << " new peers to the list.\n";
+TransportAddress Peer_logic::getSuperPeerAddress()
+{
+	return super_peer_address;
 }
 
 void Peer_logic::handleP2PMsg(cMessage *msg)
 {
 	char err_str[50];
 
-	if ((strcmp(msg->getName(), "write") == 0) || (strcmp(msg->getName(), "replica_write") == 0))
+	Packet *packet = check_and_cast<Packet *>(msg);
+
+	if (packet->getPayloadType() == WRITE)
 	{
 
 		groupPkt *group_p = check_and_cast<groupPkt *>(msg);
@@ -113,7 +75,7 @@ void Peer_logic::handleP2PMsg(cMessage *msg)
 		storage_msg->addObject(go);
 		send(storage_msg, "write");
 	}
-	else if (strcmp(msg->getName(), "inform") == 0)
+	else if (packet->getPayloadType() == INFORM)
 	{
 		bootstrapPkt *boot_p = check_and_cast<bootstrapPkt *>(msg);
 
@@ -123,12 +85,6 @@ void Peer_logic::handleP2PMsg(cMessage *msg)
 		cancelAndDelete(event);		//We've received the data from the directory server, so we can stop harassing them now
 
 		joinRequest(super_peer_address);
-
-		emit(groupSizeSignal, 1);	//The peer's perceived group size is one larger, because itself is part of the group it is in
-	}
-	else if (strcmp(msg->getName(), "join_accept") == 0)
-	{
-		addPeers(msg);
 	}
 	else {
 		sprintf(err_str, "Illegal P2P message received (%s)", msg->getName());
@@ -136,150 +92,33 @@ void Peer_logic::handleP2PMsg(cMessage *msg)
 	}
 }
 
-void Peer_logic::OverlayStore(GameObject *go, std::vector<TransportAddress> send_list)
+void Peer_logic::handleRequest(cMessage *msg)
 {
-	simtime_t sendDelay;
-	int overlay_replicas = par("replicas_sp");
+	groupPkt *m = check_and_cast<groupPkt *>(msg);
 
-	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
-	TransportAddress sourceAdr(thisNode->getIp(), thisNode->getPort());
-
-	PeerListPkt *overlay_write = new PeerListPkt();
-	overlay_write->setByteLength(4+4+4+4+8+go->getSize()+(send_list.size()*4));	//Source address, dest address, type, value, object name ID, object size, storage peer addresses
-
-	if (super_peer_address.isUnspecified())
-	{
-		//TODO: This error condition should be logged
-		EV << "No super peer has been identified. The object will not be replicated in the Overlay\n";
-		delete(overlay_write);
-		delete(go);
-		return;
-	}
-
-	go->setType(OVERLAY);
-
-	overlay_write->setPayloadType(OVERLAY_WRITE_REQ);
-	overlay_write->setSourceAddress(sourceAdr);
-	overlay_write->setValue(overlay_replicas);
-	overlay_write->setName("overlay_write_req");
-	overlay_write->setDestinationAddress(super_peer_address);
-	overlay_write->addObject(go);
-
-	//Add the addresses of the other peers that have stored the data to the message
-	for (unsigned int i = 0 ; i < send_list.size() ; i++)
-	{
-		PeerData peer_d;
-		peer_d.setAddress(send_list.at(i));
-		overlay_write->setPeer_list(i, peer_d);
-	}
-
-	send(overlay_write, "comms_gate$o");		//Set address
-	emit(busySignal, 0);
-}
-
-void Peer_logic::GroupStore(groupPkt *write, GameObject *go, std::vector<TransportAddress> send_list)
-{
-	unsigned int i, j;
-	simtime_t sendDelay;
-	GameObject *go_dup;
-	groupPkt *write_dup;
-
-	unsigned int group_replicas = par("replicas_g");
-
-	bool original_address;
-
-	TransportAddress dest_adr;
-
-	//This ensures that an infinite while loop situation will never occur, but it also constrains the number of replicas to the number of known nodes
-	if (group_replicas > group_peers.size())
-	{
-		emit(groupSendFailSignal, group_replicas - group_peers.size());
-		group_replicas = group_peers.size();
-	}
-
-	for (i = 0 ; i < group_replicas ; i++)
-	{
-		//Duplicates the objects for sending
-		go_dup = go->dup();
-		write_dup = write->dup();
-
-		original_address = false;
-
-		while(!original_address)
-		{
-			dest_adr = ((PeerData)group_peers.at(intuniform(0, group_peers.size()-1))).getAddress();		//Choose a random peer in the group for the destination
-
-			//Check all previous chosen addresses to determine whether this address is unique
-			original_address = true;
-			for (j = 0 ; j < i ; j++)
-			{
-				if (send_list.at(j) == dest_adr)
-					original_address = false;
-			}
-		}
-
-		if (i > 0) {
-			go_dup->setType(REPLICA);
-			write_dup->setName("replica_write");
-		}
-		else {
-			write_dup->setName("write");
-		}
-
-		write_dup->addObject(go_dup);
-		write_dup->setDestinationAddress(dest_adr);
-
-		send_list.push_back(dest_adr);
-
-		send(write_dup, "comms_gate$o");		//Set sender address
-		emit(busySignal, 0);
-	}
-
-	delete(write);
-}
-
-//TODO: This branch of functions can be implemented much more elegantly
-void Peer_logic::sendObjectForStore(int64_t o_size)
-{
-	groupPkt *write;
 	GameObject *go;
 	char name[41];
 
-	std::vector<TransportAddress> send_list;
-
-	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
-	TransportAddress sourceAdr(thisNode->getIp(), thisNode->getPort());
-
-	//Create the packet that will house the game object
-	write = new groupPkt();
-	write->setByteLength(4+4+4+8+o_size);	//Source address, dest address, type, object name ID and object size
-	write->setPayloadType(WRITE);
-	write->setSourceAddress(sourceAdr);
+	EV << getParentModule()->getName() << " " << getParentModule()->getIndex() << " received store request of size " << m->getValue() << "\n";
 
 	go = new GameObject("GameObject");
-	go->setSize(o_size);
+	go->setSize(m->getValue());
 	go->setCreationTime(simTime());
 
-	sprintf(name, "Game %d, Object %d, size %lld", getParentModule()->getIndex(), numSentForStore, o_size);	//TODO: Replace this line with the random name generation
-	//sprintf(name, "%lf", uniform(0, 10000));		//This is to test whether the SHA-1 hash in fact produces a uniform random output
+	sprintf(name, "Game %d, Object %d, size %ld", getParentModule()->getIndex(), numSentForStore, m->getValue());	//TODO: The name should actually be all object contents
 	go->setObjectName(name);
 
 	EV << "Object to be sent: " << go->getObjectName() << endl;
 
-	//Send the message to be stored on the specified number of replicas in the group.
-	GroupStore(write, go, send_list);
+	msg->addObject(go);
 
-	OverlayStore(go, send_list);	//Send the message to be stored on the specified number of replicas in the overlay.
+	//Send the game object to be stored in the group.
+	send(msg->dup(), "group_store");
+
+	//Send the game object to be stored in the overlay.
+	send(msg, "overlay_store");
 
 	numSentForStore++;
-}
-
-void Peer_logic::handleRequest(cMessage *msg)
-{
-	groupPkt *m = check_and_cast<groupPkt *>(msg);
-	EV << getParentModule()->getName() << " " << getParentModule()->getIndex() << " received store request of size " << m->getValue() << "\n";
-
-	sendObjectForStore(m->getValue());
 }
 
 void Peer_logic::joinRequest(const TransportAddress &dest_adr)

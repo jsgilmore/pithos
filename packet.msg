@@ -37,4 +37,5 @@ enum PacketTypes
     JOIN_REQ = 5;
     JOIN_ACCEPT = 6;
     STORE_REQ = 7;
+    OBJECT_ADD = 8;
 };

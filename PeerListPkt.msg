@@ -25,6 +25,7 @@ packet PeerListPkt extends Packet
 {
     @customize(true);
     
-    int value;
+    string objectName;		//This string is actually modelled as a long long int (64 bits) for the purposes of packet transmission, but a string is used to make the stored object easily readable
+    unsigned long objectSize;
     abstract PeerData peer_list[];
 }

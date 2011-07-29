@@ -17,14 +17,13 @@
 #define STORAGE_H_
 
 #include <omnetpp.h>
-#include <assert.h>
 
 #include "GameObject.h"
 
 class Storage : public cSimpleModule
 {
 	public:
-		Storage();
+	Storage();
 		virtual ~Storage();
 		int getStorageBytes();
 		int getStorageFiles();

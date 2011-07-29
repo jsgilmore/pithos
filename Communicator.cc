@@ -153,7 +153,7 @@ void Communicator::deliver(OverlayKey& key, cMessage* msg)
 {
 	//All messages received from the overlay, should be sent to the super peer
 	//OVERLAY_WRITE is handled here
-    send(msg, "sp_gate$o");
+    send(msg, "sp_overlay_gate$o");
 }
 
 // handleUDPMessage() is called when we receive a message from UDP.
@@ -173,15 +173,15 @@ void Communicator::handleUDPMessage(cMessage* msg)
 	}
 	else if (packet->getPayloadType() == JOIN_ACCEPT)
 	{
-		send(msg, "peer_gate$o");
+		send(msg, "gs_gate$o");
 	}
 	else if (packet->getPayloadType() == JOIN_REQ)
 	{
-		send(msg, "sp_gate$o");
+		send(msg, "sp_group_gate$o");
 	}
 	else if (packet->getPayloadType() == OVERLAY_WRITE_REQ)
 	{
-		send(msg, "sp_gate$o");
+		send(msg, "sp_group_gate$o");
 	}
 	else error("Communicator received unknown message from UDP");
 }
@@ -254,7 +254,7 @@ void Communicator::handlePeerMsg(cMessage *msg)
 
 void Communicator::handleMessage(cMessage *msg)
 {
-	if (strcmp(msg->getArrivalGate()->getName(), "sp_gate$i") == 0)
+	if (strcmp(msg->getArrivalGate()->getName(), "sp_group_gate$i") == 0)
 	{
 		handleSPMsg(msg);
 	}

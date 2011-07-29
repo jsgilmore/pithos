@@ -50,30 +50,19 @@ void Super_peer_logic::finish()
 
 }
 
-void Super_peer_logic::handleOverlayWrite(PeerListPkt *plist_p)
+void Super_peer_logic::handleOverlayWrite(cMessage *msg)
 {
 	overlayPkt *overlay_p;
-	GameObject *go = (GameObject *)plist_p->removeObject("GameObject");
+	groupPkt *overlay_write_req = check_and_cast<groupPkt *>(msg);
+	GameObject *go = (GameObject *)overlay_write_req->removeObject("GameObject");
+
+
 	if (go == NULL)
 		error("No game object found attached to the message\n");
 
-	//Log the file name and what peers it is stored on
-	ObjectInfo object_info;
-	object_info.setObjectName(go->getObjectName());
-	object_info.setSize(go->getSize());
-
-	for (unsigned int i = 0 ; i < plist_p->getPeer_listArraySize() ; i++)
-	{
-		object_info.addAddress((PeerData(plist_p->getPeer_list(i)).getAddress()));
-	}
-
-	object_list.push_back(object_info);
-
-	emit(storeNumberSignal, 1);
-
 	//Send the game objects into the overlay
 	//FIXME: The hash string should still be adapted to allow for multiple replicas in the overlay
-	for (int i = 0; i < plist_p->getValue(); i++)
+	for (int i = 0; i < overlay_write_req->getValue(); i++)
 	{
 		overlay_p = new overlayPkt(); // the message we'll send
 		overlay_p->setType(OVERLAY_WRITE); // set the message type to OVERLAY_WRITE
@@ -91,7 +80,26 @@ void Super_peer_logic::handleOverlayWrite(PeerListPkt *plist_p)
 	EV << "Packet sent for storage in the overlay\n";
 }
 
-void Super_peer_logic::handleBootstrapPkt(cMessage *msg)
+void Super_peer_logic::addObject(cMessage *msg)
+{
+	PeerListPkt *plist_p = check_and_cast<PeerListPkt *>(msg);
+
+	//Log the file name and what peers it is stored on
+	ObjectInfo object_info;
+	object_info.setObjectName(plist_p->getObjectName());
+	object_info.setSize(plist_p->getObjectSize());
+
+	for (unsigned int i = 0 ; i < plist_p->getPeer_listArraySize() ; i++)
+	{
+		object_info.addAddress((PeerData(plist_p->getPeer_list(i)).getAddress()));
+	}
+
+	object_list.push_back(object_info);
+
+	emit(storeNumberSignal, 1);
+}
+
+void Super_peer_logic::handleJoinReq(cMessage *msg)
 {
 	unsigned int i;
 	bootstrapPkt *boot_req = check_and_cast<bootstrapPkt *>(msg);
@@ -215,33 +223,31 @@ void Super_peer_logic::handleMessage(cMessage *msg)
 	}
 	else if (strcmp(msg->getArrivalGate()->getName(), "comms_gate$i") == 0)
 	{
-		if (strcmp(msg->getClassName(), "PeerListPkt") == 0)
-		{
-			PeerListPkt *plist_p = check_and_cast<PeerListPkt *>(msg);
+		Packet *packet = check_and_cast<Packet *>(msg);
 
-			if (plist_p->getPayloadType() == OVERLAY_WRITE_REQ)
-			{
-				handleOverlayWrite(plist_p);
-			}
-			else {
-				EV << "Message type: " << plist_p->getPayloadType() << " name: " << plist_p->getName() << endl;
-				error("Super peer received an unknown message");
-			}
-		}
-		else if (strcmp(msg->getClassName(), "bootstrapPkt") == 0)
+		if (packet->getPayloadType() == OVERLAY_WRITE_REQ)
 		{
-			handleBootstrapPkt(msg);
+			handleOverlayWrite(msg);
+		}
+		else if (packet->getPayloadType() == OBJECT_ADD)
+		{
+			addObject(msg);
+		}
+		else if (packet->getPayloadType() == JOIN_REQ)
+		{
+			handleJoinReq(msg);
 
 			emit(groupSizeSignal, group_peers.size());
 		}
-		else if (strcmp(msg->getName(), "overlay_write") == 0)	//Note that getName is used here and not getClassName
-		{
-			overlayPkt *overlay_p = check_and_cast<overlayPkt *>(msg);
+		else error("Super peer received unknown group message from communicator");
+	}
+	else if (strcmp(msg->getArrivalGate()->getName(), "overlay_gate$i") == 0)
+	{
+		overlayPkt *overlay_p = check_and_cast<overlayPkt *>(msg);
 
-			GroupStore(overlay_p);
+		GroupStore(overlay_p);
 
-			emit(OverlayDeliveredSignal, 1);
-		} else error("Super peer received unknown message from communicator");
+		emit(OverlayDeliveredSignal, 1);
 	}
 	else {
 		char msg_str[100];

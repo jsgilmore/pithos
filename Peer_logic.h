@@ -25,9 +25,8 @@
 #include "PeerData.h"
 
 #include "groupPkt_m.h"
-#include "bootstrapPkt_m.h"
 #include "PeerListPkt.h"
-
+#include "bootstrapPkt_m.h"
 
 enum SP_indeces {
     UNKNOWN = -1,
@@ -46,29 +45,25 @@ class Peer_logic: public cSimpleModule
 
 		TransportAddress super_peer_address;
 
-		std::vector<PeerData> group_peers;
-
 		// statistics
 		int numSentForStore;              //number of packets sent
-		simsignal_t busySignal;
-		simsignal_t groupSizeSignal;
-		simsignal_t joinTimeSignal;
-		simsignal_t groupSendFailSignal;
 	public:
 		Peer_logic();
 		virtual ~Peer_logic();
+
+		bool hasSuperPeer();
+		TransportAddress getSuperPeerAddress();
 	protected:
 		virtual void initialize();
 		virtual void handleMessage(cMessage *msg);
 
-		void sendObjectForStore(int64_t o_size);
+		void sendObjectForStore(long long int o_size);
 		void handleP2PMsg(cMessage *msg);
 		void handleRequest(cMessage *msg);
-		void GroupStore(groupPkt *write, GameObject *go, std::vector<TransportAddress> send_list);
+
 		void OverlayStore(GameObject *go, std::vector<TransportAddress> send_list);
 
 		void joinRequest(const TransportAddress &dest_adr);
-		void addPeers(cMessage *msg);
 };
 
 Define_Module(Peer_logic);

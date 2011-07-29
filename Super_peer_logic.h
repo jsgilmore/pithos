@@ -59,11 +59,12 @@ class Super_peer_logic : public cSimpleModule
 		void finish();                              // called when the module is about to be destroyed
 
 		virtual void handleMessage(cMessage *msg);
-		void handleOverlayWrite(PeerListPkt *plist_p);
+		void handleOverlayWrite(cMessage *msg);
 		void handleP2PMsg(cMessage *msg);
-		void handleBootstrapPkt(cMessage *msg);
+		void handleJoinReq(cMessage *msg);
 		void GroupStore(overlayPkt *overlay_p);
 		void addSuperPeer();
+		void addObject(cMessage *msg);
 };
 
 Define_Module(Super_peer_logic);
