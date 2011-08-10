@@ -302,9 +302,9 @@ super peer storage being lack fairness and security. It is also difficult to ach
 \subsection{Overlay storage}
 
 %Description
-Overlay storage is classified as using any type of structured P2P overlay to store data in a distributed fashion \cite{Douglas05enablingmassively},
-\cite{using_freenet_storage}, \cite{Fan_phd}, \cite{past_storage_focus}. This is a very broad definition, which encompasses any P2P distributed
-storage currently in use. Examples and a comparison of different distributed storage techniques can be found in
+Overlay storage distributes the game state across a P2P overlay \cite{Douglas05enablingmassively}, \cite{using_freenet_storage}, \cite{Fan_phd},
+\cite{past_storage_focus}. Any available P2P overlay can be used, but a structured overlay is preferred because all objects are always accessible,
+which is not always the case in a unstructured overlay. Various distributed storage techniques are compared in
 \cite{Hasan_distributed_storage_survey}.
 
 %Advantages/Disadvantages
@@ -315,23 +315,25 @@ security, with the main disadvantage being lack of responsiveness.
 \subsection{Hybrid storage}
 
 %Description
-The world is divided into regions, with each region controlled by a super peer \cite{zoned_federation}, \cite{hybrid_storage1}. The complete region
-state is cached at every super peer, the same as with super peer storage. There also exists a backup overlay storage architecture, to which data may
-be backed up for long term, redundant and secure storage.
+Hybrid storage describes any combination of the other three storage types. Only one type of hybrid storage is, however, currently found in the
+literature \cite{zoned_federation}, \cite{hybrid_storage1}. The combination is super peer and overlay storage. Super peer - overlay hybrid storage
+divides the world into regions, as with super peer storage. Super peers are assigned region states to store as with super peer storage, but the
+complete region state is also pushed to a form of overlay storage.
 
 %Advantages/Disadvantages
-Hybrid storage combines some of the features present in overlay and super peer storage to have the advantages of high reliability from overlay
-storage and high responsiveness from super peer storage. Hybrid storage, does however, still suffer from the same security issues and lack of
-fairness present in super peer storage.
+Hybrid super peer - overlay storage combines some of the features present in overlay and super peer storage to have the advantages of high
+reliability from overlay storage and high responsiveness from super peer storage. Hybrid storage, does however, still suffer from the same security
+issues and lack of fairness present in super peer storage.
 
 \subsection{Distance-based storage}
 \label{classic_distance_based}
 
-%Description
-Distance based approaches, such as the Voronoi storage approaches \cite{Buyukkaya_voronoi_state_management}, \cite{Hu_voronoi_IM} and some more
-general approaches \cite{colyseus_distance_based}, \cite{solipsis}, store object data on the peer closest to the object in the virtual world. In some
-systems, only user states are considered for storage \cite{individual_storage1}, \cite{cheat_proof_playout}. This storage type is termed individual
-storage and is considered as a subset of distance-based storage, which also allows for non-user objects to be stored.
+Distance-based approaches distribute objects to the closest peers in the virtual world \cite{colyseus_distance_based}, \cite{solipsis}. The
+hypothesis is that peers are interested in objects that are close to them, so the object access latency can be reduced by storing objects on nodes
+that are interested in them. Some storage approaches only consider player characters (PCs) for storage and do not consider non-player characters
+(NPCs) \cite{individual_storage1}, \cite{cheat_proof_playout}. These storage types are considered sub-sets of distance-based storage. Some
+specialised distance-based approaches exist that partition the virtual world into a Voronoi diagram to determine which objects are closest to which
+peers \cite{Buyukkaya_voronoi_state_management}, \cite{Hu_voronoi_IM}.
 
 %Advantages/Disadvantages
 Distance-based storage exploits the assumption that objects close to each other in the virtual world are more likely to interact with one another and
