@@ -241,9 +241,8 @@ Section \ref{conclusion} concludes with a summary of the paper and a discussion 
 \label{current_models}
 
 %Overview of four approaches
-After reviewing various storage architectures, we categorised the reviewed architectures into four broad types by which state persistency is achieved
-in P2P MMVEs \cite{gilmore_p2p_mmog_state_persistency}. These are: \emph{super peer storage}, \emph{overlay storage}, \emph{distance-based storage}
-and \emph{hybrid storage}. In order to evaluate the different storage types, we identified the following requirements:
+After reviewing various storage architectures, the reviewed architectures were categorised into four broad types by which state persistency is currently achieved
+in P2P MMVEs. We published the results of this survey in \cite{gilmore_p2p_mmog_state_persistency}. The four identified storage types are: \emph{super peer storage}, \emph{overlay storage}, \emph{distance-based storage} and \emph{hybrid storage}. In order to evaluate the different storage types, we identified the following requirements:
 
 \begin{itemize}
 %Scalability
@@ -280,24 +279,18 @@ Hybrid & High & High & Medium & Low\\
 Distance & Medium & High & Low & Medium\\
 \hline
 \end{tabular}
-\caption{Differences between storage mechanisms} \label{tab_storage}
+\caption{Differences between storage mechanisms \cite{gilmore_p2p_mmog_state_persistency}} \label{tab_storage}
 \end{table}
 %
-Table \ref{tab_storage} presents a characterisation of current storage systems according to the requirements defined. A brief description of each
-storage type is presented in the following sub-sections.
+Table \ref{tab_storage} presents a summary of all storage types, according to their reliability, responsiveness, security and fairness. The following sub-sections briefly describe the different storage types and lists the advantages and disadvantages of each. For a thorough evaluation of the different storage types, the reader is referred to \cite{gilmore_p2p_mmog_state_persistency}.
 
 \subsection{Super peer storage}
 
-%Super peer storage - description
-Super peer storage relies on the super peer storing all information that is in its domain \cite{knutsson_p2p_first}. A domain is usually created by
-segmenting the world into regions and super peers act as regional servers to all peers in their region. Each super peer handles state persistency for
-its region, hosting NPCs, objects and persistent user data. This storage method is much like a Client/Server setup, with the super peer acting as the
-server for the virtual geographic region assigned to it.
+Super peer storage uses super peers to store the game state \cite{knutsson_p2p_first}. The game world is usually divided into multiple regions, with the root objects of each region stored on different super peers. Each super peer stores the authoritive objects for its region. All peers in a region access their regional super peer to store and retrieve regional object states. In this way, super peer storage can be seen as a C/S type of storage, with super peers acting as regional servers. To improve reliability, multiple super peers per region are sometimes used, where each super peer in the same region stores the same objects as all other super peers in that region.
 
 The advantage of super peer storage is that it's responsive. The disadvantages of super peer storage stem from the per-region centralised approach,
 where super peers have access to all region data and they are the only entities in the network that store data. This leads to the main issues with
-super peer storage being lack fairness and security. It is also difficult to achieve high levels of reliability.
-
+super peer storage being lack of fairness and security. It is also difficult to achieve high levels of reliability.
 
 \subsection{Overlay storage}
 
