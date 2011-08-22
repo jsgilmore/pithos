@@ -175,7 +175,7 @@
 % paper title
 \title{Pithos: A State Persistency Architecture for Peer-to-Peer Massively Multiuser Virtual Environments}
 
-%\author{\IEEEauthorblockN{John S. Gilmore and Herman A. Engelbrecht\\}
+%\author{\IEEEauthorblockN{John S. Gilmore and Herman A. Engelbrecht\\
 %\IEEEauthorblockA{MIH Media Lab\\
 %Electronic Engineering Department\\
 %Stellenbosch University\\
@@ -186,11 +186,12 @@
 
 \begin{abstract}
 %\boldmath
-The field of state persistency for peer-to-peer massively multiuser virtual environments (MMVEs) is explored and categorised into super peer storage,
-overlay storage, hybrid storage and distance-based storage. The storage types are briefly evaluated against the identified storage system
-requirements of scalability, fairness, reliability, responsiveness and security. All storage types are found to be lacking in some respects and
-therefore a novel storage system called Pithos is introduced. The design of Pithos, which is based on a multi-tiered hybrid architecture making use
-of grouping is presented. Preliminary results show that Pithos addresses all of the identified requirements.
+An aspect of peer-to-peer (P2P) massively multiuser virtual environments (MMVEs) that has not received significant attention thus far, is how game
+objects can be stored in a distributed fashion, taking into account the unique aspects of MMVEs. The field is termed P2P MMVE state persistency. This
+paper explores the different models of state persistency for P2P MMVEs, namely super peer storage, overlay storage, hybrid storage and distance-based
+storage. All storage types are found to be lacking in some respects and therefore a novel storage system called Pithos is introduced. Pithos provides
+low latency storage for group peers, while enabling higher latency, but reliable backup to a storage overlay. This is achieved by a two-tiered hybrid
+architecture making use of player grouping.
 \end{abstract}
 
 
@@ -200,7 +201,7 @@ of grouping is presented. Preliminary results show that Pithos addresses all of 
 %P2P MMVE Background
 Peer-to-Peer (P2P) Massively Multiuser Virtual Environments (MMVEs) have received significant attention from the research community, since the first
 publication on the subject by Knutssonn et al. in 2004 \cite{knutsson_p2p_first}. P2P MMVEs promise to solve many issues prevalent in today's
-Client/Server (C/S) based MMVEs. Some key issues have to be solved before P2P MMVEs can be implemented commercially.
+Client/Server (C/S) based MMVEs.
 
 %Key challenges and focus
 Recently, six key challenges of P2P systems have been identified: \emph{interest management}, \emph{game event dissemination}, \emph{non-player
@@ -210,83 +211,69 @@ state persistency.
 
 State persistency defines how object states should be stored. Objects states can be anything from a user's position to the state of the virtual
 market in an MMVE. For a P2P MMVE, game data must be distributed amongst various peers in the network. This creates challenges not usually present in
-classic C/S MMVEs. The focus of this paper is exclusively on state persistency in P2P MMVEs.
+classic C/S MMVEs. We've identified the main requirements of P2P MMVE state persistency in a previous paper as scalability, reliability, fairness,
+responsiveness and security \cite{gilmore_p2p_mmog_state_persistency}.
 
-%Current techniques not perfect
-The paper first attempts to categorise state persistency mechanisms found in the literature. The paper then shows that thus far none of the
-approaches to state persistency meet the storage requirements of modern MMVEs. All storage models are evaluated according to the identified
-requirements of scalability, fairness, reliability, responsiveness and security.
+In our previous paper we argue that none of the current approaches to state persistency satisfy all identified requirements
+\cite{gilmore_p2p_mmog_state_persistency}. The focus of this paper is, therefore, exclusively on state persistency in P2P MMVEs. It presents a design
+that satisfies all the identified requirements, along with some implementation details and preliminary results. Pithos, a novel hybrid multi-tiered
+state persistency architecture is proposed. The novelty of Pithos lies in its support for both a responsive and a fair storage system, while also
+taking into account security aspects of distributed storage. To the best of our knowledge, there are some storage systems that provide responsive or
+fair storage, but none that provide both. No storage system, designed specifically for P2P MMVEs, have taken security into account.
 
-%Propose multi-tiered model
-Pithos, a novel hybrid multi-tiered state persistency architecture is proposed in this paper, since current state persistency models do not address
-all the requirements of modern MMVEs.
-
-%Implementation
-The proposed multi-tiered model is currently being implemented in Oversim, a P2P simulation environment based in Omnet++, which allows for the
-measurement of identified requirements. Furthermore, it allows for the comparison of the current model with other state persistency models. Initial
-results are promising, with the implemented model functioning as expected. The system simulated is very responsive when storing data within a group
-and as responsive as storing data in an overlay when storing data between groups.
+If Pithos is incorporated into an existing P2P MMVE network architecture, it will add the ability to reliability share the storage load of long and
+short term game state. The addition of a robust state persistency mechanism, specifically designed for P2P MMVEs, will bring us one step closer to
+the creation of a complete P2P MMVE architecture.
 
 %TODO: This should be reviewed
 %Summary
-Section \ref{current_models} groups storage models found in the literature and describes the advantages and disadvantages of each group.
+Section \ref{current_models} describes the different storage models found in the literature and describes the advantages and disadvantages of each
+group.
 %
-In Section \ref{design} a novel state persistency architecture design is described.
+Section \ref{design} presents the key design characteristics the define Pithos.
 %
-Section \ref{evaluation} presents an evaluation of the proposed state persistency model and presents some preliminary results.
+Section \ref{evaluation} describes the implementation of the simulated Pithos and continues to evaluate the responsiveness and fairness of the
+simulation.
 %
-Section \ref{conclusion} concludes with a summary of the paper and a discussion on possible future work.
+Section \ref{conclusion} concludes with a summary of the paper and a discussion on future work.
 
 \section{Distributed state persistency models}
 \label{current_models}
 
 %Overview of four approaches
-After reviewing various storage architectures, the reviewed architectures were categorised into four broad types by which state persistency is currently achieved
-in P2P MMVEs. We published the results of this survey in \cite{gilmore_p2p_mmog_state_persistency}. The four identified storage types are: \emph{super peer storage}, \emph{overlay storage}, \emph{distance-based storage} and \emph{hybrid storage}. In order to evaluate the different storage types, we identified the following requirements:
+After reviewing various storage architectures, the reviewed architectures were categorised into four broad types by which state persistency is
+currently achieved in P2P MMVEs. We published the results of this survey in \cite{gilmore_p2p_mmog_state_persistency}. The four identified storage
+types are: \emph{super peer storage}, \emph{overlay storage}, \emph{distance-based storage} and \emph{hybrid storage}. In order to evaluate the
+different storage types, the following requirements were identified:
 
-\begin{itemize}
-%Scalability
-\item \emph{Scalability}: For an MMVE state persistency architecture to be scalable, it should be able to support thousands of users. In the
-    paper, scalability it not handled as some separate entity, but rather all other requirements are evaluated in terms of a system of thousands
-    of users.
+\emph{Scalability}: For an MMVE state persistency architecture to be scalable, it should be able to support thousands of users. In the paper,
+scalability it not handled as some separate entity, but rather all other requirements are evaluated in terms of a system of thousands of users.
 
 %Reliability
-\item \emph{Reliability}: Reliability is defined to mean that a file in the storage system may neither be lost, nor be unavailable when a user
-    requests it.
+\emph{Reliability}: Reliability is defined to mean that a file in the storage system may neither be lost, nor be unavailable when a user requests it.
 
 %Fairness
-\item \emph{Fairness}: For a system to be fair, the responsibility of storage should be equally shared amongst all users according to their
-    available resources. This ensures that costs due to bandwidth and storage are shared amongst all.
+\emph{Fairness}: For a system to be fair, the responsibility of storage should be equally shared amongst all users according to their available
+resources. This ensures that costs due to bandwidth and storage are shared amongst all.
 
 %Responsiveness
-\item \emph{Responsiveness}: Responsiveness is a requirement that has not really been part of file storage systems in the past. For MMVEs, it is
-    believed that responsive object storage is a key requirement to promote responsive game play and robust recovery mechanisms.
+\emph{Responsiveness}: Responsiveness is a requirement that has not really been part of file storage systems in the past. For MMVEs, it is believed
+that responsive object storage is a key requirement to promote responsive game play and robust recovery mechanisms.
 
 %Security
-\item \emph{Security} Data security is a major issue for distributed storage, because data are stored on users' machines who should not
-    necessarily be able to access and alter the data stored.
-\end{itemize}
+\emph{Security} Data security is a major issue for distributed storage, because data are stored on users' machines who should not necessarily be able
+to access and alter the data stored.
 
-\begin{table}[htbp]
-\centering
-\begin{tabular}{|r|c|c|c|c|}
-\hline
-Storage type & Reliability & Responsiveness & Security & Fairness\\
-\hline
-Super Peer & Medium & High & Low & Low\\
-Overlay & High & Low & Medium & High\\
-Hybrid & High & High & Medium & Low\\
-Distance & Medium & High & Low & Medium\\
-\hline
-\end{tabular}
-\caption{Differences between storage mechanisms \cite{gilmore_p2p_mmog_state_persistency}} \label{tab_storage}
-\end{table}
-%
-Table \ref{tab_storage} presents a summary of all storage types, according to their reliability, responsiveness, security and fairness. The following sub-sections briefly describe the different storage types and lists the advantages and disadvantages of each. For a thorough evaluation of the different storage types, the reader is referred to \cite{gilmore_p2p_mmog_state_persistency}.
+The following sub-sections briefly describe the different storage types and lists the advantages and disadvantages of each. For a thorough evaluation
+of the different storage types, the reader is referred to \cite{gilmore_p2p_mmog_state_persistency}.
 
 \subsection{Super peer storage}
 
-Super peer storage uses super peers to store the game state \cite{knutsson_p2p_first}. The game world is usually divided into multiple regions, with the root objects of each region stored on different super peers. Each super peer stores the authoritive objects for its region. All peers in a region access their regional super peer to store and retrieve regional object states. In this way, super peer storage can be seen as a C/S type of storage, with super peers acting as regional servers. To improve reliability, multiple super peers per region are sometimes used, where each super peer in the same region stores the same objects as all other super peers in that region.
+Super peer storage uses super peers to store the game state \cite{knutsson_p2p_first}. The game world is usually divided into multiple regions, with
+the root objects of each region stored on different super peers. Each super peer stores the authoritive objects for its region. All peers in a region
+access their regional super peer to store and retrieve regional object states. In this way, super peer storage can be seen as a C/S type of storage,
+with super peers acting as regional servers. To improve reliability, multiple super peers per region are sometimes used, where each super peer in the
+same region stores the same objects as all other super peers in that region \cite{varvello_p2p_second_life}.
 
 The advantage of super peer storage is that it's responsive. The disadvantages of super peer storage stem from the per-region centralised approach,
 where super peers have access to all region data and they are the only entities in the network that store data. This leads to the main issues with
@@ -340,11 +327,12 @@ Super peer storage is not fair nor secure, overlay storage is not responsive, hy
 storage is not secure and not yet reliable.
 
 It should also be noted that most of these storage types are not mature. In the referenced papers, they were mentioned as a means by which
-persistency might be achieved. But none of the papers, save for PAST \cite{storage_and_chaching_PAST}, presented concrete designs and results. This
-shows that not only is a storage type required that improves upon previous storage types, but a concrete design and implementation is also required
-that uncovers unforeseen issues that might arise when implementing P2P MMVEs. In the following section we provide such a design.
+persistency might be achieved. But none of the papers, save for PAST \cite{storage_and_chaching_PAST} and P2P Second Life
+\cite{varvello_p2p_second_life}, presented concrete designs and results. This shows that not only is a storage type required that improves upon
+previous storage types, but a concrete design and implementation is also required that uncovers unforeseen issues that might arise when implementing
+P2P MMVEs. In the following section we provide such a design.
 
-\section{Architecture design}
+\section{Architecture characteristics}
 \label{design}
 
 In this section ``Pithos'', the proposed P2P MMVE state persistency architecture design is described. The inspiration for this architecture comes
@@ -400,46 +388,32 @@ As an alternative to clustering, dynamic regioning might also be used to group p
 regioning. SOSPS creates dynamic regions based on a Voronoi overlay network \cite{voronoi_diagrams_survey}. Near constant user density is achieved by
 increasing and decreasing the area sizes. This system is based on VON, a distributed Voronoi overlay network designed for MMVEs \cite{VON_VAST}.
 
-\subsection{Store and retrieve with replication}
+\subsection{Replication}
 \label{store_retrieve}
 
-The process of storing a file in Pithos is as follows:
-\begin{enumerate}
-\item A peer receives a store request from the higher game layer, along with the object that should be stored and an SHA-1 hash of that object.
-\item The storing peer then replicates the object $k$ times.
-\item For each object, the storing peer selects a single peer from its list of group peers by sampling from a uniformly random distribution.
-\item Each object is then sent to the selected peer for storage.
-\item The storing peer also sends an update message to all group peers to inform them of the new object available in the group and on which peers
-    the object is stored.
-\item The storing peer then sends an additional replica of the object to the super peer, along with a value ($l$) specifying how many overlay
-    replicas are required.
-\item The group super peer uses the received uniformly distributed SHA-1 hash as the destination ID to route the overlay object to.
-\item The destination super peer received the overlay object and resends it to $l$ of its overlay neighbours.
-\item At each destination super peer, the super peer selects a single node in its group from a uniform random distribution where the overlay
-    object is then sent to and stored.
-\end{enumerate}
+When storing objects in Pithos, replication is used to increase object availability under network churn and security in the presence of malicious
+nodes \cite{storage_and_chaching_PAST}. For every object that is stored in Pithos, $k$ object replicas are also stored. The number of replicas ($k$)
+depends on the degree of network churn as well as the number of expected malicious users in the network. If the rate at which peers leave the network
+is high, more replicas are required to avoid the situation where all $k$ peers hosting an object leaves the network before any object migration can
+be done. More replicas reduces this probability.
 
-Currently, Pithos sends the object with the store request to the group super peer, where the group super peer then forwards that object to another
-super peer and that super peer then sends the object to a group peer for storage. A future improvement might be to only send signalling messages to
-the nodes in the forwarding path that indicate that a source node has an object to store. When the signalling messages then arrive at the different
-destination nodes, they can contact the source node directly and obtain the object from that node. This will reduce the amount of bandwidth consumed
-by the storage operation.
+If a node leaves the network and stops to transmit ``keep alive'' messages, the migration mechanism will detect this and replicate the file on
+another node. Replication exists intra- as well as inter-group and is useful in ensuring that if a nodes leaves the network, the data is not lost.
+All object requests are routed to the peer with the next closest ID, because of how overly routing functions if the root peer leaves. The new
+destination peers will possess the stored files, since Pithos stores overlay replicas at overlay neighbours.
 
-The process of retrieving a file from Pithos is as follows:
-\begin{enumerate}
-\item A peer receives a retrieve request from the higher game layer that contains the object ID generated from the SHA-1 hash.
-\item The peer then searches for the object in its list of group objects.
-\item If the object is available in the group, the object is requested from the peer containing it and sent up to the game layer.
-\item If the object is not available in the group, an object request is sent to the group super peer.
-\item The group super peer requests the object by ID, forwards the received object to the requesting peer where the requesting peer then sends
-    the object to the game layer.
-\end{enumerate}
+%Explain how objects are replicated in the overlay and how they are replicated in a group.
+In Pithos, group root and replica objects are stored on random peers within a group according to how many files are already stored. A group file
+list, containing a list of all files and the peers on which they are stored is stored on each group peer and updated as new files are added to the
+group. Overlay replicas are stored at the node ID neighbours corresponding to the SHA-1 hash of the object being stored.
 
-Pithos implements data replication to enable it to handle node churn. If a node leaves the network and stops to transmit ``keep alive'' messages, the
-migration mechanism will detect this and replicate the file on another node. Replication exists intra- as well as inter-group and is useful in
-ensuring that if a nodes leaves the network, the data is not lost. All object requests are routed to the peer with the next closest ID, because of
-how overly routing functions if the root peer leaves. The new destination peers will possess the stored files, since Pithos stores overlay replicas
-at overlay neighbours.
+Another reason to replicate game objects is to make the system more secure. If it is known that a certain percentage of users are malicious, it is
+advantages to have more replicas than malicious users. This will allow for a secure system where object hashes can be compared to determine which
+nodes are malicious and what version of an object is accurate.
+
+%SHA-1 hashing of object to determine object ID and how this is used to find a destination
+%Uniformly selecting group peers for storage
+%Object lists and how object updates are exchanged
 
 \subsection{Distance-based storage}
 \label{distance_based}
@@ -478,35 +452,50 @@ changes can be tracked to a specific node will simplify the task of eliminating 
 Pithos is currently still a work in progress, and although the design presented in the previous section is meant to address all identified
 requirements, only preliminary results for responsiveness and fairness is presented in this section.
 
-\subsection{Test setup}
+\subsection{Simulated model}
 \label{test_setup}
+
+%Implementation
+The proposed multi-tiered model is currently being implemented in Oversim \cite{OverSim_2007}, a P2P simulation environment based in Omnet++, which
+allows for the measurement of identified requirements. Furthermore, it allows for the comparison of the current model with other state persistency
+models. Initial results are promising, with the implemented model functioning as expected. The simulated system is very responsive when storing data
+within a group and as responsive as storing data in an overlay when storing data between groups.
 
 Pithos is being implemented in Oversim, running on Omnet++. Oversim was chosen because of the variety of already implemented protocols as well as the
 layered architecture, which simplifies testing with different overlays and comparison with different storage types.
 
+Pithos is designed to form part of a complete P2P MMVE network solution. In this sense, it is assumed that there exists some intelligence that has to
+determine when objects have to be stored and retrieved on each peer. This intelligence will depend on the game design and can, therefore, not be
+integrated into Pithos if Pithos is to be a generic storage architecture for P2P MMVEs. From Pithos's perspective, the intelligence that decides when
+to store and retrieve what data is modelled as a higher tier application layer in Oversim. This intelligence is termed the game layer.
+
 In the results shown, Pastry was used as the P2P overlay and Pithos was driven by a \emph{game} module. After a node has joined a group, the game
-module starts to generate store and retrieve requests at a rate of 10 s and a size of 1 KB. Pithos was configured to store two group replicas and one
-overlay replica for every root object stored to give a ratio of group storage to overlay storage of 3:1. The choice of these values are based on the
-values found in the \verb.KBRTestApp. in Oversim.
+module starts to generate store and retrieve requests at a rate of 10 s and a size of 1024 bytes. The size of 1024 byte objects was chosen to be much
+larger than Quake 3 game objects without delta encoding \cite{Bharambe_Donnybrook}. Pithos is designed for the low latency storage of usually small
+game objects.
 
 For the results shown, 14499 peers, 500 super peers and a single directory server are created at the start of the simulation. The directory server
 publishes super peer information, which allows a peer to join the group nearest to it. Because of the way Pithos is structured, each super peer node
 is also a peer node, which then gives a total of 15000 Oversim nodes.
+
+To be able to simulate Pithos for 15000 nodes, it runs on the Oversim simple underlay network \cite{oversim_applications}, where node latencies are
+determined by the distance between nodes placed in an $n$-dimensional Euclidean space. The positions of the nodes are chosen to match the latencies
+of the CAIDA/Skitter project. Different nodes are also assigned different bandwidth and jitter parameters to simulate a heterogenous network.
 
 \subsection{Responsiveness}
 
 In the storage system, we expect two levels of responsiveness. We expect a certain level of responsiveness for intra-group communications and a
 certain level of responsiveness for inter-group communications.
 
-
-We define $P(g)$ as the probability that a message is routed within a group. We define $T_{\textrm{group}}$ as the root and replica message
-distribution and $T_{\textrm{overlay}}$ as the overlay message distribution, both shown in Figure \ref{fig_pithos_response}. The expected value of
-the overall system response time ($E[T_{\textrm{resp}}]$) can then be presented as a weighted average of the expected values of both the group and
-overlay storage distributions, as follows:
+We define $P(g)$ as the probability that a message is routed within a group and $P(o) = 1 - P(g)$ the probability that a message is routed within the
+overlay. We define $T_{\textrm{group}}$ as the root and replica message distribution and $T_{\textrm{overlay}}$ as the overlay message distribution,
+both shown in Figure \ref{fig_pithos_response}. The expected value of the overall system response time ($E[T_{\textrm{resp}}]$) can then be presented
+as a weighted average of the expected values of both the group and overlay storage distributions, as follows:
 %
-\begin{equation}\label{expected_response_time}
-    E[T_{\textrm{resp}}] = P(g)\left(E\left[T_{\textrm{group}}\right]\right) + \left(1 - P(g)\right)\left(E\left[T_{\textrm{overlay}}\right]\right).
-\end{equation}
+\begin{align}
+    E[T_{\textrm{resp}}] &= P(g)\left(E\left[T_{\textrm{group}}\right]\right) + P(o)\left(E\left[T_{\textrm{overlay}}\right]\right)\notag\\
+                         &= P(g)\left(E\left[T_{\textrm{group}}\right]\right) + \left[1 - P(g)\right]\left(E\left[T_{\textrm{overlay}}\right]\right).\label{expected_response_time}
+\end{align}
 
 \begin{figure}[htbp]
  \centering
@@ -517,12 +506,15 @@ overlay storage distributions, as follows:
 %
 Figure \ref{fig_pithos_response} (top) shows the distribution of mean storage request times over all nodes in the Pithos network for the different
 storage types. One can see that the intra-group root and replica objects are stored much faster ($E\left[T_{\textrm{group}}\right] = 0.0878 s$) than
-the overlay objects in the network ($E\left[T_{\textrm{overlay}}\right] = 0.328 s$).
+the overlay objects in the network ($E\left[T_{\textrm{overlay}}\right] = 0.328 s$). Figure \ref{fig_pithos_response} (bottom) presents the
+responsiveness of a pure Pastry network of 14999 nodes, using the \verb.KBRTestApp. application and Pastry overlay in Oversim. The Pastry network has
+a mean routing time of 0.12 s.
 
-Figure \ref{fig_pithos_response} (bottom) presents the responsiveness of a pure Pastry network of 14999 nodes, using the \verb.KBRTestApp.
-application and Pastry overlay in Oversim. The Pastry network has a mean routing time of 0.12 s. To exactly compare Pithos with overlay storage, the
-percentage of intra-group requests ($P(g)$) should first be known. At this time there is no way to know what this percentage is, but the
-responsiveness can be calculated as a function of $P(g)$.
+To exactly compare Pithos with overlay storage, the percentage of intra-group requests ($P(g)$) should first be known. It is expected that $P(g)$
+will be different for MMVEs with different defining mechanics. It should be possible to determine $P(g)$ experimentally for a specific type of game,
+but this will require access to the game client of an already implemented P2P MMVE. The exact measurement of $P(g)$ is left for future work, but the
+responsiveness can be calculated as a function of $P(g)$. Working with a function in $P(g)$, also allows for the implementation of various dynamic
+strategies that can adapt to various values of $P(g)$.
 
 The responsiveness of Pithos will depend on the responsiveness of Pastry, where the expected number of Pastry hops are given by:
 \cite{storage_and_chaching_PAST}:
@@ -537,7 +529,7 @@ compare that with a theoretical performance of overlay storage.
 When using a weighted hop average, as with Equation \eqref{expected_response_time}, the expected number of Pithos hops is given by:
 %
 \begin{equation}\label{expected_response_time}
-    E[H_{\textrm{pithos}}] = P(g)\left(E\left[H_{\textrm{group}}\right]\right) + \left(1 - P(g)\right)\left(E\left[H_{\textrm{overlay}}\right]\right),
+    E[H_{\textrm{pithos}}] = P(g)\left(E\left[H_{\textrm{group}}\right]\right) + \left[1 - P(g)\right]\left(E\left[H_{\textrm{overlay}}\right]\right),
 \end{equation}
 %
 where $E\left[H_{\textrm{group}}\right]$ is the expected number of group hops and $E\left[H_{\textrm{overlay}}\right]$ is the expected number of
@@ -555,9 +547,12 @@ another hop is required to send the message to the destination group peer. This 
 %
 Equation \eqref{expected_response_time} then becomes:
 %
-\begin{equation}\label{expected_response_time_exp}
-    E[H_{\textrm{pithos}}] = P(g) + \left(1 - P(g)\right)\left(2 + \log_{16}\left(M\right)\right).
-\end{equation}
+\begin{align}
+E[H_{\textrm{pithos}}] &= P(g) + \left[1 - P(g)\right]\left[2 + \log_{16}\left(M\right)\right]\notag\\
+                       &= 1 + \left[1 - P(g)\right] + \left[1 - P(g)\right]\left[\log_{16}(M)\right]\notag\\
+                       &= 1 + \left[1 - P(g)\right]\left[1 + \log_{16}(M)\right]\notag\\
+                       &= 1 + P(o)\left[1 + \log_{16}(M)\right].\label{expected_response_time_exp}
+\end{align}
 
 \begin{figure}[htbp]
  \centering
@@ -612,22 +607,26 @@ respectively. This shows that the fairness of Pithos is currently dominated by t
 
 \subsection{Summary}
 
-In this paper, we presented a novel classification of storage types. None of the storage types satisfied all identified requirements of P2P MMVE
-storage systems. A novel storage architecture called Pithos was presented to satisfy all the identified requirements, followed by a description of
-all its key design aspects. For preliminary results, the requirements of responsiveness and reliability were compared to those of overlay storage and
-Pithos was found to be more responsive than overlay storage and as fair.
+In this paper, it was found that none of the storage types reviewed satisfied all identified requirements of P2P MMVE storage systems. A novel
+storage architecture called Pithos was presented to satisfy all the identified requirements. The key characteristics of Pithos is that is groups
+peers and thereby forms a two-tiered storage architecture to promote low latency interactions amongst group peers. It employs storage replication to
+ensure reliable storage. It uses distance-based storage to determine on which groups objects will be stored. This is to ensure that objects stored
+within a group are of interest to the group. Pithos also makes use of secure ID assignments and request signing to promote storage security. For
+preliminary results, the requirements of responsiveness and reliability were compared to those of overlay storage and Pithos was found to be more
+responsive than overlay storage and as fair.
 
 \subsection{Future work}
 \label{future_work}
 
 %Complete implementation
-For future work, we plan to complete the Pithos architecture and compare all requirements with all identified storage types. The simulation does not
-yet support network churn. A migration mechanism should still be implemented before testing under churn can be done. Various improvements to the
-current Pithos architecture can also be made. This includes using signalling to store files as described in Section \ref{store_retrieve} as well as
-further improving fairness and responsiveness in Pithos.
+We plan to complete the Pithos architecture and compare all requirements with all identified storage types. The simulation does not yet support
+network churn. A migration mechanism should still be implemented before testing under churn can be done. Various improvements to the current Pithos
+architecture can also be made. This includes using signalling to store files as described in Section \ref{store_retrieve} as well as further
+improving fairness and responsiveness in Pithos.
 
 A key aspect of completing Pithos will be how players are grouped. Future research will focus on user behaviour, clustering algorithms and dynamic
-regioning approaches. The different clustering techniques should be compared and the most applicable one will be chosen to drive Pithos.
+regioning approaches. The different clustering techniques should be compared and the most applicable one will be chosen and improved, to drive
+Pithos.
 
 %Driver data
 A model of data storage and retrieval requests are also required for a typical MMVE. This should include object sizes stored, how regularly these
