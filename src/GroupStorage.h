@@ -38,9 +38,9 @@ class GroupStorage : public cSimpleModule
 		simsignal_t groupSendFailSignal;
 		simsignal_t joinTimeSignal;
 
-		void createWritePkt(groupPkt *write);
+		void createWritePkt(groupPkt **write);
 		void updateSuperPeerObjects(const char *objectName, unsigned long objectSize, std::vector<TransportAddress> send_list);
-		TransportAddress selectDestination(std::vector<TransportAddress> send_list);
+		void selectDestination(TransportAddress *dest_adr, std::vector<TransportAddress> send_list);
 		void store(GameObject *go);
 		void addPeers(cMessage *msg);
 		int getReplicaNr();

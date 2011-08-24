@@ -100,6 +100,8 @@ simple GroupStorage
         
         output read;
         input write;
+        
+        output to_upperTier;     // gate to the upper tier
 }
 
 simple OverlayStorage
@@ -140,7 +142,6 @@ simple Peer_logic
         input overlay_read;
         
         input from_upperTier;    // gate from the upper tier
-        output to_upperTier;     // gate to the upper tier
 }
 
 simple Super_peer_logic
@@ -218,7 +219,7 @@ module Peer like ITier
         
         communicator.peer_gate <--> peer_logic.comms_gate;
         communicator.toPeer_fromUpper --> peer_logic.from_upperTier;
-        communicator.fromPeer_toUpper <-- peer_logic.to_upperTier;
+        communicator.fromPeer_toUpper <-- group_storage.to_upperTier;
         communicator.gs_gate <--> group_storage.comms_gate;
         communicator.os_gate <--> overlay_storage.comms_gate;
 
@@ -251,22 +252,24 @@ module Super_peer like ITier
     submodules:
         peer_logic: Peer_logic;
         super_peer_logic: Super_peer_logic;
+        storage : Storage;
         group_storage: GroupStorage;
         overlay_storage: OverlayStorage;
         communicator: Communicator;
     connections allowunconnected:
         //Internal connection to the peer_logic, storage and game modules
+        peer_logic.write --> storage.write;
+        storage.read --> peer_logic.read;
         peer_logic.group_write --> group_storage.write;
         group_storage.read --> peer_logic.group_read;
         peer_logic.overlay_write --> overlay_storage.write;
         overlay_storage.read --> peer_logic.overlay_read;
-        
 
         communicator.peer_gate <--> peer_logic.comms_gate;
         communicator.sp_group_gate <--> super_peer_logic.comms_gate;
         communicator.sp_overlay_gate <--> super_peer_logic.overlay_gate;
         communicator.toPeer_fromUpper --> peer_logic.from_upperTier;
-        communicator.fromPeer_toUpper <-- peer_logic.to_upperTier;
+        communicator.fromPeer_toUpper <-- group_storage.to_upperTier;
         communicator.gs_gate <--> group_storage.comms_gate;
         communicator.os_gate <--> overlay_storage.comms_gate;
 
