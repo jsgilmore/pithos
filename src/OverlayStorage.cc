@@ -33,7 +33,7 @@ void OverlayStorage::store(GameObject *go)
 {
 	simtime_t sendDelay;
 	Peer_logic * this_peer = ((Peer_logic *)getParentModule()->getSubmodule("peer_logic"));
-	int overlay_replicas = par("replicas_sp");
+	int overlay_replicas = par("replicas");
 
 	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
 	TransportAddress sourceAdr(thisNode->getIp(), thisNode->getPort());
@@ -41,7 +41,7 @@ void OverlayStorage::store(GameObject *go)
 	groupPkt *overlay_write = new groupPkt();
 	overlay_write->setByteLength(4+4+4+4+8+go->getSize());	//Source address, dest address, type, value, object name ID, object size
 
-	if (this_peer->hasSuperPeer())
+	if (!(this_peer->hasSuperPeer()))
 	{
 		//TODO: This error condition should be logged
 		EV << "No super peer has been identified. The object will not be replicated in the Overlay\n";
@@ -71,5 +71,5 @@ void OverlayStorage::handleMessage(cMessage *msg)
 
 	store(go);
 
-	delete(go);
+	delete(msg);
 }

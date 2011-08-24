@@ -113,10 +113,10 @@ void Peer_logic::handleRequest(cMessage *msg)
 	msg->addObject(go);
 
 	//Send the game object to be stored in the group.
-	send(msg->dup(), "group_store");
+	send(msg->dup(), "group_write");
 
 	//Send the game object to be stored in the overlay.
-	send(msg, "overlay_store");
+	send(msg, "overlay_write");
 
 	numSentForStore++;
 }
@@ -157,7 +157,6 @@ void Peer_logic::handleMessage(cMessage *msg)
 	{
 		//A storage request was received from the game or higher layer. This is data that should be stored in the network
 		handleRequest(msg);
-		delete(msg);
 	}
 	else if (strcmp(msg->getArrivalGate()->getName(), "comms_gate$i") == 0)
 	{

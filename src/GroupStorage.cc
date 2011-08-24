@@ -43,7 +43,7 @@ void GroupStorage::updateSuperPeerObjects(const char *objectName, unsigned long 
 	objectAddPkt->setByteLength(4+4+4+8+(send_list.size()*4));	//Source address, dest address, type, object name ID, storage peer addresses
 
 
-	if (this_peer->hasSuperPeer())
+	if (!(this_peer->hasSuperPeer()))
 	{
 		//TODO: This error condition should be logged
 		EV << "No super peer has been identified. The object will not be replicated in the Overlay\n";
@@ -63,7 +63,7 @@ void GroupStorage::updateSuperPeerObjects(const char *objectName, unsigned long 
 	{
 		PeerData peer_d;
 		peer_d.setAddress(send_list.at(i));
-		objectAddPkt->setPeer_list(i, peer_d);
+		objectAddPkt->addToPeerList(peer_d);
 	}
 
 	send(objectAddPkt, "comms_gate$o");		//Set address
@@ -83,39 +83,36 @@ int GroupStorage::getReplicaNr()
 	return replicas;
 }
 
-void GroupStorage::createWritePkt(groupPkt *write)
+void GroupStorage::createWritePkt(groupPkt **write)
 {
 	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
 	TransportAddress sourceAdr(thisNode->getIp(), thisNode->getPort());
 
 	//Create the packet that will house the game object
-	write = new groupPkt();
-	write->setByteLength(4+4+4+8);	//Source address, dest address, type, object name ID and object size
-	write->setPayloadType(WRITE);
-	write->setSourceAddress(sourceAdr);
+	(*write) = new groupPkt();
+	(*write)->setByteLength(4+4+4+8);	//Source address, dest address, type, object name ID and object size
+	(*write)->setPayloadType(WRITE);
+	(*write)->setSourceAddress(sourceAdr);
 }
 
-TransportAddress GroupStorage::selectDestination(std::vector<TransportAddress> send_list)
+void GroupStorage::selectDestination(TransportAddress *dest_adr, std::vector<TransportAddress> send_list)
 {
 	unsigned int j;
-	TransportAddress dest_adr;
 	bool original_address = false;
 
 	while(!original_address)
 	{
-		dest_adr = ((PeerData)group_peers.at(intuniform(0, group_peers.size()-1))).getAddress();		//Choose a random peer in the group for the destination
+		*dest_adr = ((PeerData)group_peers.at(intuniform(0, group_peers.size()-1))).getAddress();		//Choose a random peer in the group for the destination
 
 		//Check all previous chosen addresses to determine whether this address is unique
 		original_address = true;
 
 		for (j = 0 ; j < send_list.size() ; j++)
 		{
-			if (send_list.at(j) == dest_adr)
+			if (send_list.at(j) == *dest_adr)
 				original_address = false;
 		}
 	}
-
-	return dest_adr;
 }
 
 void GroupStorage::store(GameObject *go)
@@ -132,7 +129,7 @@ void GroupStorage::store(GameObject *go)
 
 	replicas = getReplicaNr();
 
-	createWritePkt(write);
+	createWritePkt(&write);
 
 	for (i = 0 ; i < replicas ; i++)
 	{
@@ -150,7 +147,7 @@ void GroupStorage::store(GameObject *go)
 
 		write_dup->addObject(go_dup);
 
-		dest_adr = selectDestination(send_list);
+		selectDestination(&dest_adr, send_list);
 		write_dup->setDestinationAddress(dest_adr);
 
 		send_list.push_back(dest_adr);
@@ -208,8 +205,6 @@ void GroupStorage::addPeers(cMessage *msg)
 	EV << "Added " << list_p->getPeer_listArraySize() << " new peers to the list.\n";
 }
 
-
-
 void GroupStorage::handleMessage(cMessage *msg)
 {
 	Packet *packet = check_and_cast<Packet *>(msg);
@@ -221,7 +216,6 @@ void GroupStorage::handleMessage(cMessage *msg)
 	else if (packet->getPayloadType() == STORE_REQ)
 	{
 		GameObject *go = (GameObject *)msg->removeObject("GameObject");
-
 		if (go == NULL)
 			error("No object was attached to be stored in group storage");
 

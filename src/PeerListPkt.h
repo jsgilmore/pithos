@@ -66,8 +66,8 @@ class PeerListPkt : public PeerListPkt_Base
 		//The names of these methods should remain the same, since they are defined so in the abstract class as pure virtual methods
 		virtual void setPeer_listArraySize(unsigned int size) {}
 		virtual unsigned int getPeer_listArraySize() const {return peer_list.size();}
-		virtual PeerData& getPeer_list(unsigned int k) {return peer_list[k];}
-		virtual void setPeer_list(unsigned int k, const PeerData& alist) {peer_list[k]=alist;}
+		virtual PeerData& getPeer_list(unsigned int k) {return peer_list.at(k);}
+		virtual void setPeer_list(unsigned int k, const PeerData& alist) {peer_list.at(k)=alist;}
 
 		virtual void addToPeerList(const PeerData& alist) {peer_list.push_back(alist);}
 		virtual void clearPeerList() {peer_list.clear();}

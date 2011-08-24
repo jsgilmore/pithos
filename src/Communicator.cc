@@ -179,6 +179,10 @@ void Communicator::handleUDPMessage(cMessage* msg)
 	{
 		send(msg, "sp_group_gate$o");
 	}
+	else if (packet->getPayloadType() == OBJECT_ADD)
+	{
+		send(msg, "sp_group_gate$o");
+	}
 	else if (packet->getPayloadType() == OVERLAY_WRITE_REQ)
 	{
 		send(msg, "sp_group_gate$o");
@@ -258,7 +262,7 @@ void Communicator::handleMessage(cMessage *msg)
 	{
 		handleSPMsg(msg);
 	}
-	else if (strcmp(msg->getArrivalGate()->getName(), "peer_gate$i") == 0)
+	else if ((strcmp(msg->getArrivalGate()->getName(), "peer_gate$i") == 0) || (strcmp(msg->getArrivalGate()->getName(), "gs_gate$i") == 0) || (strcmp(msg->getArrivalGate()->getName(), "os_gate$i") == 0))
 	{
 		handlePeerMsg(msg);
 	}
