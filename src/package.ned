@@ -1,3 +1,0 @@
-package pithos;
-
-@license(LGPL);
