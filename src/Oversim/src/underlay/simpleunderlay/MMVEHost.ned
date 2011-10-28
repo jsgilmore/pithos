@@ -23,6 +23,7 @@ import oversim.common.BootstrapList;
 import oversim.common.CryptoModule;
 import oversim.common.IOverlay;
 import oversim.common.ITier;
+import oversim.common.ITier_overlay;
 import oversim.common.NeighborCache;
 
 
@@ -78,7 +79,7 @@ module MMVEHost
             parameters:
                 @display("p=617,149;i=block/segm");
         }
-        rootObjectStore: <rootObjectStoreType> like ITier {
+        rootObjectStore: <rootObjectStoreType> like ITier_overlay {
             parameters:
                 @display("p=477,149;i=block/segm");
         }
@@ -144,36 +145,36 @@ module MMVEHost
         agent.tcpOut --> tcp.appIn++;
         tcp.appOut++ --> agent.tcpIn;
 
-        eventLayerIM.to_lowerTier --> agent.from_upperTier;
-        eventLayerIM.from_lowerTier <-- agent.to_upperTier;
+        agent.to_lowerTier --> eventLayerIM.from_upperTier;
+        agent.from_lowerTier <-- eventLayerIM.to_upperTier;
         eventLayerIM.udpOut --> udp.appIn++;
         udp.appOut++ --> eventLayerIM.udpIn;
         eventLayerIM.tcpOut --> tcp.appIn++;
         tcp.appOut++ --> eventLayerIM.tcpIn;
 
-        eventDissemination.to_lowerTier --> eventLayerIM.from_upperTier;
-        eventDissemination.from_lowerTier <-- eventLayerIM.to_upperTier;
+        eventLayerIM.to_lowerTier --> eventDissemination.from_upperTier;
+        eventLayerIM.from_lowerTier <-- eventDissemination.to_upperTier;
         eventDissemination.udpOut --> udp.appIn++;
         udp.appOut++ --> eventDissemination.udpIn;
         eventDissemination.tcpOut --> tcp.appIn++;
         tcp.appOut++ --> eventDissemination.tcpIn;
 
-        eventOrdering.to_lowerTier --> eventDissemination.from_upperTier;
-        eventOrdering.from_lowerTier <-- eventDissemination.to_upperTier;
+        eventDissemination.to_lowerTier --> eventOrdering.from_upperTier;
+        eventDissemination.from_lowerTier <-- eventOrdering.to_upperTier;
         eventOrdering.udpOut --> udp.appIn++;
         udp.appOut++ --> eventOrdering.udpIn;
         eventOrdering.tcpOut --> tcp.appIn++;
         tcp.appOut++ --> eventOrdering.tcpIn;
 
-        gameLogic.to_lowerTier --> eventOrdering.from_upperTier;
-        gameLogic.from_lowerTier <-- eventOrdering.to_upperTier;
+        eventOrdering.to_lowerTier --> gameLogic.from_upperTier;
+        eventOrdering.from_lowerTier <-- gameLogic.to_upperTier;
         gameLogic.udpOut --> udp.appIn++;
         udp.appOut++ --> gameLogic.udpIn;
         gameLogic.tcpOut --> tcp.appIn++;
         tcp.appOut++ --> gameLogic.tcpIn;
 
-        rootObjectUpdater.to_lowerTier --> gameLogic.from_upperTier;
-        rootObjectUpdater.from_lowerTier <-- gameLogic.to_upperTier;
+        gameLogic.to_lowerTier --> rootObjectUpdater.from_upperTier;
+        gameLogic.from_lowerTier <-- rootObjectUpdater.to_upperTier;
         rootObjectUpdater.udpOut --> udp.appIn++;
         udp.appOut++ --> rootObjectUpdater.udpIn;
         rootObjectUpdater.tcpOut --> tcp.appIn++;
@@ -181,50 +182,50 @@ module MMVEHost
 
         rootObjectStore.overlayOut --> overlay.appIn;
         rootObjectStore.overlayIn <-- overlay.appOut;
-        rootObjectStore.to_lowerTier --> rootObjectUpdater.from_upperTier;
-        rootObjectStore.from_lowerTier <-- rootObjectUpdater.to_upperTier;
+        rootObjectUpdater.to_lowerTier --> rootObjectStore.from_upperTier;
+        rootObjectUpdater.from_lowerTier <-- rootObjectStore.to_upperTier;
         rootObjectStore.udpOut --> udp.appIn++;
         udp.appOut++ --> rootObjectStore.udpIn;
         rootObjectStore.tcpOut --> tcp.appIn++;
         tcp.appOut++ --> rootObjectStore.tcpIn;
 
-        updateLayerIM.to_lowerTier --> rootObjectStore.from_upperTier;
-        updateLayerIM.from_lowerTier <-- rootObjectStore.to_upperTier;
+        rootObjectStore.to_lowerTier --> updateLayerIM.from_upperTier;
+        rootObjectStore.from_lowerTier <-- updateLayerIM.to_upperTier;
         updateLayerIM.udpOut --> udp.appIn++;
         udp.appOut++ --> updateLayerIM.udpIn;
         updateLayerIM.tcpOut --> tcp.appIn++;
         tcp.appOut++ --> updateLayerIM.tcpIn;
 
-        updateDissemination.to_lowerTier --> updateLayerIM.from_upperTier;
-        updateDissemination.from_lowerTier <-- updateLayerIM.to_upperTier;
+        updateLayerIM.to_lowerTier --> updateDissemination.from_upperTier;
+        updateLayerIM.from_lowerTier <-- updateDissemination.to_upperTier;
         updateDissemination.udpOut --> udp.appIn++;
         udp.appOut++ --> updateDissemination.udpIn;
         updateDissemination.tcpOut --> tcp.appIn++;
         tcp.appOut++ --> updateDissemination.tcpIn;
 
-        objectMerger.to_lowerTier --> updateDissemination.from_upperTier;
-        objectMerger.from_lowerTier <-- updateDissemination.to_upperTier;
+        updateDissemination.to_lowerTier --> objectMerger.from_upperTier;
+        updateDissemination.from_lowerTier <-- objectMerger.to_upperTier;
         objectMerger.udpOut --> udp.appIn++;
         udp.appOut++ --> objectMerger.udpIn;
         objectMerger.tcpOut --> tcp.appIn++;
         tcp.appOut++ --> objectMerger.tcpIn;
 
-        localObjectUpdater.to_lowerTier --> objectMerger.from_upperTier;
-        localObjectUpdater.from_lowerTier <-- objectMerger.to_upperTier;
+        objectMerger.to_lowerTier --> localObjectUpdater.from_upperTier;
+        objectMerger.from_lowerTier <-- localObjectUpdater.to_upperTier;
         localObjectUpdater.udpOut --> udp.appIn++;
         udp.appOut++ --> localObjectUpdater.udpIn;
         localObjectUpdater.tcpOut --> tcp.appIn++;
         tcp.appOut++ --> localObjectUpdater.tcpIn;
 
-        localObjectStore.to_lowerTier --> localObjectUpdater.from_upperTier;
-        localObjectStore.from_lowerTier <-- localObjectUpdater.to_upperTier;
+        localObjectUpdater.to_lowerTier --> localObjectStore.from_upperTier;
+        localObjectUpdater.from_lowerTier <-- localObjectStore.to_upperTier;
         localObjectStore.udpOut --> udp.appIn++;
         udp.appOut++ --> localObjectStore.udpIn;
         localObjectStore.tcpOut --> tcp.appIn++;
         tcp.appOut++ --> localObjectStore.tcpIn;
 
-        displayUpdater.to_lowerTier --> localObjectStore.from_upperTier;
-        displayUpdater.from_lowerTier <-- localObjectStore.to_upperTier;
+        localObjectStore.to_lowerTier --> displayUpdater.from_upperTier;
+        localObjectStore.from_lowerTier <-- displayUpdater.to_upperTier;
         displayUpdater.udpOut --> udp.appIn++;
         udp.appOut++ --> displayUpdater.udpIn;
         displayUpdater.tcpOut --> tcp.appIn++;
