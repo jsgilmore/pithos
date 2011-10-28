@@ -17,8 +17,9 @@ package oversim.applications.pithos;
 
 import oversim.common.BaseApp;
 import oversim.common.ITier;
+import oversim.common.ITier_overlay;
 
-module PeerSelect like ITier
+module PeerSelect like ITier_overlay
 {
     parameters:
         @display("i=device/pc");
@@ -32,6 +33,8 @@ module PeerSelect like ITier
         input trace_in;          // gate for trace file commands
         input tcpIn;             // gate from the TCP layer
         output tcpOut;           // gate to the TCP layer
+        input overlayIn;         // gate from the Overlay layer
+        output overlayOut;       // gate to the Overlay layer
     submodules:
         peer_logic: Peer_logic;
         storage : Storage;
@@ -62,9 +65,11 @@ module PeerSelect like ITier
         tcpIn --> communicator.tcpIn;
         tcpOut <-- communicator.tcpOut;
         trace_in --> communicator.trace_in;
+        overlayIn --> communicator.overlayIn;
+        overlayOut <-- communicator.overlayOut;
 }
 
-module Super_peerSelect like ITier
+module Super_peerSelect like ITier_overlay
 {
     parameters:
         @display("i=device/pc_l");
@@ -78,6 +83,8 @@ module Super_peerSelect like ITier
         input trace_in;          // gate for trace file commands
         input tcpIn;             // gate from the TCP layer
         output tcpOut;           // gate to the TCP layer
+        input overlayIn;         // gate from the Overlay layer
+        output overlayOut;       // gate to the Overlay layer
     submodules:
         peer_logic: Peer_logic;
         super_peer_logic: Super_peer_logic;
@@ -112,4 +119,6 @@ module Super_peerSelect like ITier
         tcpIn --> communicator.tcpIn;
         tcpOut <-- communicator.tcpOut;
         trace_in --> communicator.trace_in;
+        overlayIn --> communicator.overlayIn;
+        overlayOut <-- communicator.overlayOut;
 }

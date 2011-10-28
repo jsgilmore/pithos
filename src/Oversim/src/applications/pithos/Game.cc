@@ -99,5 +99,5 @@ void Game::sendRequest()
 	//dhtPutMsg->setTtl(ttl);
 	//dhtPutMsg->setIsModifiable(true);
 
-	sendInternalRpcCall(TIER1_COMP, dhtPutMsg);
+	sendInternalRpcCall(ROOTOBJECTSTORE_COMP, dhtPutMsg);
 }
