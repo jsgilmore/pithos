@@ -43,6 +43,7 @@ module MMVEHost
         string gameLogicType;
         string rootObjectUpdaterType;
         string rootObjectStoreType;
+        string overlayStorageType;
         string updateLayerIMType;
         string updateDisseminationType;
         string localObjectUpdaterType;
@@ -82,6 +83,10 @@ module MMVEHost
         rootObjectStore: <rootObjectStoreType> like ITier_overlay {
             parameters:
                 @display("p=477,149;i=block/segm");
+        }
+        overlayStorage: <overlayStorageType> like ITier {
+            parameters:
+                @display("p=477,290;i=block/segm");
         }
         updateLayerIM: <updateLayerIMType> like ITier {
             parameters:
@@ -133,7 +138,7 @@ module MMVEHost
         }
         neighborCache: NeighborCache {
             parameters:
-                @display("p=617,457");
+                @display("p=617,446");
         }
         bootstrapList: BootstrapList {
             parameters:
@@ -180,14 +185,26 @@ module MMVEHost
         rootObjectUpdater.tcpOut --> tcp.appIn++;
         tcp.appOut++ --> rootObjectUpdater.tcpIn;
 
-        rootObjectStore.overlayOut --> overlay.appIn;
-        rootObjectStore.overlayIn <-- overlay.appOut;
+        rootObjectStore.overlayOut --> overlayStorage.from_upperTier;
+        rootObjectStore.overlayIn <-- overlayStorage.to_upperTier;
         rootObjectUpdater.to_lowerTier --> rootObjectStore.from_upperTier;
         rootObjectUpdater.from_lowerTier <-- rootObjectStore.to_upperTier;
         rootObjectStore.udpOut --> udp.appIn++;
         udp.appOut++ --> rootObjectStore.udpIn;
         rootObjectStore.tcpOut --> tcp.appIn++;
         tcp.appOut++ --> rootObjectStore.tcpIn;
+
+        overlayStorage.to_lowerTier --> overlay.appIn;
+        overlayStorage.from_lowerTier <-- overlay.appOut;
+        overlayStorage.udpOut --> udp.appIn++;
+        udp.appOut++ --> overlayStorage.udpIn;
+        overlayStorage.tcpOut --> tcp.appIn++;
+        tcp.appOut++ --> overlayStorage.tcpIn;
+
+        overlay.udpOut --> udp.appIn++;
+        overlay.udpIn <-- udp.appOut++;
+        overlay.tcpOut --> tcp.appIn++;
+        overlay.tcpIn <-- tcp.appOut++;
 
         rootObjectStore.to_lowerTier --> updateLayerIM.from_upperTier;
         rootObjectStore.from_lowerTier <-- updateLayerIM.to_upperTier;
@@ -230,12 +247,6 @@ module MMVEHost
         udp.appOut++ --> displayUpdater.udpIn;
         displayUpdater.tcpOut --> tcp.appIn++;
         tcp.appOut++ --> displayUpdater.tcpIn;
-
-        overlay.udpOut --> udp.appIn++;
-        overlay.udpIn <-- udp.appOut++;
-
-        overlay.tcpOut --> tcp.appIn++;
-        overlay.tcpIn <-- tcp.appOut++;
 
         bootstrapList.udpOut --> udp.appIn++;
         bootstrapList.udpIn <-- udp.appOut++;
