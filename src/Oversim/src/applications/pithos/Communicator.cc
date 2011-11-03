@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2009 Institut fuer Telematik, Universitaet Karlsruhe (TH)
+// Copyright (C) 2011 MIH Media lab, Stellenbosch University
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -17,10 +17,8 @@
 //
 
 /**
- * @author Antonio Zea
+ * @author John Gilmore
  */
-
-#include <string>
 
 #include "Communicator.h"
 
