@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2009 Institut fuer Telematik, Universitaet Karlsruhe (TH)
+// Copyright (C) 2011 MIH Media lab, University of Stellenbosch
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -16,12 +16,8 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 
-/**
- * @author Antonio Zea
-  */
-
-#ifndef MYAPPLICATION_H
-#define MYAPPLICATION_H
+#ifndef COMMUNICATOR_H
+#define COMMUNICATOR_H
 
 #define SHA1_WIPE_VARIABLES
 
@@ -42,6 +38,15 @@
 
 #include "DHTMessage_m.h"
 
+/**
+ * The Communicator class is the Tier1 class for Pithos and therefore the means by
+ * which Pithos communicates with higher and lower layers, as well as the overlay,
+ * UDP and TCP. All other Pithos modules that wish to send information to other layers
+ * must to so through the Communicator.
+ *
+ * @author John Gilmore
+ */
+
 class Communicator : public BaseApp
 {
 	private:
@@ -60,16 +65,66 @@ class Communicator : public BaseApp
 		void handleUDPMessage(cMessage* msg);          // called when we receive a UDP message
 		void handleUpperMessage (cMessage *msg);
 
+		/**
+		 * The function that handles RPC request from the higher layer to store, retrieve and update objects.
+		 *
+		 * @param msg The RPC message containing the request type and data
+		 */
 		bool handleRpcCall(BaseCallMessage *msg);
+
+		/**
+		 * This function has not been implemented yet, but is meant to
+		 * be a response to another node performing a push request to
+		 * this node. The response would be whether the push was successful
+		 * at the destination and will be sent back to the storing node.
+		 */
 		void handlePutRequest(DHTPutCall* dhtMsg);
+
+		/**
+		 * @see handlePutRequest()
+		 */
 		void handleGetRequest(DHTGetCall* dhtMsg);
+
+		/**
+		 * Called by @see handleRpcCall() when an internal RPC called requested a push be done.
+		 *
+		 * @param capiGetMsg Message containing the data required for the push
+		 */
 		void handleGetCAPIRequest(DHTgetCAPICall* capiGetMsg);
+
+		/**
+		 * @see handleGetCapiRequest()
+		 */
 		void handlePutCAPIRequest(DHTputCAPICall* capiPutMsg);
+
 		void handleDumpDhtRequest(DHTdumpCall* call);
 
+		/**
+		 * Called when a message is received from a super peer. The message is inspected to generate the required response.
+		 *
+		 * @param msg Message received from the Super Peer
+		 */
 		void handleSPMsg(cMessage *msg);
+
+		/**
+		 * Called when a message is received from a group peer over UDP. The message is inspected to generate the required response.
+		 *
+		 * @param msg Message received from the Peer
+		 */
 		void handlePeerMsg(cMessage *msg);
+
+		/**
+		 * Route a message to the overlay for storage.
+		 *
+		 * @param msg Message containing the GameObject that should be stored.
+		 */
 		void overlayStore(cMessage *msg);
+
+		/**
+		 * Send a packet out over UDP to the destination IP address.
+		 *
+		 * @param msg The packet that should be sent.
+		 */
 		void sendPacket(cMessage *msg);
 
 	public:
