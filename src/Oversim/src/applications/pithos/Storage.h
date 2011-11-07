@@ -37,18 +37,36 @@ class Storage : public cSimpleModule
 		int getStorageBytes();
 		int getStorageFiles();
 	private:
+
+		/** The queue holding all stored GameObjects */
 		cQueue storage;
 	protected:
+
+		/** Signal for recording the number of objects stored */
 		simsignal_t qlenSignal;
+
+		/** Signal for recording the size of objects stored in bytes */
 		simsignal_t qsizeSignal;
-		simsignal_t queueingTimeSignal;
+
+		/** Signal for recording the number of overlay objects stored */
 		simsignal_t overlayObjectsSignal;
+
+		/** Signal for recording the number of root objects stored */
 		simsignal_t rootObjectsSignal;
+
+		/** Signal for recording the number of group replica objects stored */
 		simsignal_t replicaObjectsSignal;
 
+		/** Signal for recording the time that was required to store each object */
 		simsignal_t storeTimeSignal;
+
+		/** Signal for recording the time that was required to store a root object */
 		simsignal_t rootStoreTimeSignal;
+
+		/** Signal for recording the time that was required to store a group replica object */
 		simsignal_t replicaStoreTimeSignal;
+
+		/** Signal for recording the time that was required to store an overlay object */
 		simsignal_t overlayStoreTimeSignal;
 
 		virtual void initialize();

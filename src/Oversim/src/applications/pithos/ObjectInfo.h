@@ -34,20 +34,57 @@
 class ObjectInfo
 {
 	private:
+
+		/** Object name */
 		std::string object_name;
+
+		/** Object size in bytes */
 		int size;
+
+		/** A list of TransPort addresses where this object is stored in the group. */
 		std::vector<TransportAddress> location_list;
 	public:
 		ObjectInfo();
 		virtual ~ObjectInfo();
 
+		/**
+		 * Set the object name
+		 *
+		 * @param o_name A std::string value containing the object name
+		 */
 		void setObjectName(const std::string &o_name);
+
+		/**
+		 * Set the object name
+		 *
+		 * @param o_name A char* value containing the object name
+		 */
 		void setObjectName(char *o_name);
+
 		std::string getObjectName();
+
+		/**
+		 * Add a TransportAddress to the list of object locations
+		 *
+		 * @param adr A TransportAddress containing the IP and port information
+		 */
 		void addAddress(const TransportAddress &adr);
+
+		/**
+		 * Add a TransportAddress to the list of object locations
+		 *
+		 * @param ip_str A string specifying the IP of the location
+		 * @param port The port of the object location
+		 */
 		void addAddress(const char* ip_str, int port);
+
 		TransportAddress getAddress(const int &i);
+
+		/**
+		 * @returns a random address from the list of object locations
+		 */
 		TransportAddress getRandAddress();
+
 		void setSize(const int &siz);
 		int getSize();
 };

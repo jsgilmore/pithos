@@ -59,7 +59,7 @@ class GroupStorage : public cSimpleModule
 		/**
 		 * The function creates a write packet and fills it with address information, payload type and byte length.
 		 *
-		 * @param A pointer to the write packet to be created and filled
+		 * @param write A pointer to the write packet to be created and filled
 		 */
 		void createWritePkt(groupPkt **write);
 
@@ -95,7 +95,7 @@ class GroupStorage : public cSimpleModule
 		void addPeers(cMessage *msg);
 
 		/**
-		 * @return the number of required replicas or the number of group peers, if this number is less than the required replicas (this case is also logged).
+		 * @returns the number of required replicas or the number of group peers, if this number is less than the required replicas (this case is also logged).
 		 */
 		int getReplicaNr();
 	protected:

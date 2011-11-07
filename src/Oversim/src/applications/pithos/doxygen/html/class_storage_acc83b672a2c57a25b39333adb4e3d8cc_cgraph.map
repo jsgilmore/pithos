@@ -1,0 +1,6 @@
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$class_game_object.html#a8369f83d088ed8095096874c66be92b6" title="GameObject::getCreationTime" alt="" coords="223,5,420,35"/>
+<area shape="rect" id="node5" href="$class_game_object.html#a64ba9e7c42bc9666813f4af4b24ffc88" title="GameObject::getSize" alt="" coords="248,59,395,88"/>
+<area shape="rect" id="node7" href="$class_storage.html#a691c055964772d680f555895db4e3121" title="Storage::getStorageBytes" alt="" coords="236,112,407,141"/>
+<area shape="rect" id="node9" href="$class_game_object.html#aa76ad2a2a97c5fba330f5dcff7f7b251" title="GameObject::getType" alt="" coords="247,165,396,195"/>
+</map>

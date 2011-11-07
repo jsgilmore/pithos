@@ -33,20 +33,22 @@
 class PeerListPkt : public PeerListPkt_Base
 {
 	protected:
+
+		/** The vector (list) of peers that all store a specific object */
 		std::vector<PeerData> peer_list;
 	public:
-		//PeerListPkt(const char *name=NULL, int kind=0) : PeerListPkt_Base(name, kind) {};
+
 		PeerListPkt(const char *name=NULL, int kind=0)
 		{
 			Packet(name, kind);
 		}
 
-		PeerListPkt(const PeerListPkt& other)	//TODO: Make sure this copy constructor correctly constructs the cPacket class
+		PeerListPkt(const PeerListPkt& other)
 		{
+			//Make sure this copy constructor correctly constructs the cPacket class, the constructor is not called here, because of too many levels of inheritance
 			setName(other.getName());
 			operator=(other);
 		}
-		//PeerListPkt(const PeerListPkt& other) : PeerListPkt_Base(other.getName()) { operator=(other); }
 
 		PeerListPkt& operator=(const PeerListPkt& other)
 		{
@@ -58,14 +60,49 @@ class PeerListPkt : public PeerListPkt_Base
 
 		virtual PeerListPkt *dup() {return new PeerListPkt(*this);}
 
-		//The names of these methods should remain the same, since they are defined so in the abstract class as pure virtual methods
+		/**
+		 * Set the size of the peer_list vector
+		 *
+		 * @param size The number of elements that the vector should be able to contain
+		 */
 		virtual void setPeer_listArraySize(unsigned int size) {}
+
+		/**
+		 * Get the size of the peer_list vector
+		 *
+		 * @returns size The number of elements that the vector contains
+		 */
 		virtual unsigned int getPeer_listArraySize() const {return peer_list.size();}
+
+		/**
+		 * Retrieve a single peer's information from the list of peers
+		 *
+		 * @param k the position of the peer in the list
+		 * @returns The peer information at the specified position
+		 */
 		virtual PeerData& getPeer_list(unsigned int k) {return peer_list.at(k);}
+
+		/**
+		 * Set the peer information for a particular element in the list
+		 *
+		 * @param k the position of the element
+		 * @param alist the peer information to be inserted
+		 */
 		virtual void setPeer_list(unsigned int k, const PeerData& alist) {peer_list.at(k)=alist;}
 
+		/**
+		 * Add a single peer information item to the list vector
+		 *
+		 * @param alist the peer information to be added
+		 */
 		virtual void addToPeerList(const PeerData& alist) {peer_list.push_back(alist);}
+
+		/**
+		 * Delete all elements contained in the peer list
+		 */
 		virtual void clearPeerList() {peer_list.clear();}
+
+		//Note: Ensure that the names of the above methods remain the same, since they are defined so in the abstract class as pure virtual methods
 };
 
 Register_Class(PeerListPkt);

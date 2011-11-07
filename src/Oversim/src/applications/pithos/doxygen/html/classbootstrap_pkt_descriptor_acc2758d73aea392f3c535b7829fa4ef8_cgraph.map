@@ -1,0 +1,5 @@
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$classbootstrap_pkt_descriptor.html#a8ecad21098f76fffd7ce18ec42def88a" title="bootstrapPktDescriptor::getFieldCount" alt="" coords="315,5,560,35"/>
+<area shape="rect" id="node5" href="$classbootstrap_pkt.html#a1d2a0231c6174381c5fc0a333c3ee65b" title="bootstrapPkt::setLatitude" alt="" coords="353,59,521,88"/>
+<area shape="rect" id="node7" href="$classbootstrap_pkt.html#a98f5c5f8e3de7301edce42ad55a8dd33" title="bootstrapPkt::setLongitude" alt="" coords="348,112,527,141"/>
+</map>

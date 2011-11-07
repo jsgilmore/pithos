@@ -80,7 +80,7 @@ TransportAddress Directory_logic::findAddress(const double &lati, const double &
 
 	for (i = 0 ; i < sp_adr_list.size() ; i++)
 	{
-		list_lat = ((SP_element)sp_adr_list.at(i)).getLattitude();
+		list_lat = ((SP_element)sp_adr_list.at(i)).getLatitude();
 		list_long = ((SP_element)sp_adr_list.at(i)).getLongitude();
 
 		dist = sqrt( pow(list_lat - lati, 2) + pow(list_long - longi, 2));
