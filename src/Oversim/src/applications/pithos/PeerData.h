@@ -31,7 +31,10 @@
 class PeerData
 {
 	private:
+
+		/** The transport address of the peer (IP address and port) */
 		TransportAddress address;
+
 	public:
 		PeerData();
 		PeerData(const PeerData& other);
@@ -40,8 +43,21 @@ class PeerData
 		bool operator==(const PeerData &other) const;
 		bool operator!=(const PeerData &other) const;
 
+		/**
+		 * Set the TransportAddress
+		 *
+		 * @param adr A TransportAddress object containing the IP and port information
+		 */
 		void setAddress(TransportAddress adr);
+
+		/**
+		 * Add the TransportAddress
+		 *
+		 * @param ip_str A string specifying the IP of the location
+		 * @param port The port of the object location
+		 */
 		void setAddress(const char* ip_str, int port);
+
 		TransportAddress getAddress();
 };
 

@@ -41,8 +41,15 @@ class OverlayStorage : public cSimpleModule
 	public:
 		OverlayStorage();
 		virtual ~OverlayStorage();
-	private:
+	public:
+
+		/**
+		 * Push a GameObject to the overlay for storage
+		 *
+		 * @param go the GameObject to be pushed to the overlay
+		 */
 		void store(GameObject *go);
+
 	protected:
 		virtual void initialize();
 		virtual void handleMessage(cMessage *msg);

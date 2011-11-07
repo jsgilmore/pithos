@@ -37,7 +37,6 @@ void Storage::initialize()
 	replicaStoreTimeSignal = registerSignal("replicaStoreTime");
 	overlayStoreTimeSignal = registerSignal("overlayStoreTime");
 
-	queueingTimeSignal = registerSignal("queueingTime");
 	emit(qlenSignal, storage.length());
 	emit(qsizeSignal, getStorageBytes());
 

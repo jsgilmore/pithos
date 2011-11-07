@@ -45,33 +45,61 @@ enum SP_indeces {
 class Peer_logic: public cSimpleModule
 {
 	private:
+
+		/** An event used to trigger a join request */
 		cMessage *event;
 
+		/** The IP address of the directory server (specified as a Omnet param value) */
 		char directory_ip[16];
+
+		/** The port of the directory server (specified as a Omnet param value) */
 		int directory_port;
+
+		/** The latitude of this peer (position in the virtual world) */
 		double latitude;
+
+		/** The longitude of this peer (position in the virtual world) */
 		double longitude;
 
+		/** The TransPort address of the group super peer (this address is set, after the peer has joined a group) */
 		TransportAddress super_peer_address;
 
-		// statistics
-		int numSentForStore;              //number of packets sent
+		/** Statistic recording the number of packets sent */
+		int numSentForStore;
+
 	public:
 		Peer_logic();
 		virtual ~Peer_logic();
 
+		/**
+		 * @returns true if a super peer has been set for this peer and false if not.
+		 */
 		bool hasSuperPeer();
+
 		TransportAddress getSuperPeerAddress();
 	protected:
 		virtual void initialize();
 		virtual void handleMessage(cMessage *msg);
 
-		void sendObjectForStore(long long int o_size);
+		/**
+		 * Handle a message received from the group over UDP
+		 *
+		 * @param msg the message received
+		 */
 		void handleP2PMsg(cMessage *msg);
+
+		/**
+		 * Handle a request from the higher layer for store, retrieve or update
+		 *
+		 * @param msg the request with type and required data
+		 */
 		void handleRequest(cMessage *msg);
 
-		void OverlayStore(GameObject *go, std::vector<TransportAddress> send_list);
-
+		/**
+		 * Send a join request to the directory server or a super peer
+		 *
+		 * @param the destination address of the directory server of super peer
+		 */
 		void joinRequest(const TransportAddress &dest_adr);
 };
 
