@@ -1,0 +1,11 @@
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$class_object_info.html#aa05ca8541cc8569a8a8464d309891d42" title="ObjectInfo::addAddress" alt="" coords="273,5,431,35"/>
+<area shape="rect" id="node5" href="$class_game_object.html#a8271f7a5a8a2e46f23648c68fe1804ae" title="GameObject::getObjectName" alt="" coords="255,59,449,88"/>
+<area shape="rect" id="node7" href="$class_game_object.html#a64ba9e7c42bc9666813f4af4b24ffc88" title="GameObject::getSize" alt="" coords="279,112,425,141"/>
+<area shape="rect" id="node9" href="$class_packet.html#a45f33c0de6120b8da4450f57075fd8df" title="Packet::setDestinationAddress" alt="" coords="251,165,453,195"/>
+<area shape="rect" id="node11" href="$class_object_info.html#a47d8dc70da8fb586b24b752be998e8f9" title="ObjectInfo::setObjectName" alt="" coords="261,219,443,248"/>
+<area shape="rect" id="node13" href="$class_packet.html#afcdd0af481587e75efddb32263e5bbc7" title="Packet::setPayloadType" alt="" coords="269,272,435,301"/>
+<area shape="rect" id="node15" href="$class_object_info.html#a00b9bbc0b92c4bc14023a461c69707c0" title="ObjectInfo::setSize" alt="" coords="285,325,419,355"/>
+<area shape="rect" id="node17" href="$class_packet.html#a2429eaaf7dff189b3d35e528c019e961" title="Packet::setSourceAddress" alt="" coords="263,379,441,408"/>
+<area shape="rect" id="node19" href="$class_game_object.html#ac48ab958ae21ae9e1d982fb567603bdd" title="GameObject::setType" alt="" coords="277,432,427,461"/>
+</map>

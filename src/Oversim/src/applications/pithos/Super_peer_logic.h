@@ -41,40 +41,97 @@
 class Super_peer_logic : public cSimpleModule
 {
 	private:
+
+		/** Event that is used to trigger the super peer informing the directory server of its existence */
 		cMessage *event;
 
+		/** The latitude of the super peer in the virtual world */
 		double latitude;
+
+		/** The longitude of the super peer in the virtual world */
 		double longitude;
+
+		/** The IP of the directory server */
 		char directory_ip[16];
+
+		/** The port of the directory server */
 		int directory_port;
 
+		/** A vector that records all peers that belong to this super peer's group */
 		std::vector<PeerData> group_peers;
+
+		/** A vector that records all objects that are stored in this super peer's group */
 		std::vector<ObjectInfo> object_list;
 
-		//Statistics
+		/** A signal that records the group size over time */
 		simsignal_t groupSizeSignal;
+
+		/** A signal that records the number of overlay writes performed */
 		simsignal_t OverlayWriteSignal;
+
+		/** A signal that records the number of overlay objects successfully delivered */
 		simsignal_t OverlayDeliveredSignal;
+
+		/** A signal that records when this super peer was listed in the directory server */
 		simsignal_t joinTimeSignal;
+
+		/** A signal that records the number of objects stored in this group */
 		simsignal_t storeNumberSignal;
+
+		/** A signal that records the number of overlay objects stored in this group */
 		simsignal_t overlayNumberSignal;
 
+		/** A signal that records the number of times an overlay object could not be stored */
 		simsignal_t overlaysStoreFailSignal;
 	public:
 		Super_peer_logic();
 		virtual ~Super_peer_logic();
 	protected:
-		int network_size;
 
-		void initialize();                 // called when the module is being created
-		void finish();                              // called when the module is about to be destroyed
+		/** Called when the module is being created */
+		void initialize();
+
+		/** Called when the module is about to be destroyed */
+		void finish();
 
 		virtual void handleMessage(cMessage *msg);
+
+		/**
+		 * Push the message received from the group to the overlay
+		 *
+		 * @param msg the message containing the data that should be pushed
+		 */
 		void handleOverlayWrite(cMessage *msg);
+
+		/**
+		 * Handle a message received from the group over UDP
+		 *
+		 * @param msg the message that should be handled
+		 */
 		void handleP2PMsg(cMessage *msg);
+
+		/**
+		 * Handle a peer wishing to join the group
+		 *
+		 * @param msg the message containing the joining peer's information
+		 */
 		void handleJoinReq(cMessage *msg);
+
+		/**
+		 * Store an object received from the overlay in the group
+		 *
+		 * @param overlay_p the message received from the overlay, containing the game object
+		 */
 		void GroupStore(overlayPkt *overlay_p);
+
+		/**
+		 * Send a message to add this super peer to the directory server
+		 */
 		void addSuperPeer();
+
+		/**
+		 * Add a new group object to the super peer's object list.
+		 */
 		void addObject(cMessage *msg);
 };
 

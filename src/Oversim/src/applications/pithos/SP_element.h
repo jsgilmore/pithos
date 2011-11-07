@@ -32,17 +32,48 @@
 class SP_element
 {
 	private:
+
+		/** The transport address of the peer (IP address and port) */
 		TransportAddress address;
+
+		/** The latitude of the super peer in the virtual world */
 		double latitude;
+
+		/** The longitude of the super peer in the virtual world */
 		double longitude;
 	public:
 		SP_element();
 		virtual ~SP_element();
+
+		/**
+		 * Set the TransportAddress
+		 *
+		 * @param adr A TransportAddress containing the IP and port information
+		 */
 		void setAddress(const TransportAddress &adr);
+
+		/**
+		 * Set the TransportAddress
+		 *
+		 * @param ip_str A string specifying the IP of the location
+		 * @param port The port of the object location
+		 */
 		void setAddress(const char* ip, const int &port);
+
 		TransportAddress getAddress();
+
+		/**
+		 * Set the position
+		 *
+		 * @param lati latitude
+		 * @param longi longitude
+		 */
 		void setPosition(const double &lati, const double &longi);
-		double getLattitude();
+
+		/**
+		 * @returns latitide
+		 */
+		double getLatitude();
 		double getLongitude();
 
 };

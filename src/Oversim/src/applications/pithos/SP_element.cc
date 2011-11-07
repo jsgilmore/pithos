@@ -48,7 +48,7 @@ void SP_element::setPosition(const double &lati, const double &longi)
 	longitude = longi;
 }
 
-double SP_element::getLattitude()
+double SP_element::getLatitude()
 {
 	return latitude;
 }
