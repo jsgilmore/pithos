@@ -124,14 +124,10 @@ class Super_peer_logic : public cSimpleModule
 		 */
 		void GroupStore(overlayPkt *overlay_p);
 
-		/**
-		 * Send a message to add this super peer to the directory server
-		 */
+		/** Send a message to add this super peer to the directory server */
 		void addSuperPeer();
 
-		/**
-		 * Add a new group object to the super peer's object list.
-		 */
+		/** Add a new group object to the super peer's object list. */
 		void addObject(cMessage *msg);
 };
 
