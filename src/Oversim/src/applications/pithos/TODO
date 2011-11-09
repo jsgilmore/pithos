@@ -1,55 +1,15 @@
-What still needs to be done:
-Complete the directory server that allows peers to learn of their super peer
-Add super peer functionality that allows it to inform peers of other peers in the group.
-Peers will then learn of other peers in their group from super peers and not by simulation rules.
-Investigate the possibility of rather using Vast to implement node discovery.
-Super peers might have to use vast to know what other super peers are in the network, to enable them to correctly join new peers to the network. Or some migration method is required.
-One might then be looking at a two tiered VAST network, with M+1 overlays, where M is the number of groups in the system
+PhD TODO list:
 
-Valgrind leak check summary with many news and few deletes:
-LEAK SUMMARY:
-==4470==    definitely lost: 2,435,692 bytes in 55,724 blocks
-==4470==    indirectly lost: 7,634,965 bytes in 9,482 blocks
-==4470==      possibly lost: 5,491,343 bytes in 443 blocks
-==4470==    still reachable: 4,284 bytes in 154 blocks
-==4470==         suppressed: 0 bytes in 0 blocks
+Integrate DHT into Pithos
+	Find out how BinaryValue works
+	Create conversion functions to convert between GameObject and BinaryValue
+	Update MMVEDHTTestApp to use converted GameObject at relevant time instead of BinaryValues at random times
 
-Valgrind leak check summary with mostly static objects and const *
-==7228== LEAK SUMMARY:
-==7228==    definitely lost: 140,808 bytes in 3,422 blocks
-==7228==    indirectly lost: 7,471,576 bytes in 9,454 blocks
-==7228==      possibly lost: 5,649,172 bytes in 372 blocks
-==7228==    still reachable: 4,240 bytes in 153 blocks
-==7228==         suppressed: 0 bytes in 0 blocks
-
-The Pithos configuration should be stored:
-
-[Config Pithos]
-description = Combined Peer/ Super peer network
-**.churnGeneratorTypes = "oversim.common.NoChurn oversim.common.NoChurn oversim.common.NoChurn"
-
-**-0[*].overlayType = "oversim.applications.i3.OverlayDummyModules"
-**-0[*].tier1Type = "oversim.applications.Pithos.Directory"
-**.churnGenerator[0].targetOverlayTerminalNum = 1
-**.churnGenerator[0].initPhaseCreationInterval = 0.001s
-
-**-1[*].numTiers = 2
-**-1[*].overlayType = "oversim.overlay.chord.ChordModules"
-**-1[*].tier1Type = "oversim.applications.Pithos.Super_peer"
-**-1[*].tier2Type = "oversim.applications.Pithos.GameModule"
-**-1[*].neighborCache.enableNeighborCache = true
-**.churnGenerator[1].targetOverlayTerminalNum = 15
-**.churnGenerator[1].initPhaseCreationInterval = 0.001s
-
-**-2[*].numTiers = 2
-**-2[*].overlayType = "oversim.applications.i3.OverlayDummyModules"
-**-2[*].tier1Type = "oversim.applications.Pithos.Peer"
-**-2[*].tier2Type = "oversim.applications.Pithos.GameModule"
-**.churnGenerator[2].targetOverlayTerminalNum = 300
-**.churnGenerator[2].initPhaseCreationInterval = 0.1s
-**.directory_ip = "1.0.0.1"
-**.directory_port = 2000
-**.wait_time = 1000s
-**.generation_time = 30s
-
-sim-time-limit = 20000s
+Have all peers be part of the overlay
+Implement object retrieval, update and time to live
+Add mechanisms to handle churn (leaving the game and moving to another group)
+Develop grouping algorithm based on player traces
+Have Pithos construct groups based on the grouping algorithm
+Test the system for various levels of churn and various numbers of replicas
+Test the system for various numbers of malicious peers
+Write-up PhD

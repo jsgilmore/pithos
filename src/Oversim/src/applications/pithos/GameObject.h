@@ -21,6 +21,8 @@
 
 #include <omnetpp.h>
 
+#include "BinaryValue.h"
+
 enum ObjectTypes {
     ROOT = 1,
     REPLICA = 2,
@@ -52,14 +54,15 @@ class GameObject : public cOwnedObject
 	public:
 		GameObject(const char *name=NULL, int type=ROOT);
 		GameObject(const GameObject& other);
+		GameObject(const BinaryValue& binval);
 		virtual ~GameObject();
 		GameObject& operator=(const GameObject& other);
 		virtual std::string info();
 
-		/** @return Duplicate of the game object */
+		/** @returns Duplicate of the game object */
 		virtual GameObject *dup() const;
 
-		/** @return the size of the object in bytes */
+		/** @returns the size of the object in bytes */
 		int64_t getSize();
 
 		/** @param o_size The size of the object in bytes */
@@ -70,6 +73,8 @@ class GameObject : public cOwnedObject
 		char *getObjectName();
 		void setCreationTime(const simtime_t &time);
 		simtime_t getCreationTime();
+
+		BinaryValue getBinaryValue();
 };
 
 #endif /* GO_H_ */

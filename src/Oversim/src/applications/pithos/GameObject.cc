@@ -2,15 +2,22 @@
 
 //Register_Class(GameObject);
 
-GameObject::GameObject(const char *name, int o_type) : cOwnedObject(name)
-{
-	size = 0;
-	type = o_type;
-}
-
 GameObject::GameObject(const GameObject& other) : cOwnedObject(other.getName())
 {
 	operator=(other);
+}
+
+GameObject::GameObject(const BinaryValue& binval) : cOwnedObject("")
+{
+	std::string buf;			// Have a buffer string
+	std::stringstream ss;		//Create a string stream
+	ss << binval;				// Insert the string into a stream
+
+	std::vector<std::string> tokens; // Create vector to hold our words
+
+	while (ss >> buf)
+		tokens.push_back(buf);
+
 }
 
 GameObject::~GameObject()
@@ -42,8 +49,10 @@ GameObject& GameObject::operator=(const GameObject& other)
 
 std::string GameObject::info()
 {
+	//It's important that this function is kept up to date, since the BinaryValue of the object is generated using it
+	//Also, space delimiting is used by the C++ string streams to tokenise the input for reconstruction
 	std::stringstream out;
-	out << "GameObject: size = " << size << ", type = " << type;
+	out << objectName << " " << size << " " << type << " " << creationTime;
 	return out.str();
 }
 
@@ -86,4 +95,11 @@ void GameObject::setCreationTime(const simtime_t &time)
 simtime_t GameObject::getCreationTime()
 {
 	return creationTime;
+}
+
+BinaryValue GameObject::getBinaryValue()
+{
+	BinaryValue binval(info());
+
+	return binval;
 }
