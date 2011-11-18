@@ -18,21 +18,82 @@
 
 #include <omnetpp.h>
 
+#include <SHA1.h>
+#include <GlobalNodeList.h>
+#include <GlobalStatistics.h>
+#include <UnderlayConfigurator.h>
+#include <TransportAddress.h>
+#include <OverlayKey.h>
+#include <InitStages.h>
+#include <BinaryValue.h>
+#include <BaseApp.h>
+
 #include "BaseApp.h"
 #include "Peer_logic.h"
 
 #include "groupPkt_m.h"
 #include "GameObject.h"
 
-class DHTStorage : public cSimpleModule
+class GlobalDhtTestMap;
+
+class DHTStorage : public BaseApp
 {
 	public:
 		DHTStorage();
 		virtual ~DHTStorage();
 	private:
+		/**
+		 * A container used by the DHTTestApp to
+		 * store context information for statistics
+		 *
+		 * @author Ingmar Baumgart
+		 */
+		class DHTStatsContext : public cPolymorphic
+		{
+			public:
+				bool measurementPhase;
+				simtime_t requestTime;
+				OverlayKey key;
+				BinaryValue value;
+
+				DHTStatsContext(bool measurementPhase,
+								simtime_t requestTime,
+								const OverlayKey& key,
+								const BinaryValue& value = BinaryValue::UNSPECIFIED_VALUE) :
+					measurementPhase(measurementPhase), requestTime(requestTime),
+					key(key), value(value) {};
+		};
+
+		UnderlayConfigurator* underlayConfigurator; /**< pointer to UnderlayConfigurator in this node */
+
+		GlobalNodeList* globalNodeList; /**< pointer to GlobalNodeList in this node*/
+
+		GlobalStatistics* globalStatistics; /**< pointer to GlobalStatistics module in this node*/
+		GlobalDhtTestMap* globalDhtTestMap; /**< pointer to the GlobalDhtTestMap module */
+
+		// parameters
+		bool debugOutput; /**< debug output yes/no?*/
+		int ttl; /**< ttl for stored DHT records */
+		bool activeNetwInitPhase; //!< is app active in network init phase?
+
+		// statistics
+		int numSent; /**< number of sent packets*/
+		int numGetSent; /**< number of get sent*/
+		int numGetError; /**< number of false get responses*/
+		int numGetSuccess; /**< number of false get responses*/
+		int numPutSent; /**< number of put sent*/
+		int numPutError; /**< number of error in put responses*/
+		int numPutSuccess; /**< number of success in put responses*/
+
+		bool nodeIsLeavingSoon; //!< true if the node is going to be killed shortly
+
+		void handleTraceMessage(cMessage* msg);
+		void handleRpcResponse(BaseResponseMessage* msg, const RpcState& state, simtime_t rtt);
+		void handlePutResponse(DHTputCAPIResponse* msg, DHTStatsContext* context);
 		void store(GameObject *go);
+		void finishApp();
 	protected:
-		virtual void initialize();
+		virtual void initializeApp(int stage);
 		virtual void handleMessage(cMessage *msg);
 };
 
