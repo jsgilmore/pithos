@@ -1,31 +1,68 @@
+//
+// Copyright (C) 2011 MIH Media lab, University of Stellenbosch
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+//
+
 #include "GameObject.h"
-
-//Register_Class(GameObject);
-
-GameObject::GameObject(const GameObject& other) : cOwnedObject(other.getName())
-{
-	operator=(other);
-}
-
-GameObject::GameObject(const BinaryValue& binval) : cOwnedObject("")
-{
-	std::string buf;			// Have a buffer string
-	std::stringstream ss;		//Create a string stream
-	ss << binval;				// Insert the string into a stream
-
-	std::vector<std::string> tokens; // Create vector to hold our words
-
-	while (ss >> buf)
-		tokens.push_back(buf);
-
-}
 
 GameObject::~GameObject()
 {
 
 }
 
-//The following functions do not form part of a GameObject itself, but are required for the cOwnedObject type from which this object inherits.
+GameObject::GameObject(const GameObject& other) : cOwnedObject(other.getName())
+{
+	operator=(other);
+}
+
+GameObject::GameObject(const char *name, int o_type, int64_t o_size, simtime_t o_creationTime) : cOwnedObject(name)
+{
+	type = o_type;
+	size = o_size;
+	creationTime = o_creationTime;
+}
+
+GameObject::GameObject(const BinaryValue& binval) : cOwnedObject("GameObject")	//GameObject is the name used by Pithos to identify this object when attached to Packets
+{
+	std::string buf;			// Have a buffer string
+	std::stringstream ss;		//Create a string stream
+
+	//This part tokenises the string value of BinaryValue in order to repopulate GameObject
+	ss << binval;				// Insert the string into a stream
+	std::vector<std::string> tokens; // Create vector to hold our words
+
+	while (ss >> buf)
+		tokens.push_back(buf);
+
+	//After the string has been tokenised, we have to use the tokens to populate the variables
+	strcpy(objectName, (tokens[0]).c_str());
+	size = atol((tokens[1]).c_str());		//TODO: I'm quite sure this long will be 64 bits in a 64 bit system, but unsure about 32 bit systems
+	type = atoi((tokens[2]).c_str());
+	creationTime = atof((tokens[3]).c_str());
+}
+
+//The following functions are required by the cOwnedObject type from which this object inherits.
+std::string GameObject::info()
+{
+	//It's important that this function is kept up to date, since the BinaryValue of the object is generated using it
+	//Also, space delimiting is used by the C++ string streams to tokenise the input for reconstruction
+	std::stringstream out;
+	out << objectName << " " << size << " " << type << " " << creationTime;
+	return out.str();
+}
 
 GameObject *GameObject::dup() const
 {
@@ -45,15 +82,6 @@ GameObject& GameObject::operator=(const GameObject& other)
 	creationTime = other.creationTime;
 
 	return *this;
-}
-
-std::string GameObject::info()
-{
-	//It's important that this function is kept up to date, since the BinaryValue of the object is generated using it
-	//Also, space delimiting is used by the C++ string streams to tokenise the input for reconstruction
-	std::stringstream out;
-	out << objectName << " " << size << " " << type << " " << creationTime;
-	return out.str();
 }
 
 //This is the real meat of the packet. The getter and setter methods for the different attributes.

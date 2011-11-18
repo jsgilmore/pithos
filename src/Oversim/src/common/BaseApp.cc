@@ -60,7 +60,22 @@ void BaseApp::initialize(int stage)
     CompType compType = getThisCompType();
     bool tier = (compType == TIER1_COMP ||
                  compType == TIER2_COMP ||
-                 compType == TIER3_COMP);
+                 compType == TIER3_COMP ||
+                 compType == AGENT_COMP ||
+                 compType == EVENTLAYERIM_COMP ||
+                 compType == EVENTDISSEMINATION_COMP ||
+                 compType == EVENTORDERING_COMP ||
+                 compType == GAMELOGIC_COMP ||
+                 compType == ROOTOBJECTUPDATER_COMP ||
+                 compType == ROOTOBJECTSTORE_COMP ||
+                 compType == OVERLAYSTORAGE_COMP ||
+                 compType == UPDATELAYERIM_COMP ||
+                 compType == UPDATEDISSEMINATION_COMP ||
+                 compType == OBJECTMERGER_COMP ||
+                 compType == LOCALOBJECTUPDATER_COMP ||
+                 compType == LOCALOBJECTSTORE_COMP ||
+                 compType == DISPLAYUPDATER_COMP);
+
 
     if (stage == REGISTER_STAGE) {
         OverlayAccess().get(this)->registerComp(getThisCompType(), this);
@@ -391,8 +406,9 @@ void BaseApp::forwardResponse(const OverlayKey& key, cPacket* msg,
 
     forwardMsg->setType(KBR_FORWARD_RESPONSE);
 
-    if (getThisCompType() == TIER1_COMP) {
-        send(forwardMsg, "to_lowerTier");
+    //Changed to be compatible with the MMVE architecture, which uses a OVERLAYSTORAGE_COMP instead of a TIER1_COMP and an overlayOut gate, instead of a "to_LowerGate"
+    if (getThisCompType() == OVERLAYSTORAGE_COMP) {
+        send(forwardMsg, "overlayOut");
     } else {
         sendDirect(forwardMsg, overlay->getCompRpcGate(OVERLAY_COMP));
     }

@@ -39,20 +39,28 @@ class GameObject : public cOwnedObject
 {
 	private:
 
-		/** The name of the object */
+		/**
+		 * The name of the object
+		 */
 		char objectName[41];
 
-		/** The size in bytes of the object */
+		/**
+		 * The size in bytes of the object
+		 */
 		int64_t size;
 
-		/** The type of object (root,replica,overlay) */
+		/**
+		 * The type of object (root,replica,overlay)
+		 */
 		int type;
 
-		/** The time when the object was created */
+		/**
+		 * The time when the object was created
+		 */
 		simtime_t creationTime;
 
 	public:
-		GameObject(const char *name=NULL, int type=ROOT);
+		GameObject(const char *name="", int o_type=ROOT, int64_t o_size=0, simtime_t o_creationTime=0);
 		GameObject(const GameObject& other);
 		GameObject(const BinaryValue& binval);
 		virtual ~GameObject();
