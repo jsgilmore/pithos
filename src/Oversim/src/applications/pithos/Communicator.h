@@ -99,6 +99,8 @@ class Communicator : public BaseApp
 
 		void handleDumpDhtRequest(DHTdumpCall* call);
 
+		void handleRpcResponse(BaseResponseMessage* msg, const RpcState& state, simtime_t rtt);
+
 		/**
 		 * Called when a message is received from a super peer. The message is inspected to generate the required response.
 		 *

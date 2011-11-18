@@ -86,7 +86,7 @@ module MMVEHost
         }
         overlayStorage: <overlayStorageType> like ITier {
             parameters:
-                @display("p=477,290;i=block/segm");
+                @display("p=477,301;i=block/segm");
         }
         updateLayerIM: <updateLayerIMType> like ITier {
             parameters:

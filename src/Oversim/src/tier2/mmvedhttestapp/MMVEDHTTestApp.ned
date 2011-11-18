@@ -39,7 +39,7 @@ simple MMVEDHTTestApp extends BaseApp
 //
 // Compound module for a simple DHT test application
 //
-// @author Gregoire Menuel, Ingmar Baumgart
+// @author John Gilmore, Gregoire Menuel, Ingmar Baumgart
 //
 module MMVEDHTTestAppModules like ITier_overlay
 {

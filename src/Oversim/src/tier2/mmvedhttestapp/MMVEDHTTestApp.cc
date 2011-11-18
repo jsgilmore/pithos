@@ -415,7 +415,6 @@ void MMVEDHTTestApp::handleTimerEvent(cMessage* msg)
     }
 }
 
-
 BinaryValue MMVEDHTTestApp::generateRandomValue()
 {
     char value[DHTTESTAPP_VALUE_LEN + 1];

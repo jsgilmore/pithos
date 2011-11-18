@@ -108,7 +108,7 @@ void Peer_logic::handleRequest(cMessage *msg)
 	go->setSize(m->getValue());
 	go->setCreationTime(simTime());
 
-	sprintf(name, "Game %d, Object %d, size %ld", getParentModule()->getIndex(), numSentForStore, m->getValue());	//TODO: The name should actually be all object contents
+	sprintf(name, "Game %d, Object %d", getParentModule()->getIndex(), numSentForStore);	//The name is later combined with the remaining object values
 	go->setObjectName(name);
 
 	EV << "Object to be sent: " << go->getObjectName() << endl;

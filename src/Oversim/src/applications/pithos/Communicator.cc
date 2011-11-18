@@ -145,6 +145,11 @@ bool Communicator::handleRpcCall(BaseCallMessage *msg)
     return RPC_HANDLED;
 }
 
+void Communicator::handleRpcResponse(BaseResponseMessage* msg, const RpcState& state, simtime_t rtt)
+{
+	error("No RPC response is expected at the communicator module.");
+}
+
 // deliver() is called when we receive a message from the overlay.
 // Unknown packets can be safely deleted here.
 void Communicator::deliver(OverlayKey& key, cMessage* msg)
@@ -193,7 +198,7 @@ void Communicator::overlayStore(cMessage *msg)
 	CSHA1 hash;
 	char hash_str[41];		//SHA-1 produces a 160 bit/20 byte hash
 
-	for (int i = 0 ; i < 50 ; i++)	//The string has to be cleared for the OverlayKey constructor to correctly handle it.
+	for (int i = 0 ; i < 41 ; i++)	//The string has to be cleared for the OverlayKey constructor to correctly handle it.
 		hash_str[i] = 0;
 
 	GameObject *go = (GameObject *)msg->getObject("GameObject");
