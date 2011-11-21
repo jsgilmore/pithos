@@ -120,6 +120,7 @@ void Peer_logic::handleRequest(cMessage *msg)
 
 	//Send the game object to be stored in the overlay.
 	send(msg, "overlay_write");
+	//delete(msg);	//For debugging purposes only
 
 	numSentForStore++;
 }

@@ -20,13 +20,18 @@
 #define GROUPSTORAGE_H_
 
 #include <omnetpp.h>
+#include <GlobalStatistics.h>
+
 
 #include "BaseApp.h"
 #include "Peer_logic.h"
+#include "Communicator.h"
 
 #include "GameObject.h"
 #include "PeerListPkt.h"
 #include "groupPkt_m.h"
+
+class GlobalStatistics;
 
 /**
  * The GroupStorage module is responsible for handling all aspects of group
@@ -55,6 +60,14 @@ class GroupStorage : public cSimpleModule
 
 		/** The signal recording the statistic of the group size. */
 		simsignal_t joinTimeSignal;
+
+		GlobalStatistics* globalStatistics; /**< pointer to GlobalStatistics module in this node*/
+
+		// statistics
+		int numSent; /**< number of sent packets*/
+		int numPutSent; /**< number of put sent*/
+		int numPutError; /**< number of error in put responses*/
+		int numPutSuccess; /**< number of success in put responses*/
 
 		/**
 		 * The function creates a write packet and fills it with address information, payload type and byte length.
@@ -99,7 +112,7 @@ class GroupStorage : public cSimpleModule
 		 */
 		int getReplicaNr();
 	protected:
-
+		void finishApp();
 		virtual void initialize();
 		virtual void handleMessage(cMessage *msg);
 };

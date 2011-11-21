@@ -18,7 +18,8 @@ package oversim.applications.pithos;
 import oversim.common.BaseApp;
 import oversim.common.ITier_overlay;
 
-simple DHTStorage extends BaseApp
+
+simple DHTStorage
 {
     parameters:
         @class(DHTStorage);
@@ -64,7 +65,6 @@ module Super_peerSelectDHT like ITier_overlay
         group_storage.read --> peer_logic.group_read;
         peer_logic.overlay_write --> dht_storage.write;
         dht_storage.read --> peer_logic.overlay_read;
-        trace_in --> dht_storage.trace_in;
 
         communicator.peer_gate <--> peer_logic.comms_gate;
         communicator.sp_group_gate <--> super_peer_logic.comms_gate;
@@ -83,9 +83,9 @@ module Super_peerSelectDHT like ITier_overlay
         udpOut <-- communicator.udpOut;
         tcpIn --> communicator.tcpIn;
         tcpOut <-- communicator.tcpOut;
-        //trace_in --> communicator.trace_in;
         overlayIn --> communicator.overlayIn;
         overlayOut <-- communicator.overlayOut;
+        trace_in --> communicator.trace_in;
 }
 
 module PeerSelectDHT like ITier_overlay
@@ -117,6 +117,7 @@ module PeerSelectDHT like ITier_overlay
         group_storage.read --> peer_logic.group_read;
         peer_logic.overlay_write --> dht_storage.write;
         dht_storage.read --> peer_logic.overlay_read;
+        trace_in --> communicator.trace_in;
         
         communicator.peer_gate <--> peer_logic.comms_gate;
         communicator.toPeer_fromUpper --> peer_logic.from_upperTier;
@@ -133,7 +134,6 @@ module PeerSelectDHT like ITier_overlay
         udpOut <-- communicator.udpOut;
         tcpIn --> communicator.tcpIn;
         tcpOut <-- communicator.tcpOut;
-        trace_in --> communicator.trace_in;
         overlayIn --> communicator.overlayIn;
         overlayOut <-- communicator.overlayOut;
 }
