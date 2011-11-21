@@ -59,11 +59,20 @@ void Communicator::finishApp()
     globalStatistics->addStdDev("MyApplication: Received packets", numReceived);
 }
 
+void Communicator::handleTraceMessage(cMessage* msg)
+{
+	cModule *dht_storageModule = getParentModule()->getSubmodule("dht_storage");
+
+	//This extra step ensures that the submodules exist and also does any other required error checking
+	DHTStorage *dht_storage = check_and_cast<DHTStorage *>(dht_storageModule);
+
+    dht_storage->handleTraceMessage(msg);
+}
 
 // handleTimerEvent is called when a timer event triggers
 void Communicator::handleTimerEvent(cMessage* msg)
 {
-
+	error("Unexpected timer event received.");
 }
 
 void Communicator::handleUpperMessage (cMessage *msg)
@@ -87,6 +96,11 @@ void Communicator::handleGetCAPIRequest(DHTgetCAPICall* capiGetMsg)
 {
 	//TODO: Add functionality to handle this RPC call
 	return;
+}
+
+simtime_t Communicator::getCreationTime()
+{
+	return creationTime;
 }
 
 void Communicator::handlePutCAPIRequest(DHTputCAPICall* capiPutMsg)
@@ -147,7 +161,12 @@ bool Communicator::handleRpcCall(BaseCallMessage *msg)
 
 void Communicator::handleRpcResponse(BaseResponseMessage* msg, const RpcState& state, simtime_t rtt)
 {
-	error("No RPC response is expected at the communicator module.");
+	cModule *dht_storageModule = getParentModule()->getSubmodule("dht_storage");
+
+	//This extra step ensures that the submodules exist and also does any other required error checking
+	DHTStorage *dht_storage = check_and_cast<DHTStorage *>(dht_storageModule);
+
+    dht_storage->handleRpcResponse(msg, state, rtt);
 }
 
 // deliver() is called when we receive a message from the overlay.
@@ -204,7 +223,7 @@ void Communicator::overlayStore(cMessage *msg)
 	GameObject *go = (GameObject *)msg->getObject("GameObject");
 	cPacket *pkt = check_and_cast<cPacket *>(msg);
 
-	EV << "Sending object with name: " << go->getObjectName() << endl;
+	EV << "[Communicator]: Sending object with name: " << go->getObjectName() << endl;
 
 	//Create a hash of the game object's name
 	hash.Update((unsigned char *)go->getObjectName(), strlen(go->getObjectName()));
@@ -213,7 +232,7 @@ void Communicator::overlayStore(cMessage *msg)
 
 	OverlayKey nameKey(hash_str, 16);
 
-	EV << thisNode.getIp() << ": Sending packet to " << nameKey << "!" << std::endl;
+	EV << "[Communicator]: " << thisNode.getIp() << " sending packet to " << nameKey << endl;
 
 	callRoute(nameKey, pkt);
 }

@@ -23,7 +23,7 @@ simple Game extends BaseApp
     parameters:
         @class(Game);
         @display("i=block/source");
-        double avWriteTime @unit(s) = default(0.2s);	//100 ms average
+        double avWriteTime @unit(s) = default(2s);	//2 s average
         double avObjectSize = default(1024);	//1 KB average
         double wait_time @unit(s);
         double generation_time @unit(s);
