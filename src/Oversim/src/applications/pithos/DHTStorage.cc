@@ -31,15 +31,9 @@ DHTStorage::~DHTStorage() {
 	// TODO Auto-generated destructor stub
 }
 
-void DHTStorage::initializeApp(int stage)
+void DHTStorage::initialize()
 {
-	if (stage != MIN_STAGE_APP)
-		return;
-
-	EV << "Initialising DHT storage";
-
 	// fetch parameters
-	debugOutput = par("debugOutput");
 	activeNetwInitPhase = par("activeNetwInitPhase");
 
 	ttl = par("testTtl");
@@ -56,27 +50,34 @@ void DHTStorage::initializeApp(int stage)
 
 	// statistics
 	numSent = 0;
-	numGetSent = 0;
-	numGetError = 0;
-	numGetSuccess = 0;
 	numPutSent = 0;
 	numPutError = 0;
 	numPutSuccess = 0;
+	numGetSent = 0;
+	numGetError = 0;
+	numGetSuccess = 0;
 
 	//initRpcs();
 	WATCH(numSent);
-	WATCH(numGetSent);
-	WATCH(numGetError);
-	WATCH(numGetSuccess);
 	WATCH(numPutSent);
 	WATCH(numPutError);
 	WATCH(numPutSuccess);
+	WATCH(numGetSent);
+	WATCH(numGetError);
+	WATCH(numGetSuccess);
 
 	nodeIsLeavingSoon = false;
 }
 
 void DHTStorage::handleTraceMessage(cMessage* msg)
 {
+	cModule *communicatorModule = getParentModule()->getSubmodule("communicator");
+	//This extra step ensures that the submodules exist and also does any other required error checking
+	Communicator *communicator = check_and_cast<Communicator *>(communicatorModule);
+
+	Enter_Method("[DHTStorage]: handleTraceMessage()");	//Required for Omnet++ context switching between modules
+	take(msg);	//This module should first take ownership of the received message before that message can be resent
+
     char* cmd = new char[strlen(msg->getName()) + 1];
     strcpy(cmd, msg->getName());
 
@@ -110,7 +111,7 @@ void DHTStorage::handleTraceMessage(cMessage* msg)
         dhtPutMsg->setTtl(ttl);
         dhtPutMsg->setIsModifiable(true);
         RECORD_STATS(numSent++; numPutSent++);
-        sendInternalRpcCall(OVERLAYSTORAGE_COMP, dhtPutMsg, new DHTStatsContext(globalStatistics->isMeasuring(), simTime(), destKey));
+        communicator->externallySendInternalRpcCall(OVERLAYSTORAGE_COMP, dhtPutMsg, new DHTStatsContext(globalStatistics->isMeasuring(), simTime(), destKey));
     } else if (strncmp(cmd, "GET ", 4) == 0) {
         // Get key
         BinaryValue b(cmd + 4);
@@ -119,9 +120,7 @@ void DHTStorage::handleTraceMessage(cMessage* msg)
         DHTgetCAPICall* dhtGetMsg = new DHTgetCAPICall();
         dhtGetMsg->setKey(key);
         RECORD_STATS(numSent++; numGetSent++);
-        sendInternalRpcCall(OVERLAYSTORAGE_COMP, dhtGetMsg,
-                new DHTStatsContext(globalStatistics->isMeasuring(),
-                                    simTime(), key));
+        communicator->externallySendInternalRpcCall(OVERLAYSTORAGE_COMP, dhtGetMsg, new DHTStatsContext(globalStatistics->isMeasuring(), simTime(), key));
     } else {
         throw cRuntimeError("Unknown trace command; "
                                 "only GET and PUT are allowed");
@@ -133,27 +132,30 @@ void DHTStorage::handleTraceMessage(cMessage* msg)
 
 void DHTStorage::handleRpcResponse(BaseResponseMessage* msg, const RpcState& state, simtime_t rtt)
 {
-    RPC_SWITCH_START(msg)
-    RPC_ON_RESPONSE( DHTputCAPI ) {
-        handlePutResponse(_DHTputCAPIResponse,
-                          check_and_cast<DHTStatsContext*>(state.getContext()));
-        EV << "[DHTStorage::handleRpcResponse()]\n"
-           << "    DHT Put RPC Response received: id=" << state.getId()
-           << " msg=" << *_DHTputCAPIResponse << " rtt=" << rtt
-           << endl;
-        break;
-    }
-    /*RPC_ON_RESPONSE(DHTgetCAPI)
-    {
-        handleGetResponse(_DHTgetCAPIResponse,
-                          check_and_cast<DHTStatsContext*>(state.getContext()));
-        EV << "[DHTStorage::handleRpcResponse()]\n"
-           << "    DHT Get RPC Response received: id=" << state.getId()
-           << " msg=" << *_DHTgetCAPIResponse << " rtt=" << rtt
-           << endl;
-        break;
-    }*/
-    RPC_SWITCH_END()
+	Enter_Method("[DHTStorage]: handleRpcResponse()");	//Required for Omnet++ context switching between modules
+	take(msg);	//This module should first take ownership of the received message before that message can be resent
+
+	RPC_SWITCH_START(msg)
+	   RPC_ON_RESPONSE( DHTputCAPI ) {
+		   handlePutResponse(_DHTputCAPIResponse, check_and_cast<DHTStatsContext*>(state.getContext()));
+
+		   EV << "[DHTStorage::handleRpcResponse()]\n"
+			  << "    DHT Put RPC Response received: id=" << state.getId()
+			  << " msg=" << *_DHTputCAPIResponse << " rtt=" << rtt
+			  << endl;
+		   break;
+	   }
+	   /*RPC_ON_RESPONSE(DHTgetCAPI)
+	   {
+		   handleGetResponse(_DHTgetCAPIResponse,
+							 check_and_cast<DHTStatsContext*>(state.getContext()));
+		   EV << "[DHTStorage::handleRpcResponse()]\n"
+			  << "    DHT Get RPC Response received: id=" << state.getId()
+			  << " msg=" << *_DHTgetCAPIResponse << " rtt=" << rtt
+			  << endl;
+		   break;
+	   }*/
+	   RPC_SWITCH_END()
 }
 
 void DHTStorage::handlePutResponse(DHTputCAPIResponse* msg, DHTStatsContext* context)
@@ -183,7 +185,13 @@ void DHTStorage::store(GameObject *go)
 {
 	CSHA1 hash;
 	char hash_str[41];		//SHA-1 produces a 160 bit/20 byte hash
-	Peer_logic * this_peer = ((Peer_logic *)getParentModule()->getSubmodule("peer_logic"));
+
+	cModule *this_peerModule = getParentModule()->getSubmodule("peer_logic");
+	cModule *communicatorModule = getParentModule()->getSubmodule("communicator");
+
+	//This extra step ensures that the submodules exist and also does any other required error checking
+	Peer_logic *this_peer = check_and_cast<Peer_logic *>(this_peerModule);
+	Communicator *communicator = check_and_cast<Communicator *>(communicatorModule);
 
 	if (!(this_peer->hasSuperPeer()))
 	{
@@ -216,7 +224,7 @@ void DHTStorage::store(GameObject *go)
 	//dhtPutMsg->setByteLength(4+4+4+4+8+go->getSize()); 	//Source address, dest address, type, value, object name ID, object size
 
 	RECORD_STATS(numSent++; numPutSent++);
-	sendInternalRpcCall(OVERLAYSTORAGE_COMP, dhtPutMsg, new DHTStatsContext(globalStatistics->isMeasuring(), simTime(), destKey, dhtPutMsg->getValue()));
+	communicator->externallySendInternalRpcCall(OVERLAYSTORAGE_COMP, dhtPutMsg, new DHTStatsContext(globalStatistics->isMeasuring(), simTime(), destKey, dhtPutMsg->getValue()));
 
 	delete(go);		//The GameObject was not sent, rather its string representation as a BinaryValue (required for the Oversim DHT)
 }
@@ -235,18 +243,15 @@ void DHTStorage::handleMessage(cMessage *msg)
 
 void DHTStorage::finishApp()
 {
-    simtime_t time = globalStatistics->calcMeasuredLifetime(creationTime);
+	cModule *communicatorModule = getParentModule()->getSubmodule("communicator");
+	Communicator *communicator = check_and_cast<Communicator *>(communicatorModule);
+
+    simtime_t time = globalStatistics->calcMeasuredLifetime(communicator->getCreationTime());
 
     if (time >= GlobalStatistics::MIN_MEASURED) {
         // record scalar data
         globalStatistics->addStdDev("DHTTestApp: Sent Total Messages/s",
                                     numSent / time);
-        globalStatistics->addStdDev("DHTTestApp: Sent GET Messages/s",
-                                    numGetSent / time);
-        globalStatistics->addStdDev("DHTTestApp: Failed GET Requests/s",
-                                    numGetError / time);
-        globalStatistics->addStdDev("DHTTestApp: Successful GET Requests/s",
-                                    numGetSuccess / time);
 
         globalStatistics->addStdDev("DHTTestApp: Sent PUT Messages/s",
                                     numPutSent / time);

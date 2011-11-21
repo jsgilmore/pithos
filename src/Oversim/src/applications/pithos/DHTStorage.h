@@ -30,18 +30,17 @@
 
 #include "BaseApp.h"
 #include "Peer_logic.h"
+#include "Communicator.h"
 
 #include "groupPkt_m.h"
 #include "GameObject.h"
 
+class GlobalStatistics;
 class GlobalDhtTestMap;
 
-class DHTStorage : public BaseApp
+class DHTStorage : public cSimpleModule
 {
 	public:
-		DHTStorage();
-		virtual ~DHTStorage();
-	private:
 		/**
 		 * A container used by the DHTTestApp to
 		 * store context information for statistics
@@ -64,6 +63,13 @@ class DHTStorage : public BaseApp
 					key(key), value(value) {};
 		};
 
+		DHTStorage();
+		virtual ~DHTStorage();
+
+		void handleRpcResponse(BaseResponseMessage* msg, const RpcState& state, simtime_t rtt);
+		void handleTraceMessage(cMessage* msg);
+	private:
+
 		UnderlayConfigurator* underlayConfigurator; /**< pointer to UnderlayConfigurator in this node */
 
 		GlobalNodeList* globalNodeList; /**< pointer to GlobalNodeList in this node*/
@@ -78,23 +84,22 @@ class DHTStorage : public BaseApp
 
 		// statistics
 		int numSent; /**< number of sent packets*/
-		int numGetSent; /**< number of get sent*/
-		int numGetError; /**< number of false get responses*/
-		int numGetSuccess; /**< number of false get responses*/
 		int numPutSent; /**< number of put sent*/
+		int numGetSent; /**< number of put sent*/
+		int numGetError; /**< number of error in put responses*/
+		int numGetSuccess; /**< number of success in put responses*/
 		int numPutError; /**< number of error in put responses*/
 		int numPutSuccess; /**< number of success in put responses*/
 
 		bool nodeIsLeavingSoon; //!< true if the node is going to be killed shortly
 
-		void handleTraceMessage(cMessage* msg);
-		void handleRpcResponse(BaseResponseMessage* msg, const RpcState& state, simtime_t rtt);
-		void handlePutResponse(DHTputCAPIResponse* msg, DHTStatsContext* context);
 		void store(GameObject *go);
-		void finishApp();
 	protected:
-		virtual void initializeApp(int stage);
+		void finishApp();
+		virtual void initialize();
 		virtual void handleMessage(cMessage *msg);
+
+		void handlePutResponse(DHTputCAPIResponse* msg, DHTStatsContext* context);
 };
 
 Define_Module(DHTStorage);

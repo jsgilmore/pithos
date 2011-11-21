@@ -30,6 +30,7 @@
 #include "GlobalStatistics.h"
 #include "GlobalNodeListAccess.h"
 #include "BaseApp.h"
+#include "DHTStorage.h"
 
 #include "GameObject.h"
 #include "packet_m.h"
@@ -55,6 +56,7 @@ class Communicator : public BaseApp
 		int numReceived;          //number of packets received
 
 
+	protected:
 		virtual void handleMessage(cMessage *msg);
 
 		// application routines
@@ -98,6 +100,7 @@ class Communicator : public BaseApp
 		void handlePutCAPIRequest(DHTputCAPICall* capiPutMsg);
 
 		void handleDumpDhtRequest(DHTdumpCall* call);
+		void handleTraceMessage(cMessage* msg);
 
 		void handleRpcResponse(BaseResponseMessage* msg, const RpcState& state, simtime_t rtt);
 
@@ -132,7 +135,22 @@ class Communicator : public BaseApp
 	public:
 		Communicator() {};
 		~Communicator() {};
-};
 
+		simtime_t getCreationTime();
+
+		uint32_t externallySendInternalRpcCall(CompType destComp,
+                BaseCallMessage* msg,
+                cPolymorphic* context = NULL,
+                simtime_t timeout = -1,
+                int retries = 0,
+                int rpcId = -1,
+                RpcListener* rpcListener = NULL)
+		{
+			Enter_Method("externallySendInternalRpcCall()");	//Required for Omnet++ context switching between modules
+			take(msg);	//This module should first take ownership of the received message before that message can be resent
+
+			return sendInternalRpcCall(destComp, msg, context, timeout, retries, rpcId, rpcListener);
+		}
+};
 
 #endif
