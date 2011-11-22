@@ -162,6 +162,8 @@ void DHTStorage::handlePutResponse(DHTputCAPIResponse* msg, DHTStatsContext* con
 {
     DHTEntry entry = {context->value, simTime() + ttl};
 
+    //TODO: The complete global DHT test map should be removed from the DHT storage component for the real-world application.
+    //This is ONLY required to test the correctness of the overlay itself and is effectively storing all data inserted into the overlay two-fold.
     globalDhtTestMap->insertEntry(context->key, entry);
 
     if (context->measurementPhase == false) {
@@ -241,7 +243,7 @@ void DHTStorage::handleMessage(cMessage *msg)
 	delete(msg);
 }
 
-void DHTStorage::finishApp()
+void DHTStorage::finish()
 {
 	cModule *communicatorModule = getParentModule()->getSubmodule("communicator");
 	Communicator *communicator = check_and_cast<Communicator *>(communicatorModule);
@@ -250,18 +252,18 @@ void DHTStorage::finishApp()
 
     if (time >= GlobalStatistics::MIN_MEASURED) {
         // record scalar data
-        globalStatistics->addStdDev("DHTTestApp: Sent Total Messages/s",
+        globalStatistics->addStdDev("DHTStorage: Sent Total Messages/s",
                                     numSent / time);
 
-        globalStatistics->addStdDev("DHTTestApp: Sent PUT Messages/s",
+        globalStatistics->addStdDev("DHTStorage: Sent PUT Messages/s",
                                     numPutSent / time);
-        globalStatistics->addStdDev("DHTTestApp: Failed PUT Requests/s",
+        globalStatistics->addStdDev("DHTStorage: Failed PUT Requests/s",
                                     numPutError / time);
-        globalStatistics->addStdDev("DHTTestApp: Successful PUT Requests/s",
+        globalStatistics->addStdDev("DHTStorage: Successful PUT Requests/s",
                                     numPutSuccess / time);
 
         if ((numGetSuccess + numGetError) > 0) {
-            globalStatistics->addStdDev("DHTTestApp: GET Success Ratio",
+            globalStatistics->addStdDev("DHTStorage: GET Success Ratio",
                                         (double) numGetSuccess
                                         / (double) (numGetSuccess + numGetError));
         }

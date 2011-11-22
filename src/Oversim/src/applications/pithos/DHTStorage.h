@@ -95,7 +95,7 @@ class DHTStorage : public cSimpleModule
 
 		void store(GameObject *go);
 	protected:
-		void finishApp();
+		void finish();
 		virtual void initialize();
 		virtual void handleMessage(cMessage *msg);
 
