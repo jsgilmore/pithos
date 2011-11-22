@@ -18,7 +18,7 @@
 
 /**
  * @file DHTTestApp.cc
- * @author Ingmar Baumgart
+ * @author John Gilmore Ingmar Baumgart
  */
 
 #include <IPAddressResolver.h>
