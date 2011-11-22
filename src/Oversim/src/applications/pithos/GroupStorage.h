@@ -64,10 +64,10 @@ class GroupStorage : public cSimpleModule
 		GlobalStatistics* globalStatistics; /**< pointer to GlobalStatistics module in this node*/
 
 		// statistics
-		int numSent; /**< number of sent packets*/
-		int numPutSent; /**< number of put sent*/
-		int numPutError; /**< number of error in put responses*/
-		int numPutSuccess; /**< number of success in put responses*/
+		//int numSent; /**< number of sent packets*/
+		//int numPutSent; /**< number of put sent*/
+		//int numPutError; /**< number of error in put responses*/
+		//int numPutSuccess; /**< number of success in put responses*/
 
 		/**
 		 * The function creates a write packet and fills it with address information, payload type and byte length.
