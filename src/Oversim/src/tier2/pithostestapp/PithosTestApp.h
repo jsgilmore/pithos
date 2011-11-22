@@ -17,12 +17,12 @@
 //
 
 /**
- * @file DHTTestApp.h
+ * @file PithosTestApp.h
  * @author John Gilmore Ingmar Baumgart
  */
 
-#ifndef __MMVEDHTTESTAPP_H_
-#define __MMVEDHTTESTAPP_H_
+#ifndef __PITHOSTESTAPP_H_
+#define __PITHOSTESTAPP_H_
 
 #include <omnetpp.h>
 
@@ -45,13 +45,14 @@ class GlobalDhtTestMap;
  * A simple test application that does random put and get calls
  * on the DHT layer
  *
+ * @author John Gilmore
  * @author Ingmar Baumgart
  */
-class MMVEDHTTestApp : public BaseApp
+class PithosTestApp : public BaseApp
 {
 private:
     /**
-     * A container used by the DHTTestApp to
+     * A container used by the PithosTestApp to
      * store context information for statistics
      *
      * @author Ingmar Baumgart
@@ -86,6 +87,10 @@ private:
 
     void finishApp();
 
+    void handleLowerMessage (cMessage *msg);
+
+    void sendRequest();
+
     /**
      * processes get responses
      *
@@ -94,8 +99,7 @@ private:
      * @param msg get response message
      * @param context context object used for collecting statistics
      */
-    virtual void handleGetResponse(DHTgetCAPIResponse* msg,
-                                   DHTStatsContext* context);
+    //virtual void handleGetResponse(DHTgetCAPIResponse* msg, DHTStatsContext* context);
 
     /**
      * processes put responses
@@ -105,8 +109,7 @@ private:
      * @param msg put response message
      * @param context context object used for collecting statistics
      */
-    virtual void handlePutResponse(DHTputCAPIResponse* msg,
-                                   DHTStatsContext* context);
+     //virtual void handlePutResponse(DHTputCAPIResponse* msg, DHTStatsContext* context);
 
     /**
      * processes self-messages
@@ -129,8 +132,7 @@ private:
     virtual void handleNodeLeaveNotification();
 
     // see RpcListener.h
-    void handleRpcResponse(BaseResponseMessage* msg, const RpcState& state,
-                           simtime_t rtt);
+    //void handleRpcResponse(BaseResponseMessage* msg, const RpcState& state, simtime_t rtt);
 
     UnderlayConfigurator* underlayConfigurator; /**< pointer to UnderlayConfigurator in this node */
 
@@ -144,8 +146,13 @@ private:
     double mean; //!< mean time interval between sending test messages
     double deviation; //!< deviation of time interval
     int ttl; /**< ttl for stored DHT records */
-    bool p2pnsTraffic; //!< model p2pns application traffic */
     bool activeNetwInitPhase; //!< is app active in network init phase?
+
+    simtime_t writeTime_av;
+	simtime_t wait_time;
+	simtime_t join_time;
+	simtime_t generationTime;
+	double objectSize_av;
 
     // statistics
     int numSent; /**< number of sent packets*/
@@ -156,18 +163,18 @@ private:
     int numPutError; /**< number of error in put responses*/
     int numPutSuccess; /**< number of success in put responses*/
 
-    cMessage *dhttestput_timer, *dhttestget_timer, *dhttestmod_timer;
+    cMessage *pithostestput_timer, *pithostestget_timer, *pithostestmod_timer;
     bool nodeIsLeavingSoon; //!< true if the node is going to be killed shortly
 
     static const int DHTTESTAPP_VALUE_LEN = 20;
 
 public:
-    MMVEDHTTestApp();
+    PithosTestApp();
 
     /**
      * virtual destructor
      */
-    virtual ~MMVEDHTTestApp();
+    virtual ~PithosTestApp();
 
 };
 
