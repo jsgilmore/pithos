@@ -31,7 +31,7 @@ void GroupStorage::initialize()
 	groupSendFailSignal = registerSignal("GroupSendFail");
 	joinTimeSignal = registerSignal("JoinTime");
 
-	globalStatistics = GlobalStatisticsAccess().get();
+	/*globalStatistics = GlobalStatisticsAccess().get();
 
 	// statistics
 	numSent = 0;
@@ -43,7 +43,7 @@ void GroupStorage::initialize()
 	WATCH(numSent);
 	WATCH(numPutSent);
 	WATCH(numPutError);
-	WATCH(numPutSuccess);
+	WATCH(numPutSuccess);*/
 }
 
 void GroupStorage::updateSuperPeerObjects(const char *objectName, unsigned long objectSize, std::vector<TransportAddress> send_list)
@@ -92,7 +92,7 @@ int GroupStorage::getReplicaNr()
 	if (replicas > group_peers.size())
 	{
 		emit(groupSendFailSignal, replicas - group_peers.size());
-		RECORD_STATS(numPutError++);
+		//RECORD_STATS(numPutError++);
 		replicas = group_peers.size();
 	}
 
@@ -168,7 +168,7 @@ void GroupStorage::store(GameObject *go)
 
 		send_list.push_back(dest_adr);
 
-		RECORD_STATS(numSent++; numPutSent++; numPutSuccess++);
+		//RECORD_STATS(numSent++; numPutSent++; numPutSuccess++);
 		send(write_dup, "comms_gate$o");
 	}
 
@@ -247,7 +247,7 @@ void GroupStorage::handleMessage(cMessage *msg)
 
 void GroupStorage::finishApp()
 {
-	cModule *communicatorModule = getParentModule()->getSubmodule("communicator");
+	/*cModule *communicatorModule = getParentModule()->getSubmodule("communicator");
 	Communicator *communicator = check_and_cast<Communicator *>(communicatorModule);
 
     simtime_t time = globalStatistics->calcMeasuredLifetime(communicator->getCreationTime());
@@ -264,10 +264,10 @@ void GroupStorage::finishApp()
         globalStatistics->addStdDev("GroupStorage: Successful PUT Requests/s",
                                     numPutSuccess / time);
 
-        /*if ((numGetSuccess + numGetError) > 0) {
+        if ((numGetSuccess + numGetError) > 0) {
             globalStatistics->addStdDev("GroupStorage: GET Success Ratio",
                                         (double) numGetSuccess
                                         / (double) (numGetSuccess + numGetError));
-        }*/
-    }
+        }
+    }*/
 }
