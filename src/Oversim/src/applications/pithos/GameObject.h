@@ -20,6 +20,7 @@
 #define GO_H_
 
 #include <omnetpp.h>
+#include <SHA1.h>
 
 #include "BinaryValue.h"
 
@@ -40,7 +41,7 @@ class GameObject : public cOwnedObject
 	private:
 
 		/**
-		 * The name of the object
+		 * The name of the game object, which is different from the name of the object itself, which is usually "GameObject"
 		 */
 		char objectName[41];
 
@@ -65,7 +66,10 @@ class GameObject : public cOwnedObject
 		GameObject(const BinaryValue& binval);
 		virtual ~GameObject();
 		GameObject& operator=(const GameObject& other);
+		GameObject& operator=(const BinaryValue& binval);
 		virtual std::string info();
+
+		void getHash(char hash_str[41]);
 
 		/** @returns Duplicate of the game object */
 		virtual GameObject *dup() const;

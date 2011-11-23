@@ -27,7 +27,7 @@
 #include <GlobalStatisticsAccess.h>
 #include <UnderlayConfiguratorAccess.h>
 #include <RpcMacros.h>
-#include "CommonMessages_m.h"
+#include "PithosTestMessages_m.h"
 
 #include <GlobalDhtTestMap.h>
 
@@ -112,13 +112,11 @@ void PithosTestApp::sendRequest()
 	double filesize = exponential(objectSize_av);
 	sprintf(size_str, "%lf", filesize);
 
-
-	DHTputCAPICall* dhtPutMsg = new DHTputCAPICall();
-	dhtPutMsg->setName(msgName);
-	//dhtPutMsg->setKey(key);
-	dhtPutMsg->setValue(size_str);
+	RootObjectPutCAPICall* putMsg = new RootObjectPutCAPICall();
+	putMsg->setName(msgName);
+	putMsg->setValue(size_str);
 	//dhtPutMsg->setTtl(ttl);
-	dhtPutMsg->setIsModifiable(true);
+	putMsg->setIsModifiable(true);
 
 	//sendInternalRpcCall(ROOTOBJECTSTORE_COMP, dhtPutMsg, new DHTStatsContext(globalStatistics->isMeasuring(), simTime(), destKey, dhtPutMsg->getValue()));
 	sendInternalRpcCall(ROOTOBJECTSTORE_COMP, dhtPutMsg);
