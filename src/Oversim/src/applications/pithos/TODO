@@ -1,15 +1,15 @@
 PhD TODO list:
 
-Integrate DHT into Pithos
-	Find out how BinaryValue works
-	Create conversion functions to convert between GameObject and BinaryValue
-	Update MMVEDHTTestApp to use converted GameObject at relevant time instead of BinaryValues at random times
+Extend the pithos test application to allow for failure detection and the calculation of the success to failure ratio.
+Extend the pithos test application to add retrieve and modify testing.
 
-Have all peers be part of the overlay
-Implement object retrieval, update and time to live
-Add mechanisms to handle churn (leaving the game and moving to another group)
+Implement object retrieval, update and time to live for group storage.
+Add mechanisms to handle churn in group storage (leaving the game and moving to another group)
+
 Develop grouping algorithm based on player traces
 Have Pithos construct groups based on the grouping algorithm
+
 Test the system for various levels of churn and various numbers of replicas
 Test the system for various numbers of malicious peers
+
 Write-up PhD
