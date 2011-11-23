@@ -18,7 +18,6 @@
 
 #include <omnetpp.h>
 
-#include <SHA1.h>
 #include <GlobalNodeList.h>
 #include <GlobalStatistics.h>
 #include <UnderlayConfigurator.h>

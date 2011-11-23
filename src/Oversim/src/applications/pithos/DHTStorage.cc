@@ -185,9 +185,7 @@ void DHTStorage::handlePutResponse(DHTputCAPIResponse* msg, DHTStatsContext* con
 
 void DHTStorage::store(GameObject *go)
 {
-	CSHA1 hash;
-	char hash_str[41];		//SHA-1 produces a 160 bit/20 byte hash
-
+	char hash_str[41];
 	cModule *this_peerModule = getParentModule()->getSubmodule("peer_logic");
 	cModule *communicatorModule = getParentModule()->getSubmodule("communicator");
 
@@ -203,19 +201,10 @@ void DHTStorage::store(GameObject *go)
 		return;
 	}
 
-	for (int i = 0 ; i < 41 ; i++)	//The string has to be cleared for the OverlayKey constructor to correctly handle it.
-		hash_str[i] = 0;
-
-	EV << "Sending object with name: " << go->getObjectName() << endl;
-
-	//Create a hash of the game object's name
-	hash.Update(((unsigned char *)go->info().c_str()), strlen(go->info().c_str()));
-	hash.Final();
-	hash.ReportHash(hash_str, CSHA1::REPORT_HEX);
-
 	go->setType(OVERLAY);
 
 	//OverlayKey destKey = OverlayKey::random();	//For testing purposes only
+	go->getHash(hash_str);
 	OverlayKey destKey(hash_str, 16);
 
 	DHTputCAPICall* dhtPutMsg = new DHTputCAPICall();
@@ -226,6 +215,8 @@ void DHTStorage::store(GameObject *go)
 	//dhtPutMsg->setByteLength(4+4+4+4+8+go->getSize()); 	//Source address, dest address, type, value, object name ID, object size
 
 	RECORD_STATS(numSent++; numPutSent++);
+
+	EV << "Sending object with name: " << go->getObjectName() << endl;
 	communicator->externallySendInternalRpcCall(OVERLAYSTORAGE_COMP, dhtPutMsg, new DHTStatsContext(globalStatistics->isMeasuring(), simTime(), destKey, dhtPutMsg->getValue()));
 
 	delete(go);		//The GameObject was not sent, rather its string representation as a BinaryValue (required for the Oversim DHT)
