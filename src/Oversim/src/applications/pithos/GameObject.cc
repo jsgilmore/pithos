@@ -23,11 +23,6 @@ GameObject::~GameObject()
 
 }
 
-GameObject::GameObject(const GameObject& other) : cOwnedObject(other.getName())
-{
-	operator=(other);
-}
-
 GameObject::GameObject(const char *name, int o_type, int64_t o_size, simtime_t o_creationTime) : cOwnedObject(name)
 {
 	type = o_type;
@@ -35,8 +30,34 @@ GameObject::GameObject(const char *name, int o_type, int64_t o_size, simtime_t o
 	creationTime = o_creationTime;
 }
 
-GameObject::GameObject(const BinaryValue& binval) : cOwnedObject("GameObject")	//GameObject is the name used by Pithos to identify this object when attached to Packets
+GameObject::GameObject(const GameObject& other) : cOwnedObject(other.getName())
 {
+	operator=(other);
+}
+
+GameObject& GameObject::operator=(const GameObject& other)
+{
+	if (&other==this)
+		return *this;
+	cOwnedObject::operator=(other);
+
+	size = other.size;
+	type = other.type;
+	strcpy(objectName, other.objectName);
+	creationTime = other.creationTime;
+
+	return *this;
+}
+
+GameObject::GameObject(const BinaryValue& binval)
+{
+	operator=(binval);
+}
+
+GameObject& GameObject::operator=(const BinaryValue& binval)
+{
+	cOwnedObject("GameObject");
+
 	std::string buf;			// Have a buffer string
 	std::stringstream ss;		//Create a string stream
 
@@ -49,9 +70,11 @@ GameObject::GameObject(const BinaryValue& binval) : cOwnedObject("GameObject")	/
 
 	//After the string has been tokenised, we have to use the tokens to populate the variables
 	strcpy(objectName, (tokens[0]).c_str());
-	size = atol((tokens[1]).c_str());		//TODO: I'm quite sure this long will be 64 bits in a 64 bit system, but unsure about 32 bit systems
+	size = atol((tokens[1]).c_str());		//I'm quite sure this long will be 64 bits in a 64 bit system, but unsure about 32 bit systems
 	type = atoi((tokens[2]).c_str());
 	creationTime = atof((tokens[3]).c_str());
+
+	return *this;
 }
 
 //The following functions are required by the cOwnedObject type from which this object inherits.
@@ -64,24 +87,22 @@ std::string GameObject::info()
 	return out.str();
 }
 
+void GameObject::getHash(char hash_str[41])
+{
+	CSHA1 hash;
+
+	for (int i = 0 ; i < 41 ; i++)	//The string has to be cleared for the OverlayKey constructor to correctly handle it.
+		hash_str[i] = 0;
+
+	//Create a hash of the game object's name
+	hash.Update(((unsigned char *)info().c_str()), strlen(info().c_str()));
+	hash.Final();
+	hash.ReportHash(hash_str, CSHA1::REPORT_HEX);
+}
+
 GameObject *GameObject::dup() const
 {
 	return new GameObject(*this);
-}
-
-GameObject& GameObject::operator=(const GameObject& other)
-{
-	if (&other==this)
-		return *this;
-	cOwnedObject::operator=(other);
-
-
-	size = other.size;
-	type = other.type;
-	strcpy(objectName, other.objectName);
-	creationTime = other.creationTime;
-
-	return *this;
 }
 
 //This is the real meat of the packet. The getter and setter methods for the different attributes.
