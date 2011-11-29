@@ -34,8 +34,8 @@ class PeerListPkt : public PeerListPkt_Base
 {
 	protected:
 
-		/** The vector (list) of peers that all store a specific object */
-		std::vector<PeerData> peer_list;
+		std::vector<PeerData> peer_list; /**< The vector (list) of peers that all store a specific object */
+
 	public:
 
 		PeerListPkt(const char *name=NULL, int kind=0)

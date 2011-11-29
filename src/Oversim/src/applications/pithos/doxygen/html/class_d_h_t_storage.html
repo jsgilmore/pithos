@@ -27,7 +27,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Pithos</div>
-   <div id="projectbrief">Distributed storage for MMVEs</div>
+   <div id="projectbrief">Distributed state management and persistency for P2P MMVE</div>
   </td>
  </tr>
  </tbody>
@@ -80,6 +80,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div id="doc-content">
 <div class="header">
   <div class="summary">
+<a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a>  </div>
   <div class="headertitle">
@@ -87,107 +88,38 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div>
 <div class="contents">
 <!-- doxytag: class="DHTStorage" -->
-<p><code>#include &lt;<a class="el" href="_d_h_t_storage_8h_source.html">DHTStorage.h</a>&gt;</code></p>
-
 <p><a href="class_d_h_t_storage-members.html">List of all members.</a></p>
 <table class="memberdecls">
+<tr><td colspan="2"><h2><a name="nested-classes"></a>
+Classes</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_d_h_t_storage_1_1_d_h_t_stats_context.html">DHTStatsContext</a></td></tr>
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_d_h_t_storage.html#a8bd73be8617035e2a1d8cf368b68ebd5">DHTStorage</a> ()</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_d_h_t_storage.html#aec4a25f2719f920eb5d705def21dfde0">~DHTStorage</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a31e5cdd3085dae791c5c73125ba85785"></a><!-- doxytag: member="DHTStorage::handleRpcResponse" ref="a31e5cdd3085dae791c5c73125ba85785" args="(BaseResponseMessage *msg, const RpcState &amp;state, simtime_t rtt)" -->
+void&#160;</td><td class="memItemRight" valign="bottom"><b>handleRpcResponse</b> (BaseResponseMessage *msg, const RpcState &amp;state, simtime_t rtt)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a042548eb4f04dbeb003fbc5a0407331f"></a><!-- doxytag: member="DHTStorage::handleTraceMessage" ref="a042548eb4f04dbeb003fbc5a0407331f" args="(cMessage *msg)" -->
+void&#160;</td><td class="memItemRight" valign="bottom"><b>handleTraceMessage</b> (cMessage *msg)</td></tr>
 <tr><td colspan="2"><h2><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_d_h_t_storage.html#a85735d12512dd5a566a3dd446be51c54">initialize</a> ()</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_d_h_t_storage.html#ab0c35152d19c1ac8694f11c1803e5740">handleMessage</a> (cMessage *msg)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a01d1bce8ffd60873a695ad65781bad14"></a><!-- doxytag: member="DHTStorage::finish" ref="a01d1bce8ffd60873a695ad65781bad14" args="()" -->
+void&#160;</td><td class="memItemRight" valign="bottom"><b>finish</b> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a85735d12512dd5a566a3dd446be51c54"></a><!-- doxytag: member="DHTStorage::initialize" ref="a85735d12512dd5a566a3dd446be51c54" args="()" -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>initialize</b> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab0c35152d19c1ac8694f11c1803e5740"></a><!-- doxytag: member="DHTStorage::handleMessage" ref="ab0c35152d19c1ac8694f11c1803e5740" args="(cMessage *msg)" -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>handleMessage</b> (cMessage *msg)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0a804f6d378aba9e2ff1b0f998042db6"></a><!-- doxytag: member="DHTStorage::handlePutResponse" ref="a0a804f6d378aba9e2ff1b0f998042db6" args="(DHTputCAPIResponse *msg, DHTStatsContext *context)" -->
+void&#160;</td><td class="memItemRight" valign="bottom"><b>handlePutResponse</b> (DHTputCAPIResponse *msg, <a class="el" href="class_d_h_t_storage_1_1_d_h_t_stats_context.html">DHTStatsContext</a> *context)</td></tr>
 </table>
-<hr/><a name="_details"></a><h2>Detailed Description</h2>
-<div class="textblock">
-<p>Definition at line <a class="el" href="_d_h_t_storage_8h_source.html#l00027">27</a> of file <a class="el" href="_d_h_t_storage_8h_source.html">DHTStorage.h</a>.</p>
-</div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="a8bd73be8617035e2a1d8cf368b68ebd5"></a><!-- doxytag: member="DHTStorage::DHTStorage" ref="a8bd73be8617035e2a1d8cf368b68ebd5" args="()" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">DHTStorage::DHTStorage </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="_d_h_t_storage_8cc_source.html#l00018">18</a> of file <a class="el" href="_d_h_t_storage_8cc_source.html">DHTStorage.cc</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="aec4a25f2719f920eb5d705def21dfde0"></a><!-- doxytag: member="DHTStorage::~DHTStorage" ref="aec4a25f2719f920eb5d705def21dfde0" args="()" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">DHTStorage::~DHTStorage </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td><code> [virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="_d_h_t_storage_8cc_source.html#l00023">23</a> of file <a class="el" href="_d_h_t_storage_8cc_source.html">DHTStorage.cc</a>.</p>
-
-</div>
-</div>
-<hr/><h2>Member Function Documentation</h2>
-<a class="anchor" id="ab0c35152d19c1ac8694f11c1803e5740"></a><!-- doxytag: member="DHTStorage::handleMessage" ref="ab0c35152d19c1ac8694f11c1803e5740" args="(cMessage *msg)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void DHTStorage::handleMessage </td>
-          <td>(</td>
-          <td class="paramtype">cMessage *&#160;</td>
-          <td class="paramname"><em>msg</em></td><td>)</td>
-          <td><code> [protected, virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="_d_h_t_storage_8cc_source.html#l00065">65</a> of file <a class="el" href="_d_h_t_storage_8cc_source.html">DHTStorage.cc</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a85735d12512dd5a566a3dd446be51c54"></a><!-- doxytag: member="DHTStorage::initialize" ref="a85735d12512dd5a566a3dd446be51c54" args="()" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void DHTStorage::initialize </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td><code> [protected, virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="_d_h_t_storage_8cc_source.html#l00027">27</a> of file <a class="el" href="_d_h_t_storage_8cc_source.html">DHTStorage.cc</a>.</p>
-
-</div>
-</div>
 <hr/>The documentation for this class was generated from the following files:<ul>
 <li><a class="el" href="_d_h_t_storage_8h_source.html">DHTStorage.h</a></li>
-<li><a class="el" href="_d_h_t_storage_8cc_source.html">DHTStorage.cc</a></li>
+<li>DHTStorage.cc</li>
 </ul>
 </div>
 </div>
   <div id="nav-path" class="navpath">
     <ul>
       <li class="navelem"><a class="el" href="class_d_h_t_storage.html">DHTStorage</a>      </li>
-      <li class="footer">Generated on Mon Nov 7 2011 15:57:41 for Pithos by&#160;
+      <li class="footer">Generated on Tue Nov 29 2011 10:50:45 for Pithos by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>
@@ -197,7 +129,7 @@ Protected Member Functions</h2></td></tr>
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">

@@ -53,20 +53,20 @@ class Communicator : public BaseApp
 {
 	private:
 		// statistics
-		int numSent;              //number of packets sent
-		int numReceived;          //number of packets received
+		int numSent;              /**< number of packets sent */
+		int numReceived;          /**< number of packets received */
 
 
 	protected:
 		virtual void handleMessage(cMessage *msg);
 
 		// application routines
-		void initializeApp(int stage);                 // called when the module is being created
-		void finishApp();                              // called when the module is about to be destroyed
-		void handleTimerEvent(cMessage* msg);          // called when we received a timer message
-		void deliver(OverlayKey& key, cMessage* msg);  // called when we receive a message from the overlay
-		void handleUDPMessage(cMessage* msg);          // called when we receive a UDP message
-		void handleUpperMessage (cMessage *msg);
+		void initializeApp(int stage);                 /**< called when the module is being created */
+		void finishApp();                              /**< called when the module is about to be destroyed */
+		void handleTimerEvent(cMessage* msg);          /**< called when we received a timer message */
+		void deliver(OverlayKey& key, cMessage* msg);  /**< called when we receive a message from the overlay */
+		void handleUDPMessage(cMessage* msg);          /**< called when we receive a UDP message */
+		void handleUpperMessage (cMessage *msg);       /**< called when we receive a request from the higher layer */
 
 		/**
 		 * The function that handles RPC request from the higher layer to store, retrieve and update objects.
@@ -138,13 +138,9 @@ class Communicator : public BaseApp
 
 		simtime_t getCreationTime();
 
-		uint32_t externallySendInternalRpcCall(CompType destComp,
-                BaseCallMessage* msg,
-                cPolymorphic* context = NULL,
-                simtime_t timeout = -1,
-                int retries = 0,
-                int rpcId = -1,
-                RpcListener* rpcListener = NULL)
+		uint32_t externallySendInternalRpcCall(CompType destComp, BaseCallMessage* msg,
+                cPolymorphic* context = NULL, simtime_t timeout = -1, int retries = 0,
+                int rpcId = -1, RpcListener* rpcListener = NULL)
 		{
 			Enter_Method("externallySendInternalRpcCall()");	//Required for Omnet++ context switching between modules
 			take(msg);	//This module should first take ownership of the received message before that message can be resent

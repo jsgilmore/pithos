@@ -27,7 +27,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Pithos</div>
-   <div id="projectbrief">Distributed storage for MMVEs</div>
+   <div id="projectbrief">Distributed state management and persistency for P2P MMVE</div>
   </td>
  </tr>
  </tbody>
@@ -108,29 +108,44 @@ Collaboration diagram for PeerListPkt_Base:</div>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_peer_list_pkt___base.html#a26e86f56efdc5a03b2ae299c76b2020e">~PeerListPkt_Base</a> ()</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="class_peer_list_pkt___base.html">PeerListPkt_Base</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_peer_list_pkt___base.html#abbcb053cc26f6c8f31b6b140cc61c884">dup</a> () const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_peer_list_pkt___base.html#a4b627ef7cc9ecfa08f81be42ee9dfff1">parsimPack</a> (cCommBuffer *b)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_peer_list_pkt___base.html#a43e9ace7b3d6c06f665bbccb02f8c53a">parsimUnpack</a> (cCommBuffer *b)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_peer_list_pkt___base.html#ad5e0869601dc08397eabbce2c5e10ae8">getObjectName</a> () const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_peer_list_pkt___base.html#af3d60eaf68f242510d94777bc72dedf5">setObjectName</a> (const char *<a class="el" href="class_peer_list_pkt___base.html#a94ee8633143f72fec0b05101acb9a89e">objectName_var</a>)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual unsigned long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_peer_list_pkt___base.html#ae8b65023f775a5c4001b8368453fad8b">getObjectSize</a> () const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_peer_list_pkt___base.html#af702ad7565a8cb68661c3e46b9e26535">setObjectSize</a> (unsigned long <a class="el" href="class_peer_list_pkt___base.html#aa9df7a479677b082b469e7111e29d929">objectSize_var</a>)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_peer_list_pkt___base.html#a854741e0495c4aec691dae7882afba9c">setPeer_listArraySize</a> (unsigned int size)=0</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_peer_list_pkt___base.html#ab12568db92fab6f8c739e474f00fae16">getPeer_listArraySize</a> () const =0</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="class_peer_data.html">PeerData</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_peer_list_pkt___base.html#a32cee7f058dfa90934d564db05473d76">getPeer_list</a> (unsigned int k)=0</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual const <a class="el" href="class_peer_data.html">PeerData</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_peer_list_pkt___base.html#ad768e2ae4a8ecc7cd4539965bf6ad67a">getPeer_list</a> (unsigned int k) const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_peer_list_pkt___base.html#a3f1af5577cd00abf33ce3aa46c046150">setPeer_list</a> (unsigned int k, const <a class="el" href="class_peer_data.html">PeerData</a> &amp;peer_list_var)=0</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abbcb053cc26f6c8f31b6b140cc61c884"></a><!-- doxytag: member="PeerListPkt_Base::dup" ref="abbcb053cc26f6c8f31b6b140cc61c884" args="() const " -->
+virtual <a class="el" href="class_peer_list_pkt___base.html">PeerListPkt_Base</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>dup</b> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4b627ef7cc9ecfa08f81be42ee9dfff1"></a><!-- doxytag: member="PeerListPkt_Base::parsimPack" ref="a4b627ef7cc9ecfa08f81be42ee9dfff1" args="(cCommBuffer *b)" -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>parsimPack</b> (cCommBuffer *b)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a43e9ace7b3d6c06f665bbccb02f8c53a"></a><!-- doxytag: member="PeerListPkt_Base::parsimUnpack" ref="a43e9ace7b3d6c06f665bbccb02f8c53a" args="(cCommBuffer *b)" -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>parsimUnpack</b> (cCommBuffer *b)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad5e0869601dc08397eabbce2c5e10ae8"></a><!-- doxytag: member="PeerListPkt_Base::getObjectName" ref="ad5e0869601dc08397eabbce2c5e10ae8" args="() const " -->
+virtual const char *&#160;</td><td class="memItemRight" valign="bottom"><b>getObjectName</b> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af3d60eaf68f242510d94777bc72dedf5"></a><!-- doxytag: member="PeerListPkt_Base::setObjectName" ref="af3d60eaf68f242510d94777bc72dedf5" args="(const char *objectName_var)" -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>setObjectName</b> (const char *objectName_var)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae8b65023f775a5c4001b8368453fad8b"></a><!-- doxytag: member="PeerListPkt_Base::getObjectSize" ref="ae8b65023f775a5c4001b8368453fad8b" args="() const " -->
+virtual unsigned long&#160;</td><td class="memItemRight" valign="bottom"><b>getObjectSize</b> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af702ad7565a8cb68661c3e46b9e26535"></a><!-- doxytag: member="PeerListPkt_Base::setObjectSize" ref="af702ad7565a8cb68661c3e46b9e26535" args="(unsigned long objectSize_var)" -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>setObjectSize</b> (unsigned long objectSize_var)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a854741e0495c4aec691dae7882afba9c"></a><!-- doxytag: member="PeerListPkt_Base::setPeer_listArraySize" ref="a854741e0495c4aec691dae7882afba9c" args="(unsigned int size)=0" -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>setPeer_listArraySize</b> (unsigned int size)=0</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab12568db92fab6f8c739e474f00fae16"></a><!-- doxytag: member="PeerListPkt_Base::getPeer_listArraySize" ref="ab12568db92fab6f8c739e474f00fae16" args="() const =0" -->
+virtual unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>getPeer_listArraySize</b> () const =0</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a32cee7f058dfa90934d564db05473d76"></a><!-- doxytag: member="PeerListPkt_Base::getPeer_list" ref="a32cee7f058dfa90934d564db05473d76" args="(unsigned int k)=0" -->
+virtual <a class="el" href="class_peer_data.html">PeerData</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>getPeer_list</b> (unsigned int k)=0</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad768e2ae4a8ecc7cd4539965bf6ad67a"></a><!-- doxytag: member="PeerListPkt_Base::getPeer_list" ref="ad768e2ae4a8ecc7cd4539965bf6ad67a" args="(unsigned int k) const " -->
+virtual const <a class="el" href="class_peer_data.html">PeerData</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>getPeer_list</b> (unsigned int k) const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3f1af5577cd00abf33ce3aa46c046150"></a><!-- doxytag: member="PeerListPkt_Base::setPeer_list" ref="a3f1af5577cd00abf33ce3aa46c046150" args="(unsigned int k, const PeerData &amp;peer_list_var)=0" -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>setPeer_list</b> (unsigned int k, const <a class="el" href="class_peer_data.html">PeerData</a> &amp;peer_list_var)=0</td></tr>
 <tr><td colspan="2"><h2><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_peer_list_pkt___base.html#aedbd84c1b2c9edcb29fb621160617859">operator==</a> (const <a class="el" href="class_peer_list_pkt___base.html">PeerListPkt_Base</a> &amp;)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_peer_list_pkt___base.html#ab12e322ef519c76c75b6a8154c1c3c91">PeerListPkt_Base</a> ()</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_peer_list_pkt___base.html#a1ac6dd85eeb3e47236f7fb758e7937c5">PeerListPkt_Base</a> (const <a class="el" href="class_peer_list_pkt___base.html">PeerListPkt_Base</a> &amp;other)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_peer_list_pkt___base.html">PeerListPkt_Base</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_peer_list_pkt___base.html#a73250a366479f08cfb1ae8dd76bc6b5e">operator=</a> (const <a class="el" href="class_peer_list_pkt___base.html">PeerListPkt_Base</a> &amp;other)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aedbd84c1b2c9edcb29fb621160617859"></a><!-- doxytag: member="PeerListPkt_Base::operator==" ref="aedbd84c1b2c9edcb29fb621160617859" args="(const PeerListPkt_Base &amp;)" -->
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator==</b> (const <a class="el" href="class_peer_list_pkt___base.html">PeerListPkt_Base</a> &amp;)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1ac6dd85eeb3e47236f7fb758e7937c5"></a><!-- doxytag: member="PeerListPkt_Base::PeerListPkt_Base" ref="a1ac6dd85eeb3e47236f7fb758e7937c5" args="(const PeerListPkt_Base &amp;other)" -->
+&#160;</td><td class="memItemRight" valign="bottom"><b>PeerListPkt_Base</b> (const <a class="el" href="class_peer_list_pkt___base.html">PeerListPkt_Base</a> &amp;other)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a73250a366479f08cfb1ae8dd76bc6b5e"></a><!-- doxytag: member="PeerListPkt_Base::operator=" ref="a73250a366479f08cfb1ae8dd76bc6b5e" args="(const PeerListPkt_Base &amp;other)" -->
+<a class="el" href="class_peer_list_pkt___base.html">PeerListPkt_Base</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (const <a class="el" href="class_peer_list_pkt___base.html">PeerListPkt_Base</a> &amp;other)</td></tr>
 <tr><td colspan="2"><h2><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">opp_string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_peer_list_pkt___base.html#a94ee8633143f72fec0b05101acb9a89e">objectName_var</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">unsigned long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_peer_list_pkt___base.html#aa9df7a479677b082b469e7111e29d929">objectSize_var</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a94ee8633143f72fec0b05101acb9a89e"></a><!-- doxytag: member="PeerListPkt_Base::objectName_var" ref="a94ee8633143f72fec0b05101acb9a89e" args="" -->
+opp_string&#160;</td><td class="memItemRight" valign="bottom"><b>objectName_var</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa9df7a479677b082b469e7111e29d929"></a><!-- doxytag: member="PeerListPkt_Base::objectSize_var" ref="aa9df7a479677b082b469e7111e29d929" args="" -->
+unsigned long&#160;</td><td class="memItemRight" valign="bottom"><b>objectSize_var</b></td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <div class="textblock"><p>Class generated from <code>applications/pithos/PeerListPkt.msg</code> by opp_msgc. </p>
@@ -146,495 +161,21 @@ Protected Attributes</h2></td></tr>
  class <a class="el" href="class_peer_list_pkt.html">PeerListPkt</a> : public <a class="el" href="class_peer_list_pkt___base.html">PeerListPkt_Base</a>
  {
    public:
-     PeerListPkt() : <a class="el" href="class_peer_list_pkt___base.html#ab12e322ef519c76c75b6a8154c1c3c91">PeerListPkt_Base()</a> {}
-     PeerListPkt(const PeerListPkt&amp; other) : <a class="el" href="class_peer_list_pkt___base.html#ab12e322ef519c76c75b6a8154c1c3c91">PeerListPkt_Base()</a> {operator=(other);}
+     PeerListPkt() : PeerListPkt_Base() {}
+     PeerListPkt(const PeerListPkt&amp; other) : PeerListPkt_Base() {operator=(other);}
      <a class="el" href="class_peer_list_pkt.html">PeerListPkt</a>&amp; operator=(const PeerListPkt&amp; other) {PeerListPkt_Base::operator=(other); return *this;}
      // ADD CODE HERE to redefine and implement pure virtual functions from <a class="el" href="class_peer_list_pkt___base.html">PeerListPkt_Base</a>
  };
- </pre> 
-<p>Definition at line <a class="el" href="_peer_list_pkt__m_8h_source.html#l00050">50</a> of file <a class="el" href="_peer_list_pkt__m_8h_source.html">PeerListPkt_m.h</a>.</p>
-</div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="ab12e322ef519c76c75b6a8154c1c3c91"></a><!-- doxytag: member="PeerListPkt_Base::PeerListPkt_Base" ref="ab12e322ef519c76c75b6a8154c1c3c91" args="()" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">PeerListPkt_Base::PeerListPkt_Base </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td><code> [protected]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="_peer_list_pkt__m_8cc_source.html#l00033">33</a> of file <a class="el" href="_peer_list_pkt__m_8cc_source.html">PeerListPkt_m.cc</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a1ac6dd85eeb3e47236f7fb758e7937c5"></a><!-- doxytag: member="PeerListPkt_Base::PeerListPkt_Base" ref="a1ac6dd85eeb3e47236f7fb758e7937c5" args="(const PeerListPkt_Base &amp;other)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">PeerListPkt_Base::PeerListPkt_Base </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="class_peer_list_pkt___base.html">PeerListPkt_Base</a> &amp;&#160;</td>
-          <td class="paramname"><em>other</em></td><td>)</td>
-          <td><code> [protected]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="_peer_list_pkt__m_8cc_source.html#l00039">39</a> of file <a class="el" href="_peer_list_pkt__m_8cc_source.html">PeerListPkt_m.cc</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_peer_list_pkt___base_a1ac6dd85eeb3e47236f7fb758e7937c5_cgraph.png" border="0" usemap="#class_peer_list_pkt___base_a1ac6dd85eeb3e47236f7fb758e7937c5_cgraph" alt=""/></div>
-<map name="class_peer_list_pkt___base_a1ac6dd85eeb3e47236f7fb758e7937c5_cgraph" id="class_peer_list_pkt___base_a1ac6dd85eeb3e47236f7fb758e7937c5_cgraph">
-<area shape="rect" id="node3" href="class_peer_list_pkt___base.html#a73250a366479f08cfb1ae8dd76bc6b5e" title="PeerListPkt_Base::operator=" alt="" coords="295,5,484,35"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="a26e86f56efdc5a03b2ae299c76b2020e"></a><!-- doxytag: member="PeerListPkt_Base::~PeerListPkt_Base" ref="a26e86f56efdc5a03b2ae299c76b2020e" args="()" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">PeerListPkt_Base::~PeerListPkt_Base </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td><code> [virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="_peer_list_pkt__m_8cc_source.html#l00044">44</a> of file <a class="el" href="_peer_list_pkt__m_8cc_source.html">PeerListPkt_m.cc</a>.</p>
-
-</div>
-</div>
-<hr/><h2>Member Function Documentation</h2>
-<a class="anchor" id="abbcb053cc26f6c8f31b6b140cc61c884"></a><!-- doxytag: member="PeerListPkt_Base::dup" ref="abbcb053cc26f6c8f31b6b140cc61c884" args="() const " -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual <a class="el" href="class_peer_list_pkt___base.html">PeerListPkt_Base</a>* PeerListPkt_Base::dup </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const<code> [inline, virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Reimplemented from <a class="el" href="class_packet.html#a6d1f709f7adca518d67b8d6fd028f013">Packet</a>.</p>
-
-<p>Definition at line <a class="el" href="_peer_list_pkt__m_8h_source.html#l00066">66</a> of file <a class="el" href="_peer_list_pkt__m_8h_source.html">PeerListPkt_m.h</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="ad5e0869601dc08397eabbce2c5e10ae8"></a><!-- doxytag: member="PeerListPkt_Base::getObjectName" ref="ad5e0869601dc08397eabbce2c5e10ae8" args="() const " -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const char * PeerListPkt_Base::getObjectName </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const<code> [virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="_peer_list_pkt__m_8cc_source.html#l00073">73</a> of file <a class="el" href="_peer_list_pkt__m_8cc_source.html">PeerListPkt_m.cc</a>.</p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_peer_list_pkt___base_ad5e0869601dc08397eabbce2c5e10ae8_icgraph.png" border="0" usemap="#class_peer_list_pkt___base_ad5e0869601dc08397eabbce2c5e10ae8_icgraph" alt=""/></div>
-<map name="class_peer_list_pkt___base_ad5e0869601dc08397eabbce2c5e10ae8_icgraph" id="class_peer_list_pkt___base_ad5e0869601dc08397eabbce2c5e10ae8_icgraph">
-<area shape="rect" id="node3" href="class_super__peer__logic.html#a3c0afa1028c629dce6a8f3c3e4621702" title="Super_peer_logic::addObject" alt="" coords="313,5,503,35"/><area shape="rect" id="node7" href="class_peer_list_pkt_descriptor.html#a362c083d290eda0e3ee0fd6a3b5c73fd" title="PeerListPktDescriptor::getFieldAsString" alt="" coords="281,59,535,88"/><area shape="rect" id="node5" href="class_super__peer__logic.html#a55adc92c94a1f2743e269481bd859e0a" title="Super_peer_logic::handleMessage" alt="" coords="584,5,805,35"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="ae8b65023f775a5c4001b8368453fad8b"></a><!-- doxytag: member="PeerListPkt_Base::getObjectSize" ref="ae8b65023f775a5c4001b8368453fad8b" args="() const " -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">unsigned long PeerListPkt_Base::getObjectSize </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const<code> [virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="_peer_list_pkt__m_8cc_source.html#l00083">83</a> of file <a class="el" href="_peer_list_pkt__m_8cc_source.html">PeerListPkt_m.cc</a>.</p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_peer_list_pkt___base_ae8b65023f775a5c4001b8368453fad8b_icgraph.png" border="0" usemap="#class_peer_list_pkt___base_ae8b65023f775a5c4001b8368453fad8b_icgraph" alt=""/></div>
-<map name="class_peer_list_pkt___base_ae8b65023f775a5c4001b8368453fad8b_icgraph" id="class_peer_list_pkt___base_ae8b65023f775a5c4001b8368453fad8b_icgraph">
-<area shape="rect" id="node3" href="class_super__peer__logic.html#a3c0afa1028c629dce6a8f3c3e4621702" title="Super_peer_logic::addObject" alt="" coords="305,5,495,35"/><area shape="rect" id="node7" href="class_peer_list_pkt_descriptor.html#a362c083d290eda0e3ee0fd6a3b5c73fd" title="PeerListPktDescriptor::getFieldAsString" alt="" coords="273,59,527,88"/><area shape="rect" id="node5" href="class_super__peer__logic.html#a55adc92c94a1f2743e269481bd859e0a" title="Super_peer_logic::handleMessage" alt="" coords="576,5,797,35"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="a32cee7f058dfa90934d564db05473d76"></a><!-- doxytag: member="PeerListPkt_Base::getPeer_list" ref="a32cee7f058dfa90934d564db05473d76" args="(unsigned int k)=0" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual <a class="el" href="class_peer_data.html">PeerData</a>&amp; PeerListPkt_Base::getPeer_list </td>
-          <td>(</td>
-          <td class="paramtype">unsigned int&#160;</td>
-          <td class="paramname"><em>k</em></td><td>)</td>
-          <td><code> [pure virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Implemented in <a class="el" href="class_peer_list_pkt.html#a733ae6fbfceca524344eb715940e428c">PeerListPkt</a>.</p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_peer_list_pkt___base_a32cee7f058dfa90934d564db05473d76_icgraph.png" border="0" usemap="#class_peer_list_pkt___base_a32cee7f058dfa90934d564db05473d76_icgraph" alt=""/></div>
-<map name="class_peer_list_pkt___base_a32cee7f058dfa90934d564db05473d76_icgraph" id="class_peer_list_pkt___base_a32cee7f058dfa90934d564db05473d76_icgraph">
-<area shape="rect" id="node3" href="class_peer_list_pkt_descriptor.html#a362c083d290eda0e3ee0fd6a3b5c73fd" title="PeerListPktDescriptor::getFieldAsString" alt="" coords="272,5,525,35"/><area shape="rect" id="node5" href="class_peer_list_pkt_descriptor.html#adcf019827b49fc12bdad9a25853c9bb2" title="PeerListPktDescriptor::getFieldStructPointer" alt="" coords="259,59,539,88"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="ad768e2ae4a8ecc7cd4539965bf6ad67a"></a><!-- doxytag: member="PeerListPkt_Base::getPeer_list" ref="ad768e2ae4a8ecc7cd4539965bf6ad67a" args="(unsigned int k) const " -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual const <a class="el" href="class_peer_data.html">PeerData</a>&amp; PeerListPkt_Base::getPeer_list </td>
-          <td>(</td>
-          <td class="paramtype">unsigned int&#160;</td>
-          <td class="paramname"><em>k</em></td><td>)</td>
-          <td> const<code> [inline, virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="_peer_list_pkt__m_8h_source.html#l00078">78</a> of file <a class="el" href="_peer_list_pkt__m_8h_source.html">PeerListPkt_m.h</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_peer_list_pkt___base_ad768e2ae4a8ecc7cd4539965bf6ad67a_cgraph.png" border="0" usemap="#class_peer_list_pkt___base_ad768e2ae4a8ecc7cd4539965bf6ad67a_cgraph" alt=""/></div>
-<map name="class_peer_list_pkt___base_ad768e2ae4a8ecc7cd4539965bf6ad67a_cgraph" id="class_peer_list_pkt___base_ad768e2ae4a8ecc7cd4539965bf6ad67a_cgraph">
-</map>
-</div>
-</p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_peer_list_pkt___base_ad768e2ae4a8ecc7cd4539965bf6ad67a_icgraph.png" border="0" usemap="#class_peer_list_pkt___base_ad768e2ae4a8ecc7cd4539965bf6ad67a_icgraph" alt=""/></div>
-<map name="class_peer_list_pkt___base_ad768e2ae4a8ecc7cd4539965bf6ad67a_icgraph" id="class_peer_list_pkt___base_ad768e2ae4a8ecc7cd4539965bf6ad67a_icgraph">
-</map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="ab12568db92fab6f8c739e474f00fae16"></a><!-- doxytag: member="PeerListPkt_Base::getPeer_listArraySize" ref="ab12568db92fab6f8c739e474f00fae16" args="() const =0" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual unsigned int PeerListPkt_Base::getPeer_listArraySize </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const<code> [pure virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Implemented in <a class="el" href="class_peer_list_pkt.html#a3076df2064ce7c8ab634a9b50ef947c6">PeerListPkt</a>.</p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_peer_list_pkt___base_ab12568db92fab6f8c739e474f00fae16_icgraph.png" border="0" usemap="#class_peer_list_pkt___base_ab12568db92fab6f8c739e474f00fae16_icgraph" alt=""/></div>
-<map name="class_peer_list_pkt___base_ab12568db92fab6f8c739e474f00fae16_icgraph" id="class_peer_list_pkt___base_ab12568db92fab6f8c739e474f00fae16_icgraph">
-<area shape="rect" id="node3" href="class_peer_list_pkt_descriptor.html#a116389b6e8c53091eccadbc3c2638680" title="PeerListPktDescriptor::getArraySize" alt="" coords="316,5,548,35"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="a73250a366479f08cfb1ae8dd76bc6b5e"></a><!-- doxytag: member="PeerListPkt_Base::operator=" ref="a73250a366479f08cfb1ae8dd76bc6b5e" args="(const PeerListPkt_Base &amp;other)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="class_peer_list_pkt___base.html">PeerListPkt_Base</a> &amp; PeerListPkt_Base::operator= </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="class_peer_list_pkt___base.html">PeerListPkt_Base</a> &amp;&#160;</td>
-          <td class="paramname"><em>other</em></td><td>)</td>
-          <td><code> [protected]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="_peer_list_pkt__m_8cc_source.html#l00048">48</a> of file <a class="el" href="_peer_list_pkt__m_8cc_source.html">PeerListPkt_m.cc</a>.</p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_peer_list_pkt___base_a73250a366479f08cfb1ae8dd76bc6b5e_icgraph.png" border="0" usemap="#class_peer_list_pkt___base_a73250a366479f08cfb1ae8dd76bc6b5e_icgraph" alt=""/></div>
-<map name="class_peer_list_pkt___base_a73250a366479f08cfb1ae8dd76bc6b5e_icgraph" id="class_peer_list_pkt___base_a73250a366479f08cfb1ae8dd76bc6b5e_icgraph">
-<area shape="rect" id="node3" href="class_peer_list_pkt___base.html#a1ac6dd85eeb3e47236f7fb758e7937c5" title="PeerListPkt_Base::PeerListPkt_Base" alt="" coords="245,5,485,35"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="aedbd84c1b2c9edcb29fb621160617859"></a><!-- doxytag: member="PeerListPkt_Base::operator==" ref="aedbd84c1b2c9edcb29fb621160617859" args="(const PeerListPkt_Base &amp;)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool PeerListPkt_Base::operator== </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="class_peer_list_pkt___base.html">PeerListPkt_Base</a> &amp;&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td><code> [protected]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a4b627ef7cc9ecfa08f81be42ee9dfff1"></a><!-- doxytag: member="PeerListPkt_Base::parsimPack" ref="a4b627ef7cc9ecfa08f81be42ee9dfff1" args="(cCommBuffer *b)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void PeerListPkt_Base::parsimPack </td>
-          <td>(</td>
-          <td class="paramtype">cCommBuffer *&#160;</td>
-          <td class="paramname"><em>b</em></td><td>)</td>
-          <td><code> [virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Reimplemented from <a class="el" href="class_packet.html#a4d8bbb7f3eb7f87a438981f170a5dde6">Packet</a>.</p>
-
-<p>Definition at line <a class="el" href="_peer_list_pkt__m_8cc_source.html#l00057">57</a> of file <a class="el" href="_peer_list_pkt__m_8cc_source.html">PeerListPkt_m.cc</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_peer_list_pkt___base_a4b627ef7cc9ecfa08f81be42ee9dfff1_cgraph.png" border="0" usemap="#class_peer_list_pkt___base_a4b627ef7cc9ecfa08f81be42ee9dfff1_cgraph" alt=""/></div>
-<map name="class_peer_list_pkt___base_a4b627ef7cc9ecfa08f81be42ee9dfff1_cgraph" id="class_peer_list_pkt___base_a4b627ef7cc9ecfa08f81be42ee9dfff1_cgraph">
-<area shape="rect" id="node3" href="bootstrap_pkt__m_8cc.html#ad084222f62dca5ddcdd40d5ad0c0ec86" title="doPacking" alt="" coords="259,5,341,35"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="a43e9ace7b3d6c06f665bbccb02f8c53a"></a><!-- doxytag: member="PeerListPkt_Base::parsimUnpack" ref="a43e9ace7b3d6c06f665bbccb02f8c53a" args="(cCommBuffer *b)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void PeerListPkt_Base::parsimUnpack </td>
-          <td>(</td>
-          <td class="paramtype">cCommBuffer *&#160;</td>
-          <td class="paramname"><em>b</em></td><td>)</td>
-          <td><code> [virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Reimplemented from <a class="el" href="class_packet.html#a366cd279ab2bfe4a62cf8d5d460f1821">Packet</a>.</p>
-
-<p>Definition at line <a class="el" href="_peer_list_pkt__m_8cc_source.html#l00065">65</a> of file <a class="el" href="_peer_list_pkt__m_8cc_source.html">PeerListPkt_m.cc</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_peer_list_pkt___base_a43e9ace7b3d6c06f665bbccb02f8c53a_cgraph.png" border="0" usemap="#class_peer_list_pkt___base_a43e9ace7b3d6c06f665bbccb02f8c53a_cgraph" alt=""/></div>
-<map name="class_peer_list_pkt___base_a43e9ace7b3d6c06f665bbccb02f8c53a_cgraph" id="class_peer_list_pkt___base_a43e9ace7b3d6c06f665bbccb02f8c53a_cgraph">
-<area shape="rect" id="node3" href="bootstrap_pkt__m_8cc.html#a4a7c16d9c83a185a80907df0d0b792f8" title="doUnpacking" alt="" coords="272,5,371,35"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="af3d60eaf68f242510d94777bc72dedf5"></a><!-- doxytag: member="PeerListPkt_Base::setObjectName" ref="af3d60eaf68f242510d94777bc72dedf5" args="(const char *objectName_var)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void PeerListPkt_Base::setObjectName </td>
-          <td>(</td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>objectName_var</em></td><td>)</td>
-          <td><code> [virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="_peer_list_pkt__m_8cc_source.html#l00078">78</a> of file <a class="el" href="_peer_list_pkt__m_8cc_source.html">PeerListPkt_m.cc</a>.</p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_peer_list_pkt___base_af3d60eaf68f242510d94777bc72dedf5_icgraph.png" border="0" usemap="#class_peer_list_pkt___base_af3d60eaf68f242510d94777bc72dedf5_icgraph" alt=""/></div>
-<map name="class_peer_list_pkt___base_af3d60eaf68f242510d94777bc72dedf5_icgraph" id="class_peer_list_pkt___base_af3d60eaf68f242510d94777bc72dedf5_icgraph">
-<area shape="rect" id="node3" href="class_peer_list_pkt_descriptor.html#a85da8f42e84e5df54e3afc487da36ea0" title="PeerListPktDescriptor::setFieldAsString" alt="" coords="281,5,535,35"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="af702ad7565a8cb68661c3e46b9e26535"></a><!-- doxytag: member="PeerListPkt_Base::setObjectSize" ref="af702ad7565a8cb68661c3e46b9e26535" args="(unsigned long objectSize_var)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void PeerListPkt_Base::setObjectSize </td>
-          <td>(</td>
-          <td class="paramtype">unsigned long&#160;</td>
-          <td class="paramname"><em>objectSize_var</em></td><td>)</td>
-          <td><code> [virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="_peer_list_pkt__m_8cc_source.html#l00088">88</a> of file <a class="el" href="_peer_list_pkt__m_8cc_source.html">PeerListPkt_m.cc</a>.</p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_peer_list_pkt___base_af702ad7565a8cb68661c3e46b9e26535_icgraph.png" border="0" usemap="#class_peer_list_pkt___base_af702ad7565a8cb68661c3e46b9e26535_icgraph" alt=""/></div>
-<map name="class_peer_list_pkt___base_af702ad7565a8cb68661c3e46b9e26535_icgraph" id="class_peer_list_pkt___base_af702ad7565a8cb68661c3e46b9e26535_icgraph">
-<area shape="rect" id="node3" href="class_peer_list_pkt_descriptor.html#a85da8f42e84e5df54e3afc487da36ea0" title="PeerListPktDescriptor::setFieldAsString" alt="" coords="273,5,527,35"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="a3f1af5577cd00abf33ce3aa46c046150"></a><!-- doxytag: member="PeerListPkt_Base::setPeer_list" ref="a3f1af5577cd00abf33ce3aa46c046150" args="(unsigned int k, const PeerData &amp;peer_list_var)=0" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual void PeerListPkt_Base::setPeer_list </td>
-          <td>(</td>
-          <td class="paramtype">unsigned int&#160;</td>
-          <td class="paramname"><em>k</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="class_peer_data.html">PeerData</a> &amp;&#160;</td>
-          <td class="paramname"><em>peer_list_var</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td><code> [pure virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Implemented in <a class="el" href="class_peer_list_pkt.html#a7095507ac1331d4cf1a631c536611de0">PeerListPkt</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a854741e0495c4aec691dae7882afba9c"></a><!-- doxytag: member="PeerListPkt_Base::setPeer_listArraySize" ref="a854741e0495c4aec691dae7882afba9c" args="(unsigned int size)=0" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual void PeerListPkt_Base::setPeer_listArraySize </td>
-          <td>(</td>
-          <td class="paramtype">unsigned int&#160;</td>
-          <td class="paramname"><em>size</em></td><td>)</td>
-          <td><code> [pure virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Implemented in <a class="el" href="class_peer_list_pkt.html#a01f8ec449f1196c6677695ae51c32767">PeerListPkt</a>.</p>
-
-</div>
-</div>
-<hr/><h2>Member Data Documentation</h2>
-<a class="anchor" id="a94ee8633143f72fec0b05101acb9a89e"></a><!-- doxytag: member="PeerListPkt_Base::objectName_var" ref="a94ee8633143f72fec0b05101acb9a89e" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">opp_string <a class="el" href="class_peer_list_pkt___base.html#a94ee8633143f72fec0b05101acb9a89e">PeerListPkt_Base::objectName_var</a><code> [protected]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="_peer_list_pkt__m_8h_source.html#l00053">53</a> of file <a class="el" href="_peer_list_pkt__m_8h_source.html">PeerListPkt_m.h</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="aa9df7a479677b082b469e7111e29d929"></a><!-- doxytag: member="PeerListPkt_Base::objectSize_var" ref="aa9df7a479677b082b469e7111e29d929" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">unsigned long <a class="el" href="class_peer_list_pkt___base.html#aa9df7a479677b082b469e7111e29d929">PeerListPkt_Base::objectSize_var</a><code> [protected]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="_peer_list_pkt__m_8h_source.html#l00054">54</a> of file <a class="el" href="_peer_list_pkt__m_8h_source.html">PeerListPkt_m.h</a>.</p>
-
-</div>
-</div>
-<hr/>The documentation for this class was generated from the following files:<ul>
+ </pre> </div><hr/>The documentation for this class was generated from the following files:<ul>
 <li><a class="el" href="_peer_list_pkt__m_8h_source.html">PeerListPkt_m.h</a></li>
-<li><a class="el" href="_peer_list_pkt__m_8cc_source.html">PeerListPkt_m.cc</a></li>
+<li>PeerListPkt_m.cc</li>
 </ul>
 </div>
 </div>
   <div id="nav-path" class="navpath">
     <ul>
       <li class="navelem"><a class="el" href="class_peer_list_pkt___base.html">PeerListPkt_Base</a>      </li>
-      <li class="footer">Generated on Mon Nov 7 2011 15:57:41 for Pithos by&#160;
+      <li class="footer">Generated on Tue Nov 29 2011 10:50:45 for Pithos by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>
@@ -644,7 +185,7 @@ Here is the caller graph for this function:</div>
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">

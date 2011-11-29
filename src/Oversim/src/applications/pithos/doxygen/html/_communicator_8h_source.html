@@ -27,7 +27,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Pithos</div>
-   <div id="projectbrief">Distributed storage for MMVEs</div>
+   <div id="projectbrief">Distributed state management and persistency for P2P MMVE</div>
   </td>
  </tr>
  </tbody>
@@ -59,7 +59,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="files.html"><span>File&#160;List</span></a></li>
-      <li><a href="globals.html"><span>File&#160;Members</span></a></li>
     </ul>
   </div>
 </div>
@@ -81,7 +80,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <h1>Communicator.h</h1>  </div>
 </div>
 <div class="contents">
-<a href="_communicator_8h.html">Go to the documentation of this file.</a><div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 <span class="comment">//</span>
+<div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 <span class="comment">//</span>
 <a name="l00002"></a>00002 <span class="comment">// Copyright (C) 2011 MIH Media lab, University of Stellenbosch</span>
 <a name="l00003"></a>00003 <span class="comment">//</span>
 <a name="l00004"></a>00004 <span class="comment">// This program is free software; you can redistribute it and/or</span>
@@ -102,7 +101,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00019"></a>00019 <span class="preprocessor">#ifndef COMMUNICATOR_H</span>
 <a name="l00020"></a>00020 <span class="preprocessor"></span><span class="preprocessor">#define COMMUNICATOR_H</span>
 <a name="l00021"></a>00021 <span class="preprocessor"></span>
-<a name="l00022"></a><a class="code" href="_communicator_8h.html#ae9060e21277bf171c2ead5e042dd53a6">00022</a> <span class="preprocessor">#define SHA1_WIPE_VARIABLES</span>
+<a name="l00022"></a>00022 <span class="preprocessor">#define SHA1_WIPE_VARIABLES</span>
 <a name="l00023"></a>00023 <span class="preprocessor"></span>
 <a name="l00024"></a>00024 <span class="preprocessor">#include &lt;omnetpp.h&gt;</span>
 <a name="l00025"></a>00025 <span class="preprocessor">#include &lt;iostream&gt;</span>
@@ -113,65 +112,78 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00030"></a>00030 <span class="preprocessor">#include &quot;GlobalStatistics.h&quot;</span>
 <a name="l00031"></a>00031 <span class="preprocessor">#include &quot;GlobalNodeListAccess.h&quot;</span>
 <a name="l00032"></a>00032 <span class="preprocessor">#include &quot;BaseApp.h&quot;</span>
-<a name="l00033"></a>00033 
-<a name="l00034"></a>00034 <span class="preprocessor">#include &quot;<a class="code" href="_game_object_8h.html">GameObject.h</a>&quot;</span>
-<a name="l00035"></a>00035 <span class="preprocessor">#include &quot;<a class="code" href="packet__m_8h.html">packet_m.h</a>&quot;</span>
-<a name="l00036"></a>00036 <span class="preprocessor">#include &quot;<a class="code" href="group_pkt__m_8h.html">groupPkt_m.h</a>&quot;</span>
-<a name="l00037"></a>00037 <span class="preprocessor">#include &quot;<a class="code" href="bootstrap_pkt__m_8h.html">bootstrapPkt_m.h</a>&quot;</span>
-<a name="l00038"></a>00038 
-<a name="l00039"></a>00039 <span class="preprocessor">#include &quot;DHTMessage_m.h&quot;</span>
+<a name="l00033"></a>00033 <span class="preprocessor">#include &quot;DHTStorage.h&quot;</span>
+<a name="l00034"></a>00034 
+<a name="l00035"></a>00035 <span class="preprocessor">#include &quot;GameObject.h&quot;</span>
+<a name="l00036"></a>00036 <span class="preprocessor">#include &quot;packet_m.h&quot;</span>
+<a name="l00037"></a>00037 <span class="preprocessor">#include &quot;groupPkt_m.h&quot;</span>
+<a name="l00038"></a>00038 <span class="preprocessor">#include &quot;bootstrapPkt_m.h&quot;</span>
+<a name="l00039"></a>00039 <span class="preprocessor">#include &quot;PithosTestMessages_m.h&quot;</span>
 <a name="l00040"></a>00040 
-<a name="l00050"></a><a class="code" href="class_communicator.html">00050</a> <span class="keyword">class </span><a class="code" href="class_communicator.html">Communicator</a> : <span class="keyword">public</span> BaseApp
-<a name="l00051"></a>00051 {
-<a name="l00052"></a>00052         <span class="keyword">private</span>:
-<a name="l00053"></a>00053                 <span class="comment">// statistics</span>
-<a name="l00054"></a>00054                 <span class="keywordtype">int</span> numSent;              <span class="comment">//number of packets sent</span>
-<a name="l00055"></a>00055                 <span class="keywordtype">int</span> numReceived;          <span class="comment">//number of packets received</span>
-<a name="l00056"></a>00056 
-<a name="l00057"></a>00057 
-<a name="l00058"></a>00058                 <span class="keyword">virtual</span> <span class="keywordtype">void</span> handleMessage(cMessage *msg);
-<a name="l00059"></a>00059 
-<a name="l00060"></a>00060                 <span class="comment">// application routines</span>
-<a name="l00061"></a>00061                 <span class="keywordtype">void</span> initializeApp(<span class="keywordtype">int</span> stage);                 <span class="comment">// called when the module is being created</span>
-<a name="l00062"></a>00062                 <span class="keywordtype">void</span> finishApp();                              <span class="comment">// called when the module is about to be destroyed</span>
-<a name="l00063"></a>00063                 <span class="keywordtype">void</span> handleTimerEvent(cMessage* msg);          <span class="comment">// called when we received a timer message</span>
-<a name="l00064"></a>00064                 <span class="keywordtype">void</span> deliver(OverlayKey&amp; key, cMessage* msg);  <span class="comment">// called when we receive a message from the overlay</span>
-<a name="l00065"></a>00065                 <span class="keywordtype">void</span> handleUDPMessage(cMessage* msg);          <span class="comment">// called when we receive a UDP message</span>
-<a name="l00066"></a>00066                 <span class="keywordtype">void</span> handleUpperMessage (cMessage *msg);
-<a name="l00067"></a>00067 
-<a name="l00073"></a>00073                 <span class="keywordtype">bool</span> handleRpcCall(BaseCallMessage *msg);
-<a name="l00074"></a>00074 
-<a name="l00081"></a>00081                 <span class="keywordtype">void</span> handlePutRequest(DHTPutCall* dhtMsg);
-<a name="l00082"></a>00082 
-<a name="l00086"></a>00086                 <span class="keywordtype">void</span> handleGetRequest(DHTGetCall* dhtMsg);
-<a name="l00087"></a>00087 
-<a name="l00093"></a>00093                 <span class="keywordtype">void</span> handleGetCAPIRequest(DHTgetCAPICall* capiGetMsg);
-<a name="l00094"></a>00094 
-<a name="l00098"></a>00098                 <span class="keywordtype">void</span> handlePutCAPIRequest(DHTputCAPICall* capiPutMsg);
-<a name="l00099"></a>00099 
-<a name="l00100"></a>00100                 <span class="keywordtype">void</span> handleDumpDhtRequest(DHTdumpCall* call);
-<a name="l00101"></a>00101 
-<a name="l00107"></a>00107                 <span class="keywordtype">void</span> handleSPMsg(cMessage *msg);
-<a name="l00108"></a>00108 
-<a name="l00114"></a>00114                 <span class="keywordtype">void</span> handlePeerMsg(cMessage *msg);
-<a name="l00115"></a>00115 
-<a name="l00121"></a>00121                 <span class="keywordtype">void</span> overlayStore(cMessage *msg);
-<a name="l00122"></a>00122 
-<a name="l00128"></a>00128                 <span class="keywordtype">void</span> sendPacket(cMessage *msg);
-<a name="l00129"></a>00129 
-<a name="l00130"></a>00130         <span class="keyword">public</span>:
-<a name="l00131"></a><a class="code" href="class_communicator.html#abd4c26c6a901e571bc9cfc4259e65de3">00131</a>                 <a class="code" href="class_communicator.html#abd4c26c6a901e571bc9cfc4259e65de3">Communicator</a>() {};
-<a name="l00132"></a><a class="code" href="class_communicator.html#a4ced5362bf7438924f8d7f1b0c5ec391">00132</a>                 <a class="code" href="class_communicator.html#a4ced5362bf7438924f8d7f1b0c5ec391">~Communicator</a>() {};
-<a name="l00133"></a>00133 };
+<a name="l00041"></a>00041 <span class="preprocessor">#include &quot;DHTMessage_m.h&quot;</span>
+<a name="l00042"></a>00042 
+<a name="l00052"></a><a class="code" href="class_communicator.html">00052</a> <span class="keyword">class </span><a class="code" href="class_communicator.html">Communicator</a> : <span class="keyword">public</span> BaseApp
+<a name="l00053"></a>00053 {
+<a name="l00054"></a>00054         <span class="keyword">private</span>:
+<a name="l00055"></a>00055                 <span class="comment">// statistics</span>
+<a name="l00056"></a>00056                 <span class="keywordtype">int</span> numSent;              
+<a name="l00057"></a>00057                 <span class="keywordtype">int</span> numReceived;          
+<a name="l00060"></a>00060         <span class="keyword">protected</span>:
+<a name="l00061"></a>00061                 <span class="keyword">virtual</span> <span class="keywordtype">void</span> handleMessage(cMessage *msg);
+<a name="l00062"></a>00062 
+<a name="l00063"></a>00063                 <span class="comment">// application routines</span>
+<a name="l00064"></a>00064                 <span class="keywordtype">void</span> <a class="code" href="class_communicator.html#a99fce573c8e55ff39d015df629ed1db9">initializeApp</a>(<span class="keywordtype">int</span> stage);                 
+<a name="l00065"></a>00065                 <span class="keywordtype">void</span> <a class="code" href="class_communicator.html#a4fa2cb93d804409a5f73262e7bd923fa">finishApp</a>();                              
+<a name="l00066"></a>00066                 <span class="keywordtype">void</span> <a class="code" href="class_communicator.html#a3ab68beb55470b059b1676ae8f140927">handleTimerEvent</a>(cMessage* msg);          
+<a name="l00067"></a>00067                 <span class="keywordtype">void</span> <a class="code" href="class_communicator.html#ac2770cc25f3373b13d82845d9e2555d1">deliver</a>(OverlayKey&amp; key, cMessage* msg);  
+<a name="l00068"></a>00068                 <span class="keywordtype">void</span> <a class="code" href="class_communicator.html#aed94f303dec6b31ca225fcce49aa6c05">handleUDPMessage</a>(cMessage* msg);          
+<a name="l00069"></a>00069                 <span class="keywordtype">void</span> <a class="code" href="class_communicator.html#a1f04220db1b1674bd515a897a296243c">handleUpperMessage</a> (cMessage *msg);       
+<a name="l00076"></a>00076                 <span class="keywordtype">bool</span> <a class="code" href="class_communicator.html#a32478075467b4ade9f0d8533f35fb75e">handleRpcCall</a>(BaseCallMessage *msg);
+<a name="l00077"></a>00077 
+<a name="l00084"></a>00084                 <span class="comment">//void handlePutRequest(RootObjectPutCall* dhtMsg);</span>
+<a name="l00085"></a>00085 
+<a name="l00089"></a>00089                 <span class="comment">//void handleGetRequest(RootObjectGetCall* dhtMsg);</span>
+<a name="l00090"></a>00090 
+<a name="l00096"></a>00096                 <span class="keywordtype">void</span> <a class="code" href="class_communicator.html#a9ac48ae31ed1068517e5df94951eb5b8">handleGetCAPIRequest</a>(RootObjectGetCAPICall* capiGetMsg);
+<a name="l00097"></a>00097 
+<a name="l00101"></a>00101                 <span class="keywordtype">void</span> <a class="code" href="class_communicator.html#a466c44f594812c35e6307e32d432c132">handlePutCAPIRequest</a>(RootObjectPutCAPICall* capiPutMsg);
+<a name="l00102"></a>00102 
+<a name="l00103"></a>00103                 <span class="keywordtype">void</span> handleTraceMessage(cMessage* msg);
+<a name="l00104"></a>00104 
+<a name="l00105"></a>00105                 <span class="keywordtype">void</span> handleRpcResponse(BaseResponseMessage* msg, <span class="keyword">const</span> RpcState&amp; state, simtime_t rtt);
+<a name="l00106"></a>00106 
+<a name="l00112"></a>00112                 <span class="keywordtype">void</span> <a class="code" href="class_communicator.html#a9a8a5fa319d1185b0e32a9aa24d56e49">handleSPMsg</a>(cMessage *msg);
+<a name="l00113"></a>00113 
+<a name="l00119"></a>00119                 <span class="keywordtype">void</span> <a class="code" href="class_communicator.html#aecf2c2f402bd7d4d1d3c6fb5144ef117">handlePeerMsg</a>(cMessage *msg);
+<a name="l00120"></a>00120 
+<a name="l00126"></a>00126                 <span class="keywordtype">void</span> <a class="code" href="class_communicator.html#a9d79584c06b9d47eb3a76b7994c4e3d4">overlayStore</a>(cMessage *msg);
+<a name="l00127"></a>00127 
+<a name="l00133"></a>00133                 <span class="keywordtype">void</span> <a class="code" href="class_communicator.html#ae03d1069ee8e01c017ba004e7c61b1ea">sendPacket</a>(cMessage *msg);
 <a name="l00134"></a>00134 
-<a name="l00135"></a>00135 
-<a name="l00136"></a>00136 <span class="preprocessor">#endif</span>
+<a name="l00135"></a>00135         <span class="keyword">public</span>:
+<a name="l00136"></a>00136                 <a class="code" href="class_communicator.html">Communicator</a>() {};
+<a name="l00137"></a>00137                 ~<a class="code" href="class_communicator.html">Communicator</a>() {};
+<a name="l00138"></a>00138 
+<a name="l00139"></a>00139                 simtime_t getCreationTime();
+<a name="l00140"></a>00140 
+<a name="l00141"></a>00141                 uint32_t externallySendInternalRpcCall(CompType destComp, BaseCallMessage* msg,
+<a name="l00142"></a>00142                 cPolymorphic* context = NULL, simtime_t timeout = -1, <span class="keywordtype">int</span> retries = 0,
+<a name="l00143"></a>00143                 <span class="keywordtype">int</span> rpcId = -1, RpcListener* rpcListener = NULL)
+<a name="l00144"></a>00144                 {
+<a name="l00145"></a>00145                         Enter_Method(<span class="stringliteral">&quot;externallySendInternalRpcCall()&quot;</span>);        <span class="comment">//Required for Omnet++ context switching between modules</span>
+<a name="l00146"></a>00146                         take(msg);      <span class="comment">//This module should first take ownership of the received message before that message can be resent</span>
+<a name="l00147"></a>00147 
+<a name="l00148"></a>00148                         <span class="keywordflow">return</span> sendInternalRpcCall(destComp, msg, context, timeout, retries, rpcId, rpcListener);
+<a name="l00149"></a>00149                 }
+<a name="l00150"></a>00150 };
+<a name="l00151"></a>00151 
+<a name="l00152"></a>00152 <span class="preprocessor">#endif</span>
 </pre></div></div>
 </div>
   <div id="nav-path" class="navpath">
     <ul>
-      <li class="navelem"><a class="el" href="_communicator_8h.html">Communicator.h</a>      </li>
-      <li class="footer">Generated on Mon Nov 7 2011 15:57:41 for Pithos by&#160;
+      <li class="navelem"><b>Communicator.h</b>      </li>
+      <li class="footer">Generated on Tue Nov 29 2011 10:50:45 for Pithos by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>
@@ -181,7 +193,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">

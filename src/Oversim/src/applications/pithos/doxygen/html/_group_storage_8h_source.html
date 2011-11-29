@@ -27,7 +27,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Pithos</div>
-   <div id="projectbrief">Distributed storage for MMVEs</div>
+   <div id="projectbrief">Distributed state management and persistency for P2P MMVE</div>
   </td>
  </tr>
  </tbody>
@@ -59,7 +59,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="files.html"><span>File&#160;List</span></a></li>
-      <li><a href="globals.html"><span>File&#160;Members</span></a></li>
     </ul>
   </div>
 </div>
@@ -81,7 +80,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <h1>GroupStorage.h</h1>  </div>
 </div>
 <div class="contents">
-<a href="_group_storage_8h.html">Go to the documentation of this file.</a><div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 <span class="comment">//</span>
+<div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 <span class="comment">//</span>
 <a name="l00002"></a>00002 <span class="comment">// Copyright (C) 2011 MIH Media lab, University of Stellenbosch</span>
 <a name="l00003"></a>00003 <span class="comment">//</span>
 <a name="l00004"></a>00004 <span class="comment">// This program is free software; you can redistribute it and/or</span>
@@ -103,55 +102,61 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00020"></a>00020 <span class="preprocessor"></span><span class="preprocessor">#define GROUPSTORAGE_H_</span>
 <a name="l00021"></a>00021 <span class="preprocessor"></span>
 <a name="l00022"></a>00022 <span class="preprocessor">#include &lt;omnetpp.h&gt;</span>
-<a name="l00023"></a>00023 
-<a name="l00024"></a>00024 <span class="preprocessor">#include &quot;BaseApp.h&quot;</span>
-<a name="l00025"></a>00025 <span class="preprocessor">#include &quot;<a class="code" href="_peer__logic_8h.html">Peer_logic.h</a>&quot;</span>
-<a name="l00026"></a>00026 
-<a name="l00027"></a>00027 <span class="preprocessor">#include &quot;<a class="code" href="_game_object_8h.html">GameObject.h</a>&quot;</span>
-<a name="l00028"></a>00028 <span class="preprocessor">#include &quot;<a class="code" href="_peer_list_pkt_8h.html">PeerListPkt.h</a>&quot;</span>
-<a name="l00029"></a>00029 <span class="preprocessor">#include &quot;<a class="code" href="group_pkt__m_8h.html">groupPkt_m.h</a>&quot;</span>
-<a name="l00030"></a>00030 
-<a name="l00040"></a><a class="code" href="class_group_storage.html">00040</a> <span class="keyword">class </span><a class="code" href="class_group_storage.html">GroupStorage</a> : <span class="keyword">public</span> cSimpleModule
-<a name="l00041"></a>00041 {
-<a name="l00042"></a>00042         <span class="keyword">public</span>:
-<a name="l00043"></a>00043         <a class="code" href="class_group_storage.html#aadcb37c960cd48259fcc51110d372bb6">GroupStorage</a>();
-<a name="l00044"></a>00044                 <span class="keyword">virtual</span> <a class="code" href="class_group_storage.html#a6a74cb4336f93fbb19f96af75df1d159">~GroupStorage</a>();
-<a name="l00045"></a>00045         <span class="keyword">private</span>:
-<a name="l00046"></a>00046 
-<a name="l00048"></a>00048                 std::vector&lt;PeerData&gt; group_peers;
-<a name="l00049"></a>00049 
-<a name="l00051"></a>00051                 simsignal_t groupSizeSignal;
-<a name="l00052"></a>00052 
-<a name="l00054"></a>00054                 simsignal_t groupSendFailSignal;
-<a name="l00055"></a>00055 
-<a name="l00057"></a>00057                 simsignal_t joinTimeSignal;
-<a name="l00058"></a>00058 
-<a name="l00064"></a>00064                 <span class="keywordtype">void</span> createWritePkt(<a class="code" href="classgroup_pkt.html">groupPkt</a> **write);
-<a name="l00065"></a>00065 
-<a name="l00073"></a>00073                 <span class="keywordtype">void</span> updateSuperPeerObjects(<span class="keyword">const</span> <span class="keywordtype">char</span> *objectName, <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> objectSize, std::vector&lt;TransportAddress&gt; send_list);
+<a name="l00023"></a>00023 <span class="preprocessor">#include &lt;GlobalStatistics.h&gt;</span>
+<a name="l00024"></a>00024 
+<a name="l00025"></a>00025 
+<a name="l00026"></a>00026 <span class="preprocessor">#include &quot;BaseApp.h&quot;</span>
+<a name="l00027"></a>00027 <span class="preprocessor">#include &quot;Peer_logic.h&quot;</span>
+<a name="l00028"></a>00028 <span class="preprocessor">#include &quot;Communicator.h&quot;</span>
+<a name="l00029"></a>00029 
+<a name="l00030"></a>00030 <span class="preprocessor">#include &quot;GameObject.h&quot;</span>
+<a name="l00031"></a>00031 <span class="preprocessor">#include &quot;PeerListPkt.h&quot;</span>
+<a name="l00032"></a>00032 <span class="preprocessor">#include &quot;groupPkt_m.h&quot;</span>
+<a name="l00033"></a>00033 
+<a name="l00034"></a>00034 <span class="keyword">class </span>GlobalStatistics;
+<a name="l00035"></a>00035 
+<a name="l00045"></a><a class="code" href="class_group_storage.html">00045</a> <span class="keyword">class </span><a class="code" href="class_group_storage.html">GroupStorage</a> : <span class="keyword">public</span> cSimpleModule
+<a name="l00046"></a>00046 {
+<a name="l00047"></a>00047         <span class="keyword">public</span>:
+<a name="l00048"></a>00048         <a class="code" href="class_group_storage.html">GroupStorage</a>();
+<a name="l00049"></a>00049                 <span class="keyword">virtual</span> ~<a class="code" href="class_group_storage.html">GroupStorage</a>();
+<a name="l00050"></a>00050         <span class="keyword">private</span>:
+<a name="l00051"></a>00051 
+<a name="l00052"></a>00052                 std::vector&lt;PeerData&gt; group_peers; 
+<a name="l00054"></a>00054                 simsignal_t groupSizeSignal; 
+<a name="l00056"></a>00056                 simsignal_t groupSendFailSignal; 
+<a name="l00058"></a>00058                 simsignal_t joinTimeSignal; 
+<a name="l00060"></a>00060                 GlobalStatistics* globalStatistics; 
+<a name="l00062"></a>00062                 <span class="comment">// statistics</span>
+<a name="l00063"></a>00063                 <span class="comment">//int numSent; /**&lt; number of sent packets*/</span>
+<a name="l00064"></a>00064                 <span class="comment">//int numPutSent; /**&lt; number of put sent*/</span>
+<a name="l00065"></a>00065                 <span class="comment">//int numPutError; /**&lt; number of error in put responses*/</span>
+<a name="l00066"></a>00066                 <span class="comment">//int numPutSuccess; /**&lt; number of success in put responses*/</span>
+<a name="l00067"></a>00067 
+<a name="l00073"></a>00073                 <span class="keywordtype">void</span> createWritePkt(<a class="code" href="classgroup_pkt.html">groupPkt</a> **write);
 <a name="l00074"></a>00074 
-<a name="l00081"></a>00081                 <span class="keywordtype">void</span> selectDestination(TransportAddress *dest_adr, std::vector&lt;TransportAddress&gt; send_list);
-<a name="l00082"></a>00082 
-<a name="l00088"></a>00088                 <span class="keywordtype">void</span> store(<a class="code" href="class_game_object.html">GameObject</a> *go);
-<a name="l00089"></a>00089 
-<a name="l00095"></a>00095                 <span class="keywordtype">void</span> addPeers(cMessage *msg);
-<a name="l00096"></a>00096 
-<a name="l00100"></a>00100                 <span class="keywordtype">int</span> getReplicaNr();
-<a name="l00101"></a>00101         <span class="keyword">protected</span>:
-<a name="l00102"></a>00102 
-<a name="l00103"></a>00103                 <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="class_group_storage.html#a2d62211385580ac80da6a8d595c52f9b">initialize</a>();
-<a name="l00104"></a>00104                 <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="class_group_storage.html#a172358c1f3b62629fc137e83b5af5fa7">handleMessage</a>(cMessage *msg);
-<a name="l00105"></a>00105 };
-<a name="l00106"></a>00106 
-<a name="l00107"></a>00107 <a class="code" href="_communicator_8cc.html#ae5b2de95a9447fab255fac33e0ee10f2">Define_Module</a>(<a class="code" href="class_group_storage.html">GroupStorage</a>);
-<a name="l00108"></a>00108 
-<a name="l00109"></a>00109 <span class="preprocessor">#endif </span><span class="comment">/* OVERLAYSTORAGE_H_ */</span>
+<a name="l00082"></a>00082                 <span class="keywordtype">void</span> updateSuperPeerObjects(<span class="keyword">const</span> <span class="keywordtype">char</span> *objectName, <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> objectSize, std::vector&lt;TransportAddress&gt; send_list);
+<a name="l00083"></a>00083 
+<a name="l00090"></a>00090                 <span class="keywordtype">void</span> selectDestination(TransportAddress *dest_adr, std::vector&lt;TransportAddress&gt; send_list);
+<a name="l00091"></a>00091 
+<a name="l00097"></a>00097                 <span class="keywordtype">void</span> store(<a class="code" href="class_game_object.html">GameObject</a> *go);
+<a name="l00098"></a>00098 
+<a name="l00104"></a>00104                 <span class="keywordtype">void</span> addPeers(cMessage *msg);
+<a name="l00105"></a>00105 
+<a name="l00109"></a>00109                 <span class="keywordtype">int</span> getReplicaNr();
+<a name="l00110"></a>00110         <span class="keyword">protected</span>:
+<a name="l00111"></a>00111                 <span class="keywordtype">void</span> finishApp();
+<a name="l00112"></a>00112                 <span class="keyword">virtual</span> <span class="keywordtype">void</span> initialize();
+<a name="l00113"></a>00113                 <span class="keyword">virtual</span> <span class="keywordtype">void</span> handleMessage(cMessage *msg);
+<a name="l00114"></a>00114 };
+<a name="l00115"></a>00115 
+<a name="l00116"></a>00116 <span class="preprocessor">#endif </span><span class="comment">/* OVERLAYSTORAGE_H_ */</span>
 </pre></div></div>
 </div>
   <div id="nav-path" class="navpath">
     <ul>
-      <li class="navelem"><a class="el" href="_group_storage_8h.html">GroupStorage.h</a>      </li>
-      <li class="footer">Generated on Mon Nov 7 2011 15:57:41 for Pithos by&#160;
+      <li class="navelem"><b>GroupStorage.h</b>      </li>
+      <li class="footer">Generated on Tue Nov 29 2011 10:50:45 for Pithos by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>
@@ -161,7 +166,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">

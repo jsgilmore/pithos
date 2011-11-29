@@ -1,9 +1,8 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$class_super__peer__logic.html#aec91e93daaf4d5dac2652244a323ac52" title="Super_peer_logic::GroupStore" alt="" coords="201,5,396,35"/>
-<area shape="rect" id="node7" href="$class_storage.html#acc83b672a2c57a25b39333adb4e3d8cc" title="Storage::handleMessage" alt="" coords="216,59,381,88"/>
-<area shape="rect" id="node9" href="$class_peer__logic.html#a2ba9623ef469018de09c58d5f20ea933" title="Peer_logic::handleP2PMsg" alt="" coords="209,112,388,141"/>
-<area shape="rect" id="node13" href="$class_overlay_storage.html#a630da205839d7a74f3b6761572710010" title="OverlayStorage::store" alt="" coords="224,165,373,195"/>
-<area shape="rect" id="node5" href="$class_super__peer__logic.html#a55adc92c94a1f2743e269481bd859e0a" title="Super_peer_logic::handleMessage" alt="" coords="445,5,667,35"/>
-<area shape="rect" id="node11" href="$class_peer__logic.html#a858ea9e4712d604817903ef91e534235" title="Peer_logic::handleMessage" alt="" coords="465,112,647,141"/>
-<area shape="rect" id="node15" href="$class_overlay_storage.html#abb52980596f7da7d502ef56e9b226825" title="OverlayStorage::handleMessage" alt="" coords="451,165,661,195"/>
+<area shape="rect" id="node3" href="$class_super__peer__logic.html#aec91e93daaf4d5dac2652244a323ac52" title="Super_peer_logic::GroupStore" alt="" coords="219,5,413,35"/>
+<area shape="rect" id="node5" href="$class_peer__logic.html#a2ba9623ef469018de09c58d5f20ea933" title="Peer_logic::handleP2PMsg" alt="" coords="227,59,405,88"/>
+<area shape="rect" id="node7" href="$class_peer__logic.html#aec0ffa7ceaa86d0febb008c694ef9bfe" title="Peer_logic::handlePutCAPIRequest" alt="" coords="201,112,431,141"/>
+<area shape="rect" id="node13" href="$class_overlay_storage.html#a630da205839d7a74f3b6761572710010" title="OverlayStorage::store" alt="" coords="241,165,391,195"/>
+<area shape="rect" id="node9" href="$class_communicator.html#a466c44f594812c35e6307e32d432c132" title="Communicator::handlePutCAPIRequest" alt="" coords="481,112,735,141"/>
+<area shape="rect" id="node11" href="$class_communicator.html#a32478075467b4ade9f0d8533f35fb75e" title="Communicator::handleRpcCall" alt="" coords="784,112,984,141"/>
 </map>

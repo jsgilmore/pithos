@@ -44,20 +44,11 @@ class Directory_logic : public BaseApp
 {
 	private:
 
-		/**
-		 * The list that holds the combination of Super Peer IPs and their positions in the world
-		 */
-		std::vector<SP_element> sp_adr_list;
+		std::vector<SP_element> sp_adr_list; /**< The list that holds the combination of Super Peer IPs and their positions in the world */
 
-		/**
-		 * Signal for collecting statistics on the number of Super Peers in the directory.
-		 */
-		simsignal_t superPeerNumSignal;
+		simsignal_t superPeerNumSignal; /**< Signal for collecting statistics on the number of Super Peers in the directory. */
 
-		/**
-		 * Signal for collecting statistics on how many times a node requested to join the network when there were no Super Peers to reply with.
-		 */
-		simsignal_t noSuperPeersSignal;
+		simsignal_t noSuperPeersSignal; /**< Signal for collecting statistics on how many times a node requested to join the network when there were no Super Peers to reply with. */
 
 	protected:
 

@@ -27,7 +27,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Pithos</div>
-   <div id="projectbrief">Distributed storage for MMVEs</div>
+   <div id="projectbrief">Distributed state management and persistency for P2P MMVE</div>
   </td>
  </tr>
  </tbody>
@@ -92,112 +92,42 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_game_object.html#a4cfbf720096e47b48538c6f48750b44d">GameObject</a> (const char *name=NULL, int type=ROOT)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_game_object.html#ab13374d070cfe6a1459539d54c671eba">GameObject</a> (const <a class="el" href="class_game_object.html">GameObject</a> &amp;other)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_game_object.html#ab82dfdb656f9051c0587e6593b2dda97">~GameObject</a> ()</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_game_object.html">GameObject</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_game_object.html#ab0973a6654325520aa4abd99e06f135f">operator=</a> (const <a class="el" href="class_game_object.html">GameObject</a> &amp;other)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_game_object.html#acd1b79929ee219b6a0b59b86ddaee673">info</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab5c44148cc22a3308d75e4d30505a851"></a><!-- doxytag: member="GameObject::GameObject" ref="ab5c44148cc22a3308d75e4d30505a851" args="(const char *name=&quot;&quot;, int o_type=ROOT, int64_t o_size=0, simtime_t o_creationTime=0)" -->
+&#160;</td><td class="memItemRight" valign="bottom"><b>GameObject</b> (const char *name=&quot;&quot;, int o_type=ROOT, int64_t o_size=0, simtime_t o_creationTime=0)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab13374d070cfe6a1459539d54c671eba"></a><!-- doxytag: member="GameObject::GameObject" ref="ab13374d070cfe6a1459539d54c671eba" args="(const GameObject &amp;other)" -->
+&#160;</td><td class="memItemRight" valign="bottom"><b>GameObject</b> (const <a class="el" href="class_game_object.html">GameObject</a> &amp;other)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5c16bb1b2585fae48fe6175ad3165bf0"></a><!-- doxytag: member="GameObject::GameObject" ref="a5c16bb1b2585fae48fe6175ad3165bf0" args="(const BinaryValue &amp;binval)" -->
+&#160;</td><td class="memItemRight" valign="bottom"><b>GameObject</b> (const BinaryValue &amp;binval)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab0973a6654325520aa4abd99e06f135f"></a><!-- doxytag: member="GameObject::operator=" ref="ab0973a6654325520aa4abd99e06f135f" args="(const GameObject &amp;other)" -->
+<a class="el" href="class_game_object.html">GameObject</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (const <a class="el" href="class_game_object.html">GameObject</a> &amp;other)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae79a27112c7cf8c8a3bcfef1e62a148e"></a><!-- doxytag: member="GameObject::operator=" ref="ae79a27112c7cf8c8a3bcfef1e62a148e" args="(const BinaryValue &amp;binval)" -->
+<a class="el" href="class_game_object.html">GameObject</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (const BinaryValue &amp;binval)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acd1b79929ee219b6a0b59b86ddaee673"></a><!-- doxytag: member="GameObject::info" ref="acd1b79929ee219b6a0b59b86ddaee673" args="()" -->
+virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><b>info</b> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a06e25fc7d1cfd2f7b059100320f28f41"></a><!-- doxytag: member="GameObject::getHash" ref="a06e25fc7d1cfd2f7b059100320f28f41" args="(char hash_str[41])" -->
+void&#160;</td><td class="memItemRight" valign="bottom"><b>getHash</b> (char hash_str[41])</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="class_game_object.html">GameObject</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_game_object.html#ae047c331e2e192c045976bb8e88d0724">dup</a> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">int64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_game_object.html#a64ba9e7c42bc9666813f4af4b24ffc88">getSize</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_game_object.html#aed479eb467f1dfbfbda19f683d676bc4">setSize</a> (const int64_t &amp;o_size)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_game_object.html#aa76ad2a2a97c5fba330f5dcff7f7b251">getType</a> ()</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_game_object.html#ac48ab958ae21ae9e1d982fb567603bdd">setType</a> (const int &amp;o_type)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_game_object.html#a96c8b08158f1526ee8cc3edab2d20efe">setObjectName</a> (const char *o_Name)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_game_object.html#a8271f7a5a8a2e46f23648c68fe1804ae">getObjectName</a> ()</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_game_object.html#a9b1336141e2e0a31edfbbdd18e5a3e05">setCreationTime</a> (const simtime_t &amp;time)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">simtime_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_game_object.html#a8369f83d088ed8095096874c66be92b6">getCreationTime</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa76ad2a2a97c5fba330f5dcff7f7b251"></a><!-- doxytag: member="GameObject::getType" ref="aa76ad2a2a97c5fba330f5dcff7f7b251" args="()" -->
+int&#160;</td><td class="memItemRight" valign="bottom"><b>getType</b> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac48ab958ae21ae9e1d982fb567603bdd"></a><!-- doxytag: member="GameObject::setType" ref="ac48ab958ae21ae9e1d982fb567603bdd" args="(const int &amp;o_type)" -->
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setType</b> (const int &amp;o_type)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a96c8b08158f1526ee8cc3edab2d20efe"></a><!-- doxytag: member="GameObject::setObjectName" ref="a96c8b08158f1526ee8cc3edab2d20efe" args="(const char *o_Name)" -->
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setObjectName</b> (const char *o_Name)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8271f7a5a8a2e46f23648c68fe1804ae"></a><!-- doxytag: member="GameObject::getObjectName" ref="a8271f7a5a8a2e46f23648c68fe1804ae" args="()" -->
+char *&#160;</td><td class="memItemRight" valign="bottom"><b>getObjectName</b> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9b1336141e2e0a31edfbbdd18e5a3e05"></a><!-- doxytag: member="GameObject::setCreationTime" ref="a9b1336141e2e0a31edfbbdd18e5a3e05" args="(const simtime_t &amp;time)" -->
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setCreationTime</b> (const simtime_t &amp;time)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8369f83d088ed8095096874c66be92b6"></a><!-- doxytag: member="GameObject::getCreationTime" ref="a8369f83d088ed8095096874c66be92b6" args="()" -->
+simtime_t&#160;</td><td class="memItemRight" valign="bottom"><b>getCreationTime</b> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa688d11f25ab898494b6f50e0a3e5bc5"></a><!-- doxytag: member="GameObject::getBinaryValue" ref="aa688d11f25ab898494b6f50e0a3e5bc5" args="()" -->
+BinaryValue&#160;</td><td class="memItemRight" valign="bottom"><b>getBinaryValue</b> ()</td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <div class="textblock"><p>The game object class stores the information of a game object. These are the atomic objects that are stored in Pithos.</p>
 <dl class="author"><dt><b>Author:</b></dt><dd>John Gilmore </dd></dl>
-
-<p>Definition at line <a class="el" href="_game_object_8h_source.html#l00036">36</a> of file <a class="el" href="_game_object_8h_source.html">GameObject.h</a>.</p>
-</div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="a4cfbf720096e47b48538c6f48750b44d"></a><!-- doxytag: member="GameObject::GameObject" ref="a4cfbf720096e47b48538c6f48750b44d" args="(const char *name=NULL, int type=ROOT)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">GameObject::GameObject </td>
-          <td>(</td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>name</em> = <code>NULL</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>type</em> = <code>ROOT</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="_game_object_8cc_source.html#l00005">5</a> of file <a class="el" href="_game_object_8cc_source.html">GameObject.cc</a>.</p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_game_object_a4cfbf720096e47b48538c6f48750b44d_icgraph.png" border="0" usemap="#class_game_object_a4cfbf720096e47b48538c6f48750b44d_icgraph" alt=""/></div>
-<map name="class_game_object_a4cfbf720096e47b48538c6f48750b44d_icgraph" id="class_game_object_a4cfbf720096e47b48538c6f48750b44d_icgraph">
-<area shape="rect" id="node3" href="class_game_object.html#ae047c331e2e192c045976bb8e88d0724" title="GameObject::dup" alt="" coords="231,5,353,35"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="ab13374d070cfe6a1459539d54c671eba"></a><!-- doxytag: member="GameObject::GameObject" ref="ab13374d070cfe6a1459539d54c671eba" args="(const GameObject &amp;other)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">GameObject::GameObject </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="class_game_object.html">GameObject</a> &amp;&#160;</td>
-          <td class="paramname"><em>other</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="_game_object_8cc_source.html#l00011">11</a> of file <a class="el" href="_game_object_8cc_source.html">GameObject.cc</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_game_object_ab13374d070cfe6a1459539d54c671eba_cgraph.png" border="0" usemap="#class_game_object_ab13374d070cfe6a1459539d54c671eba_cgraph" alt=""/></div>
-<map name="class_game_object_ab13374d070cfe6a1459539d54c671eba_cgraph" id="class_game_object_ab13374d070cfe6a1459539d54c671eba_cgraph">
-<area shape="rect" id="node3" href="class_game_object.html#ab0973a6654325520aa4abd99e06f135f" title="GameObject::operator=" alt="" coords="231,5,388,35"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="ab82dfdb656f9051c0587e6593b2dda97"></a><!-- doxytag: member="GameObject::~GameObject" ref="ab82dfdb656f9051c0587e6593b2dda97" args="()" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">GameObject::~GameObject </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td><code> [virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="_game_object_8cc_source.html#l00016">16</a> of file <a class="el" href="_game_object_8cc_source.html">GameObject.cc</a>.</p>
-
-</div>
-</div>
-<hr/><h2>Member Function Documentation</h2>
+</div><hr/><h2>Member Function Documentation</h2>
 <a class="anchor" id="ae047c331e2e192c045976bb8e88d0724"></a><!-- doxytag: member="GameObject::dup" ref="ae047c331e2e192c045976bb8e88d0724" args="() const " -->
 <div class="memitem">
 <div class="memproto">
@@ -212,71 +142,6 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 <dl class="return"><dt><b>Returns:</b></dt><dd>Duplicate of the game object </dd></dl>
-
-<p>Definition at line <a class="el" href="_game_object_8cc_source.html#l00023">23</a> of file <a class="el" href="_game_object_8cc_source.html">GameObject.cc</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_game_object_ae047c331e2e192c045976bb8e88d0724_cgraph.png" border="0" usemap="#class_game_object_ae047c331e2e192c045976bb8e88d0724_cgraph" alt=""/></div>
-<map name="class_game_object_ae047c331e2e192c045976bb8e88d0724_cgraph" id="class_game_object_ae047c331e2e192c045976bb8e88d0724_cgraph">
-<area shape="rect" id="node3" href="class_game_object.html#a4cfbf720096e47b48538c6f48750b44d" title="GameObject::GameObject" alt="" coords="179,5,355,35"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="a8369f83d088ed8095096874c66be92b6"></a><!-- doxytag: member="GameObject::getCreationTime" ref="a8369f83d088ed8095096874c66be92b6" args="()" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">simtime_t GameObject::getCreationTime </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="_game_object_8cc_source.html#l00086">86</a> of file <a class="el" href="_game_object_8cc_source.html">GameObject.cc</a>.</p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_game_object_a8369f83d088ed8095096874c66be92b6_icgraph.png" border="0" usemap="#class_game_object_a8369f83d088ed8095096874c66be92b6_icgraph" alt=""/></div>
-<map name="class_game_object_a8369f83d088ed8095096874c66be92b6_icgraph" id="class_game_object_a8369f83d088ed8095096874c66be92b6_icgraph">
-<area shape="rect" id="node3" href="class_storage.html#acc83b672a2c57a25b39333adb4e3d8cc" title="Storage::handleMessage" alt="" coords="255,5,420,35"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="a8271f7a5a8a2e46f23648c68fe1804ae"></a><!-- doxytag: member="GameObject::getObjectName" ref="a8271f7a5a8a2e46f23648c68fe1804ae" args="()" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">char * GameObject::getObjectName </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="_game_object_8cc_source.html#l00076">76</a> of file <a class="el" href="_game_object_8cc_source.html">GameObject.cc</a>.</p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_game_object_a8271f7a5a8a2e46f23648c68fe1804ae_icgraph.png" border="0" usemap="#class_game_object_a8271f7a5a8a2e46f23648c68fe1804ae_icgraph" alt=""/></div>
-<map name="class_game_object_a8271f7a5a8a2e46f23648c68fe1804ae_icgraph" id="class_game_object_a8271f7a5a8a2e46f23648c68fe1804ae_icgraph">
-<area shape="rect" id="node3" href="class_super__peer__logic.html#aec91e93daaf4d5dac2652244a323ac52" title="Super_peer_logic::GroupStore" alt="" coords="249,5,444,35"/><area shape="rect" id="node5" href="class_super__peer__logic.html#a55adc92c94a1f2743e269481bd859e0a" title="Super_peer_logic::handleMessage" alt="" coords="493,5,715,35"/></map>
-</div>
-</p>
 
 </div>
 </div>
@@ -295,127 +160,14 @@ Here is the caller graph for this function:</div>
 <div class="memdoc">
 <dl class="return"><dt><b>Returns:</b></dt><dd>the size of the object in bytes </dd></dl>
 
-<p>Definition at line <a class="el" href="_game_object_8cc_source.html#l00051">51</a> of file <a class="el" href="_game_object_8cc_source.html">GameObject.cc</a>.</p>
-
 <p><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_game_object_a64ba9e7c42bc9666813f4af4b24ffc88_icgraph.png" border="0" usemap="#class_game_object_a64ba9e7c42bc9666813f4af4b24ffc88_icgraph" alt=""/></div>
 <map name="class_game_object_a64ba9e7c42bc9666813f4af4b24ffc88_icgraph" id="class_game_object_a64ba9e7c42bc9666813f4af4b24ffc88_icgraph">
-<area shape="rect" id="node3" href="class_super__peer__logic.html#aec91e93daaf4d5dac2652244a323ac52" title="Super_peer_logic::GroupStore" alt="" coords="201,5,396,35"/><area shape="rect" id="node7" href="class_storage.html#acc83b672a2c57a25b39333adb4e3d8cc" title="Storage::handleMessage" alt="" coords="216,59,381,88"/><area shape="rect" id="node9" href="class_peer__logic.html#a2ba9623ef469018de09c58d5f20ea933" title="Peer_logic::handleP2PMsg" alt="" coords="209,112,388,141"/><area shape="rect" id="node13" href="class_overlay_storage.html#a630da205839d7a74f3b6761572710010" title="OverlayStorage::store" alt="" coords="224,165,373,195"/><area shape="rect" id="node5" href="class_super__peer__logic.html#a55adc92c94a1f2743e269481bd859e0a" title="Super_peer_logic::handleMessage" alt="" coords="445,5,667,35"/><area shape="rect" id="node11" href="class_peer__logic.html#a858ea9e4712d604817903ef91e534235" title="Peer_logic::handleMessage" alt="" coords="465,112,647,141"/><area shape="rect" id="node15" href="class_overlay_storage.html#abb52980596f7da7d502ef56e9b226825" title="OverlayStorage::handleMessage" alt="" coords="451,165,661,195"/></map>
+<area shape="rect" id="node3" href="class_super__peer__logic.html#aec91e93daaf4d5dac2652244a323ac52" title="Super_peer_logic::GroupStore" alt="" coords="219,5,413,35"/><area shape="rect" id="node5" href="class_peer__logic.html#a2ba9623ef469018de09c58d5f20ea933" title="Peer_logic::handleP2PMsg" alt="" coords="227,59,405,88"/><area shape="rect" id="node7" href="class_peer__logic.html#aec0ffa7ceaa86d0febb008c694ef9bfe" title="Peer_logic::handlePutCAPIRequest" alt="" coords="201,112,431,141"/><area shape="rect" id="node13" href="class_overlay_storage.html#a630da205839d7a74f3b6761572710010" title="OverlayStorage::store" alt="" coords="241,165,391,195"/><area shape="rect" id="node9" href="class_communicator.html#a466c44f594812c35e6307e32d432c132" title="Communicator::handlePutCAPIRequest" alt="" coords="481,112,735,141"/><area shape="rect" id="node11" href="class_communicator.html#a32478075467b4ade9f0d8533f35fb75e" title="Communicator::handleRpcCall" alt="" coords="784,112,984,141"/></map>
 </div>
 </p>
-
-</div>
-</div>
-<a class="anchor" id="aa76ad2a2a97c5fba330f5dcff7f7b251"></a><!-- doxytag: member="GameObject::getType" ref="aa76ad2a2a97c5fba330f5dcff7f7b251" args="()" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int GameObject::getType </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="_game_object_8cc_source.html#l00061">61</a> of file <a class="el" href="_game_object_8cc_source.html">GameObject.cc</a>.</p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_game_object_aa76ad2a2a97c5fba330f5dcff7f7b251_icgraph.png" border="0" usemap="#class_game_object_aa76ad2a2a97c5fba330f5dcff7f7b251_icgraph" alt=""/></div>
-<map name="class_game_object_aa76ad2a2a97c5fba330f5dcff7f7b251_icgraph" id="class_game_object_aa76ad2a2a97c5fba330f5dcff7f7b251_icgraph">
-<area shape="rect" id="node3" href="class_storage.html#acc83b672a2c57a25b39333adb4e3d8cc" title="Storage::handleMessage" alt="" coords="212,5,377,35"/><area shape="rect" id="node5" href="class_peer__logic.html#a2ba9623ef469018de09c58d5f20ea933" title="Peer_logic::handleP2PMsg" alt="" coords="205,59,384,88"/><area shape="rect" id="node7" href="class_peer__logic.html#a858ea9e4712d604817903ef91e534235" title="Peer_logic::handleMessage" alt="" coords="433,59,615,88"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="acd1b79929ee219b6a0b59b86ddaee673"></a><!-- doxytag: member="GameObject::info" ref="acd1b79929ee219b6a0b59b86ddaee673" args="()" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::string GameObject::info </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td><code> [virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="_game_object_8cc_source.html#l00043">43</a> of file <a class="el" href="_game_object_8cc_source.html">GameObject.cc</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="ab0973a6654325520aa4abd99e06f135f"></a><!-- doxytag: member="GameObject::operator=" ref="ab0973a6654325520aa4abd99e06f135f" args="(const GameObject &amp;other)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="class_game_object.html">GameObject</a> &amp; GameObject::operator= </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="class_game_object.html">GameObject</a> &amp;&#160;</td>
-          <td class="paramname"><em>other</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="_game_object_8cc_source.html#l00028">28</a> of file <a class="el" href="_game_object_8cc_source.html">GameObject.cc</a>.</p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_game_object_ab0973a6654325520aa4abd99e06f135f_icgraph.png" border="0" usemap="#class_game_object_ab0973a6654325520aa4abd99e06f135f_icgraph" alt=""/></div>
-<map name="class_game_object_ab0973a6654325520aa4abd99e06f135f_icgraph" id="class_game_object_ab0973a6654325520aa4abd99e06f135f_icgraph">
-<area shape="rect" id="node3" href="class_game_object.html#ab13374d070cfe6a1459539d54c671eba" title="GameObject::GameObject" alt="" coords="213,5,389,35"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="a9b1336141e2e0a31edfbbdd18e5a3e05"></a><!-- doxytag: member="GameObject::setCreationTime" ref="a9b1336141e2e0a31edfbbdd18e5a3e05" args="(const simtime_t &amp;time)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void GameObject::setCreationTime </td>
-          <td>(</td>
-          <td class="paramtype">const simtime_t &amp;&#160;</td>
-          <td class="paramname"><em>time</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="_game_object_8cc_source.html#l00081">81</a> of file <a class="el" href="_game_object_8cc_source.html">GameObject.cc</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a96c8b08158f1526ee8cc3edab2d20efe"></a><!-- doxytag: member="GameObject::setObjectName" ref="a96c8b08158f1526ee8cc3edab2d20efe" args="(const char *o_Name)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void GameObject::setObjectName </td>
-          <td>(</td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>o_Name</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="_game_object_8cc_source.html#l00071">71</a> of file <a class="el" href="_game_object_8cc_source.html">GameObject.cc</a>.</p>
 
 </div>
 </div>
@@ -440,48 +192,18 @@ Here is the caller graph for this function:</div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="_game_object_8cc_source.html#l00056">56</a> of file <a class="el" href="_game_object_8cc_source.html">GameObject.cc</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="ac48ab958ae21ae9e1d982fb567603bdd"></a><!-- doxytag: member="GameObject::setType" ref="ac48ab958ae21ae9e1d982fb567603bdd" args="(const int &amp;o_type)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void GameObject::setType </td>
-          <td>(</td>
-          <td class="paramtype">const int &amp;&#160;</td>
-          <td class="paramname"><em>o_type</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="_game_object_8cc_source.html#l00066">66</a> of file <a class="el" href="_game_object_8cc_source.html">GameObject.cc</a>.</p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_game_object_ac48ab958ae21ae9e1d982fb567603bdd_icgraph.png" border="0" usemap="#class_game_object_ac48ab958ae21ae9e1d982fb567603bdd_icgraph" alt=""/></div>
-<map name="class_game_object_ac48ab958ae21ae9e1d982fb567603bdd_icgraph" id="class_game_object_ac48ab958ae21ae9e1d982fb567603bdd_icgraph">
-<area shape="rect" id="node3" href="class_super__peer__logic.html#aec91e93daaf4d5dac2652244a323ac52" title="Super_peer_logic::GroupStore" alt="" coords="207,5,401,35"/><area shape="rect" id="node7" href="class_overlay_storage.html#a630da205839d7a74f3b6761572710010" title="OverlayStorage::store" alt="" coords="229,59,379,88"/><area shape="rect" id="node5" href="class_super__peer__logic.html#a55adc92c94a1f2743e269481bd859e0a" title="Super_peer_logic::handleMessage" alt="" coords="451,5,672,35"/><area shape="rect" id="node9" href="class_overlay_storage.html#abb52980596f7da7d502ef56e9b226825" title="OverlayStorage::handleMessage" alt="" coords="456,59,667,88"/></map>
-</div>
-</p>
-
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
 <li><a class="el" href="_game_object_8h_source.html">GameObject.h</a></li>
-<li><a class="el" href="_game_object_8cc_source.html">GameObject.cc</a></li>
+<li>GameObject.cc</li>
 </ul>
 </div>
 </div>
   <div id="nav-path" class="navpath">
     <ul>
       <li class="navelem"><a class="el" href="class_game_object.html">GameObject</a>      </li>
-      <li class="footer">Generated on Mon Nov 7 2011 15:57:41 for Pithos by&#160;
+      <li class="footer">Generated on Tue Nov 29 2011 10:50:45 for Pithos by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>
@@ -491,7 +213,7 @@ Here is the caller graph for this function:</div>
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">

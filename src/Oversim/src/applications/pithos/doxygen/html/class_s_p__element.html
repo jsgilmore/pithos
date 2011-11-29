@@ -27,7 +27,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Pithos</div>
-   <div id="projectbrief">Distributed storage for MMVEs</div>
+   <div id="projectbrief">Distributed state management and persistency for P2P MMVE</div>
   </td>
  </tr>
  </tbody>
@@ -92,76 +92,19 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_p__element.html#a2a868b5e3d24f77124c0a0be24dd4433">SP_element</a> ()</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_p__element.html#a2d24b1d0422b13f6fbd2e9da17488762">~SP_element</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_p__element.html#a63d3f6259ebf9309295c22d812e0d395">setAddress</a> (const TransportAddress &amp;adr)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_p__element.html#a7d069f13cacc625460511ba51d2ecb71">setAddress</a> (const char *ip, const int &amp;port)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">TransportAddress&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_p__element.html#ae7212c779ed394ba25b727079c27bb44">getAddress</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae7212c779ed394ba25b727079c27bb44"></a><!-- doxytag: member="SP_element::getAddress" ref="ae7212c779ed394ba25b727079c27bb44" args="()" -->
+TransportAddress&#160;</td><td class="memItemRight" valign="bottom"><b>getAddress</b> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_p__element.html#ab0006c68a7426b01c4881467a85a70d1">setPosition</a> (const double &amp;lati, const double &amp;longi)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_p__element.html#a6e1360ebde1234bc1d45c86d6bcc3754">getLatitude</a> ()</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_p__element.html#a8ef7f60adeaff754f860f39f3cb708a1">getLongitude</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8ef7f60adeaff754f860f39f3cb708a1"></a><!-- doxytag: member="SP_element::getLongitude" ref="a8ef7f60adeaff754f860f39f3cb708a1" args="()" -->
+double&#160;</td><td class="memItemRight" valign="bottom"><b>getLongitude</b> ()</td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <div class="textblock"><p>The abstract data type of a super peer element used in the directory server. This class stores the information of a single super peer, consisting of transport address, and position. The class forms part of a std::vector in the directory server, which stors the information of many super peers.</p>
 <dl class="author"><dt><b>Author:</b></dt><dd>John Gilmore </dd></dl>
-
-<p>Definition at line <a class="el" href="_s_p__element_8h_source.html#l00032">32</a> of file <a class="el" href="_s_p__element_8h_source.html">SP_element.h</a>.</p>
-</div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="a2a868b5e3d24f77124c0a0be24dd4433"></a><!-- doxytag: member="SP_element::SP_element" ref="a2a868b5e3d24f77124c0a0be24dd4433" args="()" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">SP_element::SP_element </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="_s_p__element_8cc_source.html#l00018">18</a> of file <a class="el" href="_s_p__element_8cc_source.html">SP_element.cc</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a2d24b1d0422b13f6fbd2e9da17488762"></a><!-- doxytag: member="SP_element::~SP_element" ref="a2d24b1d0422b13f6fbd2e9da17488762" args="()" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">SP_element::~SP_element </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td><code> [virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="_s_p__element_8cc_source.html#l00023">23</a> of file <a class="el" href="_s_p__element_8cc_source.html">SP_element.cc</a>.</p>
-
-</div>
-</div>
-<hr/><h2>Member Function Documentation</h2>
-<a class="anchor" id="ae7212c779ed394ba25b727079c27bb44"></a><!-- doxytag: member="SP_element::getAddress" ref="ae7212c779ed394ba25b727079c27bb44" args="()" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">TransportAddress SP_element::getAddress </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="_s_p__element_8cc_source.html#l00040">40</a> of file <a class="el" href="_s_p__element_8cc_source.html">SP_element.cc</a>.</p>
-
-</div>
-</div>
+</div><hr/><h2>Member Function Documentation</h2>
 <a class="anchor" id="a6e1360ebde1234bc1d45c86d6bcc3754"></a><!-- doxytag: member="SP_element::getLatitude" ref="a6e1360ebde1234bc1d45c86d6bcc3754" args="()" -->
 <div class="memitem">
 <div class="memproto">
@@ -176,26 +119,6 @@ Public Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 <dl class="return"><dt><b>Returns:</b></dt><dd>latitide </dd></dl>
-
-<p>Definition at line <a class="el" href="_s_p__element_8cc_source.html#l00051">51</a> of file <a class="el" href="_s_p__element_8cc_source.html">SP_element.cc</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a8ef7f60adeaff754f860f39f3cb708a1"></a><!-- doxytag: member="SP_element::getLongitude" ref="a8ef7f60adeaff754f860f39f3cb708a1" args="()" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">double SP_element::getLongitude </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="_s_p__element_8cc_source.html#l00056">56</a> of file <a class="el" href="_s_p__element_8cc_source.html">SP_element.cc</a>.</p>
 
 </div>
 </div>
@@ -220,8 +143,6 @@ Public Member Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-
-<p>Definition at line <a class="el" href="_s_p__element_8cc_source.html#l00027">27</a> of file <a class="el" href="_s_p__element_8cc_source.html">SP_element.cc</a>.</p>
 
 <p><div class="dynheader">
 Here is the caller graph for this function:</div>
@@ -267,8 +188,6 @@ Here is the caller graph for this function:</div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="_s_p__element_8cc_source.html#l00032">32</a> of file <a class="el" href="_s_p__element_8cc_source.html">SP_element.cc</a>.</p>
-
 </div>
 </div>
 <a class="anchor" id="ab0006c68a7426b01c4881467a85a70d1"></a><!-- doxytag: member="SP_element::setPosition" ref="ab0006c68a7426b01c4881467a85a70d1" args="(const double &amp;lati, const double &amp;longi)" -->
@@ -304,8 +223,6 @@ Here is the caller graph for this function:</div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="_s_p__element_8cc_source.html#l00045">45</a> of file <a class="el" href="_s_p__element_8cc_source.html">SP_element.cc</a>.</p>
-
 <p><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -319,14 +236,14 @@ Here is the caller graph for this function:</div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
 <li><a class="el" href="_s_p__element_8h_source.html">SP_element.h</a></li>
-<li><a class="el" href="_s_p__element_8cc_source.html">SP_element.cc</a></li>
+<li>SP_element.cc</li>
 </ul>
 </div>
 </div>
   <div id="nav-path" class="navpath">
     <ul>
       <li class="navelem"><a class="el" href="class_s_p__element.html">SP_element</a>      </li>
-      <li class="footer">Generated on Mon Nov 7 2011 15:57:41 for Pithos by&#160;
+      <li class="footer">Generated on Tue Nov 29 2011 10:50:45 for Pithos by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>
@@ -336,7 +253,7 @@ Here is the caller graph for this function:</div>
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">

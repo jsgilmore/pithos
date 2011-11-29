@@ -27,7 +27,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Pithos</div>
-   <div id="projectbrief">Distributed storage for MMVEs</div>
+   <div id="projectbrief">Distributed state management and persistency for P2P MMVE</div>
   </td>
  </tr>
  </tbody>
@@ -84,30 +84,30 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div>
 <div class="contents">
 This is the complete list of members for <a class="el" href="class_packet.html">Packet</a>, including all inherited members.<table>
-  <tr class="memlist"><td><a class="el" href="class_packet.html#a0660de6e0581ea68caedf30b7ae80b49">destinationAddress_var</a></td><td><a class="el" href="class_packet.html">Packet</a></td><td><code> [protected]</code></td></tr>
-  <tr class="memlist"><td><a class="el" href="class_packet.html#a6d1f709f7adca518d67b8d6fd028f013">dup</a>() const </td><td><a class="el" href="class_packet.html">Packet</a></td><td><code> [inline, virtual]</code></td></tr>
-  <tr class="memlist"><td><a class="el" href="class_packet.html#a08e762ee6491948b4b5d34e1a0e406be">getDestinationAddress</a>()</td><td><a class="el" href="class_packet.html">Packet</a></td><td><code> [virtual]</code></td></tr>
-  <tr class="memlist"><td><a class="el" href="class_packet.html#ac0ba7c5684ca8b08c3260040163f5706">getDestinationAddress</a>() const </td><td><a class="el" href="class_packet.html">Packet</a></td><td><code> [inline, virtual]</code></td></tr>
-  <tr class="memlist"><td><a class="el" href="class_packet.html#a506a2ee38e72edd4e596cc8ca1c4e772">getPayloadType</a>() const </td><td><a class="el" href="class_packet.html">Packet</a></td><td><code> [virtual]</code></td></tr>
-  <tr class="memlist"><td><a class="el" href="class_packet.html#ada72c872fa8619b9c10023150e76bcba">getSourceAddress</a>()</td><td><a class="el" href="class_packet.html">Packet</a></td><td><code> [virtual]</code></td></tr>
-  <tr class="memlist"><td><a class="el" href="class_packet.html#ae0addd4d5c6d08f394de792b4d89b14a">getSourceAddress</a>() const </td><td><a class="el" href="class_packet.html">Packet</a></td><td><code> [inline, virtual]</code></td></tr>
-  <tr class="memlist"><td><a class="el" href="class_packet.html#a06181263520399893eff08e197b238b2">operator=</a>(const Packet &amp;other)</td><td><a class="el" href="class_packet.html">Packet</a></td><td></td></tr>
-  <tr class="memlist"><td><a class="el" href="class_packet.html#ac812596cba491c324eea3710822fbfa8">operator==</a>(const Packet &amp;)</td><td><a class="el" href="class_packet.html">Packet</a></td><td><code> [protected]</code></td></tr>
-  <tr class="memlist"><td><a class="el" href="class_packet.html#a884189f2e5f410bb2a00fe2ae1a5c665">Packet</a>(const char *name=NULL, int kind=0)</td><td><a class="el" href="class_packet.html">Packet</a></td><td></td></tr>
-  <tr class="memlist"><td><a class="el" href="class_packet.html#ae8d5dfea51fa7fe55e4705b176f326ec">Packet</a>(const Packet &amp;other)</td><td><a class="el" href="class_packet.html">Packet</a></td><td></td></tr>
-  <tr class="memlist"><td><a class="el" href="class_packet.html#a4d8bbb7f3eb7f87a438981f170a5dde6">parsimPack</a>(cCommBuffer *b)</td><td><a class="el" href="class_packet.html">Packet</a></td><td><code> [virtual]</code></td></tr>
-  <tr class="memlist"><td><a class="el" href="class_packet.html#a366cd279ab2bfe4a62cf8d5d460f1821">parsimUnpack</a>(cCommBuffer *b)</td><td><a class="el" href="class_packet.html">Packet</a></td><td><code> [virtual]</code></td></tr>
-  <tr class="memlist"><td><a class="el" href="class_packet.html#a8e111891dcaa076944c3623964363001">payloadType_var</a></td><td><a class="el" href="class_packet.html">Packet</a></td><td><code> [protected]</code></td></tr>
-  <tr class="memlist"><td><a class="el" href="class_packet.html#a45f33c0de6120b8da4450f57075fd8df">setDestinationAddress</a>(const TransportAddress &amp;destinationAddress_var)</td><td><a class="el" href="class_packet.html">Packet</a></td><td><code> [virtual]</code></td></tr>
-  <tr class="memlist"><td><a class="el" href="class_packet.html#afcdd0af481587e75efddb32263e5bbc7">setPayloadType</a>(int payloadType_var)</td><td><a class="el" href="class_packet.html">Packet</a></td><td><code> [virtual]</code></td></tr>
-  <tr class="memlist"><td><a class="el" href="class_packet.html#a2429eaaf7dff189b3d35e528c019e961">setSourceAddress</a>(const TransportAddress &amp;sourceAddress_var)</td><td><a class="el" href="class_packet.html">Packet</a></td><td><code> [virtual]</code></td></tr>
-  <tr class="memlist"><td><a class="el" href="class_packet.html#a2ec05f2b22f8ad1f3292a509af4e63c6">sourceAddress_var</a></td><td><a class="el" href="class_packet.html">Packet</a></td><td><code> [protected]</code></td></tr>
-  <tr class="memlist"><td><a class="el" href="class_packet.html#a48938391fb7e07460bb0e01198ae5ede">~Packet</a>()</td><td><a class="el" href="class_packet.html">Packet</a></td><td><code> [virtual]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>destinationAddress_var</b> (defined in <a class="el" href="class_packet.html">Packet</a>)</td><td><a class="el" href="class_packet.html">Packet</a></td><td><code> [protected]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>dup</b>() const  (defined in <a class="el" href="class_packet.html">Packet</a>)</td><td><a class="el" href="class_packet.html">Packet</a></td><td><code> [inline, virtual]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>getDestinationAddress</b>() (defined in <a class="el" href="class_packet.html">Packet</a>)</td><td><a class="el" href="class_packet.html">Packet</a></td><td><code> [virtual]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>getDestinationAddress</b>() const  (defined in <a class="el" href="class_packet.html">Packet</a>)</td><td><a class="el" href="class_packet.html">Packet</a></td><td><code> [inline, virtual]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>getPayloadType</b>() const  (defined in <a class="el" href="class_packet.html">Packet</a>)</td><td><a class="el" href="class_packet.html">Packet</a></td><td><code> [virtual]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>getSourceAddress</b>() (defined in <a class="el" href="class_packet.html">Packet</a>)</td><td><a class="el" href="class_packet.html">Packet</a></td><td><code> [virtual]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>getSourceAddress</b>() const  (defined in <a class="el" href="class_packet.html">Packet</a>)</td><td><a class="el" href="class_packet.html">Packet</a></td><td><code> [inline, virtual]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>operator=</b>(const Packet &amp;other) (defined in <a class="el" href="class_packet.html">Packet</a>)</td><td><a class="el" href="class_packet.html">Packet</a></td><td></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>operator==</b>(const Packet &amp;) (defined in <a class="el" href="class_packet.html">Packet</a>)</td><td><a class="el" href="class_packet.html">Packet</a></td><td><code> [protected]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>Packet</b>(const char *name=NULL, int kind=0) (defined in <a class="el" href="class_packet.html">Packet</a>)</td><td><a class="el" href="class_packet.html">Packet</a></td><td></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>Packet</b>(const Packet &amp;other) (defined in <a class="el" href="class_packet.html">Packet</a>)</td><td><a class="el" href="class_packet.html">Packet</a></td><td></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>parsimPack</b>(cCommBuffer *b) (defined in <a class="el" href="class_packet.html">Packet</a>)</td><td><a class="el" href="class_packet.html">Packet</a></td><td><code> [virtual]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>parsimUnpack</b>(cCommBuffer *b) (defined in <a class="el" href="class_packet.html">Packet</a>)</td><td><a class="el" href="class_packet.html">Packet</a></td><td><code> [virtual]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>payloadType_var</b> (defined in <a class="el" href="class_packet.html">Packet</a>)</td><td><a class="el" href="class_packet.html">Packet</a></td><td><code> [protected]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>setDestinationAddress</b>(const TransportAddress &amp;destinationAddress_var) (defined in <a class="el" href="class_packet.html">Packet</a>)</td><td><a class="el" href="class_packet.html">Packet</a></td><td><code> [virtual]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>setPayloadType</b>(int payloadType_var) (defined in <a class="el" href="class_packet.html">Packet</a>)</td><td><a class="el" href="class_packet.html">Packet</a></td><td><code> [virtual]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>setSourceAddress</b>(const TransportAddress &amp;sourceAddress_var) (defined in <a class="el" href="class_packet.html">Packet</a>)</td><td><a class="el" href="class_packet.html">Packet</a></td><td><code> [virtual]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>sourceAddress_var</b> (defined in <a class="el" href="class_packet.html">Packet</a>)</td><td><a class="el" href="class_packet.html">Packet</a></td><td><code> [protected]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>~Packet</b>() (defined in <a class="el" href="class_packet.html">Packet</a>)</td><td><a class="el" href="class_packet.html">Packet</a></td><td><code> [virtual]</code></td></tr>
 </table></div>
 </div>
   <div id="nav-path" class="navpath">
     <ul>
-      <li class="footer">Generated on Mon Nov 7 2011 15:57:41 for Pithos by&#160;
+      <li class="footer">Generated on Tue Nov 29 2011 10:50:45 for Pithos by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>
@@ -117,7 +117,7 @@ This is the complete list of members for <a class="el" href="class_packet.html">
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">

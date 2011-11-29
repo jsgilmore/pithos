@@ -27,7 +27,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Pithos</div>
-   <div id="projectbrief">Distributed storage for MMVEs</div>
+   <div id="projectbrief">Distributed state management and persistency for P2P MMVE</div>
   </td>
  </tr>
  </tbody>
@@ -92,61 +92,24 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_object_info.html#aaeb7ce52a36f3990d9fedc49531e9f9b">ObjectInfo</a> ()</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_object_info.html#aa261bb4c565c956a9e9c1b90b277ad22">~ObjectInfo</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_object_info.html#a47d8dc70da8fb586b24b752be998e8f9">setObjectName</a> (const std::string &amp;o_name)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_object_info.html#a433b6beb6c99e9c767e3e4bbf72180d2">setObjectName</a> (char *o_name)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_object_info.html#ac2381f283ec05f0ba158cf916bedc55b">getObjectName</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac2381f283ec05f0ba158cf916bedc55b"></a><!-- doxytag: member="ObjectInfo::getObjectName" ref="ac2381f283ec05f0ba158cf916bedc55b" args="()" -->
+std::string&#160;</td><td class="memItemRight" valign="bottom"><b>getObjectName</b> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_object_info.html#aa05ca8541cc8569a8a8464d309891d42">addAddress</a> (const TransportAddress &amp;adr)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_object_info.html#a53c1a647c4117a31b05978aa6ea29149">addAddress</a> (const char *ip_str, int port)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">TransportAddress&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_object_info.html#a17cf7449699ee3f95f71a8d5bab3aa9d">getAddress</a> (const int &amp;i)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a17cf7449699ee3f95f71a8d5bab3aa9d"></a><!-- doxytag: member="ObjectInfo::getAddress" ref="a17cf7449699ee3f95f71a8d5bab3aa9d" args="(const int &amp;i)" -->
+TransportAddress&#160;</td><td class="memItemRight" valign="bottom"><b>getAddress</b> (const int &amp;i)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">TransportAddress&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_object_info.html#acad0f67b683c0af32e9e5faa9e2e62f8">getRandAddress</a> ()</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_object_info.html#a00b9bbc0b92c4bc14023a461c69707c0">setSize</a> (const int &amp;siz)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_object_info.html#a1bedcfdcefd83002935a7b701f94fb12">getSize</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a00b9bbc0b92c4bc14023a461c69707c0"></a><!-- doxytag: member="ObjectInfo::setSize" ref="a00b9bbc0b92c4bc14023a461c69707c0" args="(const int &amp;siz)" -->
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setSize</b> (const int &amp;siz)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1bedcfdcefd83002935a7b701f94fb12"></a><!-- doxytag: member="ObjectInfo::getSize" ref="a1bedcfdcefd83002935a7b701f94fb12" args="()" -->
+int&#160;</td><td class="memItemRight" valign="bottom"><b>getSize</b> ()</td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <div class="textblock"><p>This class stores the information of a single object, including name, size and a list of peers that store the object. The class is used by super peers as part of a vector to keep track of which game objects reside where in the group.</p>
 <dl class="author"><dt><b>Author:</b></dt><dd>John Gilmore </dd></dl>
-
-<p>Definition at line <a class="el" href="_object_info_8h_source.html#l00034">34</a> of file <a class="el" href="_object_info_8h_source.html">ObjectInfo.h</a>.</p>
-</div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="aaeb7ce52a36f3990d9fedc49531e9f9b"></a><!-- doxytag: member="ObjectInfo::ObjectInfo" ref="aaeb7ce52a36f3990d9fedc49531e9f9b" args="()" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">ObjectInfo::ObjectInfo </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="_object_info_8cc_source.html#l00018">18</a> of file <a class="el" href="_object_info_8cc_source.html">ObjectInfo.cc</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="aa261bb4c565c956a9e9c1b90b277ad22"></a><!-- doxytag: member="ObjectInfo::~ObjectInfo" ref="aa261bb4c565c956a9e9c1b90b277ad22" args="()" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">ObjectInfo::~ObjectInfo </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td><code> [virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="_object_info_8cc_source.html#l00023">23</a> of file <a class="el" href="_object_info_8cc_source.html">ObjectInfo.cc</a>.</p>
-
-</div>
-</div>
-<hr/><h2>Member Function Documentation</h2>
+</div><hr/><h2>Member Function Documentation</h2>
 <a class="anchor" id="aa05ca8541cc8569a8a8464d309891d42"></a><!-- doxytag: member="ObjectInfo::addAddress" ref="aa05ca8541cc8569a8a8464d309891d42" args="(const TransportAddress &amp;adr)" -->
 <div class="memitem">
 <div class="memproto">
@@ -169,14 +132,12 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="_object_info_8cc_source.html#l00043">43</a> of file <a class="el" href="_object_info_8cc_source.html">ObjectInfo.cc</a>.</p>
-
 <p><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_object_info_aa05ca8541cc8569a8a8464d309891d42_icgraph.png" border="0" usemap="#class_object_info_aa05ca8541cc8569a8a8464d309891d42_icgraph" alt=""/></div>
 <map name="class_object_info_aa05ca8541cc8569a8a8464d309891d42_icgraph" id="class_object_info_aa05ca8541cc8569a8a8464d309891d42_icgraph">
-<area shape="rect" id="node3" href="class_super__peer__logic.html#aec91e93daaf4d5dac2652244a323ac52" title="Super_peer_logic::GroupStore" alt="" coords="215,5,409,35"/><area shape="rect" id="node5" href="class_super__peer__logic.html#a55adc92c94a1f2743e269481bd859e0a" title="Super_peer_logic::handleMessage" alt="" coords="459,5,680,35"/></map>
+<area shape="rect" id="node3" href="class_super__peer__logic.html#aec91e93daaf4d5dac2652244a323ac52" title="Super_peer_logic::GroupStore" alt="" coords="215,5,409,35"/></map>
 </div>
 </p>
 
@@ -215,45 +176,6 @@ Here is the caller graph for this function:</div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="_object_info_8cc_source.html#l00048">48</a> of file <a class="el" href="_object_info_8cc_source.html">ObjectInfo.cc</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a17cf7449699ee3f95f71a8d5bab3aa9d"></a><!-- doxytag: member="ObjectInfo::getAddress" ref="a17cf7449699ee3f95f71a8d5bab3aa9d" args="(const int &amp;i)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">TransportAddress ObjectInfo::getAddress </td>
-          <td>(</td>
-          <td class="paramtype">const int &amp;&#160;</td>
-          <td class="paramname"><em>i</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="_object_info_8cc_source.html#l00058">58</a> of file <a class="el" href="_object_info_8cc_source.html">ObjectInfo.cc</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="ac2381f283ec05f0ba158cf916bedc55b"></a><!-- doxytag: member="ObjectInfo::getObjectName" ref="ac2381f283ec05f0ba158cf916bedc55b" args="()" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::string ObjectInfo::getObjectName </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="_object_info_8cc_source.html#l00038">38</a> of file <a class="el" href="_object_info_8cc_source.html">ObjectInfo.cc</a>.</p>
-
 </div>
 </div>
 <a class="anchor" id="acad0f67b683c0af32e9e5faa9e2e62f8"></a><!-- doxytag: member="ObjectInfo::getRandAddress" ref="acad0f67b683c0af32e9e5faa9e2e62f8" args="()" -->
@@ -270,26 +192,6 @@ Here is the caller graph for this function:</div>
 </div>
 <div class="memdoc">
 <dl class="return"><dt><b>Returns:</b></dt><dd>a random address from the list of object locations </dd></dl>
-
-<p>Definition at line <a class="el" href="_object_info_8cc_source.html#l00063">63</a> of file <a class="el" href="_object_info_8cc_source.html">ObjectInfo.cc</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a1bedcfdcefd83002935a7b701f94fb12"></a><!-- doxytag: member="ObjectInfo::getSize" ref="a1bedcfdcefd83002935a7b701f94fb12" args="()" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int ObjectInfo::getSize </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="_object_info_8cc_source.html#l00074">74</a> of file <a class="el" href="_object_info_8cc_source.html">ObjectInfo.cc</a>.</p>
 
 </div>
 </div>
@@ -315,8 +217,6 @@ Here is the caller graph for this function:</div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="_object_info_8cc_source.html#l00032">32</a> of file <a class="el" href="_object_info_8cc_source.html">ObjectInfo.cc</a>.</p>
-
 </div>
 </div>
 <a class="anchor" id="a47d8dc70da8fb586b24b752be998e8f9"></a><!-- doxytag: member="ObjectInfo::setObjectName" ref="a47d8dc70da8fb586b24b752be998e8f9" args="(const std::string &amp;o_name)" -->
@@ -341,42 +241,12 @@ Here is the caller graph for this function:</div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="_object_info_8cc_source.html#l00027">27</a> of file <a class="el" href="_object_info_8cc_source.html">ObjectInfo.cc</a>.</p>
-
 <p><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_object_info_a47d8dc70da8fb586b24b752be998e8f9_icgraph.png" border="0" usemap="#class_object_info_a47d8dc70da8fb586b24b752be998e8f9_icgraph" alt=""/></div>
 <map name="class_object_info_a47d8dc70da8fb586b24b752be998e8f9_icgraph" id="class_object_info_a47d8dc70da8fb586b24b752be998e8f9_icgraph">
-<area shape="rect" id="node3" href="class_super__peer__logic.html#a3c0afa1028c629dce6a8f3c3e4621702" title="Super_peer_logic::addObject" alt="" coords="239,5,428,35"/><area shape="rect" id="node7" href="class_super__peer__logic.html#aec91e93daaf4d5dac2652244a323ac52" title="Super_peer_logic::GroupStore" alt="" coords="236,59,431,88"/><area shape="rect" id="node5" href="class_super__peer__logic.html#a55adc92c94a1f2743e269481bd859e0a" title="Super_peer_logic::handleMessage" alt="" coords="480,32,701,61"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="a00b9bbc0b92c4bc14023a461c69707c0"></a><!-- doxytag: member="ObjectInfo::setSize" ref="a00b9bbc0b92c4bc14023a461c69707c0" args="(const int &amp;siz)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void ObjectInfo::setSize </td>
-          <td>(</td>
-          <td class="paramtype">const int &amp;&#160;</td>
-          <td class="paramname"><em>siz</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="_object_info_8cc_source.html#l00069">69</a> of file <a class="el" href="_object_info_8cc_source.html">ObjectInfo.cc</a>.</p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_object_info_a00b9bbc0b92c4bc14023a461c69707c0_icgraph.png" border="0" usemap="#class_object_info_a00b9bbc0b92c4bc14023a461c69707c0_icgraph" alt=""/></div>
-<map name="class_object_info_a00b9bbc0b92c4bc14023a461c69707c0_icgraph" id="class_object_info_a00b9bbc0b92c4bc14023a461c69707c0_icgraph">
-<area shape="rect" id="node3" href="class_super__peer__logic.html#aec91e93daaf4d5dac2652244a323ac52" title="Super_peer_logic::GroupStore" alt="" coords="191,5,385,35"/><area shape="rect" id="node5" href="class_super__peer__logic.html#a55adc92c94a1f2743e269481bd859e0a" title="Super_peer_logic::handleMessage" alt="" coords="435,5,656,35"/></map>
+<area shape="rect" id="node3" href="class_super__peer__logic.html#a3c0afa1028c629dce6a8f3c3e4621702" title="Super_peer_logic::addObject" alt="" coords="239,5,428,35"/><area shape="rect" id="node5" href="class_super__peer__logic.html#aec91e93daaf4d5dac2652244a323ac52" title="Super_peer_logic::GroupStore" alt="" coords="236,59,431,88"/></map>
 </div>
 </p>
 
@@ -384,14 +254,14 @@ Here is the caller graph for this function:</div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
 <li><a class="el" href="_object_info_8h_source.html">ObjectInfo.h</a></li>
-<li><a class="el" href="_object_info_8cc_source.html">ObjectInfo.cc</a></li>
+<li>ObjectInfo.cc</li>
 </ul>
 </div>
 </div>
   <div id="nav-path" class="navpath">
     <ul>
       <li class="navelem"><a class="el" href="class_object_info.html">ObjectInfo</a>      </li>
-      <li class="footer">Generated on Mon Nov 7 2011 15:57:41 for Pithos by&#160;
+      <li class="footer">Generated on Tue Nov 29 2011 10:50:45 for Pithos by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>
@@ -401,7 +271,7 @@ Here is the caller graph for this function:</div>
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">

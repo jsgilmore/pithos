@@ -42,47 +42,33 @@ class Super_peer_logic : public cSimpleModule
 {
 	private:
 
-		/** Event that is used to trigger the super peer informing the directory server of its existence */
-		cMessage *event;
+		cMessage *event; /**< Event that is used to trigger the super peer informing the directory server of its existence */
 
-		/** The latitude of the super peer in the virtual world */
-		double latitude;
+		double latitude; /**< The latitude of the super peer in the virtual world */
 
-		/** The longitude of the super peer in the virtual world */
-		double longitude;
+		double longitude; /**< The longitude of the super peer in the virtual world */
 
-		/** The IP of the directory server */
-		char directory_ip[16];
+		char directory_ip[16]; /**< The IP of the directory server */
 
-		/** The port of the directory server */
-		int directory_port;
+		int directory_port; /**< The port of the directory server */
 
-		/** A vector that records all peers that belong to this super peer's group */
-		std::vector<PeerData> group_peers;
+		std::vector<PeerData> group_peers; /**< A vector that records all peers that belong to this super peer's group */
 
-		/** A vector that records all objects that are stored in this super peer's group */
-		std::vector<ObjectInfo> object_list;
+		std::vector<ObjectInfo> object_list; /**< A vector that records all objects that are stored in this super peer's group */
 
-		/** A signal that records the group size over time */
-		simsignal_t groupSizeSignal;
+		simsignal_t groupSizeSignal; /**< A signal that records the group size over time */
 
-		/** A signal that records the number of overlay writes performed */
-		simsignal_t OverlayWriteSignal;
+		simsignal_t OverlayWriteSignal; /**< A signal that records the number of overlay writes performed */
 
-		/** A signal that records the number of overlay objects successfully delivered */
-		simsignal_t OverlayDeliveredSignal;
+		simsignal_t OverlayDeliveredSignal; /**< A signal that records the number of overlay objects successfully delivered */
 
-		/** A signal that records when this super peer was listed in the directory server */
-		simsignal_t joinTimeSignal;
+		simsignal_t joinTimeSignal; /**< A signal that records when this super peer was listed in the directory server */
 
-		/** A signal that records the number of objects stored in this group */
-		simsignal_t storeNumberSignal;
+		simsignal_t storeNumberSignal; /**< A signal that records the number of objects stored in this group */
 
-		/** A signal that records the number of overlay objects stored in this group */
-		simsignal_t overlayNumberSignal;
+		simsignal_t overlayNumberSignal; /**< A signal that records the number of overlay objects stored in this group */
 
-		/** A signal that records the number of times an overlay object could not be stored */
-		simsignal_t overlaysStoreFailSignal;
+		simsignal_t overlaysStoreFailSignal; /**< A signal that records the number of times an overlay object could not be stored */
 	public:
 		Super_peer_logic();
 		virtual ~Super_peer_logic();
