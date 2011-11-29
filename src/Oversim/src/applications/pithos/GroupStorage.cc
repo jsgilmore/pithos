@@ -16,6 +16,8 @@
 #include "GroupStorage.h"
 #include <GlobalStatisticsAccess.h>
 
+Define_Module(GroupStorage);
+
 GroupStorage::GroupStorage() {
 	// TODO Auto-generated constructor stub
 

@@ -18,6 +18,8 @@
 
 #include "Peer_logic.h"
 
+Define_Module(Peer_logic);
+
 Peer_logic::Peer_logic()
 {
 }
@@ -31,11 +33,6 @@ void Peer_logic::initialize()
 {
 	strcpy(directory_ip, par("directory_ip"));
 	directory_port = par("directory_port");
-
-	// initialize our statistics variables
-	numSentForStore = 0;
-	// tell the GUI to display our variables
-	WATCH(numSentForStore);
 
 	event = new cMessage("event");
 	scheduleAt(simTime()+par("wait_time"), event);
@@ -95,34 +92,32 @@ void Peer_logic::handleP2PMsg(cMessage *msg)
 	}
 }
 
-void Peer_logic::handleRequest(cMessage *msg)
+void Peer_logic::handlePutCAPIRequest(RootObjectPutCAPICall* capiPutMsg)
+//void Peer_logic::handlePutCAPIRequest(const GameObject &go)
 {
-	groupPkt *m = check_and_cast<groupPkt *>(msg);
+	groupPkt *write_pkt;
+	Enter_Method("[Peer_logic]: handlePutCAPIRequest()");	//Required for Omnet++ context switching between modules
+	//take(capiPutMsg);
 
-	GameObject *go;
-	char name[41];
+	GameObject *go = (GameObject *)capiPutMsg->removeObject("GameObject");
+	if (go == NULL)
+		error("No object was attached to be stored in group storage");
 
-	EV << getParentModule()->getName() << " " << getParentModule()->getIndex() << " received store request of size " << m->getValue() << "\n";
-
-	go = new GameObject("GameObject");
-	go->setSize(m->getValue());
-	go->setCreationTime(simTime());
-
-	sprintf(name, "Game %d, Object %d", getParentModule()->getIndex(), numSentForStore);	//The name is later combined with the remaining object values
-	go->setObjectName(name);
+	EV << getParentModule()->getName() << " " << getParentModule()->getIndex() << " received game object to store of size " << go->getSize() << "\n";
 
 	EV << "Object to be sent: " << go->getObjectName() << endl;
 
-	msg->addObject(go);
+	write_pkt = new groupPkt();
+	//write_pkt->setName(capiPutMsg->getName());
+	write_pkt->setPayloadType(STORE_REQ);
+	write_pkt->addObject(go);
 
 	//Send the game object to be stored in the group.
-	send(msg->dup(), "group_write");
+	send(write_pkt->dup(), "group_write");
 
 	//Send the game object to be stored in the overlay.
-	send(msg, "overlay_write");
-	//delete(msg);	//For debugging purposes only
+	send(write_pkt, "overlay_write");
 
-	numSentForStore++;
 }
 
 void Peer_logic::joinRequest(const TransportAddress &dest_adr)
@@ -159,8 +154,7 @@ void Peer_logic::handleMessage(cMessage *msg)
 	}
 	else if (strcmp(msg->getArrivalGate()->getName(), "from_upperTier") == 0)
 	{
-		//A storage request was received from the game or higher layer. This is data that should be stored in the network
-		handleRequest(msg);
+		error("This gate has been closed down in favor of RPC calls");
 	}
 	else if (strcmp(msg->getArrivalGate()->getName(), "comms_gate$i") == 0)
 	{

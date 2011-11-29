@@ -15,6 +15,8 @@
 
 #include "OverlayStorage.h"
 
+Define_Module(OverlayStorage);
+
 OverlayStorage::OverlayStorage() {
 	// TODO Auto-generated constructor stub
 

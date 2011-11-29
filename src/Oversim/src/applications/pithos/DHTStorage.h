@@ -28,12 +28,14 @@
 #include <BaseApp.h>
 
 #include "BaseApp.h"
-#include "Peer_logic.h"
 #include "Communicator.h"
+#include "Peer_logic.h"
 
 #include "groupPkt_m.h"
 #include "GameObject.h"
 
+class Peer_logic;
+class Communicator;
 class GlobalStatistics;
 class GlobalDhtTestMap;
 
@@ -100,7 +102,5 @@ class DHTStorage : public cSimpleModule
 
 		void handlePutResponse(DHTputCAPIResponse* msg, DHTStatsContext* context);
 };
-
-Define_Module(DHTStorage);
 
 #endif /* OVERLAYSTORAGE_H_ */

@@ -15,6 +15,8 @@
 
 #include "Directory_logic.h"
 
+Define_Module(Directory_logic);
+
 Directory_logic::Directory_logic() {
 
 

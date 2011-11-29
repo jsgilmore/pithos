@@ -82,6 +82,4 @@ class Game : public BaseApp
 		void sendRequest();
 };
 
-Define_Module(Game);
-
 #endif /* GAME_H_ */

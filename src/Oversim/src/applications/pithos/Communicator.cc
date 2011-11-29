@@ -80,19 +80,19 @@ void Communicator::handleUpperMessage (cMessage *msg)
 	send(msg, "toPeer_fromUpper");		//This is the storage request from the game module
 }
 
-void Communicator::handlePutRequest(DHTPutCall* dhtMsg)
+/*void Communicator::handlePutRequest(RootObjectPutCall* dhtMsg)
 {
 	//TODO: Add functionality to handle this RPC call
 	return;
 }
 
-void Communicator::handleGetRequest(DHTGetCall* dhtMsg)
+void Communicator::handleGetRequest(RootObjectGetCall* dhtMsg)
 {
 	//TODO: Add functionality to handle this RPC call
 	return;
-}
+}*/
 
-void Communicator::handleGetCAPIRequest(DHTgetCAPICall* capiGetMsg)
+void Communicator::handleGetCAPIRequest(RootObjectGetCAPICall* capiGetMsg)
 {
 	//TODO: Add functionality to handle this RPC call
 	return;
@@ -103,38 +103,21 @@ simtime_t Communicator::getCreationTime()
 	return creationTime;
 }
 
-void Communicator::handlePutCAPIRequest(DHTputCAPICall* capiPutMsg)
+void Communicator::handlePutCAPIRequest(RootObjectPutCAPICall* capiPutMsg)
 {
-	DHTputCAPIResponse* capiPutRespMsg;		//This should be added when the below code is included
-	groupPkt *write_pkt;
-	char *size_str = new char[capiPutMsg->getValue().size()];
-	double filesize;
+	DHTputCAPIResponse* capiPutRespMsg;
 
-	//Convert the binary data into a double defining the file size to be stored
-	copy (capiPutMsg->getValue().begin(), capiPutMsg->getValue().end(), size_str);
-	filesize = atof(size_str);
+	cModule *peer_logicModule = getParentModule()->getSubmodule("peer_logic");
+	//This extra step ensures that the submodules exist and also does any other required error checking
+	Peer_logic *peer_logic = check_and_cast<Peer_logic *>(peer_logicModule);
 
-	//Create a group packet that is sent to the peer_logic module to initiate the store mechanism
-	write_pkt = new groupPkt();
-	write_pkt->setName(capiPutMsg->getName());
-	write_pkt->setValue(filesize);
-	write_pkt->setPayloadType(STORE_REQ);
-	send(write_pkt, "toPeer_fromUpper");
+	peer_logic->handlePutCAPIRequest(capiPutMsg);
 
 	//Respond to the RPC call with a success message
-	//TODO: Include this when there is a chance that a store might fail
+	//TODO: This success message should eventually only be sent after it has been confirmed that the data were sucessfully stored.
 	capiPutRespMsg = new DHTputCAPIResponse();
 	capiPutRespMsg->setIsSuccess(true);
 	sendRpcResponse(capiPutMsg, capiPutRespMsg);
-	//delete(capiPutMsg);	//TODO: This should be removed when the above code is included
-
-	delete [] size_str;
-}
-
-void Communicator::handleDumpDhtRequest(DHTdumpCall* call)
-{
-	//TODO: Add functionality to handle this RPC call
-	return;
 }
 
 bool Communicator::handleRpcCall(BaseCallMessage *msg)
@@ -145,12 +128,11 @@ bool Communicator::handleRpcCall(BaseCallMessage *msg)
     // start an RPC switch
     RPC_SWITCH_START(msg);
 		// RPCs between nodes
-		RPC_DELEGATE(DHTPut, handlePutRequest);
-		RPC_DELEGATE(DHTGet, handleGetRequest);
+		//RPC_DELEGATE(RootObjectPut, handlePutRequest);
+		//RPC_DELEGATE(RootObjectGet, handleGetRequest);
 		// internal RPCs
-		RPC_DELEGATE(DHTputCAPI, handlePutCAPIRequest);		//If we received a put request from Tier 2
-		RPC_DELEGATE(DHTgetCAPI, handleGetCAPIRequest);		//If we received a get request from Tier 2
-		RPC_DELEGATE(DHTdump, handleDumpDhtRequest);
+		RPC_DELEGATE(RootObjectPutCAPI, handlePutCAPIRequest);		//If we received a put request from Tier 2
+		RPC_DELEGATE(RootObjectGetCAPI, handleGetCAPIRequest);		//If we received a get request from Tier 2
     // end the switch
     RPC_SWITCH_END();
 

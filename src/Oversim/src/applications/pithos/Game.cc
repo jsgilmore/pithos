@@ -16,6 +16,7 @@
 #include "Game.h"
 #include "Storage.h"
 
+Define_Module(Game);
 
 Game::Game() {
 	// TODO Auto-generated constructor stub

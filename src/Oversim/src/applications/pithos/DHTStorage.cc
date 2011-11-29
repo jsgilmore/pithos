@@ -22,6 +22,9 @@
 
 #include <GlobalDhtTestMap.h>
 
+// register module class with `\opp`
+Define_Module(DHTStorage);
+
 DHTStorage::DHTStorage() {
 	// TODO Auto-generated constructor stub
 

@@ -55,6 +55,4 @@ class OverlayStorage : public cSimpleModule
 		virtual void handleMessage(cMessage *msg);
 };
 
-Define_Module(OverlayStorage);
-
 #endif /* OVERLAYSTORAGE_H_ */
