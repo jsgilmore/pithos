@@ -117,6 +117,4 @@ class GroupStorage : public cSimpleModule
 		virtual void handleMessage(cMessage *msg);
 };
 
-Define_Module(GroupStorage);
-
 #endif /* OVERLAYSTORAGE_H_ */

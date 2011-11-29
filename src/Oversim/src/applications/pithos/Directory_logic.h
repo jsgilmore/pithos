@@ -131,6 +131,4 @@ class Directory_logic : public BaseApp
 		~Directory_logic();
 };
 
-Define_Module(Directory_logic);
-
 #endif /* DIRECTORY_LOGIC_H_ */

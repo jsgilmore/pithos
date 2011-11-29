@@ -30,6 +30,7 @@
 #include "groupPkt_m.h"
 #include "PeerListPkt.h"
 #include "bootstrapPkt_m.h"
+#include "PithosTestMessages_m.h"
 
 enum SP_indeces {
     UNKNOWN = -1,
@@ -64,9 +65,6 @@ class Peer_logic: public cSimpleModule
 		/** The TransPort address of the group super peer (this address is set, after the peer has joined a group) */
 		TransportAddress super_peer_address;
 
-		/** Statistic recording the number of packets sent */
-		int numSentForStore;
-
 	public:
 		Peer_logic();
 		virtual ~Peer_logic();
@@ -75,6 +73,14 @@ class Peer_logic: public cSimpleModule
 		 * @returns true if a super peer has been set for this peer and false if not.
 		 */
 		bool hasSuperPeer();
+
+		/**
+		 * Handle a request from the higher layer for store, retrieve or update
+		 *
+		 * @param capiPutMsg the request containing the GameObject
+		 */
+		void handlePutCAPIRequest(RootObjectPutCAPICall* capiPutMsg);
+		//void handlePutCAPIRequest(const GameObject &go);
 
 		TransportAddress getSuperPeerAddress();
 	protected:
@@ -89,20 +95,11 @@ class Peer_logic: public cSimpleModule
 		void handleP2PMsg(cMessage *msg);
 
 		/**
-		 * Handle a request from the higher layer for store, retrieve or update
-		 *
-		 * @param msg the request with type and required data
-		 */
-		void handleRequest(cMessage *msg);
-
-		/**
 		 * Send a join request to the directory server or a super peer
 		 *
 		 * @param the destination address of the directory server of super peer
 		 */
 		void joinRequest(const TransportAddress &dest_adr);
 };
-
-Define_Module(Peer_logic);
 
 #endif /* PEER_LOGIC_H_ */
