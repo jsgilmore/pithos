@@ -32,8 +32,7 @@ class PeerData
 {
 	private:
 
-		/** The transport address of the peer (IP address and port) */
-		TransportAddress address;
+		TransportAddress address; /**< The transport address of the peer (IP address and port) */
 
 	public:
 		PeerData();

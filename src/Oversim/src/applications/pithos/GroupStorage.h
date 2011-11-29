@@ -49,17 +49,13 @@ class GroupStorage : public cSimpleModule
 		virtual ~GroupStorage();
 	private:
 
-		/** The list of peers in the group and which objects they store. */
-		std::vector<PeerData> group_peers;
+		std::vector<PeerData> group_peers; /**< The list of peers in the group and which objects they store. */
 
-		/** The signal recording the statistic of the group size. */
-		simsignal_t groupSizeSignal;
+		simsignal_t groupSizeSignal; /**< The signal recording the statistic of the group size. */
 
-		/** The signal recording the statistic of how many times a group storage failed. */
-		simsignal_t groupSendFailSignal;
+		simsignal_t groupSendFailSignal; /**< The signal recording the statistic of how many times a group storage failed. */
 
-		/** The signal recording the statistic of the group size. */
-		simsignal_t joinTimeSignal;
+		simsignal_t joinTimeSignal; /**< The signal recording the statistic of the group size. */
 
 		GlobalStatistics* globalStatistics; /**< pointer to GlobalStatistics module in this node*/
 

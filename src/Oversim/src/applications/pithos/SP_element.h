@@ -33,14 +33,11 @@ class SP_element
 {
 	private:
 
-		/** The transport address of the peer (IP address and port) */
-		TransportAddress address;
+		TransportAddress address; /**< The transport address of the peer (IP address and port) */
 
-		/** The latitude of the super peer in the virtual world */
-		double latitude;
+		double latitude; /**< The latitude of the super peer in the virtual world */
 
-		/** The longitude of the super peer in the virtual world */
-		double longitude;
+		double longitude; /**< The longitude of the super peer in the virtual world */
 	public:
 		SP_element();
 		virtual ~SP_element();
