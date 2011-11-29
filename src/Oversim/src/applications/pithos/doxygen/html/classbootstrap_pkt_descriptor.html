@@ -27,7 +27,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Pithos</div>
-   <div id="projectbrief">Distributed storage for MMVEs</div>
+   <div id="projectbrief">Distributed state management and persistency for P2P MMVE</div>
   </td>
  </tr>
  </tbody>
@@ -90,539 +90,42 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbootstrap_pkt_descriptor.html#a1feb2a8eabcabe9fde9da479d3592ba6">bootstrapPktDescriptor</a> ()</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbootstrap_pkt_descriptor.html#a759ed47ba7726647d85d4db5eca8bd1d">~bootstrapPktDescriptor</a> ()</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbootstrap_pkt_descriptor.html#a8c71aba1037744160390f57497993656">doesSupport</a> (cObject *obj) const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbootstrap_pkt_descriptor.html#acf6326774687dcf94497f4af377757ed">getProperty</a> (const char *propertyname) const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbootstrap_pkt_descriptor.html#a8ecad21098f76fffd7ce18ec42def88a">getFieldCount</a> (void *object) const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbootstrap_pkt_descriptor.html#aeff299ff9dc06b97f41bb332ce9f3eff">getFieldName</a> (void *object, int field) const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbootstrap_pkt_descriptor.html#a24f9dac4c4389a8fd2695cde5f0fafbd">findField</a> (void *object, const char *fieldName) const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbootstrap_pkt_descriptor.html#ab40cbe12f1a802eb053530def0cf00c2">getFieldTypeFlags</a> (void *object, int field) const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbootstrap_pkt_descriptor.html#a9955e314aedb20aa8d0b1282acf9257a">getFieldTypeString</a> (void *object, int field) const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbootstrap_pkt_descriptor.html#a1638a6d86c8b285034832fed08a3e1cc">getFieldProperty</a> (void *object, int field, const char *propertyname) const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbootstrap_pkt_descriptor.html#a2d7187ad381e46f5d4d30ab8ec9f8ca0">getArraySize</a> (void *object, int field) const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbootstrap_pkt_descriptor.html#a9abfa5b4af44ee34c64b2f9236ffafc3">getFieldAsString</a> (void *object, int field, int i) const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbootstrap_pkt_descriptor.html#acc2758d73aea392f3c535b7829fa4ef8">setFieldAsString</a> (void *object, int field, int i, const char *value) const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbootstrap_pkt_descriptor.html#a9cfc237d9418b1b442f173f17a7f4a66">getFieldStructName</a> (void *object, int field) const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbootstrap_pkt_descriptor.html#ac8c8895449bf746124a5d019f2d7ee53">getFieldStructPointer</a> (void *object, int field, int i) const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8c71aba1037744160390f57497993656"></a><!-- doxytag: member="bootstrapPktDescriptor::doesSupport" ref="a8c71aba1037744160390f57497993656" args="(cObject *obj) const " -->
+virtual bool&#160;</td><td class="memItemRight" valign="bottom"><b>doesSupport</b> (cObject *obj) const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acf6326774687dcf94497f4af377757ed"></a><!-- doxytag: member="bootstrapPktDescriptor::getProperty" ref="acf6326774687dcf94497f4af377757ed" args="(const char *propertyname) const " -->
+virtual const char *&#160;</td><td class="memItemRight" valign="bottom"><b>getProperty</b> (const char *propertyname) const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8ecad21098f76fffd7ce18ec42def88a"></a><!-- doxytag: member="bootstrapPktDescriptor::getFieldCount" ref="a8ecad21098f76fffd7ce18ec42def88a" args="(void *object) const " -->
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><b>getFieldCount</b> (void *object) const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aeff299ff9dc06b97f41bb332ce9f3eff"></a><!-- doxytag: member="bootstrapPktDescriptor::getFieldName" ref="aeff299ff9dc06b97f41bb332ce9f3eff" args="(void *object, int field) const " -->
+virtual const char *&#160;</td><td class="memItemRight" valign="bottom"><b>getFieldName</b> (void *object, int field) const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a24f9dac4c4389a8fd2695cde5f0fafbd"></a><!-- doxytag: member="bootstrapPktDescriptor::findField" ref="a24f9dac4c4389a8fd2695cde5f0fafbd" args="(void *object, const char *fieldName) const " -->
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><b>findField</b> (void *object, const char *fieldName) const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab40cbe12f1a802eb053530def0cf00c2"></a><!-- doxytag: member="bootstrapPktDescriptor::getFieldTypeFlags" ref="ab40cbe12f1a802eb053530def0cf00c2" args="(void *object, int field) const " -->
+virtual unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>getFieldTypeFlags</b> (void *object, int field) const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9955e314aedb20aa8d0b1282acf9257a"></a><!-- doxytag: member="bootstrapPktDescriptor::getFieldTypeString" ref="a9955e314aedb20aa8d0b1282acf9257a" args="(void *object, int field) const " -->
+virtual const char *&#160;</td><td class="memItemRight" valign="bottom"><b>getFieldTypeString</b> (void *object, int field) const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1638a6d86c8b285034832fed08a3e1cc"></a><!-- doxytag: member="bootstrapPktDescriptor::getFieldProperty" ref="a1638a6d86c8b285034832fed08a3e1cc" args="(void *object, int field, const char *propertyname) const " -->
+virtual const char *&#160;</td><td class="memItemRight" valign="bottom"><b>getFieldProperty</b> (void *object, int field, const char *propertyname) const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2d7187ad381e46f5d4d30ab8ec9f8ca0"></a><!-- doxytag: member="bootstrapPktDescriptor::getArraySize" ref="a2d7187ad381e46f5d4d30ab8ec9f8ca0" args="(void *object, int field) const " -->
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><b>getArraySize</b> (void *object, int field) const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9abfa5b4af44ee34c64b2f9236ffafc3"></a><!-- doxytag: member="bootstrapPktDescriptor::getFieldAsString" ref="a9abfa5b4af44ee34c64b2f9236ffafc3" args="(void *object, int field, int i) const " -->
+virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><b>getFieldAsString</b> (void *object, int field, int i) const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acc2758d73aea392f3c535b7829fa4ef8"></a><!-- doxytag: member="bootstrapPktDescriptor::setFieldAsString" ref="acc2758d73aea392f3c535b7829fa4ef8" args="(void *object, int field, int i, const char *value) const " -->
+virtual bool&#160;</td><td class="memItemRight" valign="bottom"><b>setFieldAsString</b> (void *object, int field, int i, const char *value) const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9cfc237d9418b1b442f173f17a7f4a66"></a><!-- doxytag: member="bootstrapPktDescriptor::getFieldStructName" ref="a9cfc237d9418b1b442f173f17a7f4a66" args="(void *object, int field) const " -->
+virtual const char *&#160;</td><td class="memItemRight" valign="bottom"><b>getFieldStructName</b> (void *object, int field) const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac8c8895449bf746124a5d019f2d7ee53"></a><!-- doxytag: member="bootstrapPktDescriptor::getFieldStructPointer" ref="ac8c8895449bf746124a5d019f2d7ee53" args="(void *object, int field, int i) const " -->
+virtual void *&#160;</td><td class="memItemRight" valign="bottom"><b>getFieldStructPointer</b> (void *object, int field, int i) const </td></tr>
 </table>
-<hr/><a name="_details"></a><h2>Detailed Description</h2>
-<div class="textblock">
-<p>Definition at line <a class="el" href="bootstrap_pkt__m_8cc_source.html#l00104">104</a> of file <a class="el" href="bootstrap_pkt__m_8cc_source.html">bootstrapPkt_m.cc</a>.</p>
-</div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="a1feb2a8eabcabe9fde9da479d3592ba6"></a><!-- doxytag: member="bootstrapPktDescriptor::bootstrapPktDescriptor" ref="a1feb2a8eabcabe9fde9da479d3592ba6" args="()" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bootstrapPktDescriptor::bootstrapPktDescriptor </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="bootstrap_pkt__m_8cc_source.html#l00129">129</a> of file <a class="el" href="bootstrap_pkt__m_8cc_source.html">bootstrapPkt_m.cc</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a759ed47ba7726647d85d4db5eca8bd1d"></a><!-- doxytag: member="bootstrapPktDescriptor::~bootstrapPktDescriptor" ref="a759ed47ba7726647d85d4db5eca8bd1d" args="()" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bootstrapPktDescriptor::~bootstrapPktDescriptor </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td><code> [virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="bootstrap_pkt__m_8cc_source.html#l00133">133</a> of file <a class="el" href="bootstrap_pkt__m_8cc_source.html">bootstrapPkt_m.cc</a>.</p>
-
-</div>
-</div>
-<hr/><h2>Member Function Documentation</h2>
-<a class="anchor" id="a8c71aba1037744160390f57497993656"></a><!-- doxytag: member="bootstrapPktDescriptor::doesSupport" ref="a8c71aba1037744160390f57497993656" args="(cObject *obj) const " -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool bootstrapPktDescriptor::doesSupport </td>
-          <td>(</td>
-          <td class="paramtype">cObject *&#160;</td>
-          <td class="paramname"><em>obj</em></td><td>)</td>
-          <td> const<code> [virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="bootstrap_pkt__m_8cc_source.html#l00137">137</a> of file <a class="el" href="bootstrap_pkt__m_8cc_source.html">bootstrapPkt_m.cc</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a24f9dac4c4389a8fd2695cde5f0fafbd"></a><!-- doxytag: member="bootstrapPktDescriptor::findField" ref="a24f9dac4c4389a8fd2695cde5f0fafbd" args="(void *object, const char *fieldName) const " -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int bootstrapPktDescriptor::findField </td>
-          <td>(</td>
-          <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>object</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>fieldName</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const<code> [virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="bootstrap_pkt__m_8cc_source.html#l00186">186</a> of file <a class="el" href="bootstrap_pkt__m_8cc_source.html">bootstrapPkt_m.cc</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a2d7187ad381e46f5d4d30ab8ec9f8ca0"></a><!-- doxytag: member="bootstrapPktDescriptor::getArraySize" ref="a2d7187ad381e46f5d4d30ab8ec9f8ca0" args="(void *object, int field) const " -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int bootstrapPktDescriptor::getArraySize </td>
-          <td>(</td>
-          <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>object</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>field</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const<code> [virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="bootstrap_pkt__m_8cc_source.html#l00225">225</a> of file <a class="el" href="bootstrap_pkt__m_8cc_source.html">bootstrapPkt_m.cc</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classbootstrap_pkt_descriptor_a2d7187ad381e46f5d4d30ab8ec9f8ca0_cgraph.png" border="0" usemap="#classbootstrap_pkt_descriptor_a2d7187ad381e46f5d4d30ab8ec9f8ca0_cgraph" alt=""/></div>
-<map name="classbootstrap_pkt_descriptor_a2d7187ad381e46f5d4d30ab8ec9f8ca0_cgraph" id="classbootstrap_pkt_descriptor_a2d7187ad381e46f5d4d30ab8ec9f8ca0_cgraph">
-<area shape="rect" id="node3" href="classbootstrap_pkt_descriptor.html#a8ecad21098f76fffd7ce18ec42def88a" title="bootstrapPktDescriptor::getFieldCount" alt="" coords="293,5,539,35"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="a9abfa5b4af44ee34c64b2f9236ffafc3"></a><!-- doxytag: member="bootstrapPktDescriptor::getFieldAsString" ref="a9abfa5b4af44ee34c64b2f9236ffafc3" args="(void *object, int field, int i) const " -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::string bootstrapPktDescriptor::getFieldAsString </td>
-          <td>(</td>
-          <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>object</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>field</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>i</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const<code> [virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="bootstrap_pkt__m_8cc_source.html#l00239">239</a> of file <a class="el" href="bootstrap_pkt__m_8cc_source.html">bootstrapPkt_m.cc</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classbootstrap_pkt_descriptor_a9abfa5b4af44ee34c64b2f9236ffafc3_cgraph.png" border="0" usemap="#classbootstrap_pkt_descriptor_a9abfa5b4af44ee34c64b2f9236ffafc3_cgraph" alt=""/></div>
-<map name="classbootstrap_pkt_descriptor_a9abfa5b4af44ee34c64b2f9236ffafc3_cgraph" id="classbootstrap_pkt_descriptor_a9abfa5b4af44ee34c64b2f9236ffafc3_cgraph">
-<area shape="rect" id="node3" href="classbootstrap_pkt_descriptor.html#a8ecad21098f76fffd7ce18ec42def88a" title="bootstrapPktDescriptor::getFieldCount" alt="" coords="315,5,560,35"/><area shape="rect" id="node5" href="classbootstrap_pkt.html#a016e892279c326fd12706bad355d52e8" title="bootstrapPkt::getLatitude" alt="" coords="353,59,521,88"/><area shape="rect" id="node7" href="classbootstrap_pkt.html#a22f95ae153066c2d2bb0cf7b3cafd786" title="bootstrapPkt::getLongitude" alt="" coords="348,112,527,141"/><area shape="rect" id="node9" href="classbootstrap_pkt.html#ad1b68dceb784d72b036ce2d161d24db5" title="bootstrapPkt::getSuperPeerAdr" alt="" coords="336,165,539,195"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="a8ecad21098f76fffd7ce18ec42def88a"></a><!-- doxytag: member="bootstrapPktDescriptor::getFieldCount" ref="a8ecad21098f76fffd7ce18ec42def88a" args="(void *object) const " -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int bootstrapPktDescriptor::getFieldCount </td>
-          <td>(</td>
-          <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>object</em></td><td>)</td>
-          <td> const<code> [virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="bootstrap_pkt__m_8cc_source.html#l00148">148</a> of file <a class="el" href="bootstrap_pkt__m_8cc_source.html">bootstrapPkt_m.cc</a>.</p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classbootstrap_pkt_descriptor_a8ecad21098f76fffd7ce18ec42def88a_icgraph.png" border="0" usemap="#classbootstrap_pkt_descriptor_a8ecad21098f76fffd7ce18ec42def88a_icgraph" alt=""/></div>
-<map name="classbootstrap_pkt_descriptor_a8ecad21098f76fffd7ce18ec42def88a_icgraph" id="classbootstrap_pkt_descriptor_a8ecad21098f76fffd7ce18ec42def88a_icgraph">
-<area shape="rect" id="node3" href="classbootstrap_pkt_descriptor.html#a2d7187ad381e46f5d4d30ab8ec9f8ca0" title="bootstrapPktDescriptor::getArraySize" alt="" coords="324,5,561,35"/><area shape="rect" id="node5" href="classbootstrap_pkt_descriptor.html#a9abfa5b4af44ee34c64b2f9236ffafc3" title="bootstrapPktDescriptor::getFieldAsString" alt="" coords="313,59,572,88"/><area shape="rect" id="node7" href="classbootstrap_pkt_descriptor.html#aeff299ff9dc06b97f41bb332ce9f3eff" title="bootstrapPktDescriptor::getFieldName" alt="" coords="320,112,565,141"/><area shape="rect" id="node9" href="classbootstrap_pkt_descriptor.html#a1638a6d86c8b285034832fed08a3e1cc" title="bootstrapPktDescriptor::getFieldProperty" alt="" coords="313,165,572,195"/><area shape="rect" id="node11" href="classbootstrap_pkt_descriptor.html#a9cfc237d9418b1b442f173f17a7f4a66" title="bootstrapPktDescriptor::getFieldStructName" alt="" coords="303,219,583,248"/><area shape="rect" id="node13" href="classbootstrap_pkt_descriptor.html#ac8c8895449bf746124a5d019f2d7ee53" title="bootstrapPktDescriptor::getFieldStructPointer" alt="" coords="300,272,585,301"/><area shape="rect" id="node15" href="classbootstrap_pkt_descriptor.html#ab40cbe12f1a802eb053530def0cf00c2" title="bootstrapPktDescriptor::getFieldTypeFlags" alt="" coords="308,325,577,355"/><area shape="rect" id="node17" href="classbootstrap_pkt_descriptor.html#a9955e314aedb20aa8d0b1282acf9257a" title="bootstrapPktDescriptor::getFieldTypeString" alt="" coords="307,379,579,408"/><area shape="rect" id="node19" href="classbootstrap_pkt_descriptor.html#acc2758d73aea392f3c535b7829fa4ef8" title="bootstrapPktDescriptor::setFieldAsString" alt="" coords="313,432,572,461"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="aeff299ff9dc06b97f41bb332ce9f3eff"></a><!-- doxytag: member="bootstrapPktDescriptor::getFieldName" ref="aeff299ff9dc06b97f41bb332ce9f3eff" args="(void *object, int field) const " -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const char * bootstrapPktDescriptor::getFieldName </td>
-          <td>(</td>
-          <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>object</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>field</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const<code> [virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="bootstrap_pkt__m_8cc_source.html#l00170">170</a> of file <a class="el" href="bootstrap_pkt__m_8cc_source.html">bootstrapPkt_m.cc</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classbootstrap_pkt_descriptor_aeff299ff9dc06b97f41bb332ce9f3eff_cgraph.png" border="0" usemap="#classbootstrap_pkt_descriptor_aeff299ff9dc06b97f41bb332ce9f3eff_cgraph" alt=""/></div>
-<map name="classbootstrap_pkt_descriptor_aeff299ff9dc06b97f41bb332ce9f3eff_cgraph" id="classbootstrap_pkt_descriptor_aeff299ff9dc06b97f41bb332ce9f3eff_cgraph">
-<area shape="rect" id="node3" href="classbootstrap_pkt_descriptor.html#a8ecad21098f76fffd7ce18ec42def88a" title="bootstrapPktDescriptor::getFieldCount" alt="" coords="299,5,544,35"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="a1638a6d86c8b285034832fed08a3e1cc"></a><!-- doxytag: member="bootstrapPktDescriptor::getFieldProperty" ref="a1638a6d86c8b285034832fed08a3e1cc" args="(void *object, int field, const char *propertyname) const " -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const char * bootstrapPktDescriptor::getFieldProperty </td>
-          <td>(</td>
-          <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>object</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>field</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>propertyname</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const<code> [virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="bootstrap_pkt__m_8cc_source.html#l00212">212</a> of file <a class="el" href="bootstrap_pkt__m_8cc_source.html">bootstrapPkt_m.cc</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classbootstrap_pkt_descriptor_a1638a6d86c8b285034832fed08a3e1cc_cgraph.png" border="0" usemap="#classbootstrap_pkt_descriptor_a1638a6d86c8b285034832fed08a3e1cc_cgraph" alt=""/></div>
-<map name="classbootstrap_pkt_descriptor_a1638a6d86c8b285034832fed08a3e1cc_cgraph" id="classbootstrap_pkt_descriptor_a1638a6d86c8b285034832fed08a3e1cc_cgraph">
-<area shape="rect" id="node3" href="classbootstrap_pkt_descriptor.html#a8ecad21098f76fffd7ce18ec42def88a" title="bootstrapPktDescriptor::getFieldCount" alt="" coords="312,5,557,35"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="a9cfc237d9418b1b442f173f17a7f4a66"></a><!-- doxytag: member="bootstrapPktDescriptor::getFieldStructName" ref="a9cfc237d9418b1b442f173f17a7f4a66" args="(void *object, int field) const " -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const char * bootstrapPktDescriptor::getFieldStructName </td>
-          <td>(</td>
-          <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>object</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>field</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const<code> [virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="bootstrap_pkt__m_8cc_source.html#l00272">272</a> of file <a class="el" href="bootstrap_pkt__m_8cc_source.html">bootstrapPkt_m.cc</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classbootstrap_pkt_descriptor_a9cfc237d9418b1b442f173f17a7f4a66_cgraph.png" border="0" usemap="#classbootstrap_pkt_descriptor_a9cfc237d9418b1b442f173f17a7f4a66_cgraph" alt=""/></div>
-<map name="classbootstrap_pkt_descriptor_a9cfc237d9418b1b442f173f17a7f4a66_cgraph" id="classbootstrap_pkt_descriptor_a9cfc237d9418b1b442f173f17a7f4a66_cgraph">
-<area shape="rect" id="node3" href="classbootstrap_pkt_descriptor.html#a8ecad21098f76fffd7ce18ec42def88a" title="bootstrapPktDescriptor::getFieldCount" alt="" coords="333,5,579,35"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="ac8c8895449bf746124a5d019f2d7ee53"></a><!-- doxytag: member="bootstrapPktDescriptor::getFieldStructPointer" ref="ac8c8895449bf746124a5d019f2d7ee53" args="(void *object, int field, int i) const " -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void * bootstrapPktDescriptor::getFieldStructPointer </td>
-          <td>(</td>
-          <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>object</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>field</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>i</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const<code> [virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="bootstrap_pkt__m_8cc_source.html#l00288">288</a> of file <a class="el" href="bootstrap_pkt__m_8cc_source.html">bootstrapPkt_m.cc</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classbootstrap_pkt_descriptor_ac8c8895449bf746124a5d019f2d7ee53_cgraph.png" border="0" usemap="#classbootstrap_pkt_descriptor_ac8c8895449bf746124a5d019f2d7ee53_cgraph" alt=""/></div>
-<map name="classbootstrap_pkt_descriptor_ac8c8895449bf746124a5d019f2d7ee53_cgraph" id="classbootstrap_pkt_descriptor_ac8c8895449bf746124a5d019f2d7ee53_cgraph">
-<area shape="rect" id="node3" href="classbootstrap_pkt_descriptor.html#a8ecad21098f76fffd7ce18ec42def88a" title="bootstrapPktDescriptor::getFieldCount" alt="" coords="341,5,587,35"/><area shape="rect" id="node5" href="classbootstrap_pkt.html#ad1b68dceb784d72b036ce2d161d24db5" title="bootstrapPkt::getSuperPeerAdr" alt="" coords="363,59,565,88"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="ab40cbe12f1a802eb053530def0cf00c2"></a><!-- doxytag: member="bootstrapPktDescriptor::getFieldTypeFlags" ref="ab40cbe12f1a802eb053530def0cf00c2" args="(void *object, int field) const " -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">unsigned int bootstrapPktDescriptor::getFieldTypeFlags </td>
-          <td>(</td>
-          <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>object</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>field</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const<code> [virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="bootstrap_pkt__m_8cc_source.html#l00154">154</a> of file <a class="el" href="bootstrap_pkt__m_8cc_source.html">bootstrapPkt_m.cc</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classbootstrap_pkt_descriptor_ab40cbe12f1a802eb053530def0cf00c2_cgraph.png" border="0" usemap="#classbootstrap_pkt_descriptor_ab40cbe12f1a802eb053530def0cf00c2_cgraph" alt=""/></div>
-<map name="classbootstrap_pkt_descriptor_ab40cbe12f1a802eb053530def0cf00c2_cgraph" id="classbootstrap_pkt_descriptor_ab40cbe12f1a802eb053530def0cf00c2_cgraph">
-<area shape="rect" id="node3" href="classbootstrap_pkt_descriptor.html#a8ecad21098f76fffd7ce18ec42def88a" title="bootstrapPktDescriptor::getFieldCount" alt="" coords="325,5,571,35"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="a9955e314aedb20aa8d0b1282acf9257a"></a><!-- doxytag: member="bootstrapPktDescriptor::getFieldTypeString" ref="a9955e314aedb20aa8d0b1282acf9257a" args="(void *object, int field) const " -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const char * bootstrapPktDescriptor::getFieldTypeString </td>
-          <td>(</td>
-          <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>object</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>field</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const<code> [virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="bootstrap_pkt__m_8cc_source.html#l00196">196</a> of file <a class="el" href="bootstrap_pkt__m_8cc_source.html">bootstrapPkt_m.cc</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classbootstrap_pkt_descriptor_a9955e314aedb20aa8d0b1282acf9257a_cgraph.png" border="0" usemap="#classbootstrap_pkt_descriptor_a9955e314aedb20aa8d0b1282acf9257a_cgraph" alt=""/></div>
-<map name="classbootstrap_pkt_descriptor_a9955e314aedb20aa8d0b1282acf9257a_cgraph" id="classbootstrap_pkt_descriptor_a9955e314aedb20aa8d0b1282acf9257a_cgraph">
-<area shape="rect" id="node3" href="classbootstrap_pkt_descriptor.html#a8ecad21098f76fffd7ce18ec42def88a" title="bootstrapPktDescriptor::getFieldCount" alt="" coords="328,5,573,35"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="acf6326774687dcf94497f4af377757ed"></a><!-- doxytag: member="bootstrapPktDescriptor::getProperty" ref="acf6326774687dcf94497f4af377757ed" args="(const char *propertyname) const " -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const char * bootstrapPktDescriptor::getProperty </td>
-          <td>(</td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>propertyname</em></td><td>)</td>
-          <td> const<code> [virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="bootstrap_pkt__m_8cc_source.html#l00142">142</a> of file <a class="el" href="bootstrap_pkt__m_8cc_source.html">bootstrapPkt_m.cc</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="acc2758d73aea392f3c535b7829fa4ef8"></a><!-- doxytag: member="bootstrapPktDescriptor::setFieldAsString" ref="acc2758d73aea392f3c535b7829fa4ef8" args="(void *object, int field, int i, const char *value) const " -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool bootstrapPktDescriptor::setFieldAsString </td>
-          <td>(</td>
-          <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>object</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>field</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>i</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>value</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const<code> [virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="bootstrap_pkt__m_8cc_source.html#l00256">256</a> of file <a class="el" href="bootstrap_pkt__m_8cc_source.html">bootstrapPkt_m.cc</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classbootstrap_pkt_descriptor_acc2758d73aea392f3c535b7829fa4ef8_cgraph.png" border="0" usemap="#classbootstrap_pkt_descriptor_acc2758d73aea392f3c535b7829fa4ef8_cgraph" alt=""/></div>
-<map name="classbootstrap_pkt_descriptor_acc2758d73aea392f3c535b7829fa4ef8_cgraph" id="classbootstrap_pkt_descriptor_acc2758d73aea392f3c535b7829fa4ef8_cgraph">
-<area shape="rect" id="node3" href="classbootstrap_pkt_descriptor.html#a8ecad21098f76fffd7ce18ec42def88a" title="bootstrapPktDescriptor::getFieldCount" alt="" coords="315,5,560,35"/><area shape="rect" id="node5" href="classbootstrap_pkt.html#a1d2a0231c6174381c5fc0a333c3ee65b" title="bootstrapPkt::setLatitude" alt="" coords="353,59,521,88"/><area shape="rect" id="node7" href="classbootstrap_pkt.html#a98f5c5f8e3de7301edce42ad55a8dd33" title="bootstrapPkt::setLongitude" alt="" coords="348,112,527,141"/></map>
-</div>
-</p>
-
-</div>
-</div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li><a class="el" href="bootstrap_pkt__m_8cc_source.html">bootstrapPkt_m.cc</a></li>
+<li>bootstrapPkt_m.cc</li>
 </ul>
 </div>
 </div>
   <div id="nav-path" class="navpath">
     <ul>
       <li class="navelem"><a class="el" href="classbootstrap_pkt_descriptor.html">bootstrapPktDescriptor</a>      </li>
-      <li class="footer">Generated on Mon Nov 7 2011 15:57:41 for Pithos by&#160;
+      <li class="footer">Generated on Tue Nov 29 2011 10:50:45 for Pithos by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>
@@ -632,7 +135,7 @@ Here is the call graph for this function:</div>
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">

@@ -1,5 +1,8 @@
 PhD TODO list:
 
+Upgrade to Omnet++ 4.2
+Update Doxygen documentation
+
 Extend the pithos test application to allow for failure detection and the calculation of the success to failure ratio.
 Extend the pithos test application to add retrieve and modify testing.
 

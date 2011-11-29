@@ -40,25 +40,13 @@ class GameObject : public cOwnedObject
 {
 	private:
 
-		/**
-		 * The name of the game object, which is different from the name of the object itself, which is usually "GameObject"
-		 */
-		char objectName[41];
+		char objectName[41]; /**< The name of the game object, which is different from the name of the object itself, which is usually "GameObject" */
 
-		/**
-		 * The size in bytes of the object
-		 */
-		int64_t size;
+		int64_t size; /**< The size in bytes of the object */
 
-		/**
-		 * The type of object (root,replica,overlay)
-		 */
-		int type;
+		int type; /**< The type of object (root,replica,overlay) */
 
-		/**
-		 * The time when the object was created
-		 */
-		simtime_t creationTime;
+		simtime_t creationTime; /**< The time when the object was created */
 
 	public:
 		GameObject(const char *name="", int o_type=ROOT, int64_t o_size=0, simtime_t o_creationTime=0);

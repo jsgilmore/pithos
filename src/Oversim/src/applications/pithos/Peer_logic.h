@@ -47,23 +47,17 @@ class Peer_logic: public cSimpleModule
 {
 	private:
 
-		/** An event used to trigger a join request */
-		cMessage *event;
+		cMessage *event; /**< An event used to trigger a join request */
 
-		/** The IP address of the directory server (specified as a Omnet param value) */
-		char directory_ip[16];
+		char directory_ip[16]; /**< The IP address of the directory server (specified as a Omnet param value) */
 
-		/** The port of the directory server (specified as a Omnet param value) */
-		int directory_port;
+		int directory_port; /**< The port of the directory server (specified as a Omnet param value) */
 
-		/** The latitude of this peer (position in the virtual world) */
-		double latitude;
+		double latitude; /**< The latitude of this peer (position in the virtual world) */
 
-		/** The longitude of this peer (position in the virtual world) */
-		double longitude;
+		double longitude; /**< The longitude of this peer (position in the virtual world) */
 
-		/** The TransPort address of the group super peer (this address is set, after the peer has joined a group) */
-		TransportAddress super_peer_address;
+		TransportAddress super_peer_address; /**< The TransPort address of the group super peer (this address is set, after the peer has joined a group) */
 
 	public:
 		Peer_logic();

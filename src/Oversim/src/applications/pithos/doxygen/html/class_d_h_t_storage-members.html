@@ -27,7 +27,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Pithos</div>
-   <div id="projectbrief">Distributed storage for MMVEs</div>
+   <div id="projectbrief">Distributed state management and persistency for P2P MMVE</div>
   </td>
  </tr>
  </tbody>
@@ -84,15 +84,19 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div>
 <div class="contents">
 This is the complete list of members for <a class="el" href="class_d_h_t_storage.html">DHTStorage</a>, including all inherited members.<table>
-  <tr class="memlist"><td><a class="el" href="class_d_h_t_storage.html#a8bd73be8617035e2a1d8cf368b68ebd5">DHTStorage</a>()</td><td><a class="el" href="class_d_h_t_storage.html">DHTStorage</a></td><td></td></tr>
-  <tr class="memlist"><td><a class="el" href="class_d_h_t_storage.html#ab0c35152d19c1ac8694f11c1803e5740">handleMessage</a>(cMessage *msg)</td><td><a class="el" href="class_d_h_t_storage.html">DHTStorage</a></td><td><code> [protected, virtual]</code></td></tr>
-  <tr class="memlist"><td><a class="el" href="class_d_h_t_storage.html#a85735d12512dd5a566a3dd446be51c54">initialize</a>()</td><td><a class="el" href="class_d_h_t_storage.html">DHTStorage</a></td><td><code> [protected, virtual]</code></td></tr>
-  <tr class="memlist"><td><a class="el" href="class_d_h_t_storage.html#aec4a25f2719f920eb5d705def21dfde0">~DHTStorage</a>()</td><td><a class="el" href="class_d_h_t_storage.html">DHTStorage</a></td><td><code> [virtual]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>DHTStorage</b>() (defined in <a class="el" href="class_d_h_t_storage.html">DHTStorage</a>)</td><td><a class="el" href="class_d_h_t_storage.html">DHTStorage</a></td><td></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>finish</b>() (defined in <a class="el" href="class_d_h_t_storage.html">DHTStorage</a>)</td><td><a class="el" href="class_d_h_t_storage.html">DHTStorage</a></td><td><code> [protected]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>handleMessage</b>(cMessage *msg) (defined in <a class="el" href="class_d_h_t_storage.html">DHTStorage</a>)</td><td><a class="el" href="class_d_h_t_storage.html">DHTStorage</a></td><td><code> [protected, virtual]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>handlePutResponse</b>(DHTputCAPIResponse *msg, DHTStatsContext *context) (defined in <a class="el" href="class_d_h_t_storage.html">DHTStorage</a>)</td><td><a class="el" href="class_d_h_t_storage.html">DHTStorage</a></td><td><code> [protected]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>handleRpcResponse</b>(BaseResponseMessage *msg, const RpcState &amp;state, simtime_t rtt) (defined in <a class="el" href="class_d_h_t_storage.html">DHTStorage</a>)</td><td><a class="el" href="class_d_h_t_storage.html">DHTStorage</a></td><td></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>handleTraceMessage</b>(cMessage *msg) (defined in <a class="el" href="class_d_h_t_storage.html">DHTStorage</a>)</td><td><a class="el" href="class_d_h_t_storage.html">DHTStorage</a></td><td></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>initialize</b>() (defined in <a class="el" href="class_d_h_t_storage.html">DHTStorage</a>)</td><td><a class="el" href="class_d_h_t_storage.html">DHTStorage</a></td><td><code> [protected, virtual]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>~DHTStorage</b>() (defined in <a class="el" href="class_d_h_t_storage.html">DHTStorage</a>)</td><td><a class="el" href="class_d_h_t_storage.html">DHTStorage</a></td><td><code> [virtual]</code></td></tr>
 </table></div>
 </div>
   <div id="nav-path" class="navpath">
     <ul>
-      <li class="footer">Generated on Mon Nov 7 2011 15:57:41 for Pithos by&#160;
+      <li class="footer">Generated on Tue Nov 29 2011 10:50:45 for Pithos by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>
@@ -102,7 +106,7 @@ This is the complete list of members for <a class="el" href="class_d_h_t_storage
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">

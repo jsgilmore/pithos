@@ -27,7 +27,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Pithos</div>
-   <div id="projectbrief">Distributed storage for MMVEs</div>
+   <div id="projectbrief">Distributed state management and persistency for P2P MMVE</div>
   </td>
  </tr>
  </tbody>
@@ -84,13 +84,31 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div>
 <div class="contents">
 This is the complete list of members for <a class="el" href="class_communicator.html">Communicator</a>, including all inherited members.<table>
-  <tr class="memlist"><td><a class="el" href="class_communicator.html#abd4c26c6a901e571bc9cfc4259e65de3">Communicator</a>()</td><td><a class="el" href="class_communicator.html">Communicator</a></td><td><code> [inline]</code></td></tr>
-  <tr class="memlist"><td><a class="el" href="class_communicator.html#a4ced5362bf7438924f8d7f1b0c5ec391">~Communicator</a>()</td><td><a class="el" href="class_communicator.html">Communicator</a></td><td><code> [inline]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>Communicator</b>() (defined in <a class="el" href="class_communicator.html">Communicator</a>)</td><td><a class="el" href="class_communicator.html">Communicator</a></td><td><code> [inline]</code></td></tr>
+  <tr class="memlist"><td><a class="el" href="class_communicator.html#ac2770cc25f3373b13d82845d9e2555d1">deliver</a>(OverlayKey &amp;key, cMessage *msg)</td><td><a class="el" href="class_communicator.html">Communicator</a></td><td><code> [protected]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>externallySendInternalRpcCall</b>(CompType destComp, BaseCallMessage *msg, cPolymorphic *context=NULL, simtime_t timeout=-1, int retries=0, int rpcId=-1, RpcListener *rpcListener=NULL) (defined in <a class="el" href="class_communicator.html">Communicator</a>)</td><td><a class="el" href="class_communicator.html">Communicator</a></td><td><code> [inline]</code></td></tr>
+  <tr class="memlist"><td><a class="el" href="class_communicator.html#a4fa2cb93d804409a5f73262e7bd923fa">finishApp</a>()</td><td><a class="el" href="class_communicator.html">Communicator</a></td><td><code> [protected]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>getCreationTime</b>() (defined in <a class="el" href="class_communicator.html">Communicator</a>)</td><td><a class="el" href="class_communicator.html">Communicator</a></td><td></td></tr>
+  <tr class="memlist"><td><a class="el" href="class_communicator.html#a9ac48ae31ed1068517e5df94951eb5b8">handleGetCAPIRequest</a>(RootObjectGetCAPICall *capiGetMsg)</td><td><a class="el" href="class_communicator.html">Communicator</a></td><td><code> [protected]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>handleMessage</b>(cMessage *msg) (defined in <a class="el" href="class_communicator.html">Communicator</a>)</td><td><a class="el" href="class_communicator.html">Communicator</a></td><td><code> [protected, virtual]</code></td></tr>
+  <tr class="memlist"><td><a class="el" href="class_communicator.html#aecf2c2f402bd7d4d1d3c6fb5144ef117">handlePeerMsg</a>(cMessage *msg)</td><td><a class="el" href="class_communicator.html">Communicator</a></td><td><code> [protected]</code></td></tr>
+  <tr class="memlist"><td><a class="el" href="class_communicator.html#a466c44f594812c35e6307e32d432c132">handlePutCAPIRequest</a>(RootObjectPutCAPICall *capiPutMsg)</td><td><a class="el" href="class_communicator.html">Communicator</a></td><td><code> [protected]</code></td></tr>
+  <tr class="memlist"><td><a class="el" href="class_communicator.html#a32478075467b4ade9f0d8533f35fb75e">handleRpcCall</a>(BaseCallMessage *msg)</td><td><a class="el" href="class_communicator.html">Communicator</a></td><td><code> [protected]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>handleRpcResponse</b>(BaseResponseMessage *msg, const RpcState &amp;state, simtime_t rtt) (defined in <a class="el" href="class_communicator.html">Communicator</a>)</td><td><a class="el" href="class_communicator.html">Communicator</a></td><td><code> [protected]</code></td></tr>
+  <tr class="memlist"><td><a class="el" href="class_communicator.html#a9a8a5fa319d1185b0e32a9aa24d56e49">handleSPMsg</a>(cMessage *msg)</td><td><a class="el" href="class_communicator.html">Communicator</a></td><td><code> [protected]</code></td></tr>
+  <tr class="memlist"><td><a class="el" href="class_communicator.html#a3ab68beb55470b059b1676ae8f140927">handleTimerEvent</a>(cMessage *msg)</td><td><a class="el" href="class_communicator.html">Communicator</a></td><td><code> [protected]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>handleTraceMessage</b>(cMessage *msg) (defined in <a class="el" href="class_communicator.html">Communicator</a>)</td><td><a class="el" href="class_communicator.html">Communicator</a></td><td><code> [protected]</code></td></tr>
+  <tr class="memlist"><td><a class="el" href="class_communicator.html#aed94f303dec6b31ca225fcce49aa6c05">handleUDPMessage</a>(cMessage *msg)</td><td><a class="el" href="class_communicator.html">Communicator</a></td><td><code> [protected]</code></td></tr>
+  <tr class="memlist"><td><a class="el" href="class_communicator.html#a1f04220db1b1674bd515a897a296243c">handleUpperMessage</a>(cMessage *msg)</td><td><a class="el" href="class_communicator.html">Communicator</a></td><td><code> [protected]</code></td></tr>
+  <tr class="memlist"><td><a class="el" href="class_communicator.html#a99fce573c8e55ff39d015df629ed1db9">initializeApp</a>(int stage)</td><td><a class="el" href="class_communicator.html">Communicator</a></td><td><code> [protected]</code></td></tr>
+  <tr class="memlist"><td><a class="el" href="class_communicator.html#a9d79584c06b9d47eb3a76b7994c4e3d4">overlayStore</a>(cMessage *msg)</td><td><a class="el" href="class_communicator.html">Communicator</a></td><td><code> [protected]</code></td></tr>
+  <tr class="memlist"><td><a class="el" href="class_communicator.html#ae03d1069ee8e01c017ba004e7c61b1ea">sendPacket</a>(cMessage *msg)</td><td><a class="el" href="class_communicator.html">Communicator</a></td><td><code> [protected]</code></td></tr>
+  <tr bgcolor="#f0f0f0"><td><b>~Communicator</b>() (defined in <a class="el" href="class_communicator.html">Communicator</a>)</td><td><a class="el" href="class_communicator.html">Communicator</a></td><td><code> [inline]</code></td></tr>
 </table></div>
 </div>
   <div id="nav-path" class="navpath">
     <ul>
-      <li class="footer">Generated on Mon Nov 7 2011 15:57:41 for Pithos by&#160;
+      <li class="footer">Generated on Tue Nov 29 2011 10:50:45 for Pithos by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>
@@ -100,7 +118,7 @@ This is the complete list of members for <a class="el" href="class_communicator.
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">

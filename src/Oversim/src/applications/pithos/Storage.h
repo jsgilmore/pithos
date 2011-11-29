@@ -38,36 +38,26 @@ class Storage : public cSimpleModule
 		int getStorageFiles();
 	private:
 
-		/** The queue holding all stored GameObjects */
-		cQueue storage;
+		cQueue storage; /**< The queue holding all stored GameObjects */
 	protected:
 
-		/** Signal for recording the number of objects stored */
-		simsignal_t qlenSignal;
+		simsignal_t qlenSignal; /**< Signal for recording the number of objects stored */
 
-		/** Signal for recording the size of objects stored in bytes */
-		simsignal_t qsizeSignal;
+		simsignal_t qsizeSignal; /**< Signal for recording the size of objects stored in bytes */
 
-		/** Signal for recording the number of overlay objects stored */
-		simsignal_t overlayObjectsSignal;
+		simsignal_t overlayObjectsSignal; /**< Signal for recording the number of overlay objects stored */
 
-		/** Signal for recording the number of root objects stored */
-		simsignal_t rootObjectsSignal;
+		simsignal_t rootObjectsSignal; /**< Signal for recording the number of root objects stored */
 
-		/** Signal for recording the number of group replica objects stored */
-		simsignal_t replicaObjectsSignal;
+		simsignal_t replicaObjectsSignal; /**< Signal for recording the number of group replica objects stored */
 
-		/** Signal for recording the time that was required to store each object */
-		simsignal_t storeTimeSignal;
+		simsignal_t storeTimeSignal; /**< Signal for recording the time that was required to store each object */
 
-		/** Signal for recording the time that was required to store a root object */
-		simsignal_t rootStoreTimeSignal;
+		simsignal_t rootStoreTimeSignal; /**< Signal for recording the time that was required to store a root object */
 
-		/** Signal for recording the time that was required to store a group replica object */
-		simsignal_t replicaStoreTimeSignal;
+		simsignal_t replicaStoreTimeSignal; /**< Signal for recording the time that was required to store a group replica object */
 
-		/** Signal for recording the time that was required to store an overlay object */
-		simsignal_t overlayStoreTimeSignal;
+		simsignal_t overlayStoreTimeSignal; /**< Signal for recording the time that was required to store an overlay object */
 
 		virtual void initialize();
 		virtual void handleMessage(cMessage *msg);

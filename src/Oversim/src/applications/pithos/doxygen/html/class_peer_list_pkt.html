@@ -27,7 +27,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Pithos</div>
-   <div id="projectbrief">Distributed storage for MMVEs</div>
+   <div id="projectbrief">Distributed state management and persistency for P2P MMVE</div>
   </td>
  </tr>
  </tbody>
@@ -107,10 +107,14 @@ Collaboration diagram for PeerListPkt:</div>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_peer_list_pkt.html#a8d4459dc780849080f08645679ac2e53">PeerListPkt</a> (const char *name=NULL, int kind=0)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_peer_list_pkt.html#a073d6ec7706952363e5d4731fcbaf81b">PeerListPkt</a> (const <a class="el" href="class_peer_list_pkt.html">PeerListPkt</a> &amp;other)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_peer_list_pkt.html">PeerListPkt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_peer_list_pkt.html#abf5b6ab539dcf00ba9de8cc8910bf9c1">operator=</a> (const <a class="el" href="class_peer_list_pkt.html">PeerListPkt</a> &amp;other)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="class_peer_list_pkt.html">PeerListPkt</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_peer_list_pkt.html#ada1ac8ea05569f6d92b8503fdde6feb7">dup</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8d4459dc780849080f08645679ac2e53"></a><!-- doxytag: member="PeerListPkt::PeerListPkt" ref="a8d4459dc780849080f08645679ac2e53" args="(const char *name=NULL, int kind=0)" -->
+&#160;</td><td class="memItemRight" valign="bottom"><b>PeerListPkt</b> (const char *name=NULL, int kind=0)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a073d6ec7706952363e5d4731fcbaf81b"></a><!-- doxytag: member="PeerListPkt::PeerListPkt" ref="a073d6ec7706952363e5d4731fcbaf81b" args="(const PeerListPkt &amp;other)" -->
+&#160;</td><td class="memItemRight" valign="bottom"><b>PeerListPkt</b> (const <a class="el" href="class_peer_list_pkt.html">PeerListPkt</a> &amp;other)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abf5b6ab539dcf00ba9de8cc8910bf9c1"></a><!-- doxytag: member="PeerListPkt::operator=" ref="abf5b6ab539dcf00ba9de8cc8910bf9c1" args="(const PeerListPkt &amp;other)" -->
+<a class="el" href="class_peer_list_pkt.html">PeerListPkt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (const <a class="el" href="class_peer_list_pkt.html">PeerListPkt</a> &amp;other)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ada1ac8ea05569f6d92b8503fdde6feb7"></a><!-- doxytag: member="PeerListPkt::dup" ref="ada1ac8ea05569f6d92b8503fdde6feb7" args="()" -->
+virtual <a class="el" href="class_peer_list_pkt.html">PeerListPkt</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>dup</b> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_peer_list_pkt.html#a01f8ec449f1196c6677695ae51c32767">setPeer_listArraySize</a> (unsigned int size)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_peer_list_pkt.html#a3076df2064ce7c8ab634a9b50ef947c6">getPeer_listArraySize</a> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="class_peer_data.html">PeerData</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_peer_list_pkt.html#a733ae6fbfceca524344eb715940e428c">getPeer_list</a> (unsigned int k)</td></tr>
@@ -124,85 +128,7 @@ Protected Attributes</h2></td></tr>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <div class="textblock"><p>Implementation of the peer list packet, which expands on the abstract msg definition. This further implementation is required to add a std::vector to the message definition, which is not supported by the msg definition language.</p>
 <dl class="author"><dt><b>Author:</b></dt><dd>John Gilmore </dd></dl>
-
-<p>Definition at line <a class="el" href="_peer_list_pkt_8h_source.html#l00033">33</a> of file <a class="el" href="_peer_list_pkt_8h_source.html">PeerListPkt.h</a>.</p>
-</div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="a8d4459dc780849080f08645679ac2e53"></a><!-- doxytag: member="PeerListPkt::PeerListPkt" ref="a8d4459dc780849080f08645679ac2e53" args="(const char *name=NULL, int kind=0)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">PeerListPkt::PeerListPkt </td>
-          <td>(</td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>name</em> = <code>NULL</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>kind</em> = <code>0</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td><code> [inline]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="_peer_list_pkt_8h_source.html#l00041">41</a> of file <a class="el" href="_peer_list_pkt_8h_source.html">PeerListPkt.h</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_peer_list_pkt_a8d4459dc780849080f08645679ac2e53_cgraph.png" border="0" usemap="#class_peer_list_pkt_a8d4459dc780849080f08645679ac2e53_cgraph" alt=""/></div>
-<map name="class_peer_list_pkt_a8d4459dc780849080f08645679ac2e53_cgraph" id="class_peer_list_pkt_a8d4459dc780849080f08645679ac2e53_cgraph">
-<area shape="rect" id="node3" href="class_packet.html#a884189f2e5f410bb2a00fe2ae1a5c665" title="Packet::Packet" alt="" coords="221,5,333,35"/></map>
-</div>
-</p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_peer_list_pkt_a8d4459dc780849080f08645679ac2e53_icgraph.png" border="0" usemap="#class_peer_list_pkt_a8d4459dc780849080f08645679ac2e53_icgraph" alt=""/></div>
-<map name="class_peer_list_pkt_a8d4459dc780849080f08645679ac2e53_icgraph" id="class_peer_list_pkt_a8d4459dc780849080f08645679ac2e53_icgraph">
-<area shape="rect" id="node3" href="class_peer_list_pkt.html#ada1ac8ea05569f6d92b8503fdde6feb7" title="PeerListPkt::dup" alt="" coords="223,5,340,35"/><area shape="rect" id="node5" href="class_super__peer__logic.html#adcc9461531fc44be7b07e21ab09abcb7" title="Super_peer_logic::handleJoinReq" alt="" coords="389,5,605,35"/><area shape="rect" id="node7" href="class_super__peer__logic.html#a55adc92c94a1f2743e269481bd859e0a" title="Super_peer_logic::handleMessage" alt="" coords="653,5,875,35"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="a073d6ec7706952363e5d4731fcbaf81b"></a><!-- doxytag: member="PeerListPkt::PeerListPkt" ref="a073d6ec7706952363e5d4731fcbaf81b" args="(const PeerListPkt &amp;other)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">PeerListPkt::PeerListPkt </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="class_peer_list_pkt.html">PeerListPkt</a> &amp;&#160;</td>
-          <td class="paramname"><em>other</em></td><td>)</td>
-          <td><code> [inline]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="_peer_list_pkt_8h_source.html#l00046">46</a> of file <a class="el" href="_peer_list_pkt_8h_source.html">PeerListPkt.h</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_peer_list_pkt_a073d6ec7706952363e5d4731fcbaf81b_cgraph.png" border="0" usemap="#class_peer_list_pkt_a073d6ec7706952363e5d4731fcbaf81b_cgraph" alt=""/></div>
-<map name="class_peer_list_pkt_a073d6ec7706952363e5d4731fcbaf81b_cgraph" id="class_peer_list_pkt_a073d6ec7706952363e5d4731fcbaf81b_cgraph">
-<area shape="rect" id="node3" href="class_peer_list_pkt.html#abf5b6ab539dcf00ba9de8cc8910bf9c1" title="PeerListPkt::operator=" alt="" coords="223,5,375,35"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<hr/><h2>Member Function Documentation</h2>
+</div><hr/><h2>Member Function Documentation</h2>
 <a class="anchor" id="a5d29f2f307d4d19056b8feca4925e717"></a><!-- doxytag: member="PeerListPkt::addToPeerList" ref="a5d29f2f307d4d19056b8feca4925e717" args="(const PeerData &amp;alist)" -->
 <div class="memitem">
 <div class="memproto">
@@ -225,14 +151,12 @@ Here is the call graph for this function:</div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="_peer_list_pkt_8h_source.html#l00098">98</a> of file <a class="el" href="_peer_list_pkt_8h_source.html">PeerListPkt.h</a>.</p>
-
 <p><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_peer_list_pkt_a5d29f2f307d4d19056b8feca4925e717_icgraph.png" border="0" usemap="#class_peer_list_pkt_a5d29f2f307d4d19056b8feca4925e717_icgraph" alt=""/></div>
 <map name="class_peer_list_pkt_a5d29f2f307d4d19056b8feca4925e717_icgraph" id="class_peer_list_pkt_a5d29f2f307d4d19056b8feca4925e717_icgraph">
-<area shape="rect" id="node3" href="class_super__peer__logic.html#adcc9461531fc44be7b07e21ab09abcb7" title="Super_peer_logic::handleJoinReq" alt="" coords="237,5,453,35"/><area shape="rect" id="node5" href="class_super__peer__logic.html#a55adc92c94a1f2743e269481bd859e0a" title="Super_peer_logic::handleMessage" alt="" coords="501,5,723,35"/></map>
+<area shape="rect" id="node3" href="class_super__peer__logic.html#adcc9461531fc44be7b07e21ab09abcb7" title="Super_peer_logic::handleJoinReq" alt="" coords="237,5,453,35"/></map>
 </div>
 </p>
 
@@ -253,50 +177,12 @@ Here is the caller graph for this function:</div>
 <div class="memdoc">
 <p>Delete all elements contained in the peer list </p>
 
-<p>Definition at line <a class="el" href="_peer_list_pkt_8h_source.html#l00103">103</a> of file <a class="el" href="_peer_list_pkt_8h_source.html">PeerListPkt.h</a>.</p>
-
 <p><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_peer_list_pkt_a8dbb55c1da631c1bb706fa0eebcfb8a6_icgraph.png" border="0" usemap="#class_peer_list_pkt_a8dbb55c1da631c1bb706fa0eebcfb8a6_icgraph" alt=""/></div>
 <map name="class_peer_list_pkt_a8dbb55c1da631c1bb706fa0eebcfb8a6_icgraph" id="class_peer_list_pkt_a8dbb55c1da631c1bb706fa0eebcfb8a6_icgraph">
-<area shape="rect" id="node3" href="class_super__peer__logic.html#adcc9461531fc44be7b07e21ab09abcb7" title="Super_peer_logic::handleJoinReq" alt="" coords="229,5,445,35"/><area shape="rect" id="node5" href="class_super__peer__logic.html#a55adc92c94a1f2743e269481bd859e0a" title="Super_peer_logic::handleMessage" alt="" coords="493,5,715,35"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="ada1ac8ea05569f6d92b8503fdde6feb7"></a><!-- doxytag: member="PeerListPkt::dup" ref="ada1ac8ea05569f6d92b8503fdde6feb7" args="()" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual <a class="el" href="class_peer_list_pkt.html">PeerListPkt</a>* PeerListPkt::dup </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td><code> [inline, virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="_peer_list_pkt_8h_source.html#l00061">61</a> of file <a class="el" href="_peer_list_pkt_8h_source.html">PeerListPkt.h</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_peer_list_pkt_ada1ac8ea05569f6d92b8503fdde6feb7_cgraph.png" border="0" usemap="#class_peer_list_pkt_ada1ac8ea05569f6d92b8503fdde6feb7_cgraph" alt=""/></div>
-<map name="class_peer_list_pkt_ada1ac8ea05569f6d92b8503fdde6feb7_cgraph" id="class_peer_list_pkt_ada1ac8ea05569f6d92b8503fdde6feb7_cgraph">
-<area shape="rect" id="node3" href="class_peer_list_pkt.html#a8d4459dc780849080f08645679ac2e53" title="PeerListPkt::PeerListPkt" alt="" coords="175,5,340,35"/><area shape="rect" id="node5" href="class_packet.html#a884189f2e5f410bb2a00fe2ae1a5c665" title="Packet::Packet" alt="" coords="389,5,501,35"/></map>
-</div>
-</p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_peer_list_pkt_ada1ac8ea05569f6d92b8503fdde6feb7_icgraph.png" border="0" usemap="#class_peer_list_pkt_ada1ac8ea05569f6d92b8503fdde6feb7_icgraph" alt=""/></div>
-<map name="class_peer_list_pkt_ada1ac8ea05569f6d92b8503fdde6feb7_icgraph" id="class_peer_list_pkt_ada1ac8ea05569f6d92b8503fdde6feb7_icgraph">
-<area shape="rect" id="node3" href="class_super__peer__logic.html#adcc9461531fc44be7b07e21ab09abcb7" title="Super_peer_logic::handleJoinReq" alt="" coords="173,5,389,35"/><area shape="rect" id="node5" href="class_super__peer__logic.html#a55adc92c94a1f2743e269481bd859e0a" title="Super_peer_logic::handleMessage" alt="" coords="437,5,659,35"/></map>
+<area shape="rect" id="node3" href="class_super__peer__logic.html#adcc9461531fc44be7b07e21ab09abcb7" title="Super_peer_logic::handleJoinReq" alt="" coords="229,5,445,35"/></map>
 </div>
 </p>
 
@@ -325,16 +211,14 @@ Here is the caller graph for this function:</div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>The peer information at the specified position </dd></dl>
 
-<p>Implements <a class="el" href="class_peer_list_pkt___base.html#a32cee7f058dfa90934d564db05473d76">PeerListPkt_Base</a>.</p>
-
-<p>Definition at line <a class="el" href="_peer_list_pkt_8h_source.html#l00083">83</a> of file <a class="el" href="_peer_list_pkt_8h_source.html">PeerListPkt.h</a>.</p>
+<p>Implements <a class="el" href="class_peer_list_pkt___base.html">PeerListPkt_Base</a>.</p>
 
 <p><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_peer_list_pkt_a733ae6fbfceca524344eb715940e428c_icgraph.png" border="0" usemap="#class_peer_list_pkt_a733ae6fbfceca524344eb715940e428c_icgraph" alt=""/></div>
 <map name="class_peer_list_pkt_a733ae6fbfceca524344eb715940e428c_icgraph" id="class_peer_list_pkt_a733ae6fbfceca524344eb715940e428c_icgraph">
-<area shape="rect" id="node3" href="class_super__peer__logic.html#a3c0afa1028c629dce6a8f3c3e4621702" title="Super_peer_logic::addObject" alt="" coords="221,5,411,35"/><area shape="rect" id="node5" href="class_super__peer__logic.html#a55adc92c94a1f2743e269481bd859e0a" title="Super_peer_logic::handleMessage" alt="" coords="459,5,680,35"/></map>
+<area shape="rect" id="node3" href="class_super__peer__logic.html#a3c0afa1028c629dce6a8f3c3e4621702" title="Super_peer_logic::addObject" alt="" coords="221,5,411,35"/></map>
 </div>
 </p>
 
@@ -356,44 +240,14 @@ Here is the caller graph for this function:</div>
 <p>Get the size of the peer_list vector</p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>size The number of elements that the vector contains </dd></dl>
 
-<p>Implements <a class="el" href="class_peer_list_pkt___base.html#ab12568db92fab6f8c739e474f00fae16">PeerListPkt_Base</a>.</p>
-
-<p>Definition at line <a class="el" href="_peer_list_pkt_8h_source.html#l00075">75</a> of file <a class="el" href="_peer_list_pkt_8h_source.html">PeerListPkt.h</a>.</p>
+<p>Implements <a class="el" href="class_peer_list_pkt___base.html">PeerListPkt_Base</a>.</p>
 
 <p><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_peer_list_pkt_a3076df2064ce7c8ab634a9b50ef947c6_icgraph.png" border="0" usemap="#class_peer_list_pkt_a3076df2064ce7c8ab634a9b50ef947c6_icgraph" alt=""/></div>
 <map name="class_peer_list_pkt_a3076df2064ce7c8ab634a9b50ef947c6_icgraph" id="class_peer_list_pkt_a3076df2064ce7c8ab634a9b50ef947c6_icgraph">
-<area shape="rect" id="node3" href="class_super__peer__logic.html#a3c0afa1028c629dce6a8f3c3e4621702" title="Super_peer_logic::addObject" alt="" coords="277,5,467,35"/><area shape="rect" id="node5" href="class_super__peer__logic.html#a55adc92c94a1f2743e269481bd859e0a" title="Super_peer_logic::handleMessage" alt="" coords="515,5,736,35"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="abf5b6ab539dcf00ba9de8cc8910bf9c1"></a><!-- doxytag: member="PeerListPkt::operator=" ref="abf5b6ab539dcf00ba9de8cc8910bf9c1" args="(const PeerListPkt &amp;other)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="class_peer_list_pkt.html">PeerListPkt</a>&amp; PeerListPkt::operator= </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="class_peer_list_pkt.html">PeerListPkt</a> &amp;&#160;</td>
-          <td class="paramname"><em>other</em></td><td>)</td>
-          <td><code> [inline]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="_peer_list_pkt_8h_source.html#l00053">53</a> of file <a class="el" href="_peer_list_pkt_8h_source.html">PeerListPkt.h</a>.</p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_peer_list_pkt_abf5b6ab539dcf00ba9de8cc8910bf9c1_icgraph.png" border="0" usemap="#class_peer_list_pkt_abf5b6ab539dcf00ba9de8cc8910bf9c1_icgraph" alt=""/></div>
-<map name="class_peer_list_pkt_abf5b6ab539dcf00ba9de8cc8910bf9c1_icgraph" id="class_peer_list_pkt_abf5b6ab539dcf00ba9de8cc8910bf9c1_icgraph">
-<area shape="rect" id="node3" href="class_peer_list_pkt.html#a073d6ec7706952363e5d4731fcbaf81b" title="PeerListPkt::PeerListPkt" alt="" coords="209,5,375,35"/></map>
+<area shape="rect" id="node3" href="class_super__peer__logic.html#a3c0afa1028c629dce6a8f3c3e4621702" title="Super_peer_logic::addObject" alt="" coords="277,5,467,35"/></map>
 </div>
 </p>
 
@@ -432,9 +286,7 @@ Here is the caller graph for this function:</div>
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="class_peer_list_pkt___base.html#a3f1af5577cd00abf33ce3aa46c046150">PeerListPkt_Base</a>.</p>
-
-<p>Definition at line <a class="el" href="_peer_list_pkt_8h_source.html#l00091">91</a> of file <a class="el" href="_peer_list_pkt_8h_source.html">PeerListPkt.h</a>.</p>
+<p>Implements <a class="el" href="class_peer_list_pkt___base.html">PeerListPkt_Base</a>.</p>
 
 </div>
 </div>
@@ -460,9 +312,7 @@ Here is the caller graph for this function:</div>
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="class_peer_list_pkt___base.html#a854741e0495c4aec691dae7882afba9c">PeerListPkt_Base</a>.</p>
-
-<p>Definition at line <a class="el" href="_peer_list_pkt_8h_source.html#l00068">68</a> of file <a class="el" href="_peer_list_pkt_8h_source.html">PeerListPkt.h</a>.</p>
+<p>Implements <a class="el" href="class_peer_list_pkt___base.html">PeerListPkt_Base</a>.</p>
 
 </div>
 </div>
@@ -479,8 +329,6 @@ Here is the caller graph for this function:</div>
 <div class="memdoc">
 <p>The vector (list) of peers that all store a specific object </p>
 
-<p>Definition at line <a class="el" href="_peer_list_pkt_8h_source.html#l00038">38</a> of file <a class="el" href="_peer_list_pkt_8h_source.html">PeerListPkt.h</a>.</p>
-
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
@@ -491,7 +339,7 @@ Here is the caller graph for this function:</div>
   <div id="nav-path" class="navpath">
     <ul>
       <li class="navelem"><a class="el" href="class_peer_list_pkt.html">PeerListPkt</a>      </li>
-      <li class="footer">Generated on Mon Nov 7 2011 15:57:41 for Pithos by&#160;
+      <li class="footer">Generated on Tue Nov 29 2011 10:50:45 for Pithos by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>
@@ -501,7 +349,7 @@ Here is the caller graph for this function:</div>
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">

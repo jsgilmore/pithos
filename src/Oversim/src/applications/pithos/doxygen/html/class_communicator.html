@@ -27,7 +27,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Pithos</div>
-   <div id="projectbrief">Distributed storage for MMVEs</div>
+   <div id="projectbrief">Distributed state management and persistency for P2P MMVE</div>
   </td>
  </tr>
  </tbody>
@@ -80,7 +80,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div id="doc-content">
 <div class="header">
   <div class="summary">
-<a href="#pub-methods">Public Member Functions</a>  </div>
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pro-methods">Protected Member Functions</a>  </div>
   <div class="headertitle">
 <h1>Communicator Class Reference</h1>  </div>
 </div>
@@ -92,61 +93,400 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_communicator.html#abd4c26c6a901e571bc9cfc4259e65de3">Communicator</a> ()</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_communicator.html#a4ced5362bf7438924f8d7f1b0c5ec391">~Communicator</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7b84b123e02ce3c15d1dca042a5309dd"></a><!-- doxytag: member="Communicator::getCreationTime" ref="a7b84b123e02ce3c15d1dca042a5309dd" args="()" -->
+simtime_t&#160;</td><td class="memItemRight" valign="bottom"><b>getCreationTime</b> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a36340a00f9d3eb25ee9af5e10efa66b7"></a><!-- doxytag: member="Communicator::externallySendInternalRpcCall" ref="a36340a00f9d3eb25ee9af5e10efa66b7" args="(CompType destComp, BaseCallMessage *msg, cPolymorphic *context=NULL, simtime_t timeout=&#45;1, int retries=0, int rpcId=&#45;1, RpcListener *rpcListener=NULL)" -->
+uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>externallySendInternalRpcCall</b> (CompType destComp, BaseCallMessage *msg, cPolymorphic *context=NULL, simtime_t timeout=-1, int retries=0, int rpcId=-1, RpcListener *rpcListener=NULL)</td></tr>
+<tr><td colspan="2"><h2><a name="pro-methods"></a>
+Protected Member Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0717a86d0ca4daf40e499ad6e48313a7"></a><!-- doxytag: member="Communicator::handleMessage" ref="a0717a86d0ca4daf40e499ad6e48313a7" args="(cMessage *msg)" -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>handleMessage</b> (cMessage *msg)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_communicator.html#a99fce573c8e55ff39d015df629ed1db9">initializeApp</a> (int stage)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_communicator.html#a4fa2cb93d804409a5f73262e7bd923fa">finishApp</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_communicator.html#a3ab68beb55470b059b1676ae8f140927">handleTimerEvent</a> (cMessage *msg)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_communicator.html#ac2770cc25f3373b13d82845d9e2555d1">deliver</a> (OverlayKey &amp;key, cMessage *msg)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_communicator.html#aed94f303dec6b31ca225fcce49aa6c05">handleUDPMessage</a> (cMessage *msg)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_communicator.html#a1f04220db1b1674bd515a897a296243c">handleUpperMessage</a> (cMessage *msg)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_communicator.html#a32478075467b4ade9f0d8533f35fb75e">handleRpcCall</a> (BaseCallMessage *msg)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_communicator.html#a9ac48ae31ed1068517e5df94951eb5b8">handleGetCAPIRequest</a> (RootObjectGetCAPICall *capiGetMsg)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_communicator.html#a466c44f594812c35e6307e32d432c132">handlePutCAPIRequest</a> (RootObjectPutCAPICall *capiPutMsg)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a78e3ebae10760b031cebbdda1bc6d24a"></a><!-- doxytag: member="Communicator::handleTraceMessage" ref="a78e3ebae10760b031cebbdda1bc6d24a" args="(cMessage *msg)" -->
+void&#160;</td><td class="memItemRight" valign="bottom"><b>handleTraceMessage</b> (cMessage *msg)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aadac57e17b78abc5ee479578ed36527e"></a><!-- doxytag: member="Communicator::handleRpcResponse" ref="aadac57e17b78abc5ee479578ed36527e" args="(BaseResponseMessage *msg, const RpcState &amp;state, simtime_t rtt)" -->
+void&#160;</td><td class="memItemRight" valign="bottom"><b>handleRpcResponse</b> (BaseResponseMessage *msg, const RpcState &amp;state, simtime_t rtt)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_communicator.html#a9a8a5fa319d1185b0e32a9aa24d56e49">handleSPMsg</a> (cMessage *msg)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_communicator.html#aecf2c2f402bd7d4d1d3c6fb5144ef117">handlePeerMsg</a> (cMessage *msg)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_communicator.html#a9d79584c06b9d47eb3a76b7994c4e3d4">overlayStore</a> (cMessage *msg)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_communicator.html#ae03d1069ee8e01c017ba004e7c61b1ea">sendPacket</a> (cMessage *msg)</td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <div class="textblock"><p>The <a class="el" href="class_communicator.html">Communicator</a> class is the Tier1 class for Pithos and therefore the means by which Pithos communicates with higher and lower layers, as well as the overlay, UDP and TCP. All other Pithos modules that wish to send information to other layers must to so through the <a class="el" href="class_communicator.html">Communicator</a>.</p>
 <dl class="author"><dt><b>Author:</b></dt><dd>John Gilmore </dd></dl>
-
-<p>Definition at line <a class="el" href="_communicator_8h_source.html#l00050">50</a> of file <a class="el" href="_communicator_8h_source.html">Communicator.h</a>.</p>
-</div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="abd4c26c6a901e571bc9cfc4259e65de3"></a><!-- doxytag: member="Communicator::Communicator" ref="abd4c26c6a901e571bc9cfc4259e65de3" args="()" -->
+</div><hr/><h2>Member Function Documentation</h2>
+<a class="anchor" id="ac2770cc25f3373b13d82845d9e2555d1"></a><!-- doxytag: member="Communicator::deliver" ref="ac2770cc25f3373b13d82845d9e2555d1" args="(OverlayKey &amp;key, cMessage *msg)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">Communicator::Communicator </td>
+          <td class="memname">void Communicator::deliver </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td><code> [inline]</code></td>
+          <td class="paramtype">OverlayKey &amp;&#160;</td>
+          <td class="paramname"><em>key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">cMessage *&#160;</td>
+          <td class="paramname"><em>msg</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td><code> [protected]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
-
-<p>Definition at line <a class="el" href="_communicator_8h_source.html#l00131">131</a> of file <a class="el" href="_communicator_8h_source.html">Communicator.h</a>.</p>
+<p>called when we receive a message from the overlay </p>
 
 </div>
 </div>
-<a class="anchor" id="a4ced5362bf7438924f8d7f1b0c5ec391"></a><!-- doxytag: member="Communicator::~Communicator" ref="a4ced5362bf7438924f8d7f1b0c5ec391" args="()" -->
+<a class="anchor" id="a4fa2cb93d804409a5f73262e7bd923fa"></a><!-- doxytag: member="Communicator::finishApp" ref="a4fa2cb93d804409a5f73262e7bd923fa" args="()" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">Communicator::~Communicator </td>
+          <td class="memname">void Communicator::finishApp </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td><code> [inline]</code></td>
+          <td><code> [protected]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
+<p>called when the module is about to be destroyed </p>
 
-<p>Definition at line <a class="el" href="_communicator_8h_source.html#l00132">132</a> of file <a class="el" href="_communicator_8h_source.html">Communicator.h</a>.</p>
+</div>
+</div>
+<a class="anchor" id="a9ac48ae31ed1068517e5df94951eb5b8"></a><!-- doxytag: member="Communicator::handleGetCAPIRequest" ref="a9ac48ae31ed1068517e5df94951eb5b8" args="(RootObjectGetCAPICall *capiGetMsg)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Communicator::handleGetCAPIRequest </td>
+          <td>(</td>
+          <td class="paramtype">RootObjectGetCAPICall *&#160;</td>
+          <td class="paramname"><em>capiGetMsg</em></td><td>)</td>
+          <td><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>This function has not been implemented yet, but is meant to be a response to another node performing a push request to this node. The response would be whether the push was successful at the destination and will be sent back to the storing node. </p>
+<dl class="see"><dt><b>See also:</b></dt><dd>handlePutRequest() Called by </dd>
+<dd>
+<a class="el" href="class_communicator.html#a32478075467b4ade9f0d8533f35fb75e">handleRpcCall()</a> when an internal RPC called requested a push be done.</dd></dl>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">capiGetMsg</td><td><a class="el" href="class_message.html">Message</a> containing the data required for the push </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p><div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="class_communicator_a9ac48ae31ed1068517e5df94951eb5b8_icgraph.png" border="0" usemap="#class_communicator_a9ac48ae31ed1068517e5df94951eb5b8_icgraph" alt=""/></div>
+<map name="class_communicator_a9ac48ae31ed1068517e5df94951eb5b8_icgraph" id="class_communicator_a9ac48ae31ed1068517e5df94951eb5b8_icgraph">
+<area shape="rect" id="node3" href="class_communicator.html#a32478075467b4ade9f0d8533f35fb75e" title="Communicator::handleRpcCall" alt="" coords="309,5,509,35"/></map>
+</div>
+</p>
+
+</div>
+</div>
+<a class="anchor" id="aecf2c2f402bd7d4d1d3c6fb5144ef117"></a><!-- doxytag: member="Communicator::handlePeerMsg" ref="aecf2c2f402bd7d4d1d3c6fb5144ef117" args="(cMessage *msg)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Communicator::handlePeerMsg </td>
+          <td>(</td>
+          <td class="paramtype">cMessage *&#160;</td>
+          <td class="paramname"><em>msg</em></td><td>)</td>
+          <td><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Called when a message is received from a group peer over UDP. The message is inspected to generate the required response.</p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">msg</td><td><a class="el" href="class_message.html">Message</a> received from the Peer </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="class_communicator_aecf2c2f402bd7d4d1d3c6fb5144ef117_cgraph.png" border="0" usemap="#class_communicator_aecf2c2f402bd7d4d1d3c6fb5144ef117_cgraph" alt=""/></div>
+<map name="class_communicator_aecf2c2f402bd7d4d1d3c6fb5144ef117_cgraph" id="class_communicator_aecf2c2f402bd7d4d1d3c6fb5144ef117_cgraph">
+<area shape="rect" id="node3" href="class_communicator.html#ae03d1069ee8e01c017ba004e7c61b1ea" title="Communicator::sendPacket" alt="" coords="259,5,443,35"/></map>
+</div>
+</p>
+
+</div>
+</div>
+<a class="anchor" id="a466c44f594812c35e6307e32d432c132"></a><!-- doxytag: member="Communicator::handlePutCAPIRequest" ref="a466c44f594812c35e6307e32d432c132" args="(RootObjectPutCAPICall *capiPutMsg)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Communicator::handlePutCAPIRequest </td>
+          <td>(</td>
+          <td class="paramtype">RootObjectPutCAPICall *&#160;</td>
+          <td class="paramname"><em>capiPutMsg</em></td><td>)</td>
+          <td><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<dl class="see"><dt><b>See also:</b></dt><dd>handleGetCapiRequest() </dd></dl>
+
+<p><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="class_communicator_a466c44f594812c35e6307e32d432c132_cgraph.png" border="0" usemap="#class_communicator_a466c44f594812c35e6307e32d432c132_cgraph" alt=""/></div>
+<map name="class_communicator_a466c44f594812c35e6307e32d432c132_cgraph" id="class_communicator_a466c44f594812c35e6307e32d432c132_cgraph">
+<area shape="rect" id="node3" href="class_peer__logic.html#aec0ffa7ceaa86d0febb008c694ef9bfe" title="Peer_logic::handlePutCAPIRequest" alt="" coords="311,5,540,35"/><area shape="rect" id="node5" href="class_game_object.html#a64ba9e7c42bc9666813f4af4b24ffc88" title="GameObject::getSize" alt="" coords="589,5,736,35"/></map>
+</div>
+</p>
+
+<p><div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="class_communicator_a466c44f594812c35e6307e32d432c132_icgraph.png" border="0" usemap="#class_communicator_a466c44f594812c35e6307e32d432c132_icgraph" alt=""/></div>
+<map name="class_communicator_a466c44f594812c35e6307e32d432c132_icgraph" id="class_communicator_a466c44f594812c35e6307e32d432c132_icgraph">
+<area shape="rect" id="node3" href="class_communicator.html#a32478075467b4ade9f0d8533f35fb75e" title="Communicator::handleRpcCall" alt="" coords="309,5,509,35"/></map>
+</div>
+</p>
+
+</div>
+</div>
+<a class="anchor" id="a32478075467b4ade9f0d8533f35fb75e"></a><!-- doxytag: member="Communicator::handleRpcCall" ref="a32478075467b4ade9f0d8533f35fb75e" args="(BaseCallMessage *msg)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool Communicator::handleRpcCall </td>
+          <td>(</td>
+          <td class="paramtype">BaseCallMessage *&#160;</td>
+          <td class="paramname"><em>msg</em></td><td>)</td>
+          <td><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>The function that handles RPC request from the higher layer to store, retrieve and update objects.</p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">msg</td><td>The RPC message containing the request type and data </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="class_communicator_a32478075467b4ade9f0d8533f35fb75e_cgraph.png" border="0" usemap="#class_communicator_a32478075467b4ade9f0d8533f35fb75e_cgraph" alt=""/></div>
+<map name="class_communicator_a32478075467b4ade9f0d8533f35fb75e_cgraph" id="class_communicator_a32478075467b4ade9f0d8533f35fb75e_cgraph">
+<area shape="rect" id="node3" href="class_communicator.html#a9ac48ae31ed1068517e5df94951eb5b8" title="Communicator::handleGetCAPIRequest" alt="" coords="255,5,508,35"/><area shape="rect" id="node5" href="class_communicator.html#a466c44f594812c35e6307e32d432c132" title="Communicator::handlePutCAPIRequest" alt="" coords="255,59,508,88"/><area shape="rect" id="node7" href="class_peer__logic.html#aec0ffa7ceaa86d0febb008c694ef9bfe" title="Peer_logic::handlePutCAPIRequest" alt="" coords="559,59,788,88"/><area shape="rect" id="node9" href="class_game_object.html#a64ba9e7c42bc9666813f4af4b24ffc88" title="GameObject::getSize" alt="" coords="837,59,984,88"/></map>
+</div>
+</p>
+
+</div>
+</div>
+<a class="anchor" id="a9a8a5fa319d1185b0e32a9aa24d56e49"></a><!-- doxytag: member="Communicator::handleSPMsg" ref="a9a8a5fa319d1185b0e32a9aa24d56e49" args="(cMessage *msg)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Communicator::handleSPMsg </td>
+          <td>(</td>
+          <td class="paramtype">cMessage *&#160;</td>
+          <td class="paramname"><em>msg</em></td><td>)</td>
+          <td><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Called when a message is received from a super peer. The message is inspected to generate the required response.</p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">msg</td><td><a class="el" href="class_message.html">Message</a> received from the Super Peer </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="class_communicator_a9a8a5fa319d1185b0e32a9aa24d56e49_cgraph.png" border="0" usemap="#class_communicator_a9a8a5fa319d1185b0e32a9aa24d56e49_cgraph" alt=""/></div>
+<map name="class_communicator_a9a8a5fa319d1185b0e32a9aa24d56e49_cgraph" id="class_communicator_a9a8a5fa319d1185b0e32a9aa24d56e49_cgraph">
+<area shape="rect" id="node3" href="class_communicator.html#a9d79584c06b9d47eb3a76b7994c4e3d4" title="Communicator::overlayStore" alt="" coords="252,5,439,35"/><area shape="rect" id="node5" href="class_communicator.html#ae03d1069ee8e01c017ba004e7c61b1ea" title="Communicator::sendPacket" alt="" coords="253,59,437,88"/></map>
+</div>
+</p>
+
+</div>
+</div>
+<a class="anchor" id="a3ab68beb55470b059b1676ae8f140927"></a><!-- doxytag: member="Communicator::handleTimerEvent" ref="a3ab68beb55470b059b1676ae8f140927" args="(cMessage *msg)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Communicator::handleTimerEvent </td>
+          <td>(</td>
+          <td class="paramtype">cMessage *&#160;</td>
+          <td class="paramname"><em>msg</em></td><td>)</td>
+          <td><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>called when we received a timer message </p>
+
+</div>
+</div>
+<a class="anchor" id="aed94f303dec6b31ca225fcce49aa6c05"></a><!-- doxytag: member="Communicator::handleUDPMessage" ref="aed94f303dec6b31ca225fcce49aa6c05" args="(cMessage *msg)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Communicator::handleUDPMessage </td>
+          <td>(</td>
+          <td class="paramtype">cMessage *&#160;</td>
+          <td class="paramname"><em>msg</em></td><td>)</td>
+          <td><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>called when we receive a UDP message </p>
+
+</div>
+</div>
+<a class="anchor" id="a1f04220db1b1674bd515a897a296243c"></a><!-- doxytag: member="Communicator::handleUpperMessage" ref="a1f04220db1b1674bd515a897a296243c" args="(cMessage *msg)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Communicator::handleUpperMessage </td>
+          <td>(</td>
+          <td class="paramtype">cMessage *&#160;</td>
+          <td class="paramname"><em>msg</em></td><td>)</td>
+          <td><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>called when we receive a request from the higher layer </p>
+
+</div>
+</div>
+<a class="anchor" id="a99fce573c8e55ff39d015df629ed1db9"></a><!-- doxytag: member="Communicator::initializeApp" ref="a99fce573c8e55ff39d015df629ed1db9" args="(int stage)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Communicator::initializeApp </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>stage</em></td><td>)</td>
+          <td><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>called when the module is being created </p>
+
+</div>
+</div>
+<a class="anchor" id="a9d79584c06b9d47eb3a76b7994c4e3d4"></a><!-- doxytag: member="Communicator::overlayStore" ref="a9d79584c06b9d47eb3a76b7994c4e3d4" args="(cMessage *msg)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Communicator::overlayStore </td>
+          <td>(</td>
+          <td class="paramtype">cMessage *&#160;</td>
+          <td class="paramname"><em>msg</em></td><td>)</td>
+          <td><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Route a message to the overlay for storage.</p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">msg</td><td><a class="el" href="class_message.html">Message</a> containing the <a class="el" href="class_game_object.html">GameObject</a> that should be stored. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p><div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="class_communicator_a9d79584c06b9d47eb3a76b7994c4e3d4_icgraph.png" border="0" usemap="#class_communicator_a9d79584c06b9d47eb3a76b7994c4e3d4_icgraph" alt=""/></div>
+<map name="class_communicator_a9d79584c06b9d47eb3a76b7994c4e3d4_icgraph" id="class_communicator_a9d79584c06b9d47eb3a76b7994c4e3d4_icgraph">
+<area shape="rect" id="node3" href="class_communicator.html#a9a8a5fa319d1185b0e32a9aa24d56e49" title="Communicator::handleSPMsg" alt="" coords="244,5,439,35"/></map>
+</div>
+</p>
+
+</div>
+</div>
+<a class="anchor" id="ae03d1069ee8e01c017ba004e7c61b1ea"></a><!-- doxytag: member="Communicator::sendPacket" ref="ae03d1069ee8e01c017ba004e7c61b1ea" args="(cMessage *msg)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Communicator::sendPacket </td>
+          <td>(</td>
+          <td class="paramtype">cMessage *&#160;</td>
+          <td class="paramname"><em>msg</em></td><td>)</td>
+          <td><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Send a packet out over UDP to the destination IP address.</p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">msg</td><td>The packet that should be sent. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p><div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="class_communicator_ae03d1069ee8e01c017ba004e7c61b1ea_icgraph.png" border="0" usemap="#class_communicator_ae03d1069ee8e01c017ba004e7c61b1ea_icgraph" alt=""/></div>
+<map name="class_communicator_ae03d1069ee8e01c017ba004e7c61b1ea_icgraph" id="class_communicator_ae03d1069ee8e01c017ba004e7c61b1ea_icgraph">
+<area shape="rect" id="node3" href="class_communicator.html#aecf2c2f402bd7d4d1d3c6fb5144ef117" title="Communicator::handlePeerMsg" alt="" coords="237,5,443,35"/><area shape="rect" id="node5" href="class_communicator.html#a9a8a5fa319d1185b0e32a9aa24d56e49" title="Communicator::handleSPMsg" alt="" coords="243,59,437,88"/></map>
+</div>
+</p>
 
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
 <li><a class="el" href="_communicator_8h_source.html">Communicator.h</a></li>
-<li><a class="el" href="_communicator_8cc_source.html">Communicator.cc</a></li>
+<li>Communicator.cc</li>
 </ul>
 </div>
 </div>
   <div id="nav-path" class="navpath">
     <ul>
       <li class="navelem"><a class="el" href="class_communicator.html">Communicator</a>      </li>
-      <li class="footer">Generated on Mon Nov 7 2011 15:57:41 for Pithos by&#160;
+      <li class="footer">Generated on Tue Nov 29 2011 10:50:45 for Pithos by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>
@@ -156,7 +496,7 @@ Public Member Functions</h2></td></tr>
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">

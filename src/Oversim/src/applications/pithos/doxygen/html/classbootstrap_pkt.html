@@ -27,7 +27,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Pithos</div>
-   <div id="projectbrief">Distributed storage for MMVEs</div>
+   <div id="projectbrief">Distributed state management and persistency for P2P MMVE</div>
   </td>
  </tr>
  </tbody>
@@ -108,28 +108,42 @@ Collaboration diagram for bootstrapPkt:</div>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbootstrap_pkt.html#a94e46e29ebfb2bc8fbd88a48168fbdad">bootstrapPkt</a> ()</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbootstrap_pkt.html#ae4b12905aee909c791b7b6fc2d16686f">bootstrapPkt</a> (const <a class="el" href="classbootstrap_pkt.html">bootstrapPkt</a> &amp;other)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbootstrap_pkt.html#a385c64648848e7e071799e0320d3cf60">~bootstrapPkt</a> ()</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classbootstrap_pkt.html">bootstrapPkt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbootstrap_pkt.html#a6796074f5de8a22df34e94357af992c9">operator=</a> (const <a class="el" href="classbootstrap_pkt.html">bootstrapPkt</a> &amp;other)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classbootstrap_pkt.html">bootstrapPkt</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbootstrap_pkt.html#af49d2ed1ceb9d26a384f2ab551954e2e">dup</a> () const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbootstrap_pkt.html#aaee476eaad21561159a927c17ba94e6c">parsimPack</a> (cCommBuffer *b)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbootstrap_pkt.html#a28fba3d82e430e5d9aac19b808ffe618">parsimUnpack</a> (cCommBuffer *b)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual TransportAddress &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbootstrap_pkt.html#ad1b68dceb784d72b036ce2d161d24db5">getSuperPeerAdr</a> ()</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual const TransportAddress &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbootstrap_pkt.html#aaef2a6c9f47ee5784ae8aae672b52164">getSuperPeerAdr</a> () const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbootstrap_pkt.html#a0e2b6c52123a86a5047da831b5adbfb2">setSuperPeerAdr</a> (const TransportAddress &amp;<a class="el" href="classbootstrap_pkt.html#aec05a010283857100c85ca3ee77baf74">superPeerAdr_var</a>)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbootstrap_pkt.html#a016e892279c326fd12706bad355d52e8">getLatitude</a> () const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbootstrap_pkt.html#a1d2a0231c6174381c5fc0a333c3ee65b">setLatitude</a> (double <a class="el" href="classbootstrap_pkt.html#a56f8b050daf3ab4f35fcd0dc3706a6d8">latitude_var</a>)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbootstrap_pkt.html#a22f95ae153066c2d2bb0cf7b3cafd786">getLongitude</a> () const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbootstrap_pkt.html#a98f5c5f8e3de7301edce42ad55a8dd33">setLongitude</a> (double <a class="el" href="classbootstrap_pkt.html#a58a5da3f2d73aa413ba9c2431dffef5d">longitude_var</a>)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae4b12905aee909c791b7b6fc2d16686f"></a><!-- doxytag: member="bootstrapPkt::bootstrapPkt" ref="ae4b12905aee909c791b7b6fc2d16686f" args="(const bootstrapPkt &amp;other)" -->
+&#160;</td><td class="memItemRight" valign="bottom"><b>bootstrapPkt</b> (const <a class="el" href="classbootstrap_pkt.html">bootstrapPkt</a> &amp;other)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6796074f5de8a22df34e94357af992c9"></a><!-- doxytag: member="bootstrapPkt::operator=" ref="a6796074f5de8a22df34e94357af992c9" args="(const bootstrapPkt &amp;other)" -->
+<a class="el" href="classbootstrap_pkt.html">bootstrapPkt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (const <a class="el" href="classbootstrap_pkt.html">bootstrapPkt</a> &amp;other)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af49d2ed1ceb9d26a384f2ab551954e2e"></a><!-- doxytag: member="bootstrapPkt::dup" ref="af49d2ed1ceb9d26a384f2ab551954e2e" args="() const " -->
+virtual <a class="el" href="classbootstrap_pkt.html">bootstrapPkt</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>dup</b> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aaee476eaad21561159a927c17ba94e6c"></a><!-- doxytag: member="bootstrapPkt::parsimPack" ref="aaee476eaad21561159a927c17ba94e6c" args="(cCommBuffer *b)" -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>parsimPack</b> (cCommBuffer *b)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a28fba3d82e430e5d9aac19b808ffe618"></a><!-- doxytag: member="bootstrapPkt::parsimUnpack" ref="a28fba3d82e430e5d9aac19b808ffe618" args="(cCommBuffer *b)" -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>parsimUnpack</b> (cCommBuffer *b)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad1b68dceb784d72b036ce2d161d24db5"></a><!-- doxytag: member="bootstrapPkt::getSuperPeerAdr" ref="ad1b68dceb784d72b036ce2d161d24db5" args="()" -->
+virtual TransportAddress &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>getSuperPeerAdr</b> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aaef2a6c9f47ee5784ae8aae672b52164"></a><!-- doxytag: member="bootstrapPkt::getSuperPeerAdr" ref="aaef2a6c9f47ee5784ae8aae672b52164" args="() const " -->
+virtual const TransportAddress &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>getSuperPeerAdr</b> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0e2b6c52123a86a5047da831b5adbfb2"></a><!-- doxytag: member="bootstrapPkt::setSuperPeerAdr" ref="a0e2b6c52123a86a5047da831b5adbfb2" args="(const TransportAddress &amp;superPeerAdr_var)" -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>setSuperPeerAdr</b> (const TransportAddress &amp;superPeerAdr_var)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a016e892279c326fd12706bad355d52e8"></a><!-- doxytag: member="bootstrapPkt::getLatitude" ref="a016e892279c326fd12706bad355d52e8" args="() const " -->
+virtual double&#160;</td><td class="memItemRight" valign="bottom"><b>getLatitude</b> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1d2a0231c6174381c5fc0a333c3ee65b"></a><!-- doxytag: member="bootstrapPkt::setLatitude" ref="a1d2a0231c6174381c5fc0a333c3ee65b" args="(double latitude_var)" -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>setLatitude</b> (double latitude_var)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a22f95ae153066c2d2bb0cf7b3cafd786"></a><!-- doxytag: member="bootstrapPkt::getLongitude" ref="a22f95ae153066c2d2bb0cf7b3cafd786" args="() const " -->
+virtual double&#160;</td><td class="memItemRight" valign="bottom"><b>getLongitude</b> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a98f5c5f8e3de7301edce42ad55a8dd33"></a><!-- doxytag: member="bootstrapPkt::setLongitude" ref="a98f5c5f8e3de7301edce42ad55a8dd33" args="(double longitude_var)" -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>setLongitude</b> (double longitude_var)</td></tr>
 <tr><td colspan="2"><h2><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbootstrap_pkt.html#a608c1b175a76d73b0d0ef8c06e8e1bc5">operator==</a> (const <a class="el" href="classbootstrap_pkt.html">bootstrapPkt</a> &amp;)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a608c1b175a76d73b0d0ef8c06e8e1bc5"></a><!-- doxytag: member="bootstrapPkt::operator==" ref="a608c1b175a76d73b0d0ef8c06e8e1bc5" args="(const bootstrapPkt &amp;)" -->
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator==</b> (const <a class="el" href="classbootstrap_pkt.html">bootstrapPkt</a> &amp;)</td></tr>
 <tr><td colspan="2"><h2><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">::TransportAddress&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbootstrap_pkt.html#aec05a010283857100c85ca3ee77baf74">superPeerAdr_var</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbootstrap_pkt.html#a56f8b050daf3ab4f35fcd0dc3706a6d8">latitude_var</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbootstrap_pkt.html#a58a5da3f2d73aa413ba9c2431dffef5d">longitude_var</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aec05a010283857100c85ca3ee77baf74"></a><!-- doxytag: member="bootstrapPkt::superPeerAdr_var" ref="aec05a010283857100c85ca3ee77baf74" args="" -->
+::TransportAddress&#160;</td><td class="memItemRight" valign="bottom"><b>superPeerAdr_var</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a56f8b050daf3ab4f35fcd0dc3706a6d8"></a><!-- doxytag: member="bootstrapPkt::latitude_var" ref="a56f8b050daf3ab4f35fcd0dc3706a6d8" args="" -->
+double&#160;</td><td class="memItemRight" valign="bottom"><b>latitude_var</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a58a5da3f2d73aa413ba9c2431dffef5d"></a><!-- doxytag: member="bootstrapPkt::longitude_var" ref="a58a5da3f2d73aa413ba9c2431dffef5d" args="" -->
+double&#160;</td><td class="memItemRight" valign="bottom"><b>longitude_var</b></td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <div class="textblock"><p>Class generated from <code>applications/pithos/bootstrapPkt.msg</code> by opp_msgc. </p>
@@ -139,492 +153,16 @@ Protected Attributes</h2></td></tr>
      double latitude;
      double longitude;
  }
- </pre> 
-<p>Definition at line <a class="el" href="bootstrap_pkt__m_8h_source.html#l00033">33</a> of file <a class="el" href="bootstrap_pkt__m_8h_source.html">bootstrapPkt_m.h</a>.</p>
-</div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="a94e46e29ebfb2bc8fbd88a48168fbdad"></a><!-- doxytag: member="bootstrapPkt::bootstrapPkt" ref="a94e46e29ebfb2bc8fbd88a48168fbdad" args="()" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bootstrapPkt::bootstrapPkt </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="bootstrap_pkt__m_8cc_source.html#l00033">33</a> of file <a class="el" href="bootstrap_pkt__m_8cc_source.html">bootstrapPkt_m.cc</a>.</p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classbootstrap_pkt_a94e46e29ebfb2bc8fbd88a48168fbdad_icgraph.png" border="0" usemap="#classbootstrap_pkt_a94e46e29ebfb2bc8fbd88a48168fbdad_icgraph" alt=""/></div>
-<map name="classbootstrap_pkt_a94e46e29ebfb2bc8fbd88a48168fbdad_icgraph" id="classbootstrap_pkt_a94e46e29ebfb2bc8fbd88a48168fbdad_icgraph">
-<area shape="rect" id="node3" href="classbootstrap_pkt.html#af49d2ed1ceb9d26a384f2ab551954e2e" title="bootstrapPkt::dup" alt="" coords="232,5,357,35"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="ae4b12905aee909c791b7b6fc2d16686f"></a><!-- doxytag: member="bootstrapPkt::bootstrapPkt" ref="ae4b12905aee909c791b7b6fc2d16686f" args="(const bootstrapPkt &amp;other)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bootstrapPkt::bootstrapPkt </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classbootstrap_pkt.html">bootstrapPkt</a> &amp;&#160;</td>
-          <td class="paramname"><em>other</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="bootstrap_pkt__m_8cc_source.html#l00039">39</a> of file <a class="el" href="bootstrap_pkt__m_8cc_source.html">bootstrapPkt_m.cc</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classbootstrap_pkt_ae4b12905aee909c791b7b6fc2d16686f_cgraph.png" border="0" usemap="#classbootstrap_pkt_ae4b12905aee909c791b7b6fc2d16686f_cgraph" alt=""/></div>
-<map name="classbootstrap_pkt_ae4b12905aee909c791b7b6fc2d16686f_cgraph" id="classbootstrap_pkt_ae4b12905aee909c791b7b6fc2d16686f_cgraph">
-<area shape="rect" id="node3" href="classbootstrap_pkt.html#a6796074f5de8a22df34e94357af992c9" title="bootstrapPkt::operator=" alt="" coords="233,5,391,35"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="a385c64648848e7e071799e0320d3cf60"></a><!-- doxytag: member="bootstrapPkt::~bootstrapPkt" ref="a385c64648848e7e071799e0320d3cf60" args="()" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bootstrapPkt::~bootstrapPkt </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td><code> [virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="bootstrap_pkt__m_8cc_source.html#l00044">44</a> of file <a class="el" href="bootstrap_pkt__m_8cc_source.html">bootstrapPkt_m.cc</a>.</p>
-
-</div>
-</div>
-<hr/><h2>Member Function Documentation</h2>
-<a class="anchor" id="af49d2ed1ceb9d26a384f2ab551954e2e"></a><!-- doxytag: member="bootstrapPkt::dup" ref="af49d2ed1ceb9d26a384f2ab551954e2e" args="() const " -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual <a class="el" href="classbootstrap_pkt.html">bootstrapPkt</a>* bootstrapPkt::dup </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const<code> [inline, virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Reimplemented from <a class="el" href="class_packet.html#a6d1f709f7adca518d67b8d6fd028f013">Packet</a>.</p>
-
-<p>Definition at line <a class="el" href="bootstrap_pkt__m_8h_source.html#l00048">48</a> of file <a class="el" href="bootstrap_pkt__m_8h_source.html">bootstrapPkt_m.h</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classbootstrap_pkt_af49d2ed1ceb9d26a384f2ab551954e2e_cgraph.png" border="0" usemap="#classbootstrap_pkt_af49d2ed1ceb9d26a384f2ab551954e2e_cgraph" alt=""/></div>
-<map name="classbootstrap_pkt_af49d2ed1ceb9d26a384f2ab551954e2e_cgraph" id="classbootstrap_pkt_af49d2ed1ceb9d26a384f2ab551954e2e_cgraph">
-<area shape="rect" id="node3" href="classbootstrap_pkt.html#a94e46e29ebfb2bc8fbd88a48168fbdad" title="bootstrapPkt::bootstrapPkt" alt="" coords="179,5,357,35"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="a016e892279c326fd12706bad355d52e8"></a><!-- doxytag: member="bootstrapPkt::getLatitude" ref="a016e892279c326fd12706bad355d52e8" args="() const " -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">double bootstrapPkt::getLatitude </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const<code> [virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="bootstrap_pkt__m_8cc_source.html#l00084">84</a> of file <a class="el" href="bootstrap_pkt__m_8cc_source.html">bootstrapPkt_m.cc</a>.</p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classbootstrap_pkt_a016e892279c326fd12706bad355d52e8_icgraph.png" border="0" usemap="#classbootstrap_pkt_a016e892279c326fd12706bad355d52e8_icgraph" alt=""/></div>
-<map name="classbootstrap_pkt_a016e892279c326fd12706bad355d52e8_icgraph" id="classbootstrap_pkt_a016e892279c326fd12706bad355d52e8_icgraph">
-<area shape="rect" id="node3" href="classbootstrap_pkt_descriptor.html#a9abfa5b4af44ee34c64b2f9236ffafc3" title="bootstrapPktDescriptor::getFieldAsString" alt="" coords="223,5,481,35"/><area shape="rect" id="node5" href="class_directory__logic.html#a735bf4b01f1803522077843cc44368e0" title="Directory_logic::handleJoinReq" alt="" coords="251,59,453,88"/><area shape="rect" id="node9" href="class_directory__logic.html#af380712204fccfd1294a97564019e87f" title="Directory_logic::handleSuperPeerAdd" alt="" coords="233,112,471,141"/><area shape="rect" id="node7" href="class_directory__logic.html#aeb0a6a019e0b5f760faea015f81357c9" title="Directory_logic::handleUDPMessage" alt="" coords="531,85,768,115"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="a22f95ae153066c2d2bb0cf7b3cafd786"></a><!-- doxytag: member="bootstrapPkt::getLongitude" ref="a22f95ae153066c2d2bb0cf7b3cafd786" args="() const " -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">double bootstrapPkt::getLongitude </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const<code> [virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="bootstrap_pkt__m_8cc_source.html#l00094">94</a> of file <a class="el" href="bootstrap_pkt__m_8cc_source.html">bootstrapPkt_m.cc</a>.</p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classbootstrap_pkt_a22f95ae153066c2d2bb0cf7b3cafd786_icgraph.png" border="0" usemap="#classbootstrap_pkt_a22f95ae153066c2d2bb0cf7b3cafd786_icgraph" alt=""/></div>
-<map name="classbootstrap_pkt_a22f95ae153066c2d2bb0cf7b3cafd786_icgraph" id="classbootstrap_pkt_a22f95ae153066c2d2bb0cf7b3cafd786_icgraph">
-<area shape="rect" id="node3" href="classbootstrap_pkt_descriptor.html#a9abfa5b4af44ee34c64b2f9236ffafc3" title="bootstrapPktDescriptor::getFieldAsString" alt="" coords="233,5,492,35"/><area shape="rect" id="node5" href="class_directory__logic.html#a735bf4b01f1803522077843cc44368e0" title="Directory_logic::handleJoinReq" alt="" coords="261,59,464,88"/><area shape="rect" id="node9" href="class_directory__logic.html#af380712204fccfd1294a97564019e87f" title="Directory_logic::handleSuperPeerAdd" alt="" coords="244,112,481,141"/><area shape="rect" id="node7" href="class_directory__logic.html#aeb0a6a019e0b5f760faea015f81357c9" title="Directory_logic::handleUDPMessage" alt="" coords="541,85,779,115"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="ad1b68dceb784d72b036ce2d161d24db5"></a><!-- doxytag: member="bootstrapPkt::getSuperPeerAdr" ref="ad1b68dceb784d72b036ce2d161d24db5" args="()" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">TransportAddress &amp; bootstrapPkt::getSuperPeerAdr </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td><code> [virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="bootstrap_pkt__m_8cc_source.html#l00074">74</a> of file <a class="el" href="bootstrap_pkt__m_8cc_source.html">bootstrapPkt_m.cc</a>.</p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classbootstrap_pkt_ad1b68dceb784d72b036ce2d161d24db5_icgraph.png" border="0" usemap="#classbootstrap_pkt_ad1b68dceb784d72b036ce2d161d24db5_icgraph" alt=""/></div>
-<map name="classbootstrap_pkt_ad1b68dceb784d72b036ce2d161d24db5_icgraph" id="classbootstrap_pkt_ad1b68dceb784d72b036ce2d161d24db5_icgraph">
-<area shape="rect" id="node3" href="classbootstrap_pkt_descriptor.html#a9abfa5b4af44ee34c64b2f9236ffafc3" title="bootstrapPktDescriptor::getFieldAsString" alt="" coords="271,5,529,35"/><area shape="rect" id="node5" href="classbootstrap_pkt_descriptor.html#ac8c8895449bf746124a5d019f2d7ee53" title="bootstrapPktDescriptor::getFieldStructPointer" alt="" coords="257,59,543,88"/><area shape="rect" id="node7" href="class_directory__logic.html#a735bf4b01f1803522077843cc44368e0" title="Directory_logic::handleJoinReq" alt="" coords="299,112,501,141"/><area shape="rect" id="node11" href="class_peer__logic.html#a2ba9623ef469018de09c58d5f20ea933" title="Peer_logic::handleP2PMsg" alt="" coords="311,165,489,195"/><area shape="rect" id="node9" href="class_directory__logic.html#aeb0a6a019e0b5f760faea015f81357c9" title="Directory_logic::handleUDPMessage" alt="" coords="592,112,829,141"/><area shape="rect" id="node13" href="class_peer__logic.html#a858ea9e4712d604817903ef91e534235" title="Peer_logic::handleMessage" alt="" coords="620,165,801,195"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="aaef2a6c9f47ee5784ae8aae672b52164"></a><!-- doxytag: member="bootstrapPkt::getSuperPeerAdr" ref="aaef2a6c9f47ee5784ae8aae672b52164" args="() const " -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual const TransportAddress&amp; bootstrapPkt::getSuperPeerAdr </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const<code> [inline, virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="bootstrap_pkt__m_8h_source.html#l00054">54</a> of file <a class="el" href="bootstrap_pkt__m_8h_source.html">bootstrapPkt_m.h</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classbootstrap_pkt_aaef2a6c9f47ee5784ae8aae672b52164_cgraph.png" border="0" usemap="#classbootstrap_pkt_aaef2a6c9f47ee5784ae8aae672b52164_cgraph" alt=""/></div>
-<map name="classbootstrap_pkt_aaef2a6c9f47ee5784ae8aae672b52164_cgraph" id="classbootstrap_pkt_aaef2a6c9f47ee5784ae8aae672b52164_cgraph">
-</map>
-</div>
-</p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classbootstrap_pkt_aaef2a6c9f47ee5784ae8aae672b52164_icgraph.png" border="0" usemap="#classbootstrap_pkt_aaef2a6c9f47ee5784ae8aae672b52164_icgraph" alt=""/></div>
-<map name="classbootstrap_pkt_aaef2a6c9f47ee5784ae8aae672b52164_icgraph" id="classbootstrap_pkt_aaef2a6c9f47ee5784ae8aae672b52164_icgraph">
-</map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="a6796074f5de8a22df34e94357af992c9"></a><!-- doxytag: member="bootstrapPkt::operator=" ref="a6796074f5de8a22df34e94357af992c9" args="(const bootstrapPkt &amp;other)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classbootstrap_pkt.html">bootstrapPkt</a> &amp; bootstrapPkt::operator= </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classbootstrap_pkt.html">bootstrapPkt</a> &amp;&#160;</td>
-          <td class="paramname"><em>other</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="bootstrap_pkt__m_8cc_source.html#l00048">48</a> of file <a class="el" href="bootstrap_pkt__m_8cc_source.html">bootstrapPkt_m.cc</a>.</p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classbootstrap_pkt_a6796074f5de8a22df34e94357af992c9_icgraph.png" border="0" usemap="#classbootstrap_pkt_a6796074f5de8a22df34e94357af992c9_icgraph" alt=""/></div>
-<map name="classbootstrap_pkt_a6796074f5de8a22df34e94357af992c9_icgraph" id="classbootstrap_pkt_a6796074f5de8a22df34e94357af992c9_icgraph">
-<area shape="rect" id="node3" href="classbootstrap_pkt.html#ae4b12905aee909c791b7b6fc2d16686f" title="bootstrapPkt::bootstrapPkt" alt="" coords="213,5,392,35"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="a608c1b175a76d73b0d0ef8c06e8e1bc5"></a><!-- doxytag: member="bootstrapPkt::operator==" ref="a608c1b175a76d73b0d0ef8c06e8e1bc5" args="(const bootstrapPkt &amp;)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool bootstrapPkt::operator== </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classbootstrap_pkt.html">bootstrapPkt</a> &amp;&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td><code> [protected]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="aaee476eaad21561159a927c17ba94e6c"></a><!-- doxytag: member="bootstrapPkt::parsimPack" ref="aaee476eaad21561159a927c17ba94e6c" args="(cCommBuffer *b)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void bootstrapPkt::parsimPack </td>
-          <td>(</td>
-          <td class="paramtype">cCommBuffer *&#160;</td>
-          <td class="paramname"><em>b</em></td><td>)</td>
-          <td><code> [virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Reimplemented from <a class="el" href="class_packet.html#a4d8bbb7f3eb7f87a438981f170a5dde6">Packet</a>.</p>
-
-<p>Definition at line <a class="el" href="bootstrap_pkt__m_8cc_source.html#l00058">58</a> of file <a class="el" href="bootstrap_pkt__m_8cc_source.html">bootstrapPkt_m.cc</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classbootstrap_pkt_aaee476eaad21561159a927c17ba94e6c_cgraph.png" border="0" usemap="#classbootstrap_pkt_aaee476eaad21561159a927c17ba94e6c_cgraph" alt=""/></div>
-<map name="classbootstrap_pkt_aaee476eaad21561159a927c17ba94e6c_cgraph" id="classbootstrap_pkt_aaee476eaad21561159a927c17ba94e6c_cgraph">
-<area shape="rect" id="node3" href="bootstrap_pkt__m_8cc.html#ad084222f62dca5ddcdd40d5ad0c0ec86" title="doPacking" alt="" coords="227,5,309,35"/></map>
-</div>
-</p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classbootstrap_pkt_aaee476eaad21561159a927c17ba94e6c_icgraph.png" border="0" usemap="#classbootstrap_pkt_aaee476eaad21561159a927c17ba94e6c_icgraph" alt=""/></div>
-<map name="classbootstrap_pkt_aaee476eaad21561159a927c17ba94e6c_icgraph" id="classbootstrap_pkt_aaee476eaad21561159a927c17ba94e6c_icgraph">
-<area shape="rect" id="node3" href="bootstrap_pkt__m_8h.html#a4306c4787216102111250cfa9f7bc7f5" title="doPacking" alt="" coords="227,5,309,35"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="a28fba3d82e430e5d9aac19b808ffe618"></a><!-- doxytag: member="bootstrapPkt::parsimUnpack" ref="a28fba3d82e430e5d9aac19b808ffe618" args="(cCommBuffer *b)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void bootstrapPkt::parsimUnpack </td>
-          <td>(</td>
-          <td class="paramtype">cCommBuffer *&#160;</td>
-          <td class="paramname"><em>b</em></td><td>)</td>
-          <td><code> [virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Reimplemented from <a class="el" href="class_packet.html#a366cd279ab2bfe4a62cf8d5d460f1821">Packet</a>.</p>
-
-<p>Definition at line <a class="el" href="bootstrap_pkt__m_8cc_source.html#l00066">66</a> of file <a class="el" href="bootstrap_pkt__m_8cc_source.html">bootstrapPkt_m.cc</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classbootstrap_pkt_a28fba3d82e430e5d9aac19b808ffe618_cgraph.png" border="0" usemap="#classbootstrap_pkt_a28fba3d82e430e5d9aac19b808ffe618_cgraph" alt=""/></div>
-<map name="classbootstrap_pkt_a28fba3d82e430e5d9aac19b808ffe618_cgraph" id="classbootstrap_pkt_a28fba3d82e430e5d9aac19b808ffe618_cgraph">
-<area shape="rect" id="node3" href="bootstrap_pkt__m_8cc.html#a4a7c16d9c83a185a80907df0d0b792f8" title="doUnpacking" alt="" coords="243,5,341,35"/></map>
-</div>
-</p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classbootstrap_pkt_a28fba3d82e430e5d9aac19b808ffe618_icgraph.png" border="0" usemap="#classbootstrap_pkt_a28fba3d82e430e5d9aac19b808ffe618_icgraph" alt=""/></div>
-<map name="classbootstrap_pkt_a28fba3d82e430e5d9aac19b808ffe618_icgraph" id="classbootstrap_pkt_a28fba3d82e430e5d9aac19b808ffe618_icgraph">
-<area shape="rect" id="node3" href="bootstrap_pkt__m_8h.html#a7666794eae3604b87372f5e5e6ded8d9" title="doUnpacking" alt="" coords="243,5,341,35"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="a1d2a0231c6174381c5fc0a333c3ee65b"></a><!-- doxytag: member="bootstrapPkt::setLatitude" ref="a1d2a0231c6174381c5fc0a333c3ee65b" args="(double latitude_var)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void bootstrapPkt::setLatitude </td>
-          <td>(</td>
-          <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>latitude_var</em></td><td>)</td>
-          <td><code> [virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="bootstrap_pkt__m_8cc_source.html#l00089">89</a> of file <a class="el" href="bootstrap_pkt__m_8cc_source.html">bootstrapPkt_m.cc</a>.</p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classbootstrap_pkt_a1d2a0231c6174381c5fc0a333c3ee65b_icgraph.png" border="0" usemap="#classbootstrap_pkt_a1d2a0231c6174381c5fc0a333c3ee65b_icgraph" alt=""/></div>
-<map name="classbootstrap_pkt_a1d2a0231c6174381c5fc0a333c3ee65b_icgraph" id="classbootstrap_pkt_a1d2a0231c6174381c5fc0a333c3ee65b_icgraph">
-<area shape="rect" id="node3" href="class_super__peer__logic.html#a9c4ff0b6b6b3c7872e130a9ce4444a8c" title="Super_peer_logic::addSuperPeer" alt="" coords="247,5,457,35"/><area shape="rect" id="node7" href="class_peer__logic.html#aa8ed5237ed07e5af69c7b94395fbb40d" title="Peer_logic::joinRequest" alt="" coords="272,59,432,88"/><area shape="rect" id="node14" href="classbootstrap_pkt_descriptor.html#acc2758d73aea392f3c535b7829fa4ef8" title="bootstrapPktDescriptor::setFieldAsString" alt="" coords="223,112,481,141"/><area shape="rect" id="node5" href="class_super__peer__logic.html#a55adc92c94a1f2743e269481bd859e0a" title="Super_peer_logic::handleMessage" alt="" coords="531,5,752,35"/><area shape="rect" id="node9" href="class_peer__logic.html#a858ea9e4712d604817903ef91e534235" title="Peer_logic::handleMessage" alt="" coords="801,85,983,115"/><area shape="rect" id="node11" href="class_peer__logic.html#a2ba9623ef469018de09c58d5f20ea933" title="Peer_logic::handleP2PMsg" alt="" coords="552,111,731,140"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="a98f5c5f8e3de7301edce42ad55a8dd33"></a><!-- doxytag: member="bootstrapPkt::setLongitude" ref="a98f5c5f8e3de7301edce42ad55a8dd33" args="(double longitude_var)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void bootstrapPkt::setLongitude </td>
-          <td>(</td>
-          <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>longitude_var</em></td><td>)</td>
-          <td><code> [virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="bootstrap_pkt__m_8cc_source.html#l00099">99</a> of file <a class="el" href="bootstrap_pkt__m_8cc_source.html">bootstrapPkt_m.cc</a>.</p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classbootstrap_pkt_a98f5c5f8e3de7301edce42ad55a8dd33_icgraph.png" border="0" usemap="#classbootstrap_pkt_a98f5c5f8e3de7301edce42ad55a8dd33_icgraph" alt=""/></div>
-<map name="classbootstrap_pkt_a98f5c5f8e3de7301edce42ad55a8dd33_icgraph" id="classbootstrap_pkt_a98f5c5f8e3de7301edce42ad55a8dd33_icgraph">
-<area shape="rect" id="node3" href="class_super__peer__logic.html#a9c4ff0b6b6b3c7872e130a9ce4444a8c" title="Super_peer_logic::addSuperPeer" alt="" coords="257,5,468,35"/><area shape="rect" id="node7" href="class_peer__logic.html#aa8ed5237ed07e5af69c7b94395fbb40d" title="Peer_logic::joinRequest" alt="" coords="283,59,443,88"/><area shape="rect" id="node14" href="classbootstrap_pkt_descriptor.html#acc2758d73aea392f3c535b7829fa4ef8" title="bootstrapPktDescriptor::setFieldAsString" alt="" coords="233,112,492,141"/><area shape="rect" id="node5" href="class_super__peer__logic.html#a55adc92c94a1f2743e269481bd859e0a" title="Super_peer_logic::handleMessage" alt="" coords="541,5,763,35"/><area shape="rect" id="node9" href="class_peer__logic.html#a858ea9e4712d604817903ef91e534235" title="Peer_logic::handleMessage" alt="" coords="812,85,993,115"/><area shape="rect" id="node11" href="class_peer__logic.html#a2ba9623ef469018de09c58d5f20ea933" title="Peer_logic::handleP2PMsg" alt="" coords="563,111,741,140"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="a0e2b6c52123a86a5047da831b5adbfb2"></a><!-- doxytag: member="bootstrapPkt::setSuperPeerAdr" ref="a0e2b6c52123a86a5047da831b5adbfb2" args="(const TransportAddress &amp;superPeerAdr_var)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void bootstrapPkt::setSuperPeerAdr </td>
-          <td>(</td>
-          <td class="paramtype">const TransportAddress &amp;&#160;</td>
-          <td class="paramname"><em>superPeerAdr_var</em></td><td>)</td>
-          <td><code> [virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="bootstrap_pkt__m_8cc_source.html#l00079">79</a> of file <a class="el" href="bootstrap_pkt__m_8cc_source.html">bootstrapPkt_m.cc</a>.</p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classbootstrap_pkt_a0e2b6c52123a86a5047da831b5adbfb2_icgraph.png" border="0" usemap="#classbootstrap_pkt_a0e2b6c52123a86a5047da831b5adbfb2_icgraph" alt=""/></div>
-<map name="classbootstrap_pkt_a0e2b6c52123a86a5047da831b5adbfb2_icgraph" id="classbootstrap_pkt_a0e2b6c52123a86a5047da831b5adbfb2_icgraph">
-<area shape="rect" id="node3" href="class_directory__logic.html#a735bf4b01f1803522077843cc44368e0" title="Directory_logic::handleJoinReq" alt="" coords="256,5,459,35"/><area shape="rect" id="node5" href="class_directory__logic.html#aeb0a6a019e0b5f760faea015f81357c9" title="Directory_logic::handleUDPMessage" alt="" coords="507,5,744,35"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<hr/><h2>Member Data Documentation</h2>
-<a class="anchor" id="a56f8b050daf3ab4f35fcd0dc3706a6d8"></a><!-- doxytag: member="bootstrapPkt::latitude_var" ref="a56f8b050daf3ab4f35fcd0dc3706a6d8" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">double <a class="el" href="classbootstrap_pkt.html#a56f8b050daf3ab4f35fcd0dc3706a6d8">bootstrapPkt::latitude_var</a><code> [protected]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="bootstrap_pkt__m_8h_source.html#l00037">37</a> of file <a class="el" href="bootstrap_pkt__m_8h_source.html">bootstrapPkt_m.h</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a58a5da3f2d73aa413ba9c2431dffef5d"></a><!-- doxytag: member="bootstrapPkt::longitude_var" ref="a58a5da3f2d73aa413ba9c2431dffef5d" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">double <a class="el" href="classbootstrap_pkt.html#a58a5da3f2d73aa413ba9c2431dffef5d">bootstrapPkt::longitude_var</a><code> [protected]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="bootstrap_pkt__m_8h_source.html#l00038">38</a> of file <a class="el" href="bootstrap_pkt__m_8h_source.html">bootstrapPkt_m.h</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="aec05a010283857100c85ca3ee77baf74"></a><!-- doxytag: member="bootstrapPkt::superPeerAdr_var" ref="aec05a010283857100c85ca3ee77baf74" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">::TransportAddress <a class="el" href="classbootstrap_pkt.html#aec05a010283857100c85ca3ee77baf74">bootstrapPkt::superPeerAdr_var</a><code> [protected]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="bootstrap_pkt__m_8h_source.html#l00036">36</a> of file <a class="el" href="bootstrap_pkt__m_8h_source.html">bootstrapPkt_m.h</a>.</p>
-
-</div>
-</div>
-<hr/>The documentation for this class was generated from the following files:<ul>
+ </pre> </div><hr/>The documentation for this class was generated from the following files:<ul>
 <li><a class="el" href="bootstrap_pkt__m_8h_source.html">bootstrapPkt_m.h</a></li>
-<li><a class="el" href="bootstrap_pkt__m_8cc_source.html">bootstrapPkt_m.cc</a></li>
+<li>bootstrapPkt_m.cc</li>
 </ul>
 </div>
 </div>
   <div id="nav-path" class="navpath">
     <ul>
       <li class="navelem"><a class="el" href="classbootstrap_pkt.html">bootstrapPkt</a>      </li>
-      <li class="footer">Generated on Mon Nov 7 2011 15:57:41 for Pithos by&#160;
+      <li class="footer">Generated on Tue Nov 29 2011 10:50:45 for Pithos by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>
@@ -634,7 +172,7 @@ Here is the caller graph for this function:</div>
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">

@@ -1,12 +1,4 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$class_packet.html#a506a2ee38e72edd4e596cc8ca1c4e772" title="Packet::getPayloadType" alt="" coords="251,5,416,35"/>
-<area shape="rect" id="node5" href="$class_game_object.html#a64ba9e7c42bc9666813f4af4b24ffc88" title="GameObject::getSize" alt="" coords="260,59,407,88"/>
-<area shape="rect" id="node7" href="$classbootstrap_pkt.html#ad1b68dceb784d72b036ce2d161d24db5" title="bootstrapPkt::getSuperPeerAdr" alt="" coords="232,112,435,141"/>
-<area shape="rect" id="node9" href="$class_game_object.html#aa76ad2a2a97c5fba330f5dcff7f7b251" title="GameObject::getType" alt="" coords="259,165,408,195"/>
-<area shape="rect" id="node11" href="$class_peer__logic.html#aa8ed5237ed07e5af69c7b94395fbb40d" title="Peer_logic::joinRequest" alt="" coords="253,219,413,248"/>
-<area shape="rect" id="node13" href="$class_packet.html#a45f33c0de6120b8da4450f57075fd8df" title="Packet::setDestinationAddress" alt="" coords="483,112,685,141"/>
-<area shape="rect" id="node15" href="$classbootstrap_pkt.html#a1d2a0231c6174381c5fc0a333c3ee65b" title="bootstrapPkt::setLatitude" alt="" coords="500,165,668,195"/>
-<area shape="rect" id="node17" href="$classbootstrap_pkt.html#a98f5c5f8e3de7301edce42ad55a8dd33" title="bootstrapPkt::setLongitude" alt="" coords="495,219,673,248"/>
-<area shape="rect" id="node19" href="$class_packet.html#afcdd0af481587e75efddb32263e5bbc7" title="Packet::setPayloadType" alt="" coords="501,272,667,301"/>
-<area shape="rect" id="node21" href="$class_packet.html#a2429eaaf7dff189b3d35e528c019e961" title="Packet::setSourceAddress" alt="" coords="495,325,673,355"/>
+<area shape="rect" id="node3" href="$class_game_object.html#a64ba9e7c42bc9666813f4af4b24ffc88" title="GameObject::getSize" alt="" coords="239,5,385,35"/>
+<area shape="rect" id="node5" href="$class_peer__logic.html#aa8ed5237ed07e5af69c7b94395fbb40d" title="Peer_logic::joinRequest" alt="" coords="232,59,392,88"/>
 </map>

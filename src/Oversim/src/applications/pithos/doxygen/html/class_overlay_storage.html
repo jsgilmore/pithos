@@ -27,7 +27,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Pithos</div>
-   <div id="projectbrief">Distributed storage for MMVEs</div>
+   <div id="projectbrief">Distributed state management and persistency for P2P MMVE</div>
   </td>
  </tr>
  </tbody>
@@ -93,103 +93,18 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_overlay_storage.html#a7a4d69acc208a710d6b0394a6439fa83">OverlayStorage</a> ()</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_overlay_storage.html#abcba2a89244c6444cd6d130c77263bda">~OverlayStorage</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_overlay_storage.html#a630da205839d7a74f3b6761572710010">store</a> (<a class="el" href="class_game_object.html">GameObject</a> *go)</td></tr>
 <tr><td colspan="2"><h2><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_overlay_storage.html#a1d4890ebcb6be010f7b63471c9d657d0">initialize</a> ()</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_overlay_storage.html#abb52980596f7da7d502ef56e9b226825">handleMessage</a> (cMessage *msg)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1d4890ebcb6be010f7b63471c9d657d0"></a><!-- doxytag: member="OverlayStorage::initialize" ref="a1d4890ebcb6be010f7b63471c9d657d0" args="()" -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>initialize</b> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abb52980596f7da7d502ef56e9b226825"></a><!-- doxytag: member="OverlayStorage::handleMessage" ref="abb52980596f7da7d502ef56e9b226825" args="(cMessage *msg)" -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>handleMessage</b> (cMessage *msg)</td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <div class="textblock"><p>The <a class="el" href="class_overlay_storage.html">OverlayStorage</a> module is responsible for handling all aspects of overlay storage on the sending side. When another module wants to store an object in overlay storage, that module sends the object to this module. The reason for this indirection is that it allows for a modular design of overlay storage and the further implementation of other types of overlay storage.</p>
 <dl class="author"><dt><b>Author:</b></dt><dd>John Gilmore </dd></dl>
-
-<p>Definition at line <a class="el" href="_overlay_storage_8h_source.html#l00039">39</a> of file <a class="el" href="_overlay_storage_8h_source.html">OverlayStorage.h</a>.</p>
-</div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="a7a4d69acc208a710d6b0394a6439fa83"></a><!-- doxytag: member="OverlayStorage::OverlayStorage" ref="a7a4d69acc208a710d6b0394a6439fa83" args="()" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">OverlayStorage::OverlayStorage </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="_overlay_storage_8cc_source.html#l00018">18</a> of file <a class="el" href="_overlay_storage_8cc_source.html">OverlayStorage.cc</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="abcba2a89244c6444cd6d130c77263bda"></a><!-- doxytag: member="OverlayStorage::~OverlayStorage" ref="abcba2a89244c6444cd6d130c77263bda" args="()" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">OverlayStorage::~OverlayStorage </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td><code> [virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="_overlay_storage_8cc_source.html#l00023">23</a> of file <a class="el" href="_overlay_storage_8cc_source.html">OverlayStorage.cc</a>.</p>
-
-</div>
-</div>
-<hr/><h2>Member Function Documentation</h2>
-<a class="anchor" id="abb52980596f7da7d502ef56e9b226825"></a><!-- doxytag: member="OverlayStorage::handleMessage" ref="abb52980596f7da7d502ef56e9b226825" args="(cMessage *msg)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void OverlayStorage::handleMessage </td>
-          <td>(</td>
-          <td class="paramtype">cMessage *&#160;</td>
-          <td class="paramname"><em>msg</em></td><td>)</td>
-          <td><code> [protected, virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="_overlay_storage_8cc_source.html#l00065">65</a> of file <a class="el" href="_overlay_storage_8cc_source.html">OverlayStorage.cc</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_overlay_storage_abb52980596f7da7d502ef56e9b226825_cgraph.png" border="0" usemap="#class_overlay_storage_abb52980596f7da7d502ef56e9b226825_cgraph" alt=""/></div>
-<map name="class_overlay_storage_abb52980596f7da7d502ef56e9b226825_cgraph" id="class_overlay_storage_abb52980596f7da7d502ef56e9b226825_cgraph">
-<area shape="rect" id="node3" href="class_overlay_storage.html#a630da205839d7a74f3b6761572710010" title="OverlayStorage::store" alt="" coords="264,85,413,115"/><area shape="rect" id="node5" href="class_game_object.html#a64ba9e7c42bc9666813f4af4b24ffc88" title="GameObject::getSize" alt="" coords="497,5,644,35"/><area shape="rect" id="node7" href="class_peer__logic.html#aca75dc9992d3c7238ee64a25eb3bc7aa" title="Peer_logic::getSuperPeerAddress" alt="" coords="461,59,680,88"/><area shape="rect" id="node9" href="class_peer__logic.html#a59544f6e7e5ea481a13d04c5decbe1c7" title="Peer_logic::hasSuperPeer" alt="" coords="484,112,657,141"/><area shape="rect" id="node11" href="class_game_object.html#ac48ab958ae21ae9e1d982fb567603bdd" title="GameObject::setType" alt="" coords="496,165,645,195"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="a1d4890ebcb6be010f7b63471c9d657d0"></a><!-- doxytag: member="OverlayStorage::initialize" ref="a1d4890ebcb6be010f7b63471c9d657d0" args="()" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void OverlayStorage::initialize </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td><code> [protected, virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="_overlay_storage_8cc_source.html#l00027">27</a> of file <a class="el" href="_overlay_storage_8cc_source.html">OverlayStorage.cc</a>.</p>
-
-</div>
-</div>
+</div><hr/><h2>Member Function Documentation</h2>
 <a class="anchor" id="a630da205839d7a74f3b6761572710010"></a><!-- doxytag: member="OverlayStorage::store" ref="a630da205839d7a74f3b6761572710010" args="(GameObject *go)" -->
 <div class="memitem">
 <div class="memproto">
@@ -212,23 +127,12 @@ Here is the call graph for this function:</div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="_overlay_storage_8cc_source.html#l00032">32</a> of file <a class="el" href="_overlay_storage_8cc_source.html">OverlayStorage.cc</a>.</p>
-
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_overlay_storage_a630da205839d7a74f3b6761572710010_cgraph.png" border="0" usemap="#class_overlay_storage_a630da205839d7a74f3b6761572710010_cgraph" alt=""/></div>
 <map name="class_overlay_storage_a630da205839d7a74f3b6761572710010_cgraph" id="class_overlay_storage_a630da205839d7a74f3b6761572710010_cgraph">
-<area shape="rect" id="node3" href="class_game_object.html#a64ba9e7c42bc9666813f4af4b24ffc88" title="GameObject::getSize" alt="" coords="239,5,385,35"/><area shape="rect" id="node5" href="class_peer__logic.html#aca75dc9992d3c7238ee64a25eb3bc7aa" title="Peer_logic::getSuperPeerAddress" alt="" coords="203,59,421,88"/><area shape="rect" id="node7" href="class_peer__logic.html#a59544f6e7e5ea481a13d04c5decbe1c7" title="Peer_logic::hasSuperPeer" alt="" coords="225,112,399,141"/><area shape="rect" id="node9" href="class_game_object.html#ac48ab958ae21ae9e1d982fb567603bdd" title="GameObject::setType" alt="" coords="237,165,387,195"/></map>
-</div>
-</p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="class_overlay_storage_a630da205839d7a74f3b6761572710010_icgraph.png" border="0" usemap="#class_overlay_storage_a630da205839d7a74f3b6761572710010_icgraph" alt=""/></div>
-<map name="class_overlay_storage_a630da205839d7a74f3b6761572710010_icgraph" id="class_overlay_storage_a630da205839d7a74f3b6761572710010_icgraph">
-<area shape="rect" id="node3" href="class_overlay_storage.html#abb52980596f7da7d502ef56e9b226825" title="OverlayStorage::handleMessage" alt="" coords="203,5,413,35"/></map>
+<area shape="rect" id="node3" href="class_game_object.html#a64ba9e7c42bc9666813f4af4b24ffc88" title="GameObject::getSize" alt="" coords="216,5,363,35"/><area shape="rect" id="node5" href="class_peer__logic.html#a59544f6e7e5ea481a13d04c5decbe1c7" title="Peer_logic::hasSuperPeer" alt="" coords="203,59,376,88"/></map>
 </div>
 </p>
 
@@ -236,14 +140,14 @@ Here is the caller graph for this function:</div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
 <li><a class="el" href="_overlay_storage_8h_source.html">OverlayStorage.h</a></li>
-<li><a class="el" href="_overlay_storage_8cc_source.html">OverlayStorage.cc</a></li>
+<li>OverlayStorage.cc</li>
 </ul>
 </div>
 </div>
   <div id="nav-path" class="navpath">
     <ul>
       <li class="navelem"><a class="el" href="class_overlay_storage.html">OverlayStorage</a>      </li>
-      <li class="footer">Generated on Mon Nov 7 2011 15:57:41 for Pithos by&#160;
+      <li class="footer">Generated on Tue Nov 29 2011 10:50:45 for Pithos by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>
@@ -253,7 +157,7 @@ Here is the caller graph for this function:</div>
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">

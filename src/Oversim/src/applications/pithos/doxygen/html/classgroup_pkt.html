@@ -27,7 +27,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Pithos</div>
-   <div id="projectbrief">Distributed storage for MMVEs</div>
+   <div id="projectbrief">Distributed state management and persistency for P2P MMVE</div>
   </td>
  </tr>
  </tbody>
@@ -108,21 +108,28 @@ Collaboration diagram for groupPkt:</div>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgroup_pkt.html#a44a0f0f98074e23837c861ca7780a6e6">groupPkt</a> ()</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgroup_pkt.html#af6eb35f83f6092304d3cca5c5e04dd29">groupPkt</a> (const <a class="el" href="classgroup_pkt.html">groupPkt</a> &amp;other)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgroup_pkt.html#a799fb4020f97a9977d7703b4fa6a1a0a">~groupPkt</a> ()</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classgroup_pkt.html">groupPkt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgroup_pkt.html#a333f9387ea441cbd5c7b58a978a9dc1a">operator=</a> (const <a class="el" href="classgroup_pkt.html">groupPkt</a> &amp;other)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classgroup_pkt.html">groupPkt</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgroup_pkt.html#af9ccb070d9ec281122e7023f78fe6c41">dup</a> () const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgroup_pkt.html#a086487160ce0ba9ecbcefb8f769bae27">parsimPack</a> (cCommBuffer *b)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgroup_pkt.html#a67519a459ffbf46cbe4f3292ba2871ed">parsimUnpack</a> (cCommBuffer *b)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgroup_pkt.html#af5bf5c58238f0e55d0119586e2fb33b3">getValue</a> () const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgroup_pkt.html#a0e35fc63d6a7f8a93fae9d0a34f30d8a">setValue</a> (long <a class="el" href="classgroup_pkt.html#a6ffbd9a3d661fbab988a7dfd77e7a55d">value_var</a>)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af6eb35f83f6092304d3cca5c5e04dd29"></a><!-- doxytag: member="groupPkt::groupPkt" ref="af6eb35f83f6092304d3cca5c5e04dd29" args="(const groupPkt &amp;other)" -->
+&#160;</td><td class="memItemRight" valign="bottom"><b>groupPkt</b> (const <a class="el" href="classgroup_pkt.html">groupPkt</a> &amp;other)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a333f9387ea441cbd5c7b58a978a9dc1a"></a><!-- doxytag: member="groupPkt::operator=" ref="a333f9387ea441cbd5c7b58a978a9dc1a" args="(const groupPkt &amp;other)" -->
+<a class="el" href="classgroup_pkt.html">groupPkt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (const <a class="el" href="classgroup_pkt.html">groupPkt</a> &amp;other)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af9ccb070d9ec281122e7023f78fe6c41"></a><!-- doxytag: member="groupPkt::dup" ref="af9ccb070d9ec281122e7023f78fe6c41" args="() const " -->
+virtual <a class="el" href="classgroup_pkt.html">groupPkt</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>dup</b> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a086487160ce0ba9ecbcefb8f769bae27"></a><!-- doxytag: member="groupPkt::parsimPack" ref="a086487160ce0ba9ecbcefb8f769bae27" args="(cCommBuffer *b)" -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>parsimPack</b> (cCommBuffer *b)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a67519a459ffbf46cbe4f3292ba2871ed"></a><!-- doxytag: member="groupPkt::parsimUnpack" ref="a67519a459ffbf46cbe4f3292ba2871ed" args="(cCommBuffer *b)" -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>parsimUnpack</b> (cCommBuffer *b)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af5bf5c58238f0e55d0119586e2fb33b3"></a><!-- doxytag: member="groupPkt::getValue" ref="af5bf5c58238f0e55d0119586e2fb33b3" args="() const " -->
+virtual long&#160;</td><td class="memItemRight" valign="bottom"><b>getValue</b> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0e35fc63d6a7f8a93fae9d0a34f30d8a"></a><!-- doxytag: member="groupPkt::setValue" ref="a0e35fc63d6a7f8a93fae9d0a34f30d8a" args="(long value_var)" -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>setValue</b> (long value_var)</td></tr>
 <tr><td colspan="2"><h2><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgroup_pkt.html#a6ab09ea611ce01cbe3309b95bd1a5251">operator==</a> (const <a class="el" href="classgroup_pkt.html">groupPkt</a> &amp;)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6ab09ea611ce01cbe3309b95bd1a5251"></a><!-- doxytag: member="groupPkt::operator==" ref="a6ab09ea611ce01cbe3309b95bd1a5251" args="(const groupPkt &amp;)" -->
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator==</b> (const <a class="el" href="classgroup_pkt.html">groupPkt</a> &amp;)</td></tr>
 <tr><td colspan="2"><h2><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgroup_pkt.html#a6ffbd9a3d661fbab988a7dfd77e7a55d">value_var</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6ffbd9a3d661fbab988a7dfd77e7a55d"></a><!-- doxytag: member="groupPkt::value_var" ref="a6ffbd9a3d661fbab988a7dfd77e7a55d" args="" -->
+long&#160;</td><td class="memItemRight" valign="bottom"><b>value_var</b></td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <div class="textblock"><p>Class generated from <code>applications/pithos/groupPkt.msg</code> by opp_msgc. </p>
@@ -130,316 +137,16 @@ Protected Attributes</h2></td></tr>
  packet <a class="el" href="classgroup_pkt.html">groupPkt</a> extends <a class="el" href="class_packet.html">Packet</a> {
      long value;
  }
- </pre> 
-<p>Definition at line <a class="el" href="group_pkt__m_8h_source.html#l00030">30</a> of file <a class="el" href="group_pkt__m_8h_source.html">groupPkt_m.h</a>.</p>
-</div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="a44a0f0f98074e23837c861ca7780a6e6"></a><!-- doxytag: member="groupPkt::groupPkt" ref="a44a0f0f98074e23837c861ca7780a6e6" args="()" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">groupPkt::groupPkt </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="group_pkt__m_8cc_source.html#l00033">33</a> of file <a class="el" href="group_pkt__m_8cc_source.html">groupPkt_m.cc</a>.</p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classgroup_pkt_a44a0f0f98074e23837c861ca7780a6e6_icgraph.png" border="0" usemap="#classgroup_pkt_a44a0f0f98074e23837c861ca7780a6e6_icgraph" alt=""/></div>
-<map name="classgroup_pkt_a44a0f0f98074e23837c861ca7780a6e6_icgraph" id="classgroup_pkt_a44a0f0f98074e23837c861ca7780a6e6_icgraph">
-<area shape="rect" id="node3" href="classgroup_pkt.html#af9ccb070d9ec281122e7023f78fe6c41" title="groupPkt::dup" alt="" coords="191,5,292,35"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="af6eb35f83f6092304d3cca5c5e04dd29"></a><!-- doxytag: member="groupPkt::groupPkt" ref="af6eb35f83f6092304d3cca5c5e04dd29" args="(const groupPkt &amp;other)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">groupPkt::groupPkt </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classgroup_pkt.html">groupPkt</a> &amp;&#160;</td>
-          <td class="paramname"><em>other</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="group_pkt__m_8cc_source.html#l00038">38</a> of file <a class="el" href="group_pkt__m_8cc_source.html">groupPkt_m.cc</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classgroup_pkt_af6eb35f83f6092304d3cca5c5e04dd29_cgraph.png" border="0" usemap="#classgroup_pkt_af6eb35f83f6092304d3cca5c5e04dd29_cgraph" alt=""/></div>
-<map name="classgroup_pkt_af6eb35f83f6092304d3cca5c5e04dd29_cgraph" id="classgroup_pkt_af6eb35f83f6092304d3cca5c5e04dd29_cgraph">
-<area shape="rect" id="node3" href="classgroup_pkt.html#a333f9387ea441cbd5c7b58a978a9dc1a" title="groupPkt::operator=" alt="" coords="191,5,327,35"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="a799fb4020f97a9977d7703b4fa6a1a0a"></a><!-- doxytag: member="groupPkt::~groupPkt" ref="a799fb4020f97a9977d7703b4fa6a1a0a" args="()" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">groupPkt::~groupPkt </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td><code> [virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="group_pkt__m_8cc_source.html#l00043">43</a> of file <a class="el" href="group_pkt__m_8cc_source.html">groupPkt_m.cc</a>.</p>
-
-</div>
-</div>
-<hr/><h2>Member Function Documentation</h2>
-<a class="anchor" id="af9ccb070d9ec281122e7023f78fe6c41"></a><!-- doxytag: member="groupPkt::dup" ref="af9ccb070d9ec281122e7023f78fe6c41" args="() const " -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual <a class="el" href="classgroup_pkt.html">groupPkt</a>* groupPkt::dup </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const<code> [inline, virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Reimplemented from <a class="el" href="class_packet.html#a6d1f709f7adca518d67b8d6fd028f013">Packet</a>.</p>
-
-<p>Definition at line <a class="el" href="group_pkt__m_8h_source.html#l00043">43</a> of file <a class="el" href="group_pkt__m_8h_source.html">groupPkt_m.h</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classgroup_pkt_af9ccb070d9ec281122e7023f78fe6c41_cgraph.png" border="0" usemap="#classgroup_pkt_af9ccb070d9ec281122e7023f78fe6c41_cgraph" alt=""/></div>
-<map name="classgroup_pkt_af9ccb070d9ec281122e7023f78fe6c41_cgraph" id="classgroup_pkt_af9ccb070d9ec281122e7023f78fe6c41_cgraph">
-<area shape="rect" id="node3" href="classgroup_pkt.html#a44a0f0f98074e23837c861ca7780a6e6" title="groupPkt::groupPkt" alt="" coords="159,5,292,35"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="af5bf5c58238f0e55d0119586e2fb33b3"></a><!-- doxytag: member="groupPkt::getValue" ref="af5bf5c58238f0e55d0119586e2fb33b3" args="() const " -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">long groupPkt::getValue </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const<code> [virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="group_pkt__m_8cc_source.html#l00067">67</a> of file <a class="el" href="group_pkt__m_8cc_source.html">groupPkt_m.cc</a>.</p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classgroup_pkt_af5bf5c58238f0e55d0119586e2fb33b3_icgraph.png" border="0" usemap="#classgroup_pkt_af5bf5c58238f0e55d0119586e2fb33b3_icgraph" alt=""/></div>
-<map name="classgroup_pkt_af5bf5c58238f0e55d0119586e2fb33b3_icgraph" id="classgroup_pkt_af5bf5c58238f0e55d0119586e2fb33b3_icgraph">
-<area shape="rect" id="node3" href="classgroup_pkt_descriptor.html#abc3726ed17410e7dabf4b33a231e9a96" title="groupPktDescriptor::getFieldAsString" alt="" coords="191,5,428,35"/><area shape="rect" id="node5" href="class_super__peer__logic.html#a1b8c2d1ee8062dedf06436b041b3cc33" title="Super_peer_logic::handleOverlayWrite" alt="" coords="188,59,431,88"/><area shape="rect" id="node9" href="class_peer__logic.html#a73d1f422aa65b9ba46cecdda1b729ecd" title="Peer_logic::handleRequest" alt="" coords="220,112,399,141"/><area shape="rect" id="node7" href="class_super__peer__logic.html#a55adc92c94a1f2743e269481bd859e0a" title="Super_peer_logic::handleMessage" alt="" coords="480,59,701,88"/><area shape="rect" id="node11" href="class_peer__logic.html#a858ea9e4712d604817903ef91e534235" title="Peer_logic::handleMessage" alt="" coords="500,112,681,141"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="a333f9387ea441cbd5c7b58a978a9dc1a"></a><!-- doxytag: member="groupPkt::operator=" ref="a333f9387ea441cbd5c7b58a978a9dc1a" args="(const groupPkt &amp;other)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classgroup_pkt.html">groupPkt</a> &amp; groupPkt::operator= </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classgroup_pkt.html">groupPkt</a> &amp;&#160;</td>
-          <td class="paramname"><em>other</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="group_pkt__m_8cc_source.html#l00047">47</a> of file <a class="el" href="group_pkt__m_8cc_source.html">groupPkt_m.cc</a>.</p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classgroup_pkt_a333f9387ea441cbd5c7b58a978a9dc1a_icgraph.png" border="0" usemap="#classgroup_pkt_a333f9387ea441cbd5c7b58a978a9dc1a_icgraph" alt=""/></div>
-<map name="classgroup_pkt_a333f9387ea441cbd5c7b58a978a9dc1a_icgraph" id="classgroup_pkt_a333f9387ea441cbd5c7b58a978a9dc1a_icgraph">
-<area shape="rect" id="node3" href="classgroup_pkt.html#af6eb35f83f6092304d3cca5c5e04dd29" title="groupPkt::groupPkt" alt="" coords="193,5,327,35"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="a6ab09ea611ce01cbe3309b95bd1a5251"></a><!-- doxytag: member="groupPkt::operator==" ref="a6ab09ea611ce01cbe3309b95bd1a5251" args="(const groupPkt &amp;)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool groupPkt::operator== </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classgroup_pkt.html">groupPkt</a> &amp;&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td><code> [protected]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a086487160ce0ba9ecbcefb8f769bae27"></a><!-- doxytag: member="groupPkt::parsimPack" ref="a086487160ce0ba9ecbcefb8f769bae27" args="(cCommBuffer *b)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void groupPkt::parsimPack </td>
-          <td>(</td>
-          <td class="paramtype">cCommBuffer *&#160;</td>
-          <td class="paramname"><em>b</em></td><td>)</td>
-          <td><code> [virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Reimplemented from <a class="el" href="class_packet.html#a4d8bbb7f3eb7f87a438981f170a5dde6">Packet</a>.</p>
-
-<p>Definition at line <a class="el" href="group_pkt__m_8cc_source.html#l00055">55</a> of file <a class="el" href="group_pkt__m_8cc_source.html">groupPkt_m.cc</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classgroup_pkt_a086487160ce0ba9ecbcefb8f769bae27_cgraph.png" border="0" usemap="#classgroup_pkt_a086487160ce0ba9ecbcefb8f769bae27_cgraph" alt=""/></div>
-<map name="classgroup_pkt_a086487160ce0ba9ecbcefb8f769bae27_cgraph" id="classgroup_pkt_a086487160ce0ba9ecbcefb8f769bae27_cgraph">
-<area shape="rect" id="node3" href="bootstrap_pkt__m_8cc.html#ad084222f62dca5ddcdd40d5ad0c0ec86" title="doPacking" alt="" coords="205,5,288,35"/></map>
-</div>
-</p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classgroup_pkt_a086487160ce0ba9ecbcefb8f769bae27_icgraph.png" border="0" usemap="#classgroup_pkt_a086487160ce0ba9ecbcefb8f769bae27_icgraph" alt=""/></div>
-<map name="classgroup_pkt_a086487160ce0ba9ecbcefb8f769bae27_icgraph" id="classgroup_pkt_a086487160ce0ba9ecbcefb8f769bae27_icgraph">
-<area shape="rect" id="node3" href="group_pkt__m_8h.html#a38ec29fa6cc906053ef434dbdae089e5" title="doPacking" alt="" coords="205,5,288,35"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="a67519a459ffbf46cbe4f3292ba2871ed"></a><!-- doxytag: member="groupPkt::parsimUnpack" ref="a67519a459ffbf46cbe4f3292ba2871ed" args="(cCommBuffer *b)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void groupPkt::parsimUnpack </td>
-          <td>(</td>
-          <td class="paramtype">cCommBuffer *&#160;</td>
-          <td class="paramname"><em>b</em></td><td>)</td>
-          <td><code> [virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Reimplemented from <a class="el" href="class_packet.html#a366cd279ab2bfe4a62cf8d5d460f1821">Packet</a>.</p>
-
-<p>Definition at line <a class="el" href="group_pkt__m_8cc_source.html#l00061">61</a> of file <a class="el" href="group_pkt__m_8cc_source.html">groupPkt_m.cc</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classgroup_pkt_a67519a459ffbf46cbe4f3292ba2871ed_cgraph.png" border="0" usemap="#classgroup_pkt_a67519a459ffbf46cbe4f3292ba2871ed_cgraph" alt=""/></div>
-<map name="classgroup_pkt_a67519a459ffbf46cbe4f3292ba2871ed_cgraph" id="classgroup_pkt_a67519a459ffbf46cbe4f3292ba2871ed_cgraph">
-<area shape="rect" id="node3" href="bootstrap_pkt__m_8cc.html#a4a7c16d9c83a185a80907df0d0b792f8" title="doUnpacking" alt="" coords="221,5,320,35"/></map>
-</div>
-</p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classgroup_pkt_a67519a459ffbf46cbe4f3292ba2871ed_icgraph.png" border="0" usemap="#classgroup_pkt_a67519a459ffbf46cbe4f3292ba2871ed_icgraph" alt=""/></div>
-<map name="classgroup_pkt_a67519a459ffbf46cbe4f3292ba2871ed_icgraph" id="classgroup_pkt_a67519a459ffbf46cbe4f3292ba2871ed_icgraph">
-<area shape="rect" id="node3" href="group_pkt__m_8h.html#a92f9bbe2e21c921d3267759e6236ef99" title="doUnpacking" alt="" coords="221,5,320,35"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="a0e35fc63d6a7f8a93fae9d0a34f30d8a"></a><!-- doxytag: member="groupPkt::setValue" ref="a0e35fc63d6a7f8a93fae9d0a34f30d8a" args="(long value_var)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void groupPkt::setValue </td>
-          <td>(</td>
-          <td class="paramtype">long&#160;</td>
-          <td class="paramname"><em>value_var</em></td><td>)</td>
-          <td><code> [virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="group_pkt__m_8cc_source.html#l00072">72</a> of file <a class="el" href="group_pkt__m_8cc_source.html">groupPkt_m.cc</a>.</p>
-
-<p><div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classgroup_pkt_a0e35fc63d6a7f8a93fae9d0a34f30d8a_icgraph.png" border="0" usemap="#classgroup_pkt_a0e35fc63d6a7f8a93fae9d0a34f30d8a_icgraph" alt=""/></div>
-<map name="classgroup_pkt_a0e35fc63d6a7f8a93fae9d0a34f30d8a_icgraph" id="classgroup_pkt_a0e35fc63d6a7f8a93fae9d0a34f30d8a_icgraph">
-<area shape="rect" id="node3" href="classgroup_pkt_descriptor.html#af85dfa29ca09def314e5d9635860defe" title="groupPktDescriptor::setFieldAsString" alt="" coords="188,5,425,35"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<hr/><h2>Member Data Documentation</h2>
-<a class="anchor" id="a6ffbd9a3d661fbab988a7dfd77e7a55d"></a><!-- doxytag: member="groupPkt::value_var" ref="a6ffbd9a3d661fbab988a7dfd77e7a55d" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">long <a class="el" href="classgroup_pkt.html#a6ffbd9a3d661fbab988a7dfd77e7a55d">groupPkt::value_var</a><code> [protected]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="group_pkt__m_8h_source.html#l00033">33</a> of file <a class="el" href="group_pkt__m_8h_source.html">groupPkt_m.h</a>.</p>
-
-</div>
-</div>
-<hr/>The documentation for this class was generated from the following files:<ul>
+ </pre> </div><hr/>The documentation for this class was generated from the following files:<ul>
 <li><a class="el" href="group_pkt__m_8h_source.html">groupPkt_m.h</a></li>
-<li><a class="el" href="group_pkt__m_8cc_source.html">groupPkt_m.cc</a></li>
+<li>groupPkt_m.cc</li>
 </ul>
 </div>
 </div>
   <div id="nav-path" class="navpath">
     <ul>
       <li class="navelem"><a class="el" href="classgroup_pkt.html">groupPkt</a>      </li>
-      <li class="footer">Generated on Mon Nov 7 2011 15:57:41 for Pithos by&#160;
+      <li class="footer">Generated on Tue Nov 29 2011 10:50:45 for Pithos by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </li>
     </ul>
@@ -449,7 +156,7 @@ Here is the caller graph for this function:</div>
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
