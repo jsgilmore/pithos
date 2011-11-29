@@ -36,6 +36,7 @@
 #include "packet_m.h"
 #include "groupPkt_m.h"
 #include "bootstrapPkt_m.h"
+#include "PithosTestMessages_m.h"
 
 #include "DHTMessage_m.h"
 
@@ -80,26 +81,25 @@ class Communicator : public BaseApp
 		 * this node. The response would be whether the push was successful
 		 * at the destination and will be sent back to the storing node.
 		 */
-		void handlePutRequest(DHTPutCall* dhtMsg);
+		//void handlePutRequest(RootObjectPutCall* dhtMsg);
 
 		/**
 		 * @see handlePutRequest()
 		 */
-		void handleGetRequest(DHTGetCall* dhtMsg);
+		//void handleGetRequest(RootObjectGetCall* dhtMsg);
 
 		/**
 		 * Called by @see handleRpcCall() when an internal RPC called requested a push be done.
 		 *
 		 * @param capiGetMsg Message containing the data required for the push
 		 */
-		void handleGetCAPIRequest(DHTgetCAPICall* capiGetMsg);
+		void handleGetCAPIRequest(RootObjectGetCAPICall* capiGetMsg);
 
 		/**
 		 * @see handleGetCapiRequest()
 		 */
-		void handlePutCAPIRequest(DHTputCAPICall* capiPutMsg);
+		void handlePutCAPIRequest(RootObjectPutCAPICall* capiPutMsg);
 
-		void handleDumpDhtRequest(DHTdumpCall* call);
 		void handleTraceMessage(cMessage* msg);
 
 		void handleRpcResponse(BaseResponseMessage* msg, const RpcState& state, simtime_t rtt);

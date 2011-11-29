@@ -27,7 +27,6 @@
 #include <GlobalStatisticsAccess.h>
 #include <UnderlayConfiguratorAccess.h>
 #include <RpcMacros.h>
-#include "PithosTestMessages_m.h"
 
 #include <GlobalDhtTestMap.h>
 
@@ -104,22 +103,27 @@ void PithosTestApp::initializeApp(int stage)
     pithostestmod_timer = new cMessage("pithostest_mod_timer");
 }
 
-void PithosTestApp::sendRequest()
+void PithosTestApp::sendPutRequest()
 {
-	char msgName [20];
-	char size_str [20];		//19 characters for 64 bit integer (9223372036854775807) + 1 for \0
+	char name[41];
 
-	double filesize = exponential(objectSize_av);
-	sprintf(size_str, "%lf", filesize);
+	GameObject *go = new GameObject("GameObject");
+	go->setSize(exponential(objectSize_av));
+	go->setCreationTime(simTime());
 
-	RootObjectPutCAPICall* putMsg = new RootObjectPutCAPICall();
-	putMsg->setName(msgName);
-	putMsg->setValue(size_str);
+	sprintf(name, "Game %d, Object %d", getParentModule()->getIndex(), numPutSent);	//The name is later combined with the remaining object values
+	go->setObjectName(name);
+	go->setType(ROOT);
+
+	RootObjectPutCAPICall* capiPutMsg = new RootObjectPutCAPICall();
+
+	capiPutMsg->addObject(go);
 	//dhtPutMsg->setTtl(ttl);
-	putMsg->setIsModifiable(true);
+	capiPutMsg->setIsModifiable(true);
 
+	RECORD_STATS(numSent++; numPutSent++);
 	//sendInternalRpcCall(ROOTOBJECTSTORE_COMP, dhtPutMsg, new DHTStatsContext(globalStatistics->isMeasuring(), simTime(), destKey, dhtPutMsg->getValue()));
-	sendInternalRpcCall(ROOTOBJECTSTORE_COMP, dhtPutMsg);
+	sendInternalRpcCall(ROOTOBJECTSTORE_COMP, capiPutMsg);
 }
 
 void PithosTestApp::handleLowerMessage (cMessage *msg)
@@ -132,7 +136,7 @@ void PithosTestApp::handleLowerMessage (cMessage *msg)
 		{
 			if (simTime() < generationTime + wait_time + join_time)
 			{
-				sendRequest();
+				sendPutRequest();
 
 			    if (mean > 0) {
 			        scheduleAt(simTime() + truncnormal(mean, deviation), pithostestput_timer);
@@ -284,7 +288,7 @@ void PithosTestApp::handleTraceMessage(cMessage* msg)
         buf++;
 
         RECORD_STATS(numSent++; numPutSent++);
-        sendRequest();
+        sendPutRequest();
     } /*else if (strncmp(cmd, "GET ", 4) == 0) {
         // Get key
         BinaryValue b(cmd + 4);
@@ -318,7 +322,7 @@ void PithosTestApp::handleTimerEvent(cMessage* msg)
         if (simTime() > generationTime + wait_time + join_time)	//This has the module only generate requests for a finite amount of time
         	return;
 
-        sendRequest();
+        sendPutRequest();
 
 
     } /*else if (msg->isName("pithostest_get_timer"))

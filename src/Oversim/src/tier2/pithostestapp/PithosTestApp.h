@@ -37,6 +37,8 @@
 #include <set>
 #include <sstream>
 
+#include "PithosTestMessages_m.h"
+
 class GlobalDhtTestMap;
 
 /**
@@ -89,7 +91,7 @@ private:
 
     void handleLowerMessage (cMessage *msg);
 
-    void sendRequest();
+    void sendPutRequest();
 
     /**
      * processes get responses
