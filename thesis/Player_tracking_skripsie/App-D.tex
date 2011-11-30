@@ -1,0 +1,1168 @@
+\chapter{C code listing}
+The code for the player tracking software and log reading software is listed in this Appendix in different sections. Each separate file in the programs are listed in their own code blocks.
+
+\section{Player Tracking Software}
+
+\lstset{language=c}
+\lstset{basicstyle=\small}
+%\lstset{backgroundcolor=listinggray,framerulecolor=blue}
+%\lstset{backgroundcolor=listinggray,rulecolor=blue}
+\lstset{backgroundcolor=\color{listinggray},rulecolor=\color{blue}}
+\lstset{linewidth=\textwidth}
+%\lstset{labelstep=10}
+%\lstset{commentstyle=\textit, stringstyle=\upshape,stringspaces=false}
+\lstset{commentstyle=\textit, stringstyle=\upshape,showspaces=false}
+\lstset{frame=trBL,frameround=tttt}
+
+
+File: WoWdar.cs
+\begin{lstlisting}
+using System;
+using System.Collections.Generic;
+using System.Collections;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Windows.Forms;
+using Magic;
+
+namespace WoWdar
+{
+public partial class WoWdar : Form
+{
+  uint ClientCon = 0;
+  uint ObjectMan = 0;
+  uint FirstObj = 0;
+  uint TotWowObj = 0;
+  uint WoWBase = 0;
+  bool TrackerReady = false;
+  ArrayList allObjects = new ArrayList();
+  ArrayList objGuid = new ArrayList();
+  bool Found = false;
+         
+  static int DisplayHeight = 552;
+  static int DisplayWidth = 552;
+  Bitmap TrackingBitmap = new Bitmap(DisplayWidth, DisplayHeight);
+  float TZoom = 1;        //default zoom level
+  //dont show units that are 100 higher or lower than yourself
+  int absZRange = 100; 
+  
+  //color definitions
+  Color PlayerColor = Color.Blue;
+  Color DeadPlayer = Color.DarkBlue;
+  Color LiveNPC = Color.Plum;
+  Color DeadNPC = Color.Gray;
+  Color LocalPlayer = Color.ForestGreen;
+  Color CurrentTarget = Color.Red;
+
+  WoWObject Player = new WoWObject();
+  WoWObject Me = new WoWObject();
+  WoWObject Target = new WoWObject();
+  WoWObject CurrentObj = new WoWObject();
+  WoWObject TempObj = new WoWObject();
+  BlackMagic wow = new BlackMagic();
+
+  public WoWdar()
+  {
+    InitializeComponent();
+  }
+
+
+  private void WoWdar_Load(object sender, EventArgs e)
+  {
+   try
+   {
+     if (LoadOffsets() == true)
+        TrackerReady = true;
+
+     if (TrackerReady == false)
+     {
+        ClearBitmap(ref TrackingBitmap);
+        TrackingBitmap = WriteTextCenter(TrackingBitmap, 
+          "Please enter the game world and click Reload.", 8);
+        display.Image = TrackingBitmap;
+     }
+    }
+    catch(Exception)
+    {
+      ClearBitmap(ref TrackingBitmap);
+      TrackingBitmap = WriteTextCenter(TrackingBitmap, 
+        "Could not load offsets. Please Reload.", 8);
+      display.Image = TrackingBitmap;
+    }        
+   }
+
+  private Boolean LoadOffsets()
+  {
+    if (wow.OpenProcessAndThread(
+      SProcess.GetProcessFromProcessName("Wow")))
+    {
+    }
+    else
+    {
+      return false;
+    }
+
+    IntPtr baseWoW = wow.MainModule.BaseAddress;
+    WoWBase = (uint)baseWoW;
+
+    ClientCon = wow.ReadUInt((uint)baseWoW 
+      + (uint)ObjectManagerOff.clientConnection);
+    ObjectMan = wow.ReadUInt(ClientCon 
+      + (uint)ObjectManagerOff.objectManager);
+    FirstObj = wow.ReadUInt(ObjectMan 
+      + (uint)ObjectManagerOff.firstObject);
+    Target.GUID = wow.ReadUInt64((uint)baseWoW 
+      + (uint)PlayerOff.LastTargetGUID);
+    Me.GUID = wow.ReadUInt64(ObjectMan 
+      + (uint)ObjectManagerOff.localGuid);
+    Me.Name = wow.ReadASCIIString((uint)baseWoW + 0x980598, 20);
+            
+    this.pName.Text = "Name: " + Me.Name;
+    this.pGuid.Text = "GUID: " + Me.GUID;
+
+    if (Me.GUID == 0)
+      return false;
+    else
+      return true;
+
+  }
+
+  private float RadToDeg(float Rot)
+  {
+    return (float)(Rot * (180 / Math.PI));
+  }
+
+  private void RadarTimer_Tick(object sender, EventArgs e)
+  {
+    if(rZoom1.Checked)
+    {
+                TZoom = 1;
+    }
+    else if(rZoom2.Checked)
+    {
+      TZoom = 2;
+    }
+    else if (rZoom3.Checked)
+    {
+      TZoom = 3;
+    }
+    else if (rZoom4.Checked)
+    {
+       TZoom = 4;
+    }
+ 
+    //don't clear bitmap if traces must be shown
+    if(!cbShowTrace.Checked) 
+    {
+       ClearBitmap(ref TrackingBitmap);
+    }
+
+    if (TrackerReady == false)
+    {
+      TrackingBitmap = WriteTextCenter(TrackingBitmap, 
+        "Please enter the game world then click Reload.", 8);
+      display.Image = TrackingBitmap;
+      return;
+    }
+
+    try
+    {
+      TotWowObj = 0;
+      CurrentObj.BaseAddress = FirstObj;
+      Target.GUID = wow.ReadUInt64(WoWBase 
+        + (uint)PlayerOff.LastTargetGUID);
+
+      Me.BaseAddress = GetBaseByGuid(Me.GUID);
+      Me.X = wow.ReadFloat(Me.BaseAddress 
+        + (uint)ObjectOffsets.Pos_X);
+      Me.Y = wow.ReadFloat(Me.BaseAddress 
+        + (uint)ObjectOffsets.Pos_Y);
+      Me.Z = wow.ReadFloat(Me.BaseAddress 
+        + (uint)ObjectOffsets.Pos_Z);
+      Me.Rot = wow.ReadFloat(Me.BaseAddress 
+        + (uint)ObjectOffsets.Rot);
+
+      Graphics g = Graphics.FromImage(TrackingBitmap);
+
+      if (Target.GUID != 0)    //if valid target, get target details
+      {
+        Target.BaseAddress = GetBaseByGuid(Target.GUID);
+        Target.X = wow.ReadFloat(Target.BaseAddress 
+          + (uint)ObjectOffsets.Pos_X);
+        Target.Y = wow.ReadFloat(Target.BaseAddress 
+          + (uint)ObjectOffsets.Pos_Y);
+        Target.Z = wow.ReadFloat(Target.BaseAddress 
+          + (uint)ObjectOffsets.Pos_Z);
+        Target.Rot = wow.ReadFloat(Target.BaseAddress 
+          + (uint)ObjectOffsets.Rot);
+        Target.ObjectFields = wow.ReadUInt(Target.BaseAddress 
+          + (uint)ObjectOffsets.ObjectFields);
+        Target.Type = wow.ReadShort(Target.BaseAddress + 0x14);
+
+        if (Target.Type == 3)    //NPC 
+        {
+           Target.Name = NPCNameFromGuid(Target.GUID);
+        }
+        if (Target.Type == 4)    //human player
+        {
+           Target.Name = PlayerNameFromGuid(Target.GUID);
+        }
+        if ((Target.Type != 4) && (Target.Type != 3))
+        {
+          Target.Name = "Object.";
+        }
+
+     }//end if Target Guid !=0
+
+//now go through all objects and add new ones to array list 
+//and update old ones (all for logging purposes).
+//also display all objects
+
+     while ((CurrentObj.BaseAddress != 0) 
+        && (CurrentObj.BaseAddress % 2 == 0))
+     {
+       TotWowObj += 1;     //count all wow objects in range
+
+       CurrentObj.GUID = GetGuidByBase(CurrentObj.BaseAddress);
+       CurrentObj.ObjectFields = wow.ReadUInt(CurrentObj.BaseAddress 
+         + (uint)ObjectOffsets.ObjectFields);
+       CurrentObj.Type = wow.ReadShort(CurrentObj.BaseAddress 
+         + 0x14);
+       CurrentObj.X = wow.ReadFloat(CurrentObj.BaseAddress 
+         + (uint)ObjectOffsets.Pos_X);
+       CurrentObj.Y = wow.ReadFloat(CurrentObj.BaseAddress 
+         + (uint)ObjectOffsets.Pos_Y);
+       CurrentObj.Z = wow.ReadFloat(CurrentObj.BaseAddress 
+         + (uint)ObjectOffsets.Pos_Z);
+       CurrentObj.Rot = wow.ReadFloat(CurrentObj.BaseAddress 
+         + (uint)ObjectOffsets.Rot);
+       CurrentObj.health = wow.ReadUInt(CurrentObj.ObjectFields 
+         + (uint)UnitFields.UNIT_FIELD_HEALTH);
+
+       if (CurrentObj.Type == 3)    //NPC 
+       {
+         CurrentObj.Name = NPCNameFromGuid(CurrentObj.GUID);
+       }
+       if (CurrentObj.Type == 4)    //human player
+       {
+         CurrentObj.Name = PlayerNameFromGuid(CurrentObj.GUID);
+       }
+
+//is target is within reasonable vertical range & not me ? 
+
+       if ((Math.Abs(Me.Z - CurrentObj.Z) <= absZRange) 
+         && (CurrentObj.GUID != Me.GUID))         
+       {                                                                                                                          
+         switch (CurrentObj.Type)
+         {
+           case 3: //npc
+          //only draw NPC if showtrace not checked
+             if (!cbShowTrace.Checked)   
+             {
+               if (CurrentObj.health <= 0)
+               {
+                 TrackingBitmap = SketchPlayer(TrackingBitmap, 
+                   DeadNPC, (Me.X - CurrentObj.X) * TZoom 
+                   + DisplayWidth / 2, (Me.Y - CurrentObj.Y) 
+                   * TZoom + DisplayHeight / 2, CurrentObj.Rot, 
+                   CurrentObj.Name);
+               }//NPC dead
+               else
+               {
+                 TrackingBitmap = SketchPlayer(TrackingBitmap, 
+                   LiveNPC, (Me.X - CurrentObj.X) * TZoom 
+                   + DisplayWidth / 2, (Me.Y - CurrentObj.Y) 
+                   * TZoom + DisplayHeight / 2, CurrentObj.Rot, 
+                   CurrentObj.Name);
+               }//NPC alive
+             }                                
+             break;
+
+          case 4: //a player
+
+             if(CurrentObj.health <= 0)
+             {
+               TrackingBitmap = SketchPlayer(TrackingBitmap, 
+                 DeadPlayer, (Me.X - CurrentObj.X) * TZoom 
+                 + DisplayWidth / 2, (Me.Y - CurrentObj.Y) 
+                 * TZoom + DisplayHeight / 2, CurrentObj.Rot, 
+                 CurrentObj.Name);
+             }//player dead
+             else
+             {       //track living human players
+               if(cbTrack.Checked)
+               {
+                 if (allObjects.Count <= 0) //first entry in array
+                 {
+                   TimeAndPos temp = new TimeAndPos();
+                   temp.XPos = CurrentObj.X;
+                   temp.YPos = CurrentObj.Y;
+                   temp.ZPos = CurrentObj.Z;
+                   temp.RotPos = CurrentObj.Rot;
+                   temp.time = DateTime.Now;       
+                   ObjArray trackPlayer = new ObjArray();
+                   trackPlayer.GUID = CurrentObj.GUID;
+                   trackPlayer.info.Add(temp);
+                   allObjects.Add(trackPlayer);
+                 }
+//search through array to see if player is already there                
+                 else                    
+                 {
+                   foreach(ObjArray tracking in allObjects)
+                   {
+                   //means current player GUID already in array
+                     if (tracking.GUID == CurrentObj.GUID)
+                     {
+                       Found = true;
+                       TimeAndPos temp = new TimeAndPos();
+                       temp.XPos = CurrentObj.X;
+                       temp.YPos = CurrentObj.Y;
+                       temp.ZPos = CurrentObj.Z;
+                       temp.RotPos = CurrentObj.Rot;
+                       temp.time = DateTime.Now;
+                       tracking.info.Add(temp);
+                     }
+                   }
+                   //item not found in list, add it to list
+                   if (!Found)     
+                   {
+                     TimeAndPos temp = new TimeAndPos();
+                     temp.XPos = CurrentObj.X;
+                     temp.YPos = CurrentObj.Y;
+                     temp.ZPos = CurrentObj.Z;
+                     temp.RotPos = CurrentObj.Rot;
+                     temp.time = DateTime.Now;      
+                     ObjArray trackPlayer = new ObjArray();
+                     trackPlayer.GUID = CurrentObj.GUID;
+                     trackPlayer.info.Add(temp);
+                     allObjects.Add(trackPlayer);
+                   }
+                   else
+                   {
+                     Found = false;  //reset value
+                   }
+                   lTest.Text = "Total Players: " + allObjects.Count;
+                }
+              }
+              TrackingBitmap = SketchPlayer(TrackingBitmap, 
+                PlayerColor, (Me.X - CurrentObj.X) * TZoom 
+                + DisplayWidth / 2, (Me.Y - CurrentObj.Y) 
+                * TZoom + DisplayHeight / 2, CurrentObj.Rot, 
+                CurrentObj.Name);
+           }//Player alive
+           break;
+         }//end switch
+        }//end if
+        CurrentObj.BaseAddress = wow.ReadUInt(CurrentObj.BaseAddress 
+          + (uint)ObjectManagerOff.nextObject);
+      }//end while loop of all objects
+
+      this.pName.Text = "Name: " + Me.Name;
+      this.pGuid.Text = "GUID: " + Me.GUID;
+      this.pX.Text = "X: " + Me.X.ToString();
+      this.pY.Text = "Y: " + Me.Y;
+      this.pZ.Text = "Z: " + Me.Z;
+      this.pRotRad.Text = "Rotation in Rad: " 
+        + Math.Round(Me.Rot, 2).ToString() + " R";
+      this.pRotDeg.Text = "Rotation in Deg: " 
+        + Math.Round(RadToDeg(Me.Rot), 2).ToString() + " D";
+      TrackingBitmap = SketchPlayer(TrackingBitmap, 
+         LocalPlayer, (Me.X - Me.X) * TZoom 
+         + DisplayWidth / 2, (Me.Y - Me.Y) * TZoom 
+         + DisplayHeight / 2, Me.Rot, Me.Name);
+
+      if (Target.GUID != 0)
+      {
+        this.tName.Text = "Name: " + Target.Name;
+        this.tGuid.Text = "GUID: " + Target.GUID;
+        this.tX.Text = "X: " + Target.X.ToString();
+        this.tY.Text = "Y: " + Target.Y;
+        this.tZ.Text = "Z: " + Target.Z;
+        this.tRotRad.Text = "Rotation in Rad: " 
+          + Math.Round(Target.Rot, 2).ToString() + " R";
+        this.tRotDeg.Text = "Rotation in Deg: " 
+          + Math.Round(RadToDeg(Target.Rot), 2).ToString() + " D";
+        TrackingBitmap = SketchPlayer(TrackingBitmap, 
+           CurrentTarget, (Me.X - Target.X) * TZoom 
+           + DisplayWidth / 2, (Me.Y - Target.Y) * TZoom 
+           + DisplayHeight / 2, Target.Rot, Target.Name);
+      }//end if
+      else
+      {
+        this.tName.Text = "Name: ";
+        this.tGuid.Text = "GUID: 0";
+        this.tX.Text = "X: ";
+        this.tY.Text = "Y: ";
+        this.tZ.Text = "Z: ";
+        this.tRotRad.Text = "Rotation in Rad: ";
+        this.tRotDeg.Text = "Rotation in Deg: ";
+      }//end else
+    
+      display.Image = TrackingBitmap;
+      lTotObj.Text = "Total Objects: " + TotWowObj;
+    }
+    catch(Exception)
+    {
+      return;
+    }
+  }
+
+  public string NPCNameFromGuid(ulong Guid)
+  {
+    uint ObjectBase = GetBaseByGuid(Guid);
+    if(ObjectBase == 0)
+    {
+      return "Name not found";
+    }
+    try
+    {
+      return wow.ReadASCIIString(wow.ReadUInt(
+         wow.ReadUInt(ObjectBase + (uint)NameOffsets.UnitName1)
+         + (uint)NameOffsets.UnitName2), 30);
+    }
+    catch(Exception)
+    {
+      return "Exception";
+    }
+  }//end MobNameFromGuid
+
+  public uint GetBaseByGuid(ulong Guid)
+  {
+    TempObj.BaseAddress = FirstObj;     //start from first object
+//loop through all objects till right one is found
+    while (TempObj.BaseAddress != 0)    
+    {
+      try
+      {
+        TempObj.GUID = wow.ReadUInt64(TempObj.BaseAddress 
+          + (uint)ObjectOffsets.Guid);
+      }
+      catch(Exception)
+      {
+        TempObj.GUID = 0;
+      }
+      if(TempObj.GUID == Guid)
+      {
+        return TempObj.BaseAddress;
+      }
+      try
+      {
+        TempObj.BaseAddress = wow.ReadUInt(TempObj.BaseAddress 
+          + (uint)ObjectManagerOff.nextObject);    
+          //move on to next object
+      }
+      catch (Exception)
+      {
+        return 0;
+      }
+    }
+   return 0;   //return 0 if nothing is found.
+  }//end GetObjectBaseByGuid
+
+
+// Credits WhatSupMang, SillyBoy72 of OwnedCore.com
+  public string PlayerNameFromGuid(ulong Guid)
+  {
+    ulong mask, base_, offset, current, shortGUID, testGUID;
+    try
+    {
+      mask = wow.ReadUInt(WoWBase + (uint)NameOffsets.nameStore 
+        + (uint)NameOffsets.nameMask);
+    }
+    catch (Exception)
+    {
+      return "Exception";
+    }
+
+    base_ = wow.ReadUInt(WoWBase + (uint)NameOffsets.nameStore 
+      + (uint)NameOffsets.nameBase);
+
+    shortGUID = Guid & 0xffffffff;
+    offset = 12 * (mask & shortGUID);
+    try
+    {
+      current = wow.ReadUInt((uint)base_ + (uint)offset + 8);
+    }
+    catch (Exception)
+    {
+      return "Exception";
+    }
+
+    offset = wow.ReadUInt((uint)base_ + (uint)offset);
+
+    if ((current & 0x1) == 0x1) { return ""; }
+
+    try
+    {
+      testGUID = wow.ReadUInt((uint)current);
+    }
+    catch (Exception)
+    {
+      return "Exception";
+    }
+
+    while (testGUID != shortGUID)
+    {
+      current = wow.ReadUInt((uint)current + (uint)offset + 4);
+      
+      if ((current & 0x1) == 0x1) { return ""; }
+      try
+      {
+        testGUID = wow.ReadUInt((uint)current);
+      }
+      catch (Exception)
+      {
+        return "Exception";
+      }
+    }
+   return wow.ReadASCIIString((uint)current 
+     + (uint)NameOffsets.nameString, 30);
+  }//end PlayerNameFromGuid
+
+  private ulong GetGuidByBase(uint Base)
+  {
+    return wow.ReadUInt64(Base + (uint)ObjectOffsets.Guid);
+  }//end GetObjectGuidByBase
+
+
+// the rest of the methods are all for drawing the objects
+
+  private Bitmap SketchPlayer(Bitmap img, 
+     Color UnitColor, float Ypos, 
+     float Xpos, float Rotation, string strName)
+  {
+    Graphics G = Graphics.FromImage(img);
+
+    G.SmoothingMode = System.Drawing.
+       Drawing2D.SmoothingMode.HighQuality;
+
+    Pen NormalPen = new Pen(UnitColor, 2F);
+    Pen TracingPen = new Pen(UnitColor, 0.1F); //for showing traces
+
+    Rotation = RadToDeg(Rotation);
+
+    G.ResetTransform();     //Resets the transformation matrix
+    G.TranslateTransform(-Xpos, -Ypos, 
+    System.Drawing.Drawing2D.MatrixOrder.Append);        
+    //move drawing coordinates to origin
+    try
+    {
+      G.RotateTransform(-Rotation, 
+        System.Drawing.Drawing2D.MatrixOrder.Append);          
+      //rotate counterclockwise at origin
+    }
+    catch (ArgumentException)
+    {
+    }
+    G.TranslateTransform(Xpos, Ypos,
+      System.Drawing.Drawing2D.MatrixOrder.Append);           
+    //move back to drawing coordinates
+    try
+    {
+      if (!cbShowTrace.Checked)    //how to draw when not tracing
+      {
+        G.DrawLine(NormalPen, Xpos - 2, Ypos + 2, Xpos, Ypos - 6);
+        G.DrawLine(NormalPen, Xpos + 2, Ypos + 2, Xpos, Ypos - 6);
+        G.DrawLine(NormalPen, Xpos, Ypos - 2, Xpos, Ypos - 6);
+        G.DrawLine(NormalPen, Xpos - 2, Ypos +1, Xpos + 2, Ypos +1);
+
+        if(!cbNames.Checked)
+        {
+          WriteText(img, strName, Convert.ToInt32(Xpos) 
+            - Convert.ToInt32((strName.Length) * 2.5), 
+            Convert.ToInt32(Ypos) + 6);
+        }
+
+      }
+      else//when tracing
+      {
+        G.DrawLine(TracingPen, Xpos, Ypos, Xpos, Ypos - 3);
+      }
+    }
+    catch (Exception ex)
+    {
+    }
+    G.Dispose();
+    NormalPen.Dispose();
+    TracingPen.Dispose();
+    return img;
+  }//end sketchplayer 
+
+  private Bitmap WriteText(Bitmap img, 
+    String sText, int XPos, int YPos)
+  {
+    Graphics G = Graphics.FromImage(img);
+    G.SmoothingMode = System.Drawing.
+      Drawing2D.SmoothingMode.HighQuality;
+    Font DrawFont = new Font("Arial", 7);
+    G.DrawString(sText, DrawFont, 
+      Brushes.Black, new Point(XPos, YPos));
+    G.Dispose();
+    DrawFont.Dispose();
+    return img;
+  }
+
+  private Bitmap WriteTextCenter(Bitmap img, String sText, int size)  
+  // will draw on center of image
+  {
+    Graphics G = Graphics.FromImage(img);
+    G.SmoothingMode = System.Drawing.
+      Drawing2D.SmoothingMode.HighQuality;
+    Font TextFont = new Font("Arial", size);
+    StringFormat SF = new StringFormat();
+    SF.LineAlignment = StringAlignment.Center;
+    SF.Alignment = StringAlignment.Center;
+    RectangleF Rect = new RectangleF(0, 0, 
+      DisplayWidth, DisplayHeight);
+    G.DrawString(sText, TextFont, Brushes.Black, Rect, SF);
+    G.Dispose();
+    TextFont.Dispose();
+    SF.Dispose();
+    return img;
+  }
+
+  private void ClearBitmap(ref Bitmap img)
+  {
+    Graphics G = Graphics.FromImage(img);
+    G.Clear(display.BackColor);
+    G.Dispose();
+  }
+
+  private void bReload_Click(object sender, EventArgs e)
+  {
+    try
+    {
+      if (LoadOffsets() == true)
+        TrackerReady = true;
+
+      if (TrackerReady == false)
+      {
+        ClearBitmap(ref TrackingBitmap);
+        TrackingBitmap = WriteTextCenter(TrackingBitmap, 
+          "Please enter the game world.", 8);
+        display.Image = TrackingBitmap;
+      }
+    }
+    catch (Exception)
+    {
+      ClearBitmap(ref TrackingBitmap);
+      TrackingBitmap = WriteTextCenter(TrackingBitmap, 
+        "Could not load offsets. Please Reload.", 8);
+      display.Image = TrackingBitmap;
+    }  
+  }
+
+  private void cbOnTop_CheckedChanged(object sender, EventArgs e)
+  {
+    if (cbOnTop.Checked)
+    {
+       WoWdar.ActiveForm.TopMost = true;
+    }
+    else
+    {
+       WoWdar.ActiveForm.TopMost = false;
+    }
+  }
+
+  private void bLog_Click(object sender, EventArgs e)
+  {
+    Log saveLog = new Log();
+    saveLog.WriteToFile(allObjects);
+    allObjects.Clear();
+  }
+
+  private void cbShowTrace_CheckedChanged(object sender, EventArgs e)
+  {
+    ClearBitmap(ref TrackingBitmap);
+  }
+
+  private void cbNames_CheckedChanged(object sender, EventArgs e)
+  {
+    ClearBitmap(ref TrackingBitmap);
+  }
+ }
+}
+
+\end{lstlisting}
+
+File: Logs.cs
+\begin{lstlisting}
+using System;
+using System.IO;
+using System.Collections.Generic;
+using System.Collections;
+using System.Linq;
+using System.Text;
+
+namespace WoWdar
+{
+  class Log
+  {
+
+    public void WriteToFile(ArrayList datalist)
+    {
+      foreach(ObjArray obj in datalist)
+      {
+        using (StreamWriter w = File.AppendText(obj.GUID + ".txt"))
+        {
+          foreach(TimeAndPos data in obj.info)
+          {
+            w.WriteLine(data.time.ToString("yyyy/MM/dd,HH:mm:ss.fff") 
+            + "," + data.XPos + "," + data.YPos + ","+ data.ZPos 
+            + "," + data.RotPos);     //write data to log file
+          }
+          w.Flush();  //write and clear all buffered text
+          w.Close();  //close file
+        }
+      }
+    }
+  }
+}
+
+\end{lstlisting}
+
+File: Struct.cs
+\begin{lstlisting}
+
+using System;
+using System.Collections.Generic;
+using System.Collections;
+using System.Linq;
+using System.Text;
+
+namespace WoWdar
+{
+  //this struct is for logging location information purposes.
+  public struct TimeAndPos
+  {
+    public DateTime time;
+    public float XPos;
+    public float YPos;
+    public float ZPos;
+    public float RotPos;
+  }//end struct
+}
+
+\end{lstlisting}
+
+
+File: ObjArray.cs
+\begin{lstlisting}
+using System;
+using System.Collections.Generic;
+using System.Collections;
+using System.Linq;
+using System.Text;
+
+namespace WoWdar
+{
+//this class is for logging location information purposes.
+    class ObjArray
+    {
+        public ulong GUID = 0;
+        public ArrayList info = new ArrayList();
+    }
+}
+
+\end{lstlisting}
+
+File: Offsets.cs
+\begin{lstlisting}
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace WoWdar
+{
+//offsets for WoW 4.2.2.14545
+
+  public enum ObjectManagerOff : uint
+  {
+    clientConnection = 0x980558,
+    objectManager = 0x463C,
+    firstObject = 0xB4,
+    nextObject = 0x3C,
+    localGuid = 0xB8
+  }
+
+  public enum PlayerOff : uint
+  {
+    LastTargetGUID = 0x00A98C80,   //0xA98C88,
+    playerName = 0x980598,
+  }
+
+  public enum GameObject
+  {
+    objName1 = 0x1CC,
+    objName2 = 0xB4,
+  }
+
+  public enum ObjectFields : uint
+  {
+    OBJECT_FIELD_GUID = 0x0,
+    OBJECT_FIELD_DATA = 0x8,
+    OBJECT_FIELD_TYPE = 0x10,
+  }
+
+  public enum NameOffsets : ulong
+  {
+    ObjectName1 = 0x1CC,
+    ObjectName2 = 0xB4,
+    UnitName1 = 0x91C,  //0x142?
+    UnitName2 = 0x64,   //0x15E?
+    nameStore = 0x959EE0 + 0x8,
+    nameMask = 0x24,
+    nameBase = 0x1C,
+    nameString = 0x20
+  }
+
+  public enum ObjectOffsets : uint
+  {
+    Pos_X = 0x790,
+    Pos_Y = Pos_X + 0x4,
+    Pos_Z = Pos_X + 0x8,
+    Rot = Pos_X + 0x10,
+    Guid = 0x30,
+    ObjectFields = 0x8,
+  }
+
+  public enum UnitFields
+  {
+     UNIT_FIELD_HEALTH = 0x68,    
+  }
+}
+
+
+
+\end{lstlisting}
+
+File: Program.cs
+\begin{lstlisting}
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
+using Magic;
+
+namespace WoWdar
+{
+  static class Program
+  {
+    [STAThread]
+    static void Main()
+    {
+      Application.EnableVisualStyles();
+      Application.SetCompatibleTextRenderingDefault(false);
+      Application.Run(new WoWdar());
+    }
+  }
+}
+
+\end{lstlisting}
+
+\newpage
+
+\section{Log Reading Program}
+
+File: WoWTraces.cs
+\begin{lstlisting}
+
+using System;
+using System.IO;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Windows.Forms;
+
+namespace WindowsFormsApplication1
+{
+public partial class WowTraces : Form
+{
+  string ChosenFile = "";
+  string path = Environment.CurrentDirectory;
+  bool first = true;
+  char[] delimiter = {','};
+  float Xref = 0;
+  float Yref = 0;
+  float X = 0;
+  float fZoom = 1;
+  float Y = 0;
+  static int size = 917;
+  float Rot = 0;
+  Bitmap TraceBitmap = new Bitmap(size, size);
+  Bitmap SaveBitmap;
+
+  public WowTraces()
+  {
+    InitializeComponent();
+  }
+
+  private void mnuLoad_Click(object sender, EventArgs e)
+  {
+    openFD.FileName = "";
+    openFD.Title = "Select log file.";
+    openFD.InitialDirectory = path;
+    openFD.Filter = "LOG FILE|*.txt";
+
+    if (openFD.ShowDialog() != DialogResult.Cancel)
+    {
+      ChosenFile = openFD.FileName;
+    }
+    else
+    {
+      ChosenFile = "";
+    }
+  }
+
+  private void button1_Click(object sender, EventArgs e)
+  {
+    SaveBitmap = new Bitmap(int.Parse(nWidth.Value.ToString()), 
+      int.Parse(nHeigth.Value.ToString()));
+    Graphics G = Graphics.FromImage(SaveBitmap);
+    G.Clear(iTraces.BackColor);
+    G.Dispose();
+
+    if (ChosenFile == "")//make sure a file is chosen
+    {
+      MessageBox.Show("Please select a file first.");
+    }
+    else
+    {
+      //sets the zoom level according to option chosen
+      if(rbZoom1.Checked)
+      {
+        fZoom = 1;
+      }
+    else if (rbZoom2.Checked)
+    {
+      fZoom = 2;
+    }
+    else if (rbZoom3.Checked)
+    {
+      fZoom = 3;
+    }
+    else if (rbZoom4.Checked)
+    {
+      fZoom = 4;
+    }
+    else if (rbZoom05.Checked)
+    {
+      fZoom = 0.5F;
+    }
+    else if (rbZoom5.Checked)
+    {
+      fZoom = 5;
+    }
+
+    try
+    {
+      using (StreamReader sr = new StreamReader(ChosenFile))
+      {
+        String line;
+        while ((line = sr.ReadLine()) != null)
+        {
+          string[] info = line.Split(delimiter);
+          if (info.Length == 6)
+          {
+            if (first)
+            {
+              first = false;
+              Xref = float.Parse(info[2]);
+              Yref = float.Parse(info[3]);
+              lXref.Text = "Xref :" + Xref;
+              lYref.Text = "Yref :" + Yref;
+            }
+            X = float.Parse(info[2]);
+            Y = float.Parse(info[3]);
+            Rot = float.Parse(info[5]);
+
+            TraceBitmap = SketchPlayer(TraceBitmap, Color.Blue, 
+              (Xref - X)*fZoom + iTraces.Width / 2, (Yref - Y)
+              *fZoom + iTraces.Height / 2, Rot);
+            SaveBitmap = SketchPlayer(SaveBitmap, Color.Blue, 
+              (Xref - X) * fZoom + SaveBitmap.Width / 2, (Yref - Y) 
+              * fZoom + SaveBitmap.Height / 2, Rot);
+          }
+          else
+          {
+          }
+        }
+      }
+    }
+    catch (Exception ex)
+    {
+      MessageBox.Show("File could not be read.");
+    }
+    iTraces.Image = TraceBitmap;
+   }
+  }
+
+  private void bAllTraces_Click(object sender, EventArgs e)
+  {
+    string path = Environment.CurrentDirectory;
+    DirectoryInfo dir = new DirectoryInfo(path);
+    SaveBitmap = new Bitmap(int.Parse(nWidth.Value.ToString()), 
+      int.Parse(nHeigth.Value.ToString()));
+    Graphics G = Graphics.FromImage(SaveBitmap);
+    G.Clear(iTraces.BackColor);
+    G.Dispose();
+            
+//sets the zoom level according to option chosen
+    if (rbZoom1.Checked)
+    {
+      fZoom = 1;
+    }
+    else if (rbZoom2.Checked)
+    {
+      fZoom = 2;
+    }
+    else if (rbZoom3.Checked)
+    {
+      fZoom = 3;
+    }
+    else if (rbZoom4.Checked)
+    {
+      fZoom = 4;
+    }
+    else if (rbZoom05.Checked)
+    {
+      fZoom = 0.5F;
+    }
+    else if (rbZoom5.Checked)
+    {
+      fZoom = 5;
+    }
+
+    foreach (FileInfo f in dir.GetFiles("*.txt"))
+    {
+      try
+      {
+        String name = f.Name;
+
+        using (StreamReader sr = new StreamReader(name))
+        {
+          String line;
+          while ((line = sr.ReadLine()) != null)
+          {
+            string[] info = line.Split(delimiter);  
+            //small test to ensure right format of log
+            if (info.Length == 6)
+            {
+              if(first)
+              {
+                first = false;
+                Xref = float.Parse(info[2]);
+                Yref = float.Parse(info[3]);
+                lXref.Text = "Xref :" + Xref;
+                lYref.Text = "Yref :" + Yref;
+              }
+              X = float.Parse(info[2]);
+              Y = float.Parse(info[3]);
+              Rot = float.Parse(info[5]);
+
+              TraceBitmap = SketchPlayer(TraceBitmap, 
+                Color.Blue, (Xref - X)*fZoom + iTraces.Width/2, 
+                (Yref - Y)*fZoom + iTraces.Height/2, Rot);
+              SaveBitmap = SketchPlayer(SaveBitmap, 
+                Color.Blue, (Xref - X)*fZoom + SaveBitmap.Width/2, 
+                (Yref - Y) * fZoom + SaveBitmap.Height / 2, Rot);
+            }
+            else
+            {
+            }
+          }
+        }
+      }
+      catch (Exception ex)
+      {
+        MessageBox.Show("File could not be read.");
+      }
+    }
+    iTraces.Image = TraceBitmap;
+  }
+
+  private void bClear_Click(object sender, EventArgs e)
+  {
+    first = true;
+    Xref = 0;
+    Yref = 0;
+    Graphics G = Graphics.FromImage(TraceBitmap);
+    G.Clear(iTraces.BackColor);
+    G.Dispose();
+
+    Graphics G1 = Graphics.FromImage(SaveBitmap);
+    G1.Clear(iTraces.BackColor);
+    G1.Dispose();
+
+    iTraces.Image = TraceBitmap;
+  }
+
+  private float RadToDeg(float Rot)
+  {
+    return (float)(Rot * (180 / Math.PI));
+  }
+
+  private Bitmap SketchPlayer(Bitmap img, Color UnitColor, 
+    float Ypos, float Xpos, float Rotation)
+  {
+    Graphics G = Graphics.FromImage(img);
+    G.SmoothingMode = System.Drawing.
+      Drawing2D.SmoothingMode.HighQuality;
+    Pen TracePen = new Pen(UnitColor, 1F);
+
+    Rotation = RadToDeg(Rotation);
+    G.ResetTransform();     //Resets the matrix
+    G.TranslateTransform(-Xpos, -Ypos, 
+      System.Drawing.Drawing2D.MatrixOrder.Append);        
+      //move drawing coordinates to origin
+    try
+    {
+      G.RotateTransform(-Rotation, 
+        System.Drawing.Drawing2D.MatrixOrder.Append);          
+        //rotate counterclockwise at origin
+    }
+    catch (ArgumentException)
+    {
+    }
+    G.TranslateTransform(Xpos, Ypos, 
+      System.Drawing.Drawing2D.MatrixOrder.Append);          
+      //move back to drawing coordinates
+    try
+    {
+      if(rbArrow.Checked)
+      {
+        G.DrawLine(TracePen, Xpos - 2, Ypos + 1, Xpos, Ypos - 3);
+        G.DrawLine(TracePen, Xpos + 2, Ypos + 1, Xpos, Ypos - 3);
+        G.DrawLine(TracePen, Xpos, Ypos, Xpos, Ypos - 3);
+      }
+      else if(rbLine.Checked)
+      {
+        G.DrawLine(TracePen, Xpos, Ypos, Xpos, Ypos - 3);
+      }
+    }
+    catch (Exception ex)
+    {
+    }
+    G.Dispose();
+    TracePen.Dispose();
+    return img;
+  }
+
+  private void btnSave_Click(object sender, EventArgs e)
+  {
+    SaveBitmap.Save("traces.bmp", 
+      System.Drawing.Imaging.ImageFormat.Bmp);
+  }
+}
+}
+
+
+\end{lstlisting}

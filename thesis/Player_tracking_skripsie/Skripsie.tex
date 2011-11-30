@@ -1,0 +1,258 @@
+%==== Document Setup (usthesis)======================================
+\listfiles
+\documentclass[report,                       %... Document type
+               12pt,oneside,openany,a4paper, %... Layout
+               a5block,                      %... A5 type block
+               british, UKEnglish,         %... English default language
+               ]{usthesis}
+               
+%==== Page layout ===================================================
+
+    %% ================
+    %% Type block size:
+    %% ================
+
+    %% The standard page layout can be changed by setting the
+    %% margins. If you are using the MEMOIR base class use the
+    %% commands below. For other classes, use the GEOMETRY
+    %% package.
+
+    %% MEMOIR:
+       %\setlrmarginsandblock{25mm}{25mm}{*} % Left/Right margins
+       %\setulmarginsandblock{25mm}{25mm}{*} % Upper/Lower margins
+       %\checkandfixthelayout
+       %\setlength{\headwidth}{\textwidth}
+
+    %% GEOMETRY:
+        \usepackage[
+           hmargin={30mm,20mm},
+           vmargin={25mm,25mm}
+        ]{geometry}
+
+    %% ============
+    %% Line spacing
+    %% ============
+
+    %% Environments for doing double and
+    %% one-and-a-half spacing
+
+%       \usepackage[onehalfspacing]{setspace}%...... Set linespacing (or [onehalfspacing])
+
+    %% ============================
+    %% Paragraph indent and spacing
+    %% ============================
+
+    %% Zero paragraph indent + non-zero spacing
+    %% between paragraphs
+
+       %\usepackage{parskip}%..................... Zero Parindent and non-zero Parskip
+       
+%==== Language setup ================================================
+
+ %\usepackage[latin1]{inputenc}%................... Recognizes ê, ë, etc
+\usepackage{babel}%.............................. Language setup (use global drivers)
+       
+%==== Math setup ====================================================
+
+ \usepackage{amsmath}%............................ Advanced math (before fonts)
+%\usepackage{amssymb}%............................ AMS Symbol fonts
+
+%==== Font setup (default is Computer Modern) =======================
+
+ \usepackage[T1]{fontenc}%........................
+ \usepackage{textcomp}%........................... Additional text character
+ \usepackage{bm}%................................. Bold math symbols (after fonts)
+
+%==== SI units and numbers ==========================================
+
+    %% Please use this package to format all NUMBERS, ANGLES and
+    %% UNITS throughout your document. It is important, because
+    %% it adheres to the SABS specification for numbers and units
+    %% in South Africa and remember that a decimal comma and not
+    %% the point is being used here.
+
+ \usepackage{sistyle}%............................ SI units and numbers
+    \SIstyle{S-Africa}
+    \SIunitspace{{\cdot}}
+    \SIunitdot{{\cdot}}
+    %\SIdecimalsign{.}% Use decimal point in case of emergency
+
+%==== USthesis Bib's ================================================
+
+\usepackage{usbib}%.............................. Bibliography (local package)
+%    \bibliographystyle{IEEEtran}
+    \bibliographystyle{usmeg-n}
+    \newcommand\bibfont{\small}
+
+    %% For usmeg-a, the bib is a list of references. If you
+    %% are using usmeg-n comment out the following lines
+%    \addto{\captionsafrikaans}{\renewcommand{\bibname}{Lys van Verwysings}}
+%    \addto{\captionsenglish}{\renewcommand{\bibname}{List of References}}
+
+%==== Graphics and Color ============================================
+
+% The dvips or pdftex driver is loaded globally with the TeX
+% configuration file.
+
+%\usepackage{graphics}%........................... Imported graphics (use global driver)
+\usepackage{graphicx}
+\usepackage{color}%.............................. Color setup       (use global driver)
+
+%==== Additional US thesis packages =================================
+
+\usepackage{usnomencl}%.......................... List of symbols (local pack)
+\usepackage{ussummary}%.......................... Mech Eng summary page (local pack)
+
+
+%==== Additional US thesis packages =================================
+
+\usepackage{usnomencl}%.......................... List of symbols (local pack)
+
+
+%==== Local Defs ====================================================
+\makeatletter
+
+%
+% Please insert user defined commands here
+% and NOT in the document itself!
+
+%Package to display code listings in LaTeX
+\usepackage{listings}
+\definecolor{listinggray}{gray}{0.9}
+%
+
+\usepackage{booktabs}
+\usepackage{parskip}
+
+\makeatother
+
+%==== Title Page ====================================================
+
+\title{World of Warcraft Player Tracking Software}
+
+\author{F.A.\ Nolte}
+       {Francois Archibald Nolte\\
+           15363260}
+
+\subject{Project (E) 448}
+        {Project (E) 448}
+
+\ReportDescript{
+Report submitted in partial fulfilment of the requirements of the module Project (E) 448 for the degree
+Baccalaureus in Engineering in the Department of Electrical and Electronic Engineering at the University of
+Stellenbosch}
+
+\adress{Department of Electrical and Electronic Engineering\\
+        Stellenbosch University\\
+        Privatebag X1, 7602 Matieland\\
+        South Africa}
+
+\studyleader{Mr J.S.\ Gilmore}
+
+\setdate{10}{2011}
+
+%====================================================================%
+%                 T H E   M A I N   D O C U M E N T                  %
+%====================================================================%
+
+\begin{document}
+
+\frontmatter%========================================================
+\TitlePage
+
+\chapter{Acknowledgements}
+The author would like to thank the following persons for their contribution towards this project:
+\begin{itemize}
+    \item Mr J.S.\ Gilmore, for all his help and direction given throughout the project and for his \LaTeX template.
+    \item Tom van der Kolf, for his assistance in getting \LaTeX to work properly.
+    \item Dr. H.\ Engelbrecht, for providing encouraging advice when needed.
+    \item Van Zyl Van Vuuren, for motivating me to work hard by working hard.
+    \item All the people from the Memory Editing section on OwnedCore.com without whom this project would have been impossible.
+    \item My parents for proof reading the text.
+\end{itemize}
+\newpage
+\include{Declaration}
+%\CopyrightPage
+
+\newpage
+
+\chapter{Abstract}
+In this project the location data of human players in a simulated game world is accurately and efficiently extracted, logged and saved for further future analysis. The locations are also visually displayed in relation to the current player. This is done with a program written in C\# that reads the information from the game memory. In addition, the database of a private server for WoW is  analysed in order to characterise how the data storage methods of a mature MMORPG game works. The project looks at what can be learned from this data and goes on to provide recommendations for improving the software that tracks players and for future work that can be done after the project.
+
+
+\chapter{Opsomming}
+In hierdie projek word die lokasie informasie van menslike spelers in 'n gesimuleerde rekenaarspeletjie wêreld akkuraat en effektief onttrek, aangemeld en gestoor vir verdere toekomstige analisering. Die lokasies word ook visueel vertoon relatief tot die huidige speler. Dit word gedoen deur 'n program wat in C\# geskryf is, wat die informasie vanaf die speletjie se geheue lees. Verder is die databasis van 'n private bediener vir WoW geanaliseer om die data bergings metodes van 'n gevestigde MMORPG speletjie te karakteriseer. Die projek ondersoek wat vanaf hierdie data geleer kan word en gaan voort om aanbevelings te maak oor hoe om die opsporing sagteware te verbeter en watter werk in die toekoms aan die projek gedoen kan word.
+
+
+\newpage
+
+\tableofcontents
+\newpage
+
+\chapter{Abbreviations}
+\begin{itemize}
+    \item WoW - World of Warcraft
+	\item MMORPG - Massively multiplayer online role-playing game
+	\item MMOG - Massively multiplayer online game
+	\item PC - Personal Computer
+	%\item mob - mobile RC4?!
+	\item GUID - Globally unique identifier
+	\item NPC - Non-player character
+%	\item MUD - Multi-User Dungeons
+%	\item RPG - Role-playing game
+	\item MySQL - My Structured Query Language %(My is the name of the developers' daughter)
+    %\item RAM - Random Access Memory
+    %\item PE - Portable Executable
+    \item PID - Process Identifier
+    \item ASLR - Address space layout randomization
+    \item rad - radians
+    \item deg - degrees
+    \item ms - milliseconds
+    \item P2P - Peer-to-peer
+    \item C/S - Client/Server
+    \item RC4 - Rivest Cipher 4
+ %   \item PvP - Player versus Player
+ %   \item PvE - Player versus Environment
+    \item UI - User Interface.
+    \item GUI - Graphical User Interface
+    %\item CPU - Central Processing Unit
+\end{itemize}
+\clearpage
+
+\listoffigures
+\listoftables
+%\include{nomenkl}
+
+\mainmatter%=========================================================
+
+\numberwithin{equation}{section}%(from amsmath)
+\numberwithin{figure}{section}  %
+\numberwithin{table}{section}   %
+
+\include{Chp-1}
+\include{Chp-2}
+%\include{Chp-3}
+\include{Chp-4}
+\include{Chp-5}
+\include{Chp-6}
+\include{Chp-7}
+%\include{Chp-8}
+%\include{Chp-9}
+%\include{Chp-10}
+
+%\backmatter%=========================================================
+
+\bibliography{skripsie}
+
+\appendix%====================================== =====================
+
+\include{App-A}
+\include{App-B}
+\include{App-C}
+\include{App-D}
+%\include{App-E}
+
+\end{document}
+
+
+%onthou daai character achievement ding en hoe baie dit groei! noem dit in results!
