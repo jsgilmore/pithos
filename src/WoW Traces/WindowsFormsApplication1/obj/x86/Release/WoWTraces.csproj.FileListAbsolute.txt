@@ -1,0 +1,9 @@
+H:\Skripsie\Programming\C sharp tut\WindowsFormsApplication1\WindowsFormsApplication1\bin\Release\WindowsFormsApplication1.exe
+H:\Skripsie\Programming\C sharp tut\WindowsFormsApplication1\WindowsFormsApplication1\bin\Release\WindowsFormsApplication1.pdb
+H:\Skripsie\Programming\C sharp tut\WindowsFormsApplication1\WindowsFormsApplication1\obj\x86\Release\ResolveAssemblyReference.cache
+H:\Skripsie\Programming\C sharp tut\WindowsFormsApplication1\WindowsFormsApplication1\obj\x86\Release\WindowsFormsApplication1.Properties.Resources.resources
+H:\Skripsie\Programming\C sharp tut\WindowsFormsApplication1\WindowsFormsApplication1\obj\x86\Release\WindowsFormsApplication1.WowTraces.resources
+H:\Skripsie\Programming\C sharp tut\WindowsFormsApplication1\WindowsFormsApplication1\obj\x86\Release\ResGen.read.1.tlog
+H:\Skripsie\Programming\C sharp tut\WindowsFormsApplication1\WindowsFormsApplication1\obj\x86\Release\ResGen.write.1.tlog
+H:\Skripsie\Programming\C sharp tut\WindowsFormsApplication1\WindowsFormsApplication1\obj\x86\Release\WindowsFormsApplication1.exe
+H:\Skripsie\Programming\C sharp tut\WindowsFormsApplication1\WindowsFormsApplication1\obj\x86\Release\WindowsFormsApplication1.pdb

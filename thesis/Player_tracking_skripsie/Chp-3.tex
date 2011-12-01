@@ -1,0 +1,61 @@
+\chapter{ArcEmu} %better name?
+\label{ch3}
+
+This chapter provides a brief description of what ArcEmu is, and how to get it working properly.
+
+\section{Description}
+In order to better understand how the database of WoW works on the server side, a private server is needed for analysis purposes. If a private server is set up, the database can be accessed and analysed to discover how much traffic is created to and from it by players connecting to the game. The most frequent queries can be discovered as well as the inter arrival time of the different queries, which would be useful in creating a model of traffic generated to the database of a MMORPG.
+
+ArcEmu is an Open Source World of Warcraft server emulator. It is compatible with many different operating systems and is compatible with both 32-bit and 64-bit systems. It is developed and maintained by a group of individual programmers for research and recreational purposes, and is written in the C++ programming language. Any interested person can contribute to the project by downloading the code, improving it and resubmitting it. 
+%http://arcemu.org/forums/index.php?showtopic=16520
+ArcEmu is not affiliated with Blizzard in any way, and the server is written based on knowledge gained from reverse engineering WoW. ArcEmu can be downloaded for free and used to host your own private WoW server. It currently supports the WoW client up to version 3.5.5a and attempting to connect to an ArcEmu server with an updated WoW client will not work. The client first needs to be downgraded to be compatible.
+
+Programmers constantly update ArcEmu and provide a short description of what functionality is added to the server with the update. It is often updated several times a day, so it is better for users to read the description of the update and decide if its worth the effort of updating for the changes introduced.
+
+ArcEmu is run on your personal computer (PC) and can provide access to users in three different ways:
+
+\begin{enumerate}
+	\item From your local PC. 
+	This means that the server and the WoW client are run on the same machine.
+	\item From the local network.
+	With this setup users can connect from any other PC connected to the same network as the PC that the server is run on.
+	\item From the Internet.
+	With this setup, any user that has an Internet connection can access the server via that connection.
+\end{enumerate}
+
+The first setup is used in this project. 
+
+ArcEmu provides only the code needed for the core of the server. The NPCs and quests that populate the world are all stored in databases, that can be downloaded from other open source projects. The maps and other required data are also not provided, and need to be extracted from the WoW client.  Section \ref{setup} briefly discusses what is required to get a working ArcEmu server.
+
+%Discuss when ArcEmu started and how it still progresses. Mention other private open source servers available. Talk about the fact that all private servers that are open source work with an older version of the client, making it incompatible with the current client.
+
+
+\section{Setup} %better name?
+\label{setup}
+The process for setting up ArcEmu depends somewhat on the operating system used. The method described here is specifically for Windows devices.
+There are many guides available online on what steps need to be followed to setup ArcEmu, so the discussion here will be very high level and only for the purpose of understanding what different parts of software make up the ArcEmu server.
+
+The first step is to download and compile the source code of ArcEmu. %The source code is downloaded using Subversion client software and the code is then compiled using the CMake build system.
+The successfully compiled code is called the core of the server. It is still completely unusable without map files from the WoW client and a database, and a tool to extract these are included in the core.
+
+For ArcEmu to work it requires maps, vmaps and DBC files from WoW. The extraction tool included in the core is called ad.exe and must be copied to the WoW folder and executed. It will take a few minutes to successfully extract all the needed files. When it is done, the files need to be copied to the ArcEmu folder.
+
+The next step in the setup is getting a database that works with ArcEmu. The database part of the server is a combination of the database framework needed and the actual data stored in the databases.
+The only database framework supported by ArcEmu is MySQL which is discussed in more detail in chapter \ref{database}. Getting the data that is required to be in the databases is what is important for the setting up process.
+
+ArcEmu uses three databases to store the different data sets needed to run the game. The first one is the logon database which contains the account information of users. The second one is the character database. This database stores all the different values of your character, such as how many items, spells, skills and gold it has. The last database is the world database. All the data about NPCs, quests, items and so forth are saved in this database.
+
+The user must choose one of several similar Open Source projects that create these databases. These databases are classified as Blizzlike if they strive to make the data contained in them similar to the official WoW game. For this project the Blizzlike database called WhyDB was used. 
+
+Since the databases are from a separate project, a method is needed to make sure that the structure ArcEmu expects is compatible with the database. To do this, queries are created by ArcEmu that must be run after the databases are installed which makes the structure compatible. 
+
+After the database is installed, the configuration files of ArcEmu needs to be changed to fit your unique setup.
+%The databases and the queries generated for them by ArcEmu is discussed in chapter 4.
+After ArcEmu is successfully set up, the server needs to be started and then clients can start connecting to it. Each query that is generated to the databases from the server can then be analysed in further detail to determine the type of database traffic generated in MMORPG games. This is discussed further in chapter \ref{database}.
+
+%Explain how to set up ArcEmu briefly. Talk about how MySQL is used to store the world, character and logon databases, and how to load them. Explain the different online databases available etc.
+
+%Show proof that ArcEmu was set up correctly and is in working order.
+
+
+

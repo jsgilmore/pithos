@@ -1,0 +1,77 @@
+\chapter{Conclusion}
+\label{conclusion}
+In chapter~\ref{results}, the database of a private WoW server was analysed to determine when and why the server stores data. The accuracy and efficiency of the player tracking software was also tested. In this chapter, recommendations for improvements to the tracking software is made. The work done in the entire project is briefly reviewed and conclusions are made from the results presented in chapter \ref{results}. Possible future work is also discussed.
+
+%Discuss future work and improvements that can be done on program. This can include overlaying map in real time as well as getting the scale right between game map and tracking data. Could also combine the log reading program with the tracking software program easily. Could improve on looks of program.  Think of other possible improvements and discuss them, and then write conclusion.
+
+\section{Recommendations}
+
+\subsection{Combine Programs}
+
+This project saw the creation of tracking software that creates logs containing movement data of players in WoW. A separate program was written to read these logs and to display the movement traces of players that are contained within the logs. The log reading program also has the ability to export the traces to a bitmap image. A possible improvement would be to combine these two programs into one, where the program can track players, create logs and also read and display traces contained in logs and export the traces to a bitmap image.
+
+
+\subsection{Overlay Map}
+
+Overlaying player movement traces on a map of WoW gives a better idea of what the traces mean, as can be seen in chapter~\ref{trackingresults}. This overlaying was done by making the background of the bitmap invisible so that only traces can be seen, and then placing the program over an online map. It would be a convenient improvement if the tracking software was expanded to do this overlaying automatically for the user.
+
+
+\subsection{Allow Movement While Tracing}
+
+In the current player tracking software, traces can only be shown correctly in real time if the character of the user stands still while the traces are drawn. The reason is that the algorithm that was considered a solution to the problem caused severe lag in the program, making it unusable. A possible improvement would be to think up a better algorithm to solve this problem, and thus allow the character of the user to move around freely while showing movement traces of players.
+
+\subsection{Include proper scale}
+
+At the moment the display of the software represents players with relative distances, but it is sometimes hard to visualise how far the distance indicated by the software is in the game. A scale to show how distances in the game relate to distances in the software for each zoom level would be a good improvement. The area in which the server starts sending location data to the client can then also be indicated with a circle around the local player.
+
+\section{Conclusion}
+
+\subsection{Summary}
+After providing an overview of the problem statement of the project and mentioning previous work done in similar projects, the aims in this project was clearly stated. This project can be seen as step one of a larger field of research, where a state persistent architecture for P2P MMOGs will be developed. In order to start the larger field of research however, it is necessary to characterise  the data storage methods used by a mature C/S MMOG, which can then be used as a benchmark for the P2P architecture. 
+
+The movement of players in an MMOG also needs to be modelled in order to drive and test the performance of the P2P architecture, but since there has been very little research done in this field, data first needs to be collected about how players move in current MMOGs. Before this can be done however, a tool is first needed that can collect this data efficiently and accurately. Part of the aim of this project is thus the creation and thorough testing of such a tool. This tool can then be used in future projects to collect movement data from players and create mathematical models that describe the collected movement patterns. This will then in turn be used in the creation of a state persistent P2P architecture for MMOGs.
+
+WoW is chosen as the MMORPG for which the tracking software will be developed, because it is currently the most popular MMOG in the world. The data storing characteristics of WoW must also be investigated to better understand how an MMORPG handles the data of such a large amount of players. Basic concepts of WoW are described that will help the reader understand the results obtained from the database analysis and player tracking software tests.
+
+The methods that will be used to analyse the database and to get the player location information from the client software is described in detail before the actual analysis and testing takes place. The database is then analysed in detail with some interesting results that give a better understanding of how the server handles queries generated by clients. The player tracking software is tested for accuracy and efficiency next.
+
+\subsection{Results}
+
+From the database analysis the behaviour of the server can be characterised as follows:
+
+The server has a lot of functions that it has to perform as described in chapter~\ref{mechanics}. For this reason it can not immediately save the data of any action that causes a change in the data of a certain client. The server divides the actions of players in the game into different categories of importance. The most important actions are listed in table~\ref{queries}, and they all cause the server to immediately execute a query to the database. The reason these actions are considered of such high importance, is that they cause large changes in the game state, and more importantly, if the data changed by them are not saved immediately it could create loopholes that players could use to cheat. If a player were to sell an item, without the server noting the change, and log out, then the data could be lost. This could create a situation where the player gets gold for the item without actually losing the item.
+
+The server regards the action of players sending things to each other via mail as very important as well. A global counter is created that causes the server to execute queries created by sending mail every 3 minutes in the game.
+
+Lastly the server creates a separate counter for each player that saves the minor changes made to the player's data every 5 minutes. This is the data that changes most frequently and saving it with every change would take up a lot of time of the server. The total time in executing this query is usually under 0.2 seconds. This time is most probably much less in the real server used by WoW, where the server and database would be optimised for these specific queries. The time to execute could quickly become long, with thousands of players logged in simultaneously, but Blizzard splits different areas in the game up to be serviced by different servers in order to prevent such a situation from happening. 
+
+The most noteworthy queries size wise are queries that have to do with a player's progression through the game. The more skills, professions, spells, quests and levels a player gains, the more data needs to be saved. The different skills and so forth are also stored in different rows in the database tables, which results in more and more rows needing to be accessed. All of this data is summed up into two queries however, so it does not make a very noticeable difference in the big picture of all the queries that are executed.
+
+The P2P architecture should strive to have the same data storage characteristics and performance as the one analysed in this text.
+
+The accuracy and efficiency of the player tracking software is investigated next. Chapter~\ref{trackingresults} lists several results that proves that the tracking software is accurate in the following ways:
+
+The tracking software both understands and reads the data structure of WoW correctly. This is shown by first discussing how the data structure is understood, and then testing it by reading values three values from different places in the client softwares' memory that should all be the same. The values are shown to be the same and correct. Next the name, position and orientation of an NPC is shown to be displayed the same by the tracking software than by the game client software. This proves that the tracking software shows an accurate representation of what is currently happening in the game world.
+
+Two different players are then logged into the game concurrently and meet each other up with the software enabled for both players. The consistency of the data displayed by the software is proven by the different players seeing the same data being displayed by the software. The accuracy is then further proved by the software showing the traces of one of the players moving in both a square and a circle accurately in figure~\ref{vierkant}.
+
+Both the accuracy of the logs being created by the software as well as the accuracy of the log reading program is proven by tracing the movement of a player moving in a triangle, and recreating the trace perfectly with the log reading software.
+
+Lastly the efficiency of the tracking software is proven by tracking and showing the movement traces of more than 60 players in a capital city. The accuracy of the movement data is proven by overlaying the trace on a map of the area, showing how all the movement data makes logical sense.
+
+%It is concluded that the player tracking software can efficiently and accurately trace a large amount of players without missing any important movement data. 
+
+All the data movement data that was captured has been analysed to be correct but also incomplete. The reason for incomplete data is the result of one of three things:
+
+\begin{enumerate}
+	\item Latencies caused by slow Internet.
+	\item Players becoming invisible, causing the server to stop sending their location data to clients.
+	\item Players logging in and out, causing them to randomly appear and disappear into and out of the game world.
+\end{enumerate}
+
+
+
+It is concluded that the player tracking software can efficiently and accurately trace a large amount of players without missing any important movement data, with any missing data being because of the above mentioned reasons. The software can thus be used as a valuable tool to use in future work. Possible future work includes capturing a large amount of movement data and using that data to create models of how players move in an MMORPG. These models can then be used in turn to test the reliability and performance of P2P architectures for MMOGs. Finally a state consistent architecture for P2P MMOGs can be created. 
+
+
+%Conclude that results indicate the program works and the database reacts as expected.

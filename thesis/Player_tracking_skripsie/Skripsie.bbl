@@ -1,0 +1,152 @@
+\begin{thebibliography}{19}
+\expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
+\expandafter\ifx\csname bibnamefont\endcsname\relax
+  \def\bibnamefont#1{#1}\fi
+\expandafter\ifx\csname bibfnamefont\endcsname\relax
+  \def\bibfnamefont#1{#1}\fi
+\expandafter\ifx\csname citenamefont\endcsname\relax
+  \def\citenamefont#1{#1}\fi
+\expandafter\ifx\csname url\endcsname\relax
+  \def\url#1{\texttt{#1}}\fi
+\providecommand{\selectlanguage}[1]{\relax}
+\edef\AFRstr{\string afrikaans}
+\ifx\AFRstr\languagename
+   \input{usbib.afr}%
+ \else
+   \input{usbib.eng}%
+\fi
+\newcommand{\Capitalize}[1]{\uppercase{#1}}
+\newcommand{\capitalize}[1]{\expandafter\Capitalize#1}
+\providecommand{\eprint}[2][]{\url{#2}}
+
+\bibitem[{\citenamefont{Gilmore} \protect\BIBand{}
+  \citenamefont{Engelbrecht}(2011)}]{gilmore}
+\bibnamefont{Gilmore}, \bibfnamefont{J.S.} \protect\BIBand{}
+  \bibnamefont{Engelbrecht}, \bibfnamefont{H.A.}: A survey of state persistency
+  in peer-to-peer.
+\newblock \emph{IEEE Transactions on Parallel and distributed systems}, July
+  2011.
+\newline\bblurlpre\url{http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=\&arnumbe%
+r=5963655}
+
+\bibitem[{\citenamefont{Miller} \protect\BIBand{}
+  \citenamefont{Crowcroft}(2010)}]{p2p}
+\bibnamefont{Miller}, \bibfnamefont{J.L.} \protect\BIBand{}
+  \bibnamefont{Crowcroft}, \bibfnamefont{J.}: The near-term feasibility of p2p
+  mmog’s.
+\newblock \emph{Network and Systems Support for Games (NetGames), 2010 9th
+  Annual Workshop}, \bblpp{} 1 -- 6, November 2010.
+
+\bibitem[{\citenamefont{Woodcock}(2008)}]{subscription}
+\bibnamefont{Woodcock}, \bibfnamefont{B.S.}: An analysis of mmog subscription
+  growth - version 23.0.
+\newblock April 2008.
+\newline\bblurlpre\url{http://www.mmogchart.com/}
+
+\bibitem[{\citenamefont{Miller} \protect\BIBand{}
+  \citenamefont{Crowcroft}(2009)}]{previous}
+\bibnamefont{Miller}, \bibfnamefont{J.L.} \protect\BIBand{}
+  \bibnamefont{Crowcroft}, \bibfnamefont{J.}: Avatar movement in world of
+  warcraft battlegrounds.
+\newblock \emph{Proceedings of the 8th Annual Workshop on Network and Systems
+  Support for Games}, 2009.
+
+\bibitem[{\citenamefont{LaoArchAngel}(2011)}]{wradar}
+\bibnamefont{LaoArchAngel}: [beta] wradar - windows radar (for wow).
+\newblock January 2011.
+\newline\bblurlpre\url{http://www.ownedcore.com/forums/world-of-warcraft/\\wor%
+ld-of-warcraft-bots-programs/\\316466-beta-wradar-windows-radar-wow.html}
+
+\bibitem[{\citenamefont{Devon}(2011)}]{wowbot}
+\bibnamefont{Devon}: [guide] how to make a wow bot for complete newbs!
+\newblock February 2011.
+\newline\bblurlpre\url{http://www.ownedcore.com/forums/world-of-warcraft/\\wor%
+ld-of-warcraft-bots-programs/wow-memory-editing/\\319172-guide-how-make-wow-bo%
+t-complete-newbs.html}
+
+\bibitem[{\citenamefont{jbrauman}(2009)}]{wowradapp}
+\bibnamefont{jbrauman}: [source code] wow radar application.
+\newblock January 2009.
+\newline\bblurlpre\url{http://www.ownedcore.com/forums/world-of-warcraft/\\wor%
+ld-of-warcraft-bots-programs/\\203457-source-code-wow-radar-application.html}
+
+\bibitem[{\citenamefont{Moore}(2010)}]{wowradar}
+\bibnamefont{Moore}, \bibfnamefont{J.}: Wow radar.
+\newblock July 2010.
+\newline\bblurlpre\url{http://www.programiscellaneous.com/programming-projects%
+/\\wow-radar/what-is-it/}
+
+\bibitem[{\citenamefont{Caltagirone}
+  \emph{\bbletal{}}(2002)\citenamefont{Caltagirone}, \citenamefont{Keys},
+  \citenamefont{Schlief} \protect\BIBand{}
+  \citenamefont{Willshire}}]{mmorpgarch}
+\bibnamefont{Caltagirone}, \bibfnamefont{S.}, \bibnamefont{Keys},
+  \bibfnamefont{M.}, \bibnamefont{Schlief}, \bibfnamefont{B.} \protect\BIBand{}
+  \bibnamefont{Willshire}, \bibfnamefont{M.J.}: Architecture for a massively
+  multiplayer online role playing game engine.
+\newblock \emph{Journal of Computing Sciences in Colleges}, \bblvol{}~18,
+  \bblpp{} 105 -- 116, December 2002.
+
+\bibitem[{\citenamefont{Wilson}(2007)}]{serverclient}
+\bibnamefont{Wilson}, \bibfnamefont{T.V.}: How mmorpgs work.
+\newblock November 2007.
+\newline\bblurlpre\url{http://electronics.howstuffworks.com/mmorpg.htm}
+
+\bibitem[{\citenamefont{WoWWiki}(2011)}]{mount}
+\bibnamefont{WoWWiki}: Mount.
+\newblock 2011.
+\newline\bblurlpre\url{http://www.wowwiki.com/Mount}
+
+\bibitem[{\citenamefont{{ArcEmu developers}}(2011)}]{arcemu}
+\bibnamefont{{ArcEmu developers}}: Arcemu wiki.
+\newblock 2011.
+\newline\bblurlpre\url{http://arcemu.org/wiki/index.php?title=Main\_Page}
+
+\bibitem[{\citenamefont{{Oracle Inc.}}(2011)}]{mysqlhist}
+\bibnamefont{{Oracle Inc.}}: What is mysql?
+\newblock 2011.
+\newline\bblurlpre\url{http://dev.mysql.com/doc/refman/5.6/en/what-is-mysql.ht%
+ml}
+
+\bibitem[{\citenamefont{Amadmonk}(2009)}]{xor}
+\bibnamefont{Amadmonk}: Interesting results on self-decryptor.
+\newblock May 2009.
+\newline\bblurlpre\url{http://www.ownedcore.com/forums/world-of-warcraft/\\wor%
+ld-of-warcraft-bots-programs/wow-memory-editing/\\233078-interesting-results-s%
+elf-decryptor.html}
+
+\bibitem[{\citenamefont{Arrai}(2009)}]{rc4}
+\bibnamefont{Arrai}: Rc4 encryption in 3.1.0 client.
+\newblock March 2009.
+\newline\bblurlpre\url{http://arrai.wordpress.com/2009/03/07/\\rc4-encryption-%
+in-310-client/}
+
+\bibitem[{\citenamefont{Nopz}(2009)}]{idapro}
+\bibnamefont{Nopz}: [tutorial] how to find simple stuff.
+\newblock September 2009.
+\newline\bblurlpre\url{http://www.ownedcore.com/forums/world-of-warcraft/\\wor%
+ld-of-warcraft-bots-programs/wow-memory-editing/\\260952-tutorial-how-find-sim%
+ple-stuff.html}
+
+\bibitem[{\citenamefont{ddebug}(2010)}]{wowbase}
+\bibnamefont{ddebug}: Aslr in world of warcraft (patch).
+\newblock November 2010.
+\newline\bblurlpre\url{http://www.ownedcore.com/forums/world-of-warcraft/\\wor%
+ld-of-warcraft-bots-programs/wow-memory-editing/\\309278-disable-aslr-world-of%
+-warcraft-patch.html}
+
+\bibitem[{\citenamefont{Whitehouse}(2007)}]{aslr}
+\bibnamefont{Whitehouse}, \bibfnamefont{O.}: An analysis of address space
+  layout randomization on windows vista.
+\newblock \emph{Symantec Advanced Threat Research}, 2007.
+\newline\bblurlpre\url{http://www.symantec.com/avcenter/reference/\\Address\_S%
+pace\_Layout\_Randomization.pdf}
+
+\bibitem[{\citenamefont{MaiN}(2011)}]{objman}
+\bibnamefont{MaiN}: [question] object manager relationships.
+\newblock August 2011.
+\newline\bblurlpre\url{http://www.ownedcore.com/forums/world-of-warcraft/\\wor%
+ld-of-warcraft-bots-programs/wow-memory-editing/\\333722-question-object-manag%
+er-relationships.html}
+
+\end{thebibliography}

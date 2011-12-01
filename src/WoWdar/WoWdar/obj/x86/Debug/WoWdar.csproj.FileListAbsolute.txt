@@ -1,0 +1,14 @@
+H:\Skripsie\Programming\C sharp tut\WoWdar\WoWdar\bin\Debug\WoWdar.exe
+H:\Skripsie\Programming\C sharp tut\WoWdar\WoWdar\bin\Debug\WoWdar.pdb
+H:\Skripsie\Programming\C sharp tut\WoWdar\WoWdar\bin\Debug\BlackMagic.dll
+H:\Skripsie\Programming\C sharp tut\WoWdar\WoWdar\bin\Debug\fasmdll_managed.dll
+H:\Skripsie\Programming\C sharp tut\WoWdar\WoWdar\bin\Debug\BlackMagic.pdb
+H:\Skripsie\Programming\C sharp tut\WoWdar\WoWdar\bin\Debug\BlackMagic.xml
+H:\Skripsie\Programming\C sharp tut\WoWdar\WoWdar\bin\Debug\fasmdll_managed.pdb
+H:\Skripsie\Programming\C sharp tut\WoWdar\WoWdar\obj\x86\Debug\ResolveAssemblyReference.cache
+H:\Skripsie\Programming\C sharp tut\WoWdar\WoWdar\obj\x86\Debug\WoWdar.WoWdar.resources
+H:\Skripsie\Programming\C sharp tut\WoWdar\WoWdar\obj\x86\Debug\WoWdar.Properties.Resources.resources
+H:\Skripsie\Programming\C sharp tut\WoWdar\WoWdar\obj\x86\Debug\ResGen.read.1.tlog
+H:\Skripsie\Programming\C sharp tut\WoWdar\WoWdar\obj\x86\Debug\ResGen.write.1.tlog
+H:\Skripsie\Programming\C sharp tut\WoWdar\WoWdar\obj\x86\Debug\WoWdar.exe
+H:\Skripsie\Programming\C sharp tut\WoWdar\WoWdar\obj\x86\Debug\WoWdar.pdb
