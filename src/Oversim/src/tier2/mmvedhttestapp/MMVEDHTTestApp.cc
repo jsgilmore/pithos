@@ -351,7 +351,7 @@ void MMVEDHTTestApp::handleTimerEvent(cMessage* msg)
         const OverlayKey& key = globalDhtTestMap->getRandomKey();
 
         if (key.isUnspecified()) {
-            EV << "[DHTTestApp::handleTimerEvent() @ " << thisNode.getIp()
+            EV << "[MMVEDHTTestApp::handleTimerEvent() @ " << thisNode.getIp()
                << " (" << thisNode.getKey().toString(16) << ")]\n"
                << "    Error: No key available in global DHT test map!"
                << endl;
