@@ -45,7 +45,7 @@ void DHTStorage::initialize()
 	underlayConfigurator = UnderlayConfiguratorAccess().get();
 	globalStatistics = GlobalStatisticsAccess().get();
 
-	globalDhtTestMap = dynamic_cast<GlobalDhtTestMap*>(simulation.getModuleByPath("globalObserver.globalFunctions[0].function"));
+	globalDhtTestMap = dynamic_cast<GlobalDhtTestMap*>(simulation.getModuleByPath("globalObserver.globalFunctions[1].function"));
 
 	if (globalDhtTestMap == NULL) {
 		throw cRuntimeError("DHTStorage::initializeApp(): GlobalDhtTestMap module not found!");

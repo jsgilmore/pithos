@@ -63,6 +63,4 @@ class Storage : public cSimpleModule
 		virtual void handleMessage(cMessage *msg);
 };
 
-Define_Module(Storage);
-
 #endif /* PEER_H_ */

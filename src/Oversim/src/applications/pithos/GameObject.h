@@ -22,6 +22,7 @@
 #include <omnetpp.h>
 #include <SHA1.h>
 
+#include "OverlayKey.h"
 #include "BinaryValue.h"
 
 enum ObjectTypes {
@@ -40,16 +41,20 @@ class GameObject : public cOwnedObject
 {
 	private:
 
-		char objectName[41]; /**< The name of the game object, which is different from the name of the object itself, which is usually "GameObject" */
+		char objectName[41]; 	/**< The name of the game object, which is different from the name of the object itself, which is usually "GameObject" */
 
-		int64_t size; /**< The size in bytes of the object */
+		int64_t size; 			/**< The size in bytes of the object */
 
-		int type; /**< The type of object (root,replica,overlay) */
+		int type; 				/**< The type of object (root,replica,overlay) */
 
 		simtime_t creationTime; /**< The time when the object was created */
+		int ttl;				/**< The time-to-live of the object */
+
+		friend std::ostream& operator<<(std::ostream& Stream, const GameObject entry);
 
 	public:
-		GameObject(const char *name="", int o_type=ROOT, int64_t o_size=0, simtime_t o_creationTime=0);
+		//If no ttl is given and the object is stored, it will not be able to exist in storage
+		GameObject(const char *name="", int o_type=ROOT, int64_t o_size=0, simtime_t o_creationTime=0, int o_ttl=0);
 		GameObject(const GameObject& other);
 		GameObject(const BinaryValue& binval);
 		virtual ~GameObject();
@@ -58,6 +63,7 @@ class GameObject : public cOwnedObject
 		virtual std::string info();
 
 		void getHash(char hash_str[41]);
+		OverlayKey getHash();
 
 		/** @returns Duplicate of the game object */
 		virtual GameObject *dup() const;
@@ -67,12 +73,24 @@ class GameObject : public cOwnedObject
 
 		/** @param o_size The size of the object in bytes */
 		void setSize(const int64_t &o_size);
+
 		int getType();
+
 		void setType(const int &o_type);
+
+		int getTTL();
+		int getTTL() const;
+
+		void setTTL(const int &o_ttl);
+
 		void setObjectName(const char *o_Name);
+
 		char *getObjectName();
+
 		void setCreationTime(const simtime_t &time);
+
 		simtime_t getCreationTime();
+		simtime_t getCreationTime() const;
 
 		BinaryValue getBinaryValue();
 };

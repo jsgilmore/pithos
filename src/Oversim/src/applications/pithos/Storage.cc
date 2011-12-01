@@ -15,6 +15,8 @@
 
 #include "Storage.h"
 
+Define_Module(Storage);
+
 Storage::Storage()
 {
 }
