@@ -14,13 +14,11 @@
 //
 
 cplusplus {{
-#include "GameObject.h"
 #include "CommonMessages_m.h"
 }}
 
 class BaseCallMessage;
 class BaseResponseMessage;
-class GameObject;
 
 class noncobject OverlayKey;
 class noncobject DhtDumpEntry;
@@ -34,9 +32,9 @@ packet RootObjectPutCAPICall extends BaseCallMessage
 {
     uint32_t kind = 1; // the kind of the stored data item
     uint32_t id = 1; // the id to identify multiple date items with same key and kind 
-    GameObject go; // value that has to be stored on keys root
     int ttl; // time to life
     bool isModifiable; // true, if the data item may be overwritten by other nodes
+    //Although not contained within this message, a GameObject is usually attached to the RPC call to be stored in Pithos.
 }
 
 //

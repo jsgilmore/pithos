@@ -38,8 +38,10 @@
 #include <sstream>
 
 #include "PithosTestMessages_m.h"
+#include "GlobalPithosTestMap.h"
+#include "GameObject.h"
 
-class GlobalDhtTestMap;
+class GlobalPithosTestMap;
 
 /**
  * A simple test application for the DHT layer
@@ -59,20 +61,15 @@ private:
      *
      * @author Ingmar Baumgart
      */
-    class DHTStatsContext : public cPolymorphic
+    class PithosStatsContext : public cPolymorphic
     {
 		public:
 			bool measurementPhase;
 			simtime_t requestTime;
-			OverlayKey key;
-			BinaryValue value;
+			GameObject go;
 
-			DHTStatsContext(bool measurementPhase,
-							simtime_t requestTime,
-							const OverlayKey& key,
-							const BinaryValue& value = BinaryValue::UNSPECIFIED_VALUE) :
-				measurementPhase(measurementPhase), requestTime(requestTime),
-				key(key), value(value) {};
+			PithosStatsContext(bool measurementPhase, simtime_t requestTime, const GameObject& go) :
+				measurementPhase(measurementPhase), requestTime(requestTime), go(go) {};
     };
 
     void initializeApp(int stage);
@@ -111,7 +108,7 @@ private:
      * @param msg put response message
      * @param context context object used for collecting statistics
      */
-     //virtual void handlePutResponse(DHTputCAPIResponse* msg, DHTStatsContext* context);
+     virtual void handlePutResponse(DHTputCAPIResponse* msg, PithosStatsContext* context);
 
     /**
      * processes self-messages
@@ -134,20 +131,20 @@ private:
     virtual void handleNodeLeaveNotification();
 
     // see RpcListener.h
-    //void handleRpcResponse(BaseResponseMessage* msg, const RpcState& state, simtime_t rtt);
+    void handleRpcResponse(BaseResponseMessage* msg, const RpcState& state, simtime_t rtt);
 
     UnderlayConfigurator* underlayConfigurator; /**< pointer to UnderlayConfigurator in this node */
 
     GlobalNodeList* globalNodeList; /**< pointer to GlobalNodeList in this node*/
 
     GlobalStatistics* globalStatistics; /**< pointer to GlobalStatistics module in this node*/
-    GlobalDhtTestMap* globalDhtTestMap; /**< pointer to the GlobalDhtTestMap module */
+    GlobalPithosTestMap* globalPithosTestMap; /**< pointer to the GlobalPithosTestMap module */
 
     // parameters
     bool debugOutput; /**< debug output yes/no?*/
     double mean; //!< mean time interval between sending test messages
     double deviation; //!< deviation of time interval
-    int ttl; /**< ttl for stored DHT records */
+    int ttl; /**< ttl for stored Pithos records */
     bool activeNetwInitPhase; //!< is app active in network init phase?
 
     simtime_t writeTime_av;

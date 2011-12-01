@@ -17,7 +17,7 @@
 //
 
 /**
- * @file DHTTestApp.cc
+ * @file PithosTestApp.cc
  * @author John Gilmore
  * @author Ingmar Baumgart
  */
@@ -71,9 +71,9 @@ void PithosTestApp::initializeApp(int stage)
     underlayConfigurator = UnderlayConfiguratorAccess().get();
     globalStatistics = GlobalStatisticsAccess().get();
 
-    globalDhtTestMap = dynamic_cast<GlobalDhtTestMap*>(simulation.getModuleByPath("globalObserver.globalFunctions[0].function"));
+    globalPithosTestMap = dynamic_cast<GlobalPithosTestMap*>(simulation.getModuleByPath("globalObserver.globalFunctions[0].function"));
 
-    if (globalDhtTestMap == NULL) {
+    if (globalPithosTestMap == NULL) {
         throw cRuntimeError("PithosTestApp::initializeApp(): GlobalDhtTestMap module not found!");
     }
 
@@ -114,16 +114,18 @@ void PithosTestApp::sendPutRequest()
 	sprintf(name, "Game %d, Object %d", getParentModule()->getIndex(), numPutSent);	//The name is later combined with the remaining object values
 	go->setObjectName(name);
 	go->setType(ROOT);
+	go->setTTL(ttl);
 
 	RootObjectPutCAPICall* capiPutMsg = new RootObjectPutCAPICall();
 
 	capiPutMsg->addObject(go);
-	//dhtPutMsg->setTtl(ttl);
+	capiPutMsg->setTtl(ttl);		//The TTL is set in the RPC call as well as the GameObject, for interoperability with the DHT application
 	capiPutMsg->setIsModifiable(true);
 
 	RECORD_STATS(numSent++; numPutSent++);
-	//sendInternalRpcCall(ROOTOBJECTSTORE_COMP, dhtPutMsg, new DHTStatsContext(globalStatistics->isMeasuring(), simTime(), destKey, dhtPutMsg->getValue()));
-	sendInternalRpcCall(ROOTOBJECTSTORE_COMP, capiPutMsg);
+	sendInternalRpcCall(ROOTOBJECTSTORE_COMP, capiPutMsg, new PithosStatsContext(globalStatistics->isMeasuring(), simTime(), *go));
+	//sendInternalRpcCall(ROOTOBJECTSTORE_COMP, capiPutMsg, new DHTStatsContext(globalStatistics->isMeasuring(), simTime(), destKey, dhtPutMsg->getValue()));
+	//sendInternalRpcCall(ROOTOBJECTSTORE_COMP, capiPutMsg);
 }
 
 void PithosTestApp::handleLowerMessage (cMessage *msg)
@@ -151,19 +153,19 @@ void PithosTestApp::handleLowerMessage (cMessage *msg)
 	}
 	else error("Game received unknown message\n");
 }
-/*
+
 void PithosTestApp::handleRpcResponse(BaseResponseMessage* msg, const RpcState& state, simtime_t rtt)
 {
     RPC_SWITCH_START(msg)
     RPC_ON_RESPONSE( DHTputCAPI ) {
-        handlePutResponse(_DHTputCAPIResponse, check_and_cast<DHTStatsContext*>(state.getContext()));
+        handlePutResponse(_DHTputCAPIResponse, check_and_cast<PithosStatsContext*>(state.getContext()));
         EV << "[PithosTestApp::handleRpcResponse()]\n"
            << "    DHT Put RPC Response received: id=" << state.getId()
            << " msg=" << *_DHTputCAPIResponse << " rtt=" << rtt
            << endl;
         break;
     }
-    RPC_ON_RESPONSE(DHTgetCAPI)
+    /*RPC_ON_RESPONSE(DHTgetCAPI)
     {
         handleGetResponse(_DHTgetCAPIResponse, check_and_cast<DHTStatsContext*>(state.getContext()));
         EV << "[PithosTestApp::handleRpcResponse()]\n"
@@ -171,16 +173,16 @@ void PithosTestApp::handleRpcResponse(BaseResponseMessage* msg, const RpcState& 
            << " msg=" << *_DHTgetCAPIResponse << " rtt=" << rtt
            << endl;
         break;
-    }
+    }*/
     RPC_SWITCH_END()
-}*/
-/*
-void PithosTestApp::handlePutResponse(DHTputCAPIResponse* msg,
-                                   DHTStatsContext* context)
-{
-    DHTEntry entry = {context->value, simTime() + ttl};
+}
 
-    globalDhtTestMap->insertEntry(context->key, entry);
+void PithosTestApp::handlePutResponse(DHTputCAPIResponse* msg,
+                                   PithosStatsContext* context)
+{
+    GameObject object(context->go);
+
+    globalPithosTestMap->insertEntry(object.getHash(), object);
 
     if (context->measurementPhase == false) {
         // don't count response, if the request was not sent
@@ -197,7 +199,8 @@ void PithosTestApp::handlePutResponse(DHTputCAPIResponse* msg,
     }
 
     delete context;
-}*/
+}
+
 /*
 void PithosTestApp::handleGetResponse(DHTgetCAPIResponse* msg,
                                    DHTStatsContext* context)

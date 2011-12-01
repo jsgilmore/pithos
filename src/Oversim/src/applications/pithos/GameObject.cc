@@ -23,11 +23,12 @@ GameObject::~GameObject()
 
 }
 
-GameObject::GameObject(const char *name, int o_type, int64_t o_size, simtime_t o_creationTime) : cOwnedObject(name)
+GameObject::GameObject(const char *name, int o_type, int64_t o_size, simtime_t o_creationTime, int o_ttl) : cOwnedObject(name)
 {
 	type = o_type;
 	size = o_size;
 	creationTime = o_creationTime;
+	ttl = o_ttl;
 }
 
 GameObject::GameObject(const GameObject& other) : cOwnedObject(other.getName())
@@ -43,6 +44,7 @@ GameObject& GameObject::operator=(const GameObject& other)
 
 	size = other.size;
 	type = other.type;
+	ttl = other.ttl;
 	strcpy(objectName, other.objectName);
 	creationTime = other.creationTime;
 
@@ -73,6 +75,7 @@ GameObject& GameObject::operator=(const BinaryValue& binval)
 	size = atol((tokens[1]).c_str());		//I'm quite sure this long will be 64 bits in a 64 bit system, but unsure about 32 bit systems
 	type = atoi((tokens[2]).c_str());
 	creationTime = atof((tokens[3]).c_str());
+	ttl = atoi((tokens[4]).c_str());
 
 	return *this;
 }
@@ -83,8 +86,18 @@ std::string GameObject::info()
 	//It's important that this function is kept up to date, since the BinaryValue of the object is generated using it
 	//Also, space delimiting is used by the C++ string streams to tokenise the input for reconstruction
 	std::stringstream out;
-	out << objectName << " " << size << " " << type << " " << creationTime;
+	out << objectName << " " << size << " " << type << " " << creationTime << " " << ttl;
 	return out.str();
+}
+
+//This stream is basically a more descriptive string output of the contents of a game object
+std::ostream& operator<<(std::ostream& stream, const GameObject go)
+{
+    return stream << "ObjectName: " << go.objectName
+					<< "Size: " << go.size
+					<< "Type: " << go.type
+                  << "CreationTime: " << go.creationTime
+                  << "TTL: " << go.ttl;
 }
 
 void GameObject::getHash(char hash_str[41])
@@ -98,6 +111,11 @@ void GameObject::getHash(char hash_str[41])
 	hash.Update(((unsigned char *)info().c_str()), strlen(info().c_str()));
 	hash.Final();
 	hash.ReportHash(hash_str, CSHA1::REPORT_HEX);
+}
+
+OverlayKey GameObject::getHash()
+{
+	return OverlayKey::sha1(getBinaryValue());
 }
 
 GameObject *GameObject::dup() const
@@ -126,6 +144,21 @@ void GameObject::setType(const int &o_type)
 	type = o_type;
 }
 
+int GameObject::getTTL()
+{
+	return ttl;
+}
+
+int GameObject::getTTL() const
+{
+	return ttl;
+}
+
+void GameObject::setTTL(const int &o_ttl)
+{
+	ttl = o_ttl;
+}
+
 void GameObject::setObjectName(const char *o_Name)
 {
 	strcpy(objectName, o_Name);
@@ -142,6 +175,11 @@ void GameObject::setCreationTime(const simtime_t &time)
 }
 
 simtime_t GameObject::getCreationTime()
+{
+	return creationTime;
+}
+
+simtime_t GameObject::getCreationTime() const
 {
 	return creationTime;
 }
