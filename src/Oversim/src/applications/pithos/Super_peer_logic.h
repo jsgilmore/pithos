@@ -28,7 +28,7 @@
 
 #include "PeerListPkt.h"
 #include "PeerData.h"
-#include "overlayPkt_m.h"
+#include "PithosMessages_m.h"
 
 /**
  * The implemented super peer logic or super peer intelligence.

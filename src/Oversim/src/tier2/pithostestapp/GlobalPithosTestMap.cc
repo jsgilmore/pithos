@@ -46,7 +46,6 @@ GlobalPithosTestMap::~GlobalPithosTestMap()
 
 void GlobalPithosTestMap::initialize()
 {
-    p2pnsNameCount = 0;
     globalStatistics = GlobalStatisticsAccess().get();
     WATCH_MAP(dataMap);
 

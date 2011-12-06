@@ -111,7 +111,8 @@ void PithosTestApp::sendPutRequest()
 	go->setSize(exponential(objectSize_av));
 	go->setCreationTime(simTime());
 
-	sprintf(name, "Game %d, Object %d", getParentModule()->getIndex(), numPutSent);	//The name is later combined with the remaining object values
+	//It is important that this name not contain spaces, otherwise a GameObject cannot be correctly reconstructed from a BinaryValue
+	sprintf(name, "Node:%d,Object:%d", getParentModule()->getParentModule()->getIndex(), numPutSent);	//The name is later combined with the remaining object values
 	go->setObjectName(name);
 	go->setType(ROOT);
 	go->setTTL(ttl);
@@ -157,11 +158,11 @@ void PithosTestApp::handleLowerMessage (cMessage *msg)
 void PithosTestApp::handleRpcResponse(BaseResponseMessage* msg, const RpcState& state, simtime_t rtt)
 {
     RPC_SWITCH_START(msg)
-    RPC_ON_RESPONSE( DHTputCAPI ) {
-        handlePutResponse(_DHTputCAPIResponse, check_and_cast<PithosStatsContext*>(state.getContext()));
+    RPC_ON_RESPONSE( RootObjectPutCAPI ) {
+        handlePutResponse(_RootObjectPutCAPIResponse, check_and_cast<PithosStatsContext*>(state.getContext()));
         EV << "[PithosTestApp::handleRpcResponse()]\n"
            << "    DHT Put RPC Response received: id=" << state.getId()
-           << " msg=" << *_DHTputCAPIResponse << " rtt=" << rtt
+           << " msg=" << *_RootObjectPutCAPIResponse << " rtt=" << rtt
            << endl;
         break;
     }
@@ -177,8 +178,7 @@ void PithosTestApp::handleRpcResponse(BaseResponseMessage* msg, const RpcState& 
     RPC_SWITCH_END()
 }
 
-void PithosTestApp::handlePutResponse(DHTputCAPIResponse* msg,
-                                   PithosStatsContext* context)
+void PithosTestApp::handlePutResponse(RootObjectPutCAPIResponse* msg, PithosStatsContext* context)
 {
     GameObject object(context->go);
 

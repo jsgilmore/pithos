@@ -25,8 +25,7 @@
 
 #include "BaseApp.h"
 
-#include "bootstrapPkt_m.h"
-#include "groupPkt_m.h"
+#include "PithosMessages_m.h"
 
 #include "SP_element.h"
 

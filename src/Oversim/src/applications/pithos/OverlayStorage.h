@@ -24,7 +24,7 @@
 #include "BaseApp.h"
 #include "Peer_logic.h"
 
-#include "groupPkt_m.h"
+#include "PithosMessages_m.h"
 #include "GameObject.h"
 
 /**

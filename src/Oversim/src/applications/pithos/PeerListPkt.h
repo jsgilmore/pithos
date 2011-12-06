@@ -20,7 +20,7 @@
 #define PEER_LIST_PKT_H_
 
 #include <vector>
-#include "PeerListPkt_m.h"
+#include "PithosMessages_m.h"
 
 /**
  * Implementation of the peer list packet, which expands on the abstract

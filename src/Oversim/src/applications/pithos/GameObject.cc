@@ -18,6 +18,9 @@
 
 #include "GameObject.h"
 
+// predefined GameObject
+const GameObject GameObject::UNSPECIFIED_OBJECT;
+
 GameObject::~GameObject()
 {
 
@@ -93,11 +96,11 @@ std::string GameObject::info()
 //This stream is basically a more descriptive string output of the contents of a game object
 std::ostream& operator<<(std::ostream& stream, const GameObject go)
 {
-    return stream << "ObjectName: " << go.objectName
-					<< "Size: " << go.size
-					<< "Type: " << go.type
-                  << "CreationTime: " << go.creationTime
-                  << "TTL: " << go.ttl;
+    return stream << /*This will state the node number and object number: */ go.objectName
+					<< " Size: " << go.size
+					<< " Type: " << go.type
+                  << " CreationTime: " << go.creationTime
+                  << " TTL: " << go.ttl;
 }
 
 void GameObject::getHash(char hash_str[41])

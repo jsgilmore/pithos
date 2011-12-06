@@ -29,7 +29,7 @@
 
 #include "GameObject.h"
 #include "PeerListPkt.h"
-#include "groupPkt_m.h"
+#include "PithosMessages_m.h"
 
 class GlobalStatistics;
 

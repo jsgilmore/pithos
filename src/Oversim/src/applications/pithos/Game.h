@@ -22,7 +22,7 @@
 #include <omnetpp.h>
 #include <BaseApp.h>
 
-#include "groupPkt_m.h"
+#include "PithosMessages_m.h"
 
 /**
  * Class that is used by the Omnet module of the same name, the purpose of

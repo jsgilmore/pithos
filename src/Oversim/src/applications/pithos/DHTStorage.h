@@ -31,7 +31,7 @@
 #include "Communicator.h"
 #include "Peer_logic.h"
 
-#include "groupPkt_m.h"
+#include "PithosMessages_m.h"
 #include "GameObject.h"
 
 class Peer_logic;
@@ -54,14 +54,11 @@ class DHTStorage : public cSimpleModule
 				bool measurementPhase;
 				simtime_t requestTime;
 				OverlayKey key;
-				BinaryValue value;
+				unsigned int parent_rpcid;
+				GameObject object;
 
-				DHTStatsContext(bool measurementPhase,
-								simtime_t requestTime,
-								const OverlayKey& key,
-								const BinaryValue& value = BinaryValue::UNSPECIFIED_VALUE) :
-					measurementPhase(measurementPhase), requestTime(requestTime),
-					key(key), value(value) {};
+				DHTStatsContext(bool measurementPhase, simtime_t requestTime, const OverlayKey& key, unsigned int parent_rpcid = 0, const GameObject& object = GameObject::UNSPECIFIED_OBJECT) :
+					measurementPhase(measurementPhase), requestTime(requestTime), key(key), parent_rpcid(parent_rpcid), object(object) {};
 		};
 
 		DHTStorage();
@@ -94,7 +91,7 @@ class DHTStorage : public cSimpleModule
 
 		bool nodeIsLeavingSoon; //!< true if the node is going to be killed shortly
 
-		void store(GameObject *go);
+		void store(GameObject *go, unsigned int rpcid);
 	protected:
 		void finish();
 		virtual void initialize();

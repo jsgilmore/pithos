@@ -24,11 +24,11 @@ simple DHTStorage
     parameters:
         @class(DHTStorage);
         @display("i=abstract/cache");
-        
+
         int testTtl;      // TTL for stored test records
         bool activeNetwInitPhase;    // send messages when network is in init phase?
     gates:
-    
+
         inout comms_gate;
         output read;
         input write;
@@ -53,7 +53,7 @@ module Super_peerSelectDHT like ITier_overlay
     submodules:
         peer_logic: Peer_logic;
         super_peer_logic: Super_peer_logic;
-        storage : Storage;
+        storage: Storage;
         group_storage: GroupStorage;
         dht_storage: DHTStorage;
         communicator: Communicator;
@@ -106,7 +106,7 @@ module PeerSelectDHT like ITier_overlay
         output overlayOut;       // gate to the Overlay layer
     submodules:
         peer_logic: Peer_logic;
-        storage : Storage;
+        storage: Storage;
         group_storage: GroupStorage;
         dht_storage: DHTStorage;
         communicator: Communicator;
@@ -118,7 +118,7 @@ module PeerSelectDHT like ITier_overlay
         peer_logic.overlay_write --> dht_storage.write;
         dht_storage.read --> peer_logic.overlay_read;
         trace_in --> communicator.trace_in;
-        
+
         communicator.peer_gate <--> peer_logic.comms_gate;
         communicator.toPeer_fromUpper --> peer_logic.from_upperTier;
         communicator.fromPeer_toUpper <-- group_storage.to_upperTier;
