@@ -163,7 +163,11 @@ void DHTStorage::handleRpcResponse(BaseResponseMessage* msg, const RpcState& sta
 
 void DHTStorage::handlePutResponse(DHTputCAPIResponse* msg, DHTStatsContext* context)
 {
-    DHTEntry entry = {context->value, simTime() + ttl};
+    DHTEntry entry = {context->object.getBinaryValue(), simTime() + context->object.getTTL()};
+
+    ResponseMsg *response = new ResponseMsg();
+    response->setType(OVERLAY_PUT);
+    response->setRpcid(context->parent_rpcid);		//This allows the higher layer to know which RPC call is being acknowledged.
 
     //TODO: The complete global DHT test map should be removed from the DHT storage component for the real-world application.
     //This is ONLY required to test the correctness of the overlay itself and is effectively storing all data inserted into the overlay two-fold.
@@ -179,16 +183,19 @@ void DHTStorage::handlePutResponse(DHTputCAPIResponse* msg, DHTStatsContext* con
     if (msg->getIsSuccess()) {
         RECORD_STATS(numPutSuccess++);
         RECORD_STATS(globalStatistics->addStdDev("DHTTestApp: PUT Latency (s)", SIMTIME_DBL(simTime() - context->requestTime)));
+        response->setIsSuccess(true);
     } else {
         RECORD_STATS(numPutError++);
+        response->setIsSuccess(false);
     }
+
+    send(response, "read");
 
     delete context;
 }
 
-void DHTStorage::store(GameObject *go)
+void DHTStorage::store(GameObject *go, unsigned int rpcid)
 {
-	char hash_str[41];
 	cModule *this_peerModule = getParentModule()->getSubmodule("peer_logic");
 	cModule *communicatorModule = getParentModule()->getSubmodule("communicator");
 
@@ -205,34 +212,34 @@ void DHTStorage::store(GameObject *go)
 	}
 
 	go->setType(OVERLAY);
+	OverlayKey destkey = go->getHash();
 
-	//OverlayKey destKey = OverlayKey::random();	//For testing purposes only
-	go->getHash(hash_str);
-	OverlayKey destKey(hash_str, 16);
-
+	//TODO: Update the lower layer so that it retrieves the required information directly from the GameObject
 	DHTputCAPICall* dhtPutMsg = new DHTputCAPICall();
-	dhtPutMsg->setKey(destKey);
+	dhtPutMsg->setKey(destkey);
 	dhtPutMsg->setValue(go->getBinaryValue());
-	dhtPutMsg->setTtl(ttl);
+	dhtPutMsg->setTtl(go->getTTL());
 	dhtPutMsg->setIsModifiable(true);
-	//dhtPutMsg->setByteLength(4+4+4+4+8+go->getSize()); 	//Source address, dest address, type, value, object name ID, object size
+	dhtPutMsg->setByteLength(4+4+4+4+8+go->getSize()); 	//Source address, dest address, type, value, object name ID, object size
 
 	RECORD_STATS(numSent++; numPutSent++);
 
 	EV << "Sending object with name: " << go->getObjectName() << endl;
-	communicator->externallySendInternalRpcCall(OVERLAYSTORAGE_COMP, dhtPutMsg, new DHTStatsContext(globalStatistics->isMeasuring(), simTime(), destKey, dhtPutMsg->getValue()));
+	communicator->externallySendInternalRpcCall(OVERLAYSTORAGE_COMP, dhtPutMsg, new DHTStatsContext(globalStatistics->isMeasuring(), simTime(), destkey, rpcid, *go));
 
-	delete(go);		//The GameObject was not sent, rather its string representation as a BinaryValue (required for the Oversim DHT)
+	delete(go);
 }
 
 void DHTStorage::handleMessage(cMessage *msg)
 {
-	GameObject *go = (GameObject *)msg->removeObject("GameObject");
+	groupPkt *pkt = check_and_cast<groupPkt *>(msg);
+
+	GameObject *go = (GameObject *)pkt->removeObject("GameObject");
 
 	if (go == NULL)
 		error("No object was attached to be stored in group storage");
 
-	store(go);
+	store(go, pkt->getValue());
 
 	delete(msg);
 }

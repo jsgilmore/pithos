@@ -160,6 +160,7 @@ void GroupStorage::store(GameObject *go)
 			write_dup->setName("replica_write");
 		}
 		else {
+			//The default type is already ROOT
 			write_dup->setName("write");
 		}
 
@@ -240,7 +241,7 @@ void GroupStorage::handleMessage(cMessage *msg)
 
 		store(go);
 
-		delete(go);
+		delete(go);		//Only duplicates of the game object are stored, so the original must be deleted
 	}
 	else error("Group storage received an unknown packet");
 

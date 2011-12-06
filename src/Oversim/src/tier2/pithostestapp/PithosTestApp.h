@@ -108,7 +108,7 @@ private:
      * @param msg put response message
      * @param context context object used for collecting statistics
      */
-     virtual void handlePutResponse(DHTputCAPIResponse* msg, PithosStatsContext* context);
+    void handlePutResponse(RootObjectPutCAPIResponse* msg, PithosStatsContext* context);
 
     /**
      * processes self-messages

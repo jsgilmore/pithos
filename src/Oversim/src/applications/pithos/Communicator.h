@@ -33,9 +33,7 @@
 #include "DHTStorage.h"
 
 #include "GameObject.h"
-#include "packet_m.h"
-#include "groupPkt_m.h"
-#include "bootstrapPkt_m.h"
+#include "PithosMessages_m.h"
 #include "PithosTestMessages_m.h"
 
 #include "DHTMessage_m.h"
@@ -55,7 +53,6 @@ class Communicator : public BaseApp
 		// statistics
 		int numSent;              /**< number of packets sent */
 		int numReceived;          /**< number of packets received */
-
 
 	protected:
 		virtual void handleMessage(cMessage *msg);
@@ -133,6 +130,7 @@ class Communicator : public BaseApp
 		void sendPacket(cMessage *msg);
 
 	public:
+
 		Communicator() {};
 		~Communicator() {};
 
@@ -146,6 +144,14 @@ class Communicator : public BaseApp
 			take(msg);	//This module should first take ownership of the received message before that message can be resent
 
 			return sendInternalRpcCall(destComp, msg, context, timeout, retries, rpcId, rpcListener);
+		}
+
+		void externallySendRpcResponse(BaseCallMessage* call, BaseResponseMessage* response)
+		{
+			Enter_Method("externallySendRpcResponse()");	//Required for Omnet++ context switching between modules
+			take(response);
+
+			sendRpcResponse(call, response);
 		}
 };
 

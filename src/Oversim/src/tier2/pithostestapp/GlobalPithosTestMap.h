@@ -84,7 +84,6 @@ public:
     const OverlayKey& getRandomKey();
 
     size_t size() { return dataMap.size(); };
-    uint32_t p2pnsNameCount;
 
 private:
     void initialize();
