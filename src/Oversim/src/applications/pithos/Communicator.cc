@@ -105,8 +105,6 @@ simtime_t Communicator::getCreationTime()
 
 void Communicator::handlePutCAPIRequest(RootObjectPutCAPICall* capiPutMsg)
 {
-	DHTputCAPIResponse* capiPutRespMsg;
-
 	cModule *peer_logicModule = getParentModule()->getSubmodule("peer_logic");
 	//This extra step ensures that the submodules exist and also does any other required error checking
 	Peer_logic *peer_logic = check_and_cast<Peer_logic *>(peer_logicModule);
@@ -115,9 +113,9 @@ void Communicator::handlePutCAPIRequest(RootObjectPutCAPICall* capiPutMsg)
 
 	//Respond to the RPC call with a success message
 	//TODO: This success message should eventually only be sent after it has been confirmed that the data were sucessfully stored.
-	capiPutRespMsg = new DHTputCAPIResponse();
+	/*capiPutRespMsg = new DHTputCAPIResponse();
 	capiPutRespMsg->setIsSuccess(true);
-	sendRpcResponse(capiPutMsg, capiPutRespMsg);
+	sendRpcResponse(capiPutMsg, capiPutRespMsg);*/
 }
 
 bool Communicator::handleRpcCall(BaseCallMessage *msg)

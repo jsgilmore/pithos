@@ -26,10 +26,10 @@
 
 #include "GameObject.h"
 #include "PeerData.h"
+#include "Communicator.h"
 
-#include "groupPkt_m.h"
 #include "PeerListPkt.h"
-#include "bootstrapPkt_m.h"
+#include "PithosMessages_m.h"
 #include "PithosTestMessages_m.h"
 
 enum SP_indeces {
@@ -59,6 +59,53 @@ class Peer_logic: public cSimpleModule
 
 		TransportAddress super_peer_address; /**< The TransPort address of the group super peer (this address is set, after the peer has joined a group) */
 
+		enum PendingRpcsStates {
+			INIT = 0,
+			PUT_SENT = 2
+		};
+
+		/**
+		 * This class provides a means to store all information about pending RPC sent to the communicator.
+		 * A map of all pending RPCs are maintained and matched against RPC responses received. If a response for
+		 * a pending RPC is received, the original caller can be informed about the outcome of the request.
+		 *
+		 * @author John Gilmore, Gregoire Menuel, Ingmar Baumgart
+		 */
+		class PendingRpcsEntry
+		{
+		public:
+			PendingRpcsEntry()
+			{
+				getCallMsg = NULL;
+				putCallMsg = NULL;
+				state = INIT;
+				hashVector = NULL;
+				numSent = 0;
+				numAvailableReplica = 0;
+				numFailed = 0;
+				numResponses = 0;
+			};
+
+			typedef std::map<uint32_t, PendingRpcsEntry> PendingRpcs;
+			PendingRpcs pendingRpcs; /**< a map of all pending RPC operations */
+
+			RootObjectGetCAPICall* getCallMsg;
+			RootObjectPutCAPICall* putCallMsg;
+			PendingRpcsStates state;
+			NodeVector replica;
+			NodeVector* hashVector;
+			std::map<GameObject, NodeVector> hashes;
+			int numSent;
+			int numAvailableReplica;
+			int numFailed;
+			int numResponses;
+		};
+
+		friend std::ostream& operator<<(std::ostream& Stream, const PendingRpcsEntry& entry);
+
+		typedef std::map<uint32_t, PendingRpcsEntry> PendingRpcs;
+		PendingRpcs pendingRpcs; /**< a map of all pending RPC operations */
+
 	public:
 		Peer_logic();
 		virtual ~Peer_logic();
@@ -87,6 +134,8 @@ class Peer_logic: public cSimpleModule
 		 * @param msg the message received
 		 */
 		void handleP2PMsg(cMessage *msg);
+
+		void handleDHTMsg(cMessage *msg);
 
 		/**
 		 * Send a join request to the directory server or a super peer

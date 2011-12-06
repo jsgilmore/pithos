@@ -1,0 +1,6 @@
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$class_communicator.html#a9ac48ae31ed1068517e5df94951eb5b8" title="Communicator::handleGetCAPIRequest" alt="" coords="255,5,508,35"/>
+<area shape="rect" id="node5" href="$class_communicator.html#a466c44f594812c35e6307e32d432c132" title="Communicator::handlePutCAPIRequest" alt="" coords="255,59,508,88"/>
+<area shape="rect" id="node7" href="$class_peer__logic.html#aec0ffa7ceaa86d0febb008c694ef9bfe" title="Peer_logic::handlePutCAPIRequest" alt="" coords="559,59,788,88"/>
+<area shape="rect" id="node9" href="$class_game_object.html#a64ba9e7c42bc9666813f4af4b24ffc88" title="GameObject::getSize" alt="" coords="837,59,984,88"/>
+</map>
