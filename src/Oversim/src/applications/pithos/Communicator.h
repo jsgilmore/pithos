@@ -149,9 +149,10 @@ class Communicator : public BaseApp
 		void externallySendRpcResponse(BaseCallMessage* call, BaseResponseMessage* response)
 		{
 			Enter_Method("externallySendRpcResponse()");	//Required for Omnet++ context switching between modules
+			take(call);
 			take(response);
 
-			sendRpcResponse(call, response);
+			sendRpcResponse(INTERNAL_TRANSPORT, ROOTOBJECTUPDATER_COMP, TransportAddress::UNSPECIFIED_NODE, OverlayKey::UNSPECIFIED_KEY, call, response);
 		}
 };
 

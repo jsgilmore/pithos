@@ -47,6 +47,26 @@ void Storage::initialize()
 	replicaObjectsSignal = registerSignal("ReplicaObject");
 }
 
+int Storage::getStorageBytes()
+{
+	int i;
+	int total_size = 0;
+
+	//This is inefficient, since a sequential search will be done for every element in the queue.
+	//TODO: The "forEachChild" method should rather be implemented with an appropriate visitor class.
+	for (i = 0 ; i < storage.getLength() ; i++)
+	{
+		total_size += ((GameObject *)storage.get(i))->getSize();
+	}
+
+	return total_size;
+}
+
+int Storage::getStorageFiles()
+{
+	return storage.getLength();
+}
+
 void Storage::handleMessage(cMessage *msg)
 {
 	simtime_t delay;
@@ -54,6 +74,12 @@ void Storage::handleMessage(cMessage *msg)
 		error("Storage received a message with no game object attached");
 
 	GameObject *go = (GameObject *)msg->removeObject("GameObject");
+
+	if (go->getType() == ROOT)
+		EV << getName() << " " << getIndex() << " received root Game Object of size " << go->getSize() << "\n";
+	else if (go->getType() == REPLICA)
+		EV << getName() << " " << getIndex() << " received replica Game Object of size " << go->getSize() << "\n";
+
 	delay = simTime() - go->getCreationTime();
 
 	EV << getName() << " " << getIndex() << " received write command of size " << go->getSize() << " with delay " << go->getCreationTime() << "\n";
@@ -83,24 +109,4 @@ void Storage::handleMessage(cMessage *msg)
 	else error("The game object type was incorrectly set");
 
 	delete(msg);
-}
-
-int Storage::getStorageBytes()
-{
-	int i;
-	int total_size = 0;
-
-	//This is inefficient, since a sequential search will be done for every element in the queue.
-	//TODO: The "forEachChild" method should rather be implemented with an appropriate visitor class.
-	for (i = 0 ; i < storage.getLength() ; i++)
-	{
-		total_size += ((GameObject *)storage.get(i))->getSize();
-	}
-
-	return total_size;
-}
-
-int Storage::getStorageFiles()
-{
-	return storage.getLength();
 }

@@ -41,6 +41,16 @@ void Peer_logic::initialize()
 	longitude = uniform(0,100);		//Make this range changeable
 }
 
+void Peer_logic::finalize()
+{
+	// Iterate through 'pendingRpcs' and print out successes and failures
+	for (PendingRpcs::iterator it = pendingRpcs.begin() ; it != pendingRpcs.end(); ++it)
+	{
+	   //printf("RPC cals: Success: %d, Failure: %d\n", it->second.numResponses, it->second.numFailed);
+		EV << "RPC cals: Successes: " << it->second.numResponses << " , Failures: " << it->second.numFailed << endl;
+	}
+}
+
 bool Peer_logic::hasSuperPeer()
 {
 	if (super_peer_address.isUnspecified())
@@ -59,23 +69,7 @@ void Peer_logic::handleP2PMsg(cMessage *msg)
 
 	Packet *packet = check_and_cast<Packet *>(msg);
 
-	if (packet->getPayloadType() == WRITE)
-	{
-
-		groupPkt *group_p = check_and_cast<groupPkt *>(msg);
-
-		cMessage *storage_msg = new cMessage("storage");
-		GameObject *go = (GameObject *)group_p->removeObject("GameObject");
-
-		if (go->getType() == ROOT)
-			EV << getName() << " " << getIndex() << " received root Game Object of size " << go->getSize() << "\n";
-		else if (go->getType() == REPLICA)
-			EV << getName() << " " << getIndex() << " received replica Game Object of size " << go->getSize() << "\n";
-
-		storage_msg->addObject(go);
-		send(storage_msg, "write");
-	}
-	else if (packet->getPayloadType() == INFORM)
+	if (packet->getPayloadType() == INFORM)
 	{
 		bootstrapPkt *boot_p = check_and_cast<bootstrapPkt *>(msg);
 
@@ -96,7 +90,7 @@ void Peer_logic::handlePutCAPIRequest(RootObjectPutCAPICall* capiPutMsg)
 {
 	groupPkt *write_pkt;
 	Enter_Method("[Peer_logic]: handlePutCAPIRequest()");	//Required for Omnet++ context switching between modules
-	//take(capiPutMsg);
+	take(capiPutMsg);
 
 	GameObject *go = (GameObject *)capiPutMsg->removeObject("GameObject");
 	if (go == NULL)
@@ -120,7 +114,6 @@ void Peer_logic::handlePutCAPIRequest(RootObjectPutCAPICall* capiPutMsg)
 
 	//Send the game object to be stored in the overlay.
 	send(write_pkt, "overlay_write");
-
 
 	//Add the received RPC to the list of RPC for which responses are still outstanding
 	PendingRpcsEntry entry;
@@ -150,17 +143,17 @@ void Peer_logic::joinRequest(const TransportAddress &dest_adr)
 	send(boot_p, "comms_gate$o");
 }
 
-void Peer_logic::handleDHTMsg(cMessage *msg)
+void Peer_logic::handleResponseMsg(cMessage *msg)
 {
 	cModule *communicatorModule = getParentModule()->getSubmodule("communicator");
 	//This extra step ensures that the submodules exist and also does any other required error checking
 	Communicator *communicator = check_and_cast<Communicator *>(communicatorModule);
 
-	ResponseMsg *response = check_and_cast<ResponseMsg *>(msg);
+	ResponsePkt *response = check_and_cast<ResponsePkt *>(msg);
 
 	PendingRpcs::iterator it = pendingRpcs.find(response->getRpcid());
 
-	if (it == pendingRpcs.end()) // unknown request
+	if (it == pendingRpcs.end()) // unknown request or reqeuest for already erased call
 		return;
 
 	if (response->getIsSuccess()) {
@@ -169,20 +162,21 @@ void Peer_logic::handleDHTMsg(cMessage *msg)
 		it->second.numFailed++;
 	}
 
-	if (it->second.numResponses / (double)it->second.numSent > 0.5)
+	if (it->second.numResponses + it->second.numFailed == it->second.numSent)
 	{
-		RootObjectPutCAPIResponse* capiPutRespMsg = new RootObjectPutCAPIResponse();
-		capiPutRespMsg->setIsSuccess(true);
-		communicator->externallySendRpcResponse(it->second.putCallMsg, capiPutRespMsg);
-		pendingRpcs.erase(response->getRpcid());
-	}
-	else if (it->second.numFailed / (double)it->second.numSent > 0.5)
-	{
-
-		RootObjectPutCAPIResponse* capiPutRespMsg = new RootObjectPutCAPIResponse();
-		capiPutRespMsg->setIsSuccess(false);
-		communicator->externallySendRpcResponse(it->second.putCallMsg, capiPutRespMsg);
-		pendingRpcs.erase(response->getRpcid());
+		if (it->second.numResponses > it->second.numFailed)
+		{
+			RootObjectPutCAPIResponse* capiPutRespMsg = new RootObjectPutCAPIResponse();
+			capiPutRespMsg->setIsSuccess(true);
+			communicator->externallySendRpcResponse(it->second.putCallMsg, capiPutRespMsg);
+			pendingRpcs.erase(response->getRpcid());
+		} else
+		{
+			RootObjectPutCAPIResponse* capiPutRespMsg = new RootObjectPutCAPIResponse();
+			capiPutRespMsg->setIsSuccess(false);
+			communicator->externallySendRpcResponse(it->second.putCallMsg, capiPutRespMsg);
+			pendingRpcs.erase(response->getRpcid());
+		}
 	}
 
 	return;
@@ -210,10 +204,16 @@ void Peer_logic::handleMessage(cMessage *msg)
 		handleP2PMsg(msg);
 		delete(msg);
 	}
-	else if (strcmp(msg->getArrivalGate()->getName(), "overlay_read") == 0)
+	else if ((strcmp(msg->getArrivalGate()->getName(), "overlay_read") == 0))
 	{
 		//Data was received from the UDP layer by the communicator and has been referred to the Peer logic
-		handleDHTMsg(msg);
+		handleResponseMsg(msg);
+		delete(msg);
+	}
+	else if (strcmp(msg->getArrivalGate()->getName(), "group_read") == 0)
+	{
+		//Data was received from the UDP layer by the communicator and has been referred to the Peer logic
+		handleResponseMsg(msg);
 		delete(msg);
 	}
 	else {

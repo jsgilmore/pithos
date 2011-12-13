@@ -88,6 +88,30 @@ simple GroupStorage
         @class(GroupStorage);
         @display("i=abstract/cache");
         
+        @signal[qlen](type="int");
+        @signal[qsize](type="int");
+        @signal[queueingTime](type="simtime_t");
+        @statistic[qlen](title="queue length"; record=vector,timeavg,max; interpolationmode=sample-hold);
+        @statistic[qsize](title="queue size"; record=vector,timeavg,max; interpolationmode=sample-hold);
+        @statistic[queueingTime](title="queueing time at dequeue"; unit=s; interpolationmode=none);
+        @statistic[storeTime](title="time taken to store an object"; record=histogram,vector,timeavg; interpolationmode=sample-hold);
+
+        @signal[storeTime](type="simtime_t");
+        @signal[rootStoreTime](type="simtime_t");
+        @signal[replicaStoreTime](type="simtime_t");
+        @signal[overlayStoreTime](type="simtime_t");
+        @statistic[storeTime](title="time taken to store a root object"; record=histogram,vector,timeavg; interpolationmode=sample-hold);
+        @statistic[rootStoreTime](title="time taken to store a replica object"; record=histogram,vector,timeavg; interpolationmode=sample-hold);
+        @statistic[replicaStoreTime](title="time taken to store an overlay object"; record=histogram,vector,timeavg; interpolationmode=sample-hold);
+        @statistic[overlayStoreTime](title="time taken to store an object"; record=histogram,vector,timeavg; interpolationmode=sample-hold);
+
+        @signal[OverlayObject](type="int");
+        @signal[RootObject](type="int");
+        @signal[ReplicaObject](type="int");
+        @statistic[OverlayObject](title="Overlay Objects"; record=sum);
+        @statistic[RootObject](title="Root Objects"; record=sum);
+        @statistic[ReplicaObject](title="Replica Objects"; record=sum);
+        
         @signal[GroupSize](type="int");
         @signal[GroupSendFail](type="int");
         

@@ -33,6 +33,7 @@ enum PacketTypes
     JOIN_ACCEPT = 6;
     STORE_REQ = 7;
     OBJECT_ADD = 8;
+    RESPONSE = 9;
 };
 
 enum OverlayTypes 
@@ -52,13 +53,6 @@ enum ResponseTypes
     
 }
 
-message ResponseMsg
-{
-    int rpcid;
-    bool isSuccess;
-    int type enum(ResponseTypes);
-}
-
 // now we declare the message
 packet overlayPkt
 {
@@ -75,7 +69,14 @@ packet Packet
 
 packet groupPkt extends Packet
 {
-    long value;
+    unsigned int value;
+}
+
+message ResponsePkt extends Packet
+{
+    unsigned int rpcid;
+    bool isSuccess;
+    int responseType enum(ResponseTypes);
 }
 
 packet bootstrapPkt extends Packet

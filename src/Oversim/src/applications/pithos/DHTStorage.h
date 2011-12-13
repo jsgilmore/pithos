@@ -92,6 +92,9 @@ class DHTStorage : public cSimpleModule
 		bool nodeIsLeavingSoon; //!< true if the node is going to be killed shortly
 
 		void store(GameObject *go, unsigned int rpcid);
+
+		void sendResponse(int responseType, unsigned int rpcid, bool isSuccess);
+
 	protected:
 		void finish();
 		virtual void initialize();

@@ -47,7 +47,11 @@ class GroupStorage : public cSimpleModule
 	public:
 	GroupStorage();
 		virtual ~GroupStorage();
+		int getStorageBytes();
+		int getStorageFiles();
 	private:
+
+		cQueue storage; /**< The queue holding all stored GameObjects */
 
 		std::vector<PeerData> group_peers; /**< The list of peers in the group and which objects they store. */
 
@@ -69,8 +73,9 @@ class GroupStorage : public cSimpleModule
 		 * The function creates a write packet and fills it with address information, payload type and byte length.
 		 *
 		 * @param write A pointer to the write packet to be created and filled
+		 * @param rpcid The RPC ID of the original request from the higher layer
 		 */
-		void createWritePkt(groupPkt **write);
+		void createWritePkt(groupPkt **write, unsigned int rpcid);
 
 		/**
 		 * Send a message to the super peer informing it about a new group object and a list of peers that store it.
@@ -89,12 +94,19 @@ class GroupStorage : public cSimpleModule
 		 */
 		void selectDestination(TransportAddress *dest_adr, std::vector<TransportAddress> send_list);
 
+		void respond_toUpper(cMessage *msg);
+
+		void sendUDPResponse(cMessage *msg);
+
+		void store(cMessage *msg);
+
 		/**
 		 * Function to store files in the group. This function replicates game objects and sends them to different group nodes.
 		 *
 		 * @param go The GameObject to be stored
+		 * @param rpcid The RPC ID of the original request from the higher layer
 		 */
-		void store(GameObject *go);
+		void send_forstore(GameObject *go, unsigned int rpcid);
 
 		/**
 		 * Function is called when the peer is informed by the group super peer that new peers have joined the group.
@@ -106,8 +118,26 @@ class GroupStorage : public cSimpleModule
 		/**
 		 * @returns the number of required replicas or the number of group peers, if this number is less than the required replicas (this case is also logged).
 		 */
-		int getReplicaNr();
+		int getReplicaNr(unsigned int rpcid);
 	protected:
+		simsignal_t qlenSignal; /**< Signal for recording the number of objects stored */
+
+		simsignal_t qsizeSignal; /**< Signal for recording the size of objects stored in bytes */
+
+		simsignal_t overlayObjectsSignal; /**< Signal for recording the number of overlay objects stored */
+
+		simsignal_t rootObjectsSignal; /**< Signal for recording the number of root objects stored */
+
+		simsignal_t replicaObjectsSignal; /**< Signal for recording the number of group replica objects stored */
+
+		simsignal_t storeTimeSignal; /**< Signal for recording the time that was required to store each object */
+
+		simsignal_t rootStoreTimeSignal; /**< Signal for recording the time that was required to store a root object */
+
+		simsignal_t replicaStoreTimeSignal; /**< Signal for recording the time that was required to store a group replica object */
+
+		simsignal_t overlayStoreTimeSignal; /**< Signal for recording the time that was required to store an overlay object */
+
 		void finishApp();
 		virtual void initialize();
 		virtual void handleMessage(cMessage *msg);
