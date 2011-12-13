@@ -126,6 +126,7 @@ class Peer_logic: public cSimpleModule
 		TransportAddress getSuperPeerAddress();
 	protected:
 		virtual void initialize();
+		void finalize();
 		virtual void handleMessage(cMessage *msg);
 
 		/**
@@ -135,7 +136,7 @@ class Peer_logic: public cSimpleModule
 		 */
 		void handleP2PMsg(cMessage *msg);
 
-		void handleDHTMsg(cMessage *msg);
+		void handleResponseMsg(cMessage *msg);
 
 		/**
 		 * Send a join request to the directory server or a super peer

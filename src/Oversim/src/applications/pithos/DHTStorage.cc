@@ -161,13 +161,20 @@ void DHTStorage::handleRpcResponse(BaseResponseMessage* msg, const RpcState& sta
 	   RPC_SWITCH_END()
 }
 
+void DHTStorage::sendResponse(int responseType, unsigned int rpcid, bool isSuccess)
+{
+	ResponsePkt *response = new ResponsePkt();
+	response->setResponseType(responseType);
+	response->setPayloadType(RESPONSE);
+	response->setRpcid(rpcid);		//This allows the higher layer to know which RPC call is being acknowledged.
+	response->setIsSuccess(isSuccess);
+
+	send(response, "read");
+}
+
 void DHTStorage::handlePutResponse(DHTputCAPIResponse* msg, DHTStatsContext* context)
 {
     DHTEntry entry = {context->object.getBinaryValue(), simTime() + context->object.getTTL()};
-
-    ResponseMsg *response = new ResponseMsg();
-    response->setType(OVERLAY_PUT);
-    response->setRpcid(context->parent_rpcid);		//This allows the higher layer to know which RPC call is being acknowledged.
 
     //TODO: The complete global DHT test map should be removed from the DHT storage component for the real-world application.
     //This is ONLY required to test the correctness of the overlay itself and is effectively storing all data inserted into the overlay two-fold.
@@ -183,13 +190,11 @@ void DHTStorage::handlePutResponse(DHTputCAPIResponse* msg, DHTStatsContext* con
     if (msg->getIsSuccess()) {
         RECORD_STATS(numPutSuccess++);
         RECORD_STATS(globalStatistics->addStdDev("DHTTestApp: PUT Latency (s)", SIMTIME_DBL(simTime() - context->requestTime)));
-        response->setIsSuccess(true);
+        sendResponse(OVERLAY_PUT, context->parent_rpcid, true);
     } else {
         RECORD_STATS(numPutError++);
-        response->setIsSuccess(false);
+        sendResponse(OVERLAY_PUT, context->parent_rpcid, false);
     }
-
-    send(response, "read");
 
     delete context;
 }
@@ -205,7 +210,7 @@ void DHTStorage::store(GameObject *go, unsigned int rpcid)
 
 	if (!(this_peer->hasSuperPeer()))
 	{
-		//TODO: This error condition should be logged
+		sendResponse(OVERLAY_PUT, rpcid, false);	//Respond to the higher layer that the store request has failed
 		EV << "No super peer has been identified. The object will not be replicated in the Overlay\n";
 		delete(go);
 		return;

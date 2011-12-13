@@ -62,7 +62,7 @@ void Super_peer_logic::handleOverlayWrite(cMessage *msg)
 
 	//Send the game objects into the overlay
 	//FIXME: The hash string should still be adapted to allow for multiple replicas in the overlay
-	for (int i = 0; i < overlay_write_req->getValue(); i++)
+	for (unsigned int i = 0; i < overlay_write_req->getValue(); i++)
 	{
 		overlay_p = new overlayPkt(); // the message we'll send
 		overlay_p->setType(OVERLAY_WRITE); // set the message type to OVERLAY_WRITE

@@ -165,27 +165,15 @@ void Communicator::handleUDPMessage(cMessage* msg)
 	Packet *packet = check_and_cast<Packet *>(msg);
 	numReceived++;
 
-	if (packet->getPayloadType() == WRITE)
+	if ((packet->getPayloadType() == WRITE) || (packet->getPayloadType() == RESPONSE) || (packet->getPayloadType() == JOIN_ACCEPT))
 	{
-		send(msg, "peer_gate$o");
+		send(msg, "gs_gate$o");
 	}
 	else if (packet->getPayloadType() == INFORM)
 	{
 		send(msg, "peer_gate$o");
 	}
-	else if (packet->getPayloadType() == JOIN_ACCEPT)
-	{
-		send(msg, "gs_gate$o");
-	}
-	else if (packet->getPayloadType() == JOIN_REQ)
-	{
-		send(msg, "sp_group_gate$o");
-	}
-	else if (packet->getPayloadType() == OBJECT_ADD)
-	{
-		send(msg, "sp_group_gate$o");
-	}
-	else if (packet->getPayloadType() == OVERLAY_WRITE_REQ)
+	else if ((packet->getPayloadType() == JOIN_REQ) || (packet->getPayloadType() == OBJECT_ADD) || (packet->getPayloadType() == OVERLAY_WRITE_REQ))
 	{
 		send(msg, "sp_group_gate$o");
 	}
@@ -221,6 +209,12 @@ void Communicator::sendPacket(cMessage *msg)
 {
 	Packet *pkt = check_and_cast<Packet *>(msg);
 
+	if (underlayConfigurator->isInInitPhase())
+	{
+		delete(msg);
+		error("Underlay configurator is still in init phase, extend wait time.\n");
+	}
+
 	if (pkt->getDestinationAddress().isUnspecified())
 	{
 		delete(msg);
@@ -234,12 +228,6 @@ void Communicator::sendPacket(cMessage *msg)
 
 void Communicator::handleSPMsg(cMessage *msg)
 {
-	if (underlayConfigurator->isInInitPhase())
-	{
-		delete(msg);
-		error("Underlay configurator is still in init phase, extend wait time.\n");
-	}
-
 	if (strcmp(msg->getName(), "overlay_write") == 0)
 	{
 		overlayStore(msg);
@@ -249,12 +237,6 @@ void Communicator::handleSPMsg(cMessage *msg)
 
 void Communicator::handlePeerMsg(cMessage *msg)
 {
-	if (underlayConfigurator->isInInitPhase())
-	{
-		delete(msg);
-		error("Underlay configurator is still in init phase, extend wait time.\n");
-	}
-
 	sendPacket(msg);
 }
 
