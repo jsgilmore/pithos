@@ -73,32 +73,36 @@ class Peer_logic: public cSimpleModule
 		 */
 		class PendingRpcsEntry
 		{
-		public:
-			PendingRpcsEntry()
-			{
-				getCallMsg = NULL;
-				putCallMsg = NULL;
-				state = INIT;
-				hashVector = NULL;
-				numSent = 0;
-				numAvailableReplica = 0;
-				numFailed = 0;
-				numResponses = 0;
-			};
+			public:
+				PendingRpcsEntry()
+				{
+					getCallMsg = NULL;
+					putCallMsg = NULL;
+					state = INIT;
+					hashVector = NULL;
+					numSent = 0;
+					numAvailableReplica = 0;
+					numGroupFailed = 0;
+					numGroupSucceeded = 0;
+					numDHTSucceeded = 0;
+					numDHTFailed = 0;
+				};
 
-			typedef std::map<uint32_t, PendingRpcsEntry> PendingRpcs;
-			PendingRpcs pendingRpcs; /**< a map of all pending RPC operations */
+				typedef std::map<uint32_t, PendingRpcsEntry> PendingRpcs;
+				PendingRpcs pendingRpcs; /**< a map of all pending RPC operations */
 
-			RootObjectGetCAPICall* getCallMsg;
-			RootObjectPutCAPICall* putCallMsg;
-			PendingRpcsStates state;
-			NodeVector replica;
-			NodeVector* hashVector;
-			std::map<GameObject, NodeVector> hashes;
-			int numSent;
-			int numAvailableReplica;
-			int numFailed;
-			int numResponses;
+				RootObjectGetCAPICall* getCallMsg;
+				RootObjectPutCAPICall* putCallMsg;
+				PendingRpcsStates state;
+				NodeVector replica;
+				NodeVector* hashVector;
+				std::map<GameObject, NodeVector> hashes;
+				int numSent;
+				int numAvailableReplica;
+				int numGroupFailed;
+				int numGroupSucceeded;
+				int numDHTSucceeded;
+				int numDHTFailed;
 		};
 
 		friend std::ostream& operator<<(std::ostream& Stream, const PendingRpcsEntry& entry);
