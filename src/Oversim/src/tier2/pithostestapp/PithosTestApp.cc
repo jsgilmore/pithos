@@ -403,15 +403,23 @@ void PithosTestApp::finishApp()
     simtime_t time = globalStatistics->calcMeasuredLifetime(creationTime);
 
     if (time >= GlobalStatistics::MIN_MEASURED) {
-        // record scalar data
-        globalStatistics->addStdDev("PithosTestApp: Sent Total Messages/s", numSent / time);
+        // record scalar data per second
+        /*globalStatistics->addStdDev("PithosTestApp: Sent Total Messages/s", numSent / time);
         globalStatistics->addStdDev("PithosTestApp: Sent GET Messages/s", numGetSent / time);
         globalStatistics->addStdDev("PithosTestApp: Failed GET Requests/s", numGetError / time);
         globalStatistics->addStdDev("PithosTestApp: Successful GET Requests/s", numGetSuccess / time);
-
         globalStatistics->addStdDev("PithosTestApp: Sent PUT Messages/s", numPutSent / time);
         globalStatistics->addStdDev("PithosTestApp: Failed PUT Requests/s", numPutError / time);
-        globalStatistics->addStdDev("PithosTestApp: Successful PUT Requests/s", numPutSuccess / time);
+        globalStatistics->addStdDev("PithosTestApp: Successful PUT Requests/s", numPutSuccess / time);*/
+
+    	// record scalar data
+    	globalStatistics->addStdDev("PithosTestApp: Sent Total Messages", numSent);
+		globalStatistics->addStdDev("PithosTestApp: Sent GET Messages", numGetSent);
+		globalStatistics->addStdDev("PithosTestApp: Failed GET Requests", numGetError);
+		globalStatistics->addStdDev("PithosTestApp: Successful GET Requests", numGetSuccess);
+		globalStatistics->addStdDev("PithosTestApp: Sent PUT Messages", numPutSent);
+		globalStatistics->addStdDev("PithosTestApp: Failed PUT Requests", numPutError);
+		globalStatistics->addStdDev("PithosTestApp: Successful PUT Requests", numPutSuccess);
 
         if ((numGetSuccess + numGetError) > 0)
         {

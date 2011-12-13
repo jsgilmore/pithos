@@ -3,9 +3,7 @@ PhD TODO list:
 Upgrade to Omnet++ 4.2
 
 Ensure that all packet sizes are recorded and used for the puposes of calculating storage and retrieval latency.
-Add the same type of statistics to group storage as present in overlay storage
 
-Extend the pithos test application to allow for failure detection and the calculation of the success to failure ratio.
 Extend the pithos test application to add retrieve and modify testing.
 
 Implement object retrieval, update and time to live for group storage.
