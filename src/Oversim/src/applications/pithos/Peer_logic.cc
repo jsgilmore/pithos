@@ -43,12 +43,7 @@ void Peer_logic::initialize()
 
 void Peer_logic::finalize()
 {
-	// Iterate through 'pendingRpcs' and print out successes and failures
-	for (PendingRpcs::iterator it = pendingRpcs.begin() ; it != pendingRpcs.end(); ++it)
-	{
-	   //printf("RPC cals: Success: %d, Failure: %d\n", it->second.numResponses, it->second.numFailed);
-		EV << "RPC cals: Successes: " << it->second.numResponses << " , Failures: " << it->second.numFailed << endl;
-	}
+
 }
 
 bool Peer_logic::hasSuperPeer()
@@ -153,23 +148,44 @@ void Peer_logic::handleResponseMsg(cMessage *msg)
 
 	PendingRpcs::iterator it = pendingRpcs.find(response->getRpcid());
 
-	if (it == pendingRpcs.end()) // unknown request or reqeuest for already erased call
+	if (it == pendingRpcs.end()) // unknown request or request for already erased call
 		return;
 
-	if (response->getIsSuccess()) {
-		it->second.numResponses++;
-	} else {
-		it->second.numFailed++;
-	}
-
-	if (it->second.numResponses + it->second.numFailed == it->second.numSent)
+	//Check what type of PUT response was received and increment the successes or failures according to type
+	if (response->getResponseType() == GROUP_PUT)
 	{
-		if (it->second.numResponses > it->second.numFailed)
+		if (response->getIsSuccess())
+			it->second.numGroupSucceeded++;
+		else it->second.numGroupFailed++;
+
+	} else if (response->getResponseType() == OVERLAY_PUT)
+	{
+		if (response->getIsSuccess())
+			it->second.numDHTSucceeded++;
+		else it->second.numDHTFailed++;
+	} else error("Unknown put response type received");
+
+	//Only determine success of failure after all responses have been received
+	if (it->second.numGroupSucceeded + it->second.numGroupFailed +
+			it->second.numDHTSucceeded + it->second.numDHTFailed == it->second.numSent)
+	{
+		//Ensure that more DHT puts succeeded than failed
+		if (it->second.numDHTSucceeded > it->second.numDHTFailed)
 		{
-			RootObjectPutCAPIResponse* capiPutRespMsg = new RootObjectPutCAPIResponse();
-			capiPutRespMsg->setIsSuccess(true);
-			communicator->externallySendRpcResponse(it->second.putCallMsg, capiPutRespMsg);
-			pendingRpcs.erase(response->getRpcid());
+			//Ensure that more group puts succeeded than failed
+			if (it->second.numGroupSucceeded > it->second.numGroupFailed)
+			{
+				RootObjectPutCAPIResponse* capiPutRespMsg = new RootObjectPutCAPIResponse();
+				capiPutRespMsg->setIsSuccess(true);
+				communicator->externallySendRpcResponse(it->second.putCallMsg, capiPutRespMsg);
+				pendingRpcs.erase(response->getRpcid());
+			} else
+			{
+				RootObjectPutCAPIResponse* capiPutRespMsg = new RootObjectPutCAPIResponse();
+				capiPutRespMsg->setIsSuccess(false);
+				communicator->externallySendRpcResponse(it->second.putCallMsg, capiPutRespMsg);
+				pendingRpcs.erase(response->getRpcid());
+			}
 		} else
 		{
 			RootObjectPutCAPIResponse* capiPutRespMsg = new RootObjectPutCAPIResponse();
