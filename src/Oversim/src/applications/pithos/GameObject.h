@@ -57,7 +57,7 @@ class GameObject : public cOwnedObject
 
 		//If no ttl is given and the object is stored, it will not be able to exist in storage
 		//creationTime is initialised to an empty simtime_t object. Values such as zero do not work, since the scale exponent for simtime_t might not have been defined.
-		GameObject(const char *name="GameObject", int o_type=ROOT, int64_t o_size=0, simtime_t o_creationTime=simtime_t(), int o_ttl=0);
+		GameObject(const char *name="GameObject", int o_type=ROOT, int64_t o_size=0, simtime_t o_creationTime=SIMTIME_ZERO, int o_ttl=0);
 		GameObject(const GameObject& other);
 		GameObject(const BinaryValue& binval);
 		virtual ~GameObject();
