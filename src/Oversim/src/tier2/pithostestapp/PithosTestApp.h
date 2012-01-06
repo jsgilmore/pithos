@@ -66,10 +66,13 @@ private:
 		public:
 			bool measurementPhase;
 			simtime_t requestTime;
+			OverlayKey key;
 			GameObject go;
 
-			PithosStatsContext(bool measurementPhase, simtime_t requestTime, const GameObject& go) :
-				measurementPhase(measurementPhase), requestTime(requestTime), go(go) {};
+			PithosStatsContext(bool measurementPhase, simtime_t requestTime, const GameObject& go = GameObject::UNSPECIFIED_OBJECT) :
+				measurementPhase(measurementPhase), requestTime(requestTime), key(OverlayKey::UNSPECIFIED_KEY), go(go) {};
+			PithosStatsContext(bool measurementPhase, simtime_t requestTime, const OverlayKey& key) :
+							measurementPhase(measurementPhase), requestTime(requestTime), key(key), go(GameObject::UNSPECIFIED_OBJECT) {};
     };
 
     void initializeApp(int stage);
@@ -78,11 +81,6 @@ private:
      * Get a random key of the hashmap
      */
     OverlayKey getRandomKey();
-
-    /**
-     * generate a random human readable binary value
-     */
-    BinaryValue generateRandomValue();
 
     void finishApp();
 
@@ -98,7 +96,7 @@ private:
      * @param msg get response message
      * @param context context object used for collecting statistics
      */
-    //virtual void handleGetResponse(DHTgetCAPIResponse* msg, DHTStatsContext* context);
+    void handleGetResponse(RootObjectGetCAPIResponse* msg, PithosStatsContext* context);
 
     /**
      * processes put responses
@@ -118,15 +116,6 @@ private:
      * @param msg self-message
      */
     virtual void handleTimerEvent(cMessage* msg);
-
-    /**
-     * handleTraceMessage gets called of handleMessage(cMessage* msg)
-     * if a message arrives at trace_in. The command included in this
-     * message should be parsed and handled.
-     *
-     * @param msg the command message to handle
-     */
-    virtual void handleTraceMessage(cMessage* msg);
 
     virtual void handleNodeLeaveNotification();
 

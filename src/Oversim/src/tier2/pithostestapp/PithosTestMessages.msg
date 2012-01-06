@@ -15,10 +15,12 @@
 
 cplusplus {{
 #include "CommonMessages_m.h"
+#include "GameObject.h"
 }}
 
 class BaseCallMessage;
 class BaseResponseMessage;
+class GameObject;
 
 class noncobject OverlayKey;
 class noncobject DhtDumpEntry;
@@ -66,6 +68,6 @@ packet RootObjectPutCAPIResponse extends BaseResponseMessage
 //
 packet RootObjectGetCAPIResponse extends BaseResponseMessage
 {
-    DhtDumpEntry result[]; 
+    GameObject result; 
     bool isSuccess;
 }

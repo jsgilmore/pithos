@@ -16,24 +16,27 @@
 cplusplus {{
 #include <TransportAddress.h>
 #include "PeerData.h"
+#include "OverlayKey.h"
 }}
 
 
 // import the IP Address class
 class noncobject TransportAddress;
+class noncobject OverlayKey;
 class noncobject PeerData;
 
 enum PacketTypes
 {
     INFORM = 1;
-    WRITE = 2;		//A packet sent over the network, containing a game object to be stored.
+    WRITE = 2;				//A UDP packet sent over the group network, containing a game object to be stored.
     OVERLAY_WRITE_REQ = 3;
     SUPER_PEER_ADD = 4;
     JOIN_REQ = 5;
     JOIN_ACCEPT = 6;
-    STORE_REQ = 7;
-    OBJECT_ADD = 8;
-    RESPONSE = 9;
+    STORE_REQ = 7;			//A packet sent from peer logic to the lower layers, requesting an object be stored
+    RETRIEVE_REQ = 8;		//A packet sent from peer logic to the lower layers, requesting an object be retrieved
+    OBJECT_ADD = 9;
+    RESPONSE = 10;
 };
 
 enum OverlayTypes 
@@ -67,9 +70,15 @@ packet Packet
     int payloadType enum(PacketTypes);
 }
 
-packet groupPkt extends Packet
+packet ValuePkt extends Packet
 {
     unsigned int value;
+}
+
+packet OverlayKeyPkt extends Packet
+{
+    unsigned int value;
+    OverlayKey key;
 }
 
 message ResponsePkt extends Packet
