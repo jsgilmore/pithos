@@ -57,7 +57,7 @@ class DHTStorage : public cSimpleModule
 				unsigned int parent_rpcid;
 				GameObject object;
 
-				DHTStatsContext(bool measurementPhase, simtime_t requestTime, const OverlayKey& key, unsigned int parent_rpcid = 0, const GameObject& object = GameObject::UNSPECIFIED_OBJECT) :
+				DHTStatsContext(bool measurementPhase, simtime_t requestTime, const OverlayKey& key, unsigned int parent_rpcid=0, const GameObject& object = GameObject::UNSPECIFIED_OBJECT) :
 					measurementPhase(measurementPhase), requestTime(requestTime), key(key), parent_rpcid(parent_rpcid), object(object) {};
 		};
 
@@ -91,15 +91,18 @@ class DHTStorage : public cSimpleModule
 
 		bool nodeIsLeavingSoon; //!< true if the node is going to be killed shortly
 
-		void store(GameObject *go, unsigned int rpcid);
+		void request_retrieve(Packet *pkt);
 
-		void sendResponse(int responseType, unsigned int rpcid, bool isSuccess);
+		void send_forstore(Packet *pkt);
+
+		void sendResponse(int responseType, unsigned int rpcid, bool isSuccess, const BinaryValue& value = BinaryValue::UNSPECIFIED_VALUE);
 
 	protected:
 		void finish();
 		virtual void initialize();
 		virtual void handleMessage(cMessage *msg);
 
+		void handleGetResponse(DHTgetCAPIResponse* msg, DHTStatsContext* context);
 		void handlePutResponse(DHTputCAPIResponse* msg, DHTStatsContext* context);
 };
 

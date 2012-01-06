@@ -61,7 +61,10 @@ class Peer_logic: public cSimpleModule
 
 		enum PendingRpcsStates {
 			INIT = 0,
-			PUT_SENT = 2
+			LOOKUP_STARTED = 1,
+			GET_HASH_SENT = 2,
+			GET_VALUE_SENT = 3,
+			PUT_SENT = 4
 		};
 
 		/**
@@ -82,10 +85,16 @@ class Peer_logic: public cSimpleModule
 					hashVector = NULL;
 					numSent = 0;
 					numAvailableReplica = 0;
-					numGroupFailed = 0;
-					numGroupSucceeded = 0;
-					numDHTSucceeded = 0;
-					numDHTFailed = 0;
+
+					numGroupPutFailed = 0;
+					numGroupPutSucceeded = 0;
+					numDHTPutSucceeded = 0;
+					numDHTPutFailed = 0;
+
+					numGroupGetFailed = 0;
+					numGroupGetSucceeded = 0;
+					numDHTGetSucceeded = 0;
+					numDHTGetFailed = 0;
 				};
 
 				typedef std::map<uint32_t, PendingRpcsEntry> PendingRpcs;
@@ -99,10 +108,16 @@ class Peer_logic: public cSimpleModule
 				std::map<GameObject, NodeVector> hashes;
 				int numSent;
 				int numAvailableReplica;
-				int numGroupFailed;
-				int numGroupSucceeded;
-				int numDHTSucceeded;
-				int numDHTFailed;
+
+				int numGroupPutFailed;
+				int numGroupPutSucceeded;
+				int numDHTPutSucceeded;
+				int numDHTPutFailed;
+
+				int numGroupGetFailed;
+				int numGroupGetSucceeded;
+				int numDHTGetSucceeded;
+				int numDHTGetFailed;
 		};
 
 		friend std::ostream& operator<<(std::ostream& Stream, const PendingRpcsEntry& entry);
@@ -120,12 +135,18 @@ class Peer_logic: public cSimpleModule
 		bool hasSuperPeer();
 
 		/**
-		 * Handle a request from the higher layer for store, retrieve or update
+		 * Handle a request from the higher layer for store
 		 *
 		 * @param capiPutMsg the request containing the GameObject
 		 */
 		void handlePutCAPIRequest(RootObjectPutCAPICall* capiPutMsg);
-		//void handlePutCAPIRequest(const GameObject &go);
+
+		/**
+		 * Handle a request from the higher layer for retrieve
+		 *
+		 * @param capiGetMsg the request containing the OverlayKey
+		 */
+		void handleGetCAPIRequest(RootObjectGetCAPICall* capiGetMsg);
 
 		TransportAddress getSuperPeerAddress();
 	protected:
@@ -139,6 +160,10 @@ class Peer_logic: public cSimpleModule
 		 * @param msg the message received
 		 */
 		void handleP2PMsg(cMessage *msg);
+
+		void adjustPutSFRatio(PendingRpcsEntry entry, unsigned int rpcid);
+
+		void adjustGetSFRatio(PendingRpcsEntry entry, ResponsePkt *response);
 
 		void handleResponseMsg(cMessage *msg);
 

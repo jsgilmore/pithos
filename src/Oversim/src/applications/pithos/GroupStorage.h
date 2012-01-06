@@ -75,7 +75,7 @@ class GroupStorage : public cSimpleModule
 		 * @param write A pointer to the write packet to be created and filled
 		 * @param rpcid The RPC ID of the original request from the higher layer
 		 */
-		void createWritePkt(groupPkt **write, unsigned int rpcid);
+		void createWritePkt(ValuePkt **write, unsigned int rpcid);
 
 		/**
 		 * Send a message to the super peer informing it about a new group object and a list of peers that store it.
