@@ -69,7 +69,8 @@ bool operator==(const GameObject& object1, const GameObject& object2)
 	if (strcmp(object1.objectName, object2.objectName) != 0)
 		return false;
 
-	if (object1.creationTime != object2.creationTime)
+	//A creation time difference of no more than one is used to account for inaccuracies when converting from the float string of the BinaryValue to a float variable
+	if ((object1.creationTime - object2.creationTime) > 1)
 		return false;
 
 	return true;
@@ -93,7 +94,7 @@ GameObject& GameObject::operator=(const BinaryValue& binval)
 		strcpy(objectName, "Unspecified");
 		size = 0;
 		type = ROOT;
-		creationTime = simtime_t();
+		creationTime = SIMTIME_ZERO;
 		ttl = 0;
 
 		return *this;
