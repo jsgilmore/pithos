@@ -204,12 +204,12 @@ void PithosTestApp::handleGetResponse(RootObjectGetCAPIResponse* msg, PithosStat
         if (msg->getResult() == *entry)
         {
             RECORD_STATS(numGetSuccess++);
-            //cout << "PithosTestApp: wrong value" << endl;
-            //cout << "value: " << msg->getResult(0).getValue() << endl;
+            //cout << "PithosTestApp: success (2)" << endl;
             return;
         } else {
             RECORD_STATS(numGetError++);
-            //cout << "PithosTestApp: success (2)" << endl;
+            //cout << "PithosTestApp: wrong value" << endl;
+            //cout << "value: " << msg->getResult(0).getValue() << endl;
             return;
         }
     }
