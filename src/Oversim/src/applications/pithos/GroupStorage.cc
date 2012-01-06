@@ -133,13 +133,13 @@ int GroupStorage::getReplicaNr(unsigned int rpcid)
 	return replicas;
 }
 
-void GroupStorage::createWritePkt(groupPkt **write, unsigned int rpcid)
+void GroupStorage::createWritePkt(ValuePkt **write, unsigned int rpcid)
 {
 	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
 	TransportAddress sourceAdr(thisNode->getIp(), thisNode->getPort());
 
 	//Create the packet that will house the game object
-	(*write) = new groupPkt();
+	(*write) = new ValuePkt();
 	(*write)->setByteLength(4+4+4+8);	//Source address, dest address, type, object name ID and object size
 	(*write)->setPayloadType(WRITE);
 	(*write)->setValue(rpcid);
@@ -171,8 +171,8 @@ void GroupStorage::send_forstore(GameObject *go, unsigned int rpcid)
 	unsigned int i;
 	simtime_t sendDelay;
 	GameObject *go_dup;
-	groupPkt *write = NULL;
-	groupPkt *write_dup;
+	ValuePkt *write = NULL;
+	ValuePkt *write_dup;
 
 	unsigned int replicas;
 	TransportAddress dest_adr;
@@ -281,7 +281,7 @@ int GroupStorage::getStorageFiles()
 void GroupStorage::sendUDPResponse(cMessage *msg)
 {
 	ResponsePkt *response = new ResponsePkt();
-	groupPkt *store_req = check_and_cast<groupPkt *>(msg);
+	ValuePkt *store_req = check_and_cast<ValuePkt *>(msg);
 
 	response->setSourceAddress(store_req->getDestinationAddress());
 	response->setDestinationAddress(store_req->getSourceAddress());
@@ -372,7 +372,7 @@ void GroupStorage::handleMessage(cMessage *msg)
 	}
 	else if (packet->getPayloadType() == STORE_REQ)
 	{
-		groupPkt *store_req = check_and_cast<groupPkt *>(msg);
+		ValuePkt *store_req = check_and_cast<ValuePkt *>(msg);
 
 		GameObject *go = (GameObject *)msg->removeObject("GameObject");
 		if (go == NULL)
@@ -382,6 +382,9 @@ void GroupStorage::handleMessage(cMessage *msg)
 
 		delete(go);		//Only duplicates of the game object are stored, so the original must be deleted
 		delete(msg);
+	} else if (packet->getPayloadType() == RETRIEVE_REQ)
+	{
+		delete(msg);	//The group request path should start here
 	}
 	else error("Group storage received an unknown packet");
 }

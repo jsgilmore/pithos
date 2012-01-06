@@ -53,7 +53,7 @@ void Super_peer_logic::finish()
 void Super_peer_logic::handleOverlayWrite(cMessage *msg)
 {
 	overlayPkt *overlay_p;
-	groupPkt *overlay_write_req = check_and_cast<groupPkt *>(msg);
+	ValuePkt *overlay_write_req = check_and_cast<ValuePkt *>(msg);
 	GameObject *go = (GameObject *)overlay_write_req->removeObject("GameObject");
 
 
@@ -151,7 +151,7 @@ void Super_peer_logic::GroupStore(overlayPkt *overlay_p)
 {
 	TransportAddress dest_adr;
 	GameObject *go = (GameObject *)overlay_p->removeObject("GameObject");
-	groupPkt *group_p;
+	ValuePkt *group_p;
 	ObjectInfo object_info;
 
 	NodeHandle thisNode = ((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode();
@@ -174,7 +174,7 @@ void Super_peer_logic::GroupStore(overlayPkt *overlay_p)
 
 	go->setType(OVERLAY);
 
-	group_p = new groupPkt();
+	group_p = new ValuePkt();
 	group_p->setSourceAddress(sourceAdr);
 	group_p->setDestinationAddress(dest_adr);
 	group_p->setPayloadType(WRITE);

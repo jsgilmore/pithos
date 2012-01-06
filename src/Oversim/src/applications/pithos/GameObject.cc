@@ -28,6 +28,7 @@ GameObject::~GameObject()
 
 GameObject::GameObject(const char *name, int o_type, int64_t o_size, simtime_t o_creationTime, int o_ttl) : cOwnedObject(name)
 {
+	strcpy(objectName, "Unspecified");
 	type = o_type;
 	size = o_size;
 	creationTime = o_creationTime;
@@ -54,28 +55,63 @@ GameObject& GameObject::operator=(const GameObject& other)
 	return *this;
 }
 
-GameObject::GameObject(const BinaryValue& binval)
+bool operator==(const GameObject& object1, const GameObject& object2)
+{
+	if (object1.size != object2.size)
+		return false;
+
+	if (object1.type != object2.type)
+		return false;
+
+	if (object1.ttl != object2.ttl)
+		return false;
+
+	if (strcmp(object1.objectName, object2.objectName) != 0)
+		return false;
+
+	if (object1.creationTime != object2.creationTime)
+		return false;
+
+	return true;
+}
+
+bool operator!=(const GameObject& object1, const GameObject& object2)
+{
+	return !(object1 == object2);
+}
+
+GameObject::GameObject(const BinaryValue& binval) : cOwnedObject("GameObject")
 {
 	operator=(binval);
 }
 
 GameObject& GameObject::operator=(const BinaryValue& binval)
 {
-	cOwnedObject("GameObject");
+	//If an unspecified BinaryValue was received, return an unspecified GameObject
+	if (binval == BinaryValue::UNSPECIFIED_VALUE)
+	{
+		strcpy(objectName, "Unspecified");
+		size = 0;
+		type = ROOT;
+		creationTime = simtime_t();
+		ttl = 0;
 
-	std::string buf;			// Have a buffer string
+		return *this;
+	}
+
+	std::string buf;			//Have a buffer string
 	std::stringstream ss;		//Create a string stream
 
 	//This part tokenises the string value of BinaryValue in order to repopulate GameObject
-	ss << binval;				// Insert the string into a stream
-	std::vector<std::string> tokens; // Create vector to hold our words
+	ss << binval;						//Insert the string into a stream
+	std::vector<std::string> tokens;	//Create vector to hold our words
 
 	while (ss >> buf)
 		tokens.push_back(buf);
 
 	//After the string has been tokenised, we have to use the tokens to populate the variables
 	strcpy(objectName, (tokens[0]).c_str());
-	size = atol((tokens[1]).c_str());		//I'm quite sure this long will be 64 bits in a 64 bit system, but unsure about 32 bit systems
+	size = atol((tokens[1]).c_str());		//TODO: I'm quite sure this long will be 64 bits in a 64 bit system, but unsure about 32 bit systems
 	type = atoi((tokens[2]).c_str());
 	creationTime = atof((tokens[3]).c_str());
 	ttl = atoi((tokens[4]).c_str());
@@ -192,4 +228,9 @@ BinaryValue GameObject::getBinaryValue()
 	BinaryValue binval(info());
 
 	return binval;
+}
+
+bool GameObject::isUnspecified()
+{
+	return (*this == GameObject::UNSPECIFIED_OBJECT);
 }

@@ -103,6 +103,119 @@ void PithosTestApp::initializeApp(int stage)
     pithostestmod_timer = new cMessage("pithostest_mod_timer");
 }
 
+void PithosTestApp::handleRpcResponse(BaseResponseMessage* msg, const RpcState& state, simtime_t rtt)
+{
+    RPC_SWITCH_START(msg)
+    RPC_ON_RESPONSE( RootObjectPutCAPI ) {
+        handlePutResponse(_RootObjectPutCAPIResponse, check_and_cast<PithosStatsContext*>(state.getContext()));
+        EV << "[PithosTestApp::handleRpcResponse()]\n"
+           << "    Pithos Put RPC Response received: id=" << state.getId()
+           << " msg=" << *_RootObjectPutCAPIResponse << " rtt=" << rtt
+           << endl;
+        break;
+    }
+    RPC_ON_RESPONSE(RootObjectGetCAPI)
+    {
+        handleGetResponse(_RootObjectGetCAPIResponse, check_and_cast<PithosStatsContext*>(state.getContext()));
+        EV << "[PithosTestApp::handleRpcResponse()]\n"
+           << "    Pithos Get RPC Response received: id=" << state.getId()
+           << " msg=" << *_RootObjectGetCAPIResponse << " rtt=" << rtt
+           << endl;
+        break;
+    }
+    RPC_SWITCH_END()
+}
+
+void PithosTestApp::handlePutResponse(RootObjectPutCAPIResponse* msg, PithosStatsContext* context)
+{
+    GameObject object(context->go);
+
+    //globalPithosTestMap->insertEntry(context->go.getHash(), context->go);
+    globalPithosTestMap->insertEntry(object.getHash(), object);
+
+    EV << "Storing pithos entry: " << object.getHash() << endl;
+
+    if (context->measurementPhase == false) {
+        // don't count response, if the request was not sent
+        // in the measurement phase
+        delete context;
+        return;
+    }
+
+    if (msg->getIsSuccess()) {
+        RECORD_STATS(numPutSuccess++);
+        RECORD_STATS(globalStatistics->addStdDev("PithosTestApp: PUT Latency (s)", SIMTIME_DBL(simTime() - context->requestTime)));
+    } else {
+        RECORD_STATS(numPutError++);
+    }
+
+    delete context;
+}
+
+void PithosTestApp::handleGetResponse(RootObjectGetCAPIResponse* msg, PithosStatsContext* context)
+{
+    if (context->measurementPhase == false) {
+        // don't count response, if the request was not sent
+        // in the measurement phase
+        delete context;
+        return;
+    }
+
+    RECORD_STATS(globalStatistics->addStdDev("PithosTestApp: GET Latency (s)", SIMTIME_DBL(simTime() - context->requestTime)));
+
+    if (!(msg->getIsSuccess())) {
+        //cout << "PithosTestApp: success == false" << endl;
+        RECORD_STATS(numGetError++);
+        delete context;
+        return;
+    }
+
+    const GameObject *entry = globalPithosTestMap->findEntry(context->key);
+
+    if (entry == NULL) {
+        //unexpected key
+        RECORD_STATS(numGetError++);
+        //cout << "PithosTestApp: unexpected key" << endl;
+        delete context;
+        return;
+    }
+
+    if (simTime() > entry->getCreationTime() + entry->getTTL()) {
+        //this key doesn't exist anymore in Pithos, delete it in our hashtable
+
+    	globalPithosTestMap->eraseEntry(context->key);
+        delete context;
+
+        if (msg->getResult() == GameObject::UNSPECIFIED_OBJECT) {
+            RECORD_STATS(numGetSuccess++);
+            //cout << "PithosTestApp: deleted key still available" << endl;
+            return;
+        } else {
+            RECORD_STATS(numGetError++);
+            //cout << "PithosTestApp: success (1)" << endl;
+            return;
+        }
+    } else {
+        delete context;
+
+        EV << "Received result object: " << msg->getResult() << endl;
+        EV << "Expected result object: " << entry << endl;
+
+        if (msg->getResult() == *entry)
+        {
+            RECORD_STATS(numGetSuccess++);
+            //cout << "PithosTestApp: wrong value" << endl;
+            //cout << "value: " << msg->getResult(0).getValue() << endl;
+            return;
+        } else {
+            RECORD_STATS(numGetError++);
+            //cout << "PithosTestApp: success (2)" << endl;
+            return;
+        }
+    }
+
+}
+
 void PithosTestApp::sendPutRequest()
 {
 	char name[41];
@@ -125,8 +238,6 @@ void PithosTestApp::sendPutRequest()
 
 	RECORD_STATS(numSent++; numPutSent++);
 	sendInternalRpcCall(ROOTOBJECTSTORE_COMP, capiPutMsg, new PithosStatsContext(globalStatistics->isMeasuring(), simTime(), *go));
-	//sendInternalRpcCall(ROOTOBJECTSTORE_COMP, capiPutMsg, new DHTStatsContext(globalStatistics->isMeasuring(), simTime(), destKey, dhtPutMsg->getValue()));
-	//sendInternalRpcCall(ROOTOBJECTSTORE_COMP, capiPutMsg);
 }
 
 void PithosTestApp::handleLowerMessage (cMessage *msg)
@@ -143,7 +254,7 @@ void PithosTestApp::handleLowerMessage (cMessage *msg)
 
 			    if (mean > 0) {
 			        scheduleAt(simTime() + truncnormal(mean, deviation), pithostestput_timer);
-			        //scheduleAt(simTime() + truncnormal(mean + mean / 3, deviation), pithostestget_timer);
+			        scheduleAt(simTime() + truncnormal(mean + mean / 3, deviation), pithostestget_timer);
 			        //scheduleAt(simTime() + truncnormal(mean + 2 * mean / 3, deviation), pithostestmod_timer);
 			    }
 			    else error("The mean message creation time must be greater than zero.");
@@ -153,160 +264,6 @@ void PithosTestApp::handleLowerMessage (cMessage *msg)
 		delete(msg);
 	}
 	else error("Game received unknown message\n");
-}
-
-void PithosTestApp::handleRpcResponse(BaseResponseMessage* msg, const RpcState& state, simtime_t rtt)
-{
-    RPC_SWITCH_START(msg)
-    RPC_ON_RESPONSE( RootObjectPutCAPI ) {
-        handlePutResponse(_RootObjectPutCAPIResponse, check_and_cast<PithosStatsContext*>(state.getContext()));
-        EV << "[PithosTestApp::handleRpcResponse()]\n"
-           << "    DHT Put RPC Response received: id=" << state.getId()
-           << " msg=" << *_RootObjectPutCAPIResponse << " rtt=" << rtt
-           << endl;
-        break;
-    }
-    /*RPC_ON_RESPONSE(DHTgetCAPI)
-    {
-        handleGetResponse(_DHTgetCAPIResponse, check_and_cast<DHTStatsContext*>(state.getContext()));
-        EV << "[PithosTestApp::handleRpcResponse()]\n"
-           << "    DHT Get RPC Response received: id=" << state.getId()
-           << " msg=" << *_DHTgetCAPIResponse << " rtt=" << rtt
-           << endl;
-        break;
-    }*/
-    RPC_SWITCH_END()
-}
-
-void PithosTestApp::handlePutResponse(RootObjectPutCAPIResponse* msg, PithosStatsContext* context)
-{
-    GameObject object(context->go);
-
-    globalPithosTestMap->insertEntry(object.getHash(), object);
-
-    if (context->measurementPhase == false) {
-        // don't count response, if the request was not sent
-        // in the measurement phase
-        delete context;
-        return;
-    }
-
-    if (msg->getIsSuccess()) {
-        RECORD_STATS(numPutSuccess++);
-        RECORD_STATS(globalStatistics->addStdDev("PithosTestApp: PUT Latency (s)", SIMTIME_DBL(simTime() - context->requestTime)));
-    } else {
-        RECORD_STATS(numPutError++);
-    }
-
-    delete context;
-}
-
-/*
-void PithosTestApp::handleGetResponse(DHTgetCAPIResponse* msg,
-                                   DHTStatsContext* context)
-{
-    if (context->measurementPhase == false) {
-        // don't count response, if the request was not sent
-        // in the measurement phase
-        delete context;
-        return;
-    }
-
-    RECORD_STATS(globalStatistics->addStdDev("PithosTestApp: GET Latency (s)", SIMTIME_DBL(simTime() - context->requestTime)));
-
-    if (!(msg->getIsSuccess())) {
-        //cout << "PithosTestApp: success == false" << endl;
-        RECORD_STATS(numGetError++);
-        delete context;
-        return;
-    }
-
-    const DHTEntry* entry = globalDhtTestMap->findEntry(context->key);
-
-    if (entry == NULL) {
-        //unexpected key
-        RECORD_STATS(numGetError++);
-        //cout << "PithosTestApp: unexpected key" << endl;
-        delete context;
-        return;
-    }
-
-    if (simTime() > entry->endtime) {
-        //this key doesn't exist anymore in the DHT, delete it in our hashtable
-
-        globalDhtTestMap->eraseEntry(context->key);
-        delete context;
-
-        if (msg->getResultArraySize() > 0) {
-            RECORD_STATS(numGetError++);
-            //cout << "PithosTestApp: deleted key still available" << endl;
-            return;
-        } else {
-            RECORD_STATS(numGetSuccess++);
-            //cout << "PithosTestApp: success (1)" << endl;
-            return;
-        }
-    } else {
-        delete context;
-        if ((msg->getResultArraySize() > 0) && (msg->getResult(0).getValue() != entry->value)) {
-            RECORD_STATS(numGetError++);
-            //cout << "PithosTestApp: wrong value" << endl;
-            //cout << "value: " << msg->getResult(0).getValue() << endl;
-            return;
-        } else {
-            RECORD_STATS(numGetSuccess++);
-            //cout << "PithosTestApp: success (2)" << endl;
-            return;
-        }
-    }
-
-}*/
-
-void PithosTestApp::handleTraceMessage(cMessage* msg)
-{
-    char* cmd = new char[strlen(msg->getName()) + 1];
-    strcpy(cmd, msg->getName());
-
-    if (strlen(msg->getName()) < 5) {
-        delete[] cmd;
-        delete msg;
-        return;
-    }
-
-    if (strncmp(cmd, "PUT ", 4) == 0) {
-        // Generate key
-        char* buf = cmd + 4;
-
-        while (!isspace(buf[0])) {
-            if (buf[0] == '\0')
-                throw cRuntimeError("Error parsing PUT command");
-            buf++;
-        }
-
-        buf[0] = '\0';
-        BinaryValue b(cmd + 4);
-        OverlayKey destKey(OverlayKey::sha1(b));
-
-        // get value
-        buf++;
-
-        RECORD_STATS(numSent++; numPutSent++);
-        sendPutRequest();
-    } /*else if (strncmp(cmd, "GET ", 4) == 0) {
-        // Get key
-        BinaryValue b(cmd + 4);
-        OverlayKey key(OverlayKey::sha1(b));
-
-        DHTgetCAPICall* dhtGetMsg = new DHTgetCAPICall();
-        dhtGetMsg->setKey(key);
-        RECORD_STATS(numSent++; numGetSent++);
-        sendInternalRpcCall(OVERLAYSTORAGE_COMP, dhtGetMsg, new DHTStatsContext(globalStatistics->isMeasuring(), simTime(), key));
-    }*/ else {
-        throw cRuntimeError("Unknown trace command; only GET and PUT are allowed");
-    }
-
-    delete[] cmd;
-    delete msg;
 }
 
 void PithosTestApp::handleTimerEvent(cMessage* msg)
@@ -327,8 +284,7 @@ void PithosTestApp::handleTimerEvent(cMessage* msg)
 
         sendPutRequest();
 
-
-    } /*else if (msg->isName("pithostest_get_timer"))
+    } else if (msg->isName("pithostest_get_timer"))
     {
         scheduleAt(simTime() + truncnormal(mean, deviation), msg);
 
@@ -339,7 +295,9 @@ void PithosTestApp::handleTimerEvent(cMessage* msg)
             return;
         }
 
-        const OverlayKey& key = globalDhtTestMap->getRandomKey();
+        const OverlayKey& key = globalPithosTestMap->getRandomKey();
+
+        EV << "Retrieving key: " << key << endl;
 
         if (key.isUnspecified()) {
             EV << "[PithosTestApp::handleTimerEvent() @ " << thisNode.getIp()
@@ -349,12 +307,12 @@ void PithosTestApp::handleTimerEvent(cMessage* msg)
             return;
         }
 
-        DHTgetCAPICall* dhtGetMsg = new DHTgetCAPICall();
-        dhtGetMsg->setKey(key);
+       	RootObjectGetCAPICall* capiGetMsg = new RootObjectGetCAPICall();
+       	capiGetMsg->setKey(key);
         RECORD_STATS(numSent++; numGetSent++);
 
-        sendInternalRpcCall(OVERLAYSTORAGE_COMP, dhtGetMsg, new DHTStatsContext(globalStatistics->isMeasuring(), simTime(), key));
-    } else if (msg->isName("pithostest_mod_timer"))
+        sendInternalRpcCall(ROOTOBJECTSTORE_COMP, capiGetMsg, new PithosStatsContext(globalStatistics->isMeasuring(), simTime(), key));
+    }/* else if (msg->isName("pithostest_mod_timer"))
     {
         scheduleAt(simTime() + truncnormal(mean, deviation), msg);
 
@@ -380,18 +338,6 @@ void PithosTestApp::handleTimerEvent(cMessage* msg)
         sendInternalRpcCall(OVERLAYSTORAGE_COMP, dhtPutMsg, new DHTStatsContext(globalStatistics->isMeasuring(), simTime(), key, dhtPutMsg->getValue()));
     }*/
 }
-/*
-BinaryValue PithosTestApp::generateRandomValue()
-{
-    char value[DHTTESTAPP_VALUE_LEN + 1];
-
-    for (int i = 0; i < DHTTESTAPP_VALUE_LEN; i++) {
-        value[i] = intuniform(0, 25) + 'a';
-    }
-
-    value[DHTTESTAPP_VALUE_LEN] = '\0';
-    return BinaryValue(value);
-}*/
 
 void PithosTestApp::handleNodeLeaveNotification()
 {
@@ -403,15 +349,6 @@ void PithosTestApp::finishApp()
     simtime_t time = globalStatistics->calcMeasuredLifetime(creationTime);
 
     if (time >= GlobalStatistics::MIN_MEASURED) {
-        // record scalar data per second
-        /*globalStatistics->addStdDev("PithosTestApp: Sent Total Messages/s", numSent / time);
-        globalStatistics->addStdDev("PithosTestApp: Sent GET Messages/s", numGetSent / time);
-        globalStatistics->addStdDev("PithosTestApp: Failed GET Requests/s", numGetError / time);
-        globalStatistics->addStdDev("PithosTestApp: Successful GET Requests/s", numGetSuccess / time);
-        globalStatistics->addStdDev("PithosTestApp: Sent PUT Messages/s", numPutSent / time);
-        globalStatistics->addStdDev("PithosTestApp: Failed PUT Requests/s", numPutError / time);
-        globalStatistics->addStdDev("PithosTestApp: Successful PUT Requests/s", numPutSuccess / time);*/
-
     	// record scalar data
     	globalStatistics->addStdDev("PithosTestApp: Sent Total Messages", numSent);
 		globalStatistics->addStdDev("PithosTestApp: Sent GET Messages", numGetSent);

@@ -40,7 +40,7 @@ void OverlayStorage::store(GameObject *go)
 	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
 	TransportAddress sourceAdr(thisNode->getIp(), thisNode->getPort());
 
-	groupPkt *overlay_write = new groupPkt();
+	ValuePkt *overlay_write = new ValuePkt();
 	overlay_write->setByteLength(4+4+4+4+8+go->getSize());	//Source address, dest address, type, value, object name ID, object size
 
 	if (!(this_peer->hasSuperPeer()))

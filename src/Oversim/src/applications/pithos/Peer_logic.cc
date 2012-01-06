@@ -81,9 +81,40 @@ void Peer_logic::handleP2PMsg(cMessage *msg)
 	}
 }
 
+void Peer_logic::handleGetCAPIRequest(RootObjectGetCAPICall* capiGetMsg)
+{
+	OverlayKeyPkt *read_pkt;
+	Enter_Method("[Peer_logic]: handleGetCAPIRequest()");	//Required for Omnet++ context switching between modules
+	take(capiGetMsg);
+
+
+	EV << getParentModule()->getName() << " " << getParentModule()->getIndex() << " received storage request for overlay key " << capiGetMsg->getKey() << "\n";
+
+	read_pkt = new OverlayKeyPkt();
+	read_pkt->setName(capiGetMsg->getName());
+	read_pkt->setPayloadType(RETRIEVE_REQ);
+
+	//This is the RPC ID of capiPutMsg and will be added to the response msg which the
+	//peer logic can then use to match the received response to the relevant RPC call.
+	read_pkt->setValue(capiGetMsg->getNonce());
+	read_pkt->setKey(capiGetMsg->getKey());
+
+	//Send the game object to be stored in the group.
+	send(read_pkt->dup(), "group_write");
+
+	//Send the game object to be stored in the overlay.
+	send(read_pkt, "overlay_write");
+
+    PendingRpcsEntry entry;
+    entry.getCallMsg = capiGetMsg;
+    entry.numSent = 1;		//TODO:This numSent should be calculated from the required group and overlay writes
+    entry.state = LOOKUP_STARTED;
+    pendingRpcs.insert(std::make_pair(capiGetMsg->getNonce(), entry));
+}
+
 void Peer_logic::handlePutCAPIRequest(RootObjectPutCAPICall* capiPutMsg)
 {
-	groupPkt *write_pkt;
+	ValuePkt *write_pkt;
 	Enter_Method("[Peer_logic]: handlePutCAPIRequest()");	//Required for Omnet++ context switching between modules
 	take(capiPutMsg);
 
@@ -95,7 +126,7 @@ void Peer_logic::handlePutCAPIRequest(RootObjectPutCAPICall* capiPutMsg)
 
 	EV << "Object to be sent: " << go->getObjectName() << endl;
 
-	write_pkt = new groupPkt();
+	write_pkt = new ValuePkt();
 	write_pkt->setName(capiPutMsg->getName());
 	write_pkt->setPayloadType(STORE_REQ);
 	write_pkt->addObject(go);
@@ -112,9 +143,9 @@ void Peer_logic::handlePutCAPIRequest(RootObjectPutCAPICall* capiPutMsg)
 
 	//Add the received RPC to the list of RPC for which responses are still outstanding
 	PendingRpcsEntry entry;
-	entry.numSent = 4;		//TODO:This numsent should be calculated from the group and overlay writes
+	entry.numSent = 4;		//TODO:This numSent should be calculated from the required group and overlay writes
 	entry.putCallMsg = capiPutMsg;
-	entry.state = INIT;
+	entry.state = PUT_SENT;
 	pendingRpcs.insert(std::make_pair(capiPutMsg->getNonce(), entry));
 }
 
@@ -138,12 +169,87 @@ void Peer_logic::joinRequest(const TransportAddress &dest_adr)
 	send(boot_p, "comms_gate$o");
 }
 
-void Peer_logic::handleResponseMsg(cMessage *msg)
+void Peer_logic::adjustPutSFRatio(PendingRpcsEntry entry, unsigned int rpcid)
 {
 	cModule *communicatorModule = getParentModule()->getSubmodule("communicator");
 	//This extra step ensures that the submodules exist and also does any other required error checking
 	Communicator *communicator = check_and_cast<Communicator *>(communicatorModule);
 
+	//Only determine success of failure after all responses have been received
+	if (entry.numGroupPutSucceeded + entry.numGroupPutFailed +
+			entry.numDHTPutSucceeded + entry.numDHTPutFailed == entry.numSent)
+	{
+		//Ensure that more DHT puts succeeded than failed
+		if (entry.numDHTPutSucceeded > entry.numDHTPutFailed)
+		{
+			//Ensure that more group puts succeeded than failed
+			if (entry.numGroupPutSucceeded >= entry.numGroupPutFailed)
+			{
+				RootObjectPutCAPIResponse* capiPutRespMsg = new RootObjectPutCAPIResponse();
+				capiPutRespMsg->setIsSuccess(true);
+				communicator->externallySendRpcResponse(entry.putCallMsg, capiPutRespMsg);
+				pendingRpcs.erase(rpcid);
+			} else
+			{
+				RootObjectPutCAPIResponse* capiPutRespMsg = new RootObjectPutCAPIResponse();
+				capiPutRespMsg->setIsSuccess(false);
+				communicator->externallySendRpcResponse(entry.putCallMsg, capiPutRespMsg);
+				pendingRpcs.erase(rpcid);
+			}
+		} else
+		{
+			RootObjectPutCAPIResponse* capiPutRespMsg = new RootObjectPutCAPIResponse();
+			capiPutRespMsg->setIsSuccess(false);
+			communicator->externallySendRpcResponse(entry.putCallMsg, capiPutRespMsg);
+			pendingRpcs.erase(rpcid);
+		}
+	}
+}
+
+void Peer_logic::adjustGetSFRatio(PendingRpcsEntry entry, ResponsePkt *response)
+{
+	cModule *communicatorModule = getParentModule()->getSubmodule("communicator");
+	//This extra step ensures that the submodules exist and also does any other required error checking
+	Communicator *communicator = check_and_cast<Communicator *>(communicatorModule);
+
+	//Only determine success of failure after all responses have been received
+	if (entry.numGroupGetSucceeded + entry.numGroupGetFailed +
+			entry.numDHTGetSucceeded + entry.numDHTGetFailed == entry.numSent)
+	{
+		//Ensure that more DHT Gets succeeded than failed
+		if (entry.numDHTGetSucceeded > entry.numDHTGetFailed)
+		{
+			//Ensure that more group Gets succeeded than failed
+			if (entry.numGroupGetSucceeded >= entry.numGroupGetFailed)
+			{
+				GameObject *object = (GameObject *)response->getObject("GameObject");
+				if (object == NULL)
+					error("No object was attached to DHT Storage response message");
+
+				RootObjectGetCAPIResponse* capiGetRespMsg = new RootObjectGetCAPIResponse();
+				capiGetRespMsg->setIsSuccess(true);
+				capiGetRespMsg->setResult(*object);	//The value is copied here and not the actual object
+				communicator->externallySendRpcResponse(entry.getCallMsg, capiGetRespMsg);
+				pendingRpcs.erase(response->getRpcid());
+			} else
+			{
+				RootObjectGetCAPIResponse* capiGetRespMsg = new RootObjectGetCAPIResponse();
+				capiGetRespMsg->setIsSuccess(false);
+				communicator->externallySendRpcResponse(entry.getCallMsg, capiGetRespMsg);
+				pendingRpcs.erase(response->getRpcid());
+			}
+		} else
+		{
+			RootObjectGetCAPIResponse* capiGetRespMsg = new RootObjectGetCAPIResponse();
+			capiGetRespMsg->setIsSuccess(false);
+			communicator->externallySendRpcResponse(entry.getCallMsg, capiGetRespMsg);
+			pendingRpcs.erase(response->getRpcid());
+		}
+	}
+}
+
+void Peer_logic::handleResponseMsg(cMessage *msg)
+{
 	ResponsePkt *response = check_and_cast<ResponsePkt *>(msg);
 
 	PendingRpcs::iterator it = pendingRpcs.find(response->getRpcid());
@@ -151,49 +257,35 @@ void Peer_logic::handleResponseMsg(cMessage *msg)
 	if (it == pendingRpcs.end()) // unknown request or request for already erased call
 		return;
 
-	//Check what type of PUT response was received and increment the successes or failures according to type
+	//Check what type of response was received and increment the successes or failures according to type
 	if (response->getResponseType() == GROUP_PUT)
 	{
 		if (response->getIsSuccess())
-			it->second.numGroupSucceeded++;
-		else it->second.numGroupFailed++;
+			it->second.numGroupPutSucceeded++;
+		else it->second.numGroupPutFailed++;
 
 	} else if (response->getResponseType() == OVERLAY_PUT)
 	{
 		if (response->getIsSuccess())
-			it->second.numDHTSucceeded++;
-		else it->second.numDHTFailed++;
-	} else error("Unknown put response type received");
-
-	//Only determine success of failure after all responses have been received
-	if (it->second.numGroupSucceeded + it->second.numGroupFailed +
-			it->second.numDHTSucceeded + it->second.numDHTFailed == it->second.numSent)
+			it->second.numDHTPutSucceeded++;
+		else it->second.numDHTPutFailed++;
+	} else if (response->getResponseType() == OVERLAY_GET)
 	{
-		//Ensure that more DHT puts succeeded than failed
-		if (it->second.numDHTSucceeded > it->second.numDHTFailed)
+		if (response->getIsSuccess())
+			it->second.numDHTGetSucceeded++;
+		else it->second.numDHTGetFailed++;
+	} else if (response->getResponseType() == GROUP_GET)
 		{
-			//Ensure that more group puts succeeded than failed
-			if (it->second.numGroupSucceeded > it->second.numGroupFailed)
-			{
-				RootObjectPutCAPIResponse* capiPutRespMsg = new RootObjectPutCAPIResponse();
-				capiPutRespMsg->setIsSuccess(true);
-				communicator->externallySendRpcResponse(it->second.putCallMsg, capiPutRespMsg);
-				pendingRpcs.erase(response->getRpcid());
-			} else
-			{
-				RootObjectPutCAPIResponse* capiPutRespMsg = new RootObjectPutCAPIResponse();
-				capiPutRespMsg->setIsSuccess(false);
-				communicator->externallySendRpcResponse(it->second.putCallMsg, capiPutRespMsg);
-				pendingRpcs.erase(response->getRpcid());
-			}
-		} else
-		{
-			RootObjectPutCAPIResponse* capiPutRespMsg = new RootObjectPutCAPIResponse();
-			capiPutRespMsg->setIsSuccess(false);
-			communicator->externallySendRpcResponse(it->second.putCallMsg, capiPutRespMsg);
-			pendingRpcs.erase(response->getRpcid());
-		}
-	}
+			if (response->getIsSuccess())
+				it->second.numGroupGetSucceeded++;
+			else it->second.numGroupGetFailed++;
+	} else error("Unknown response type received");
+
+	//Adjust the success and failure ratio stats of put and get requests
+	if (response->getResponseType() == GROUP_PUT || response->getResponseType() == OVERLAY_PUT)
+		adjustPutSFRatio(it->second, response->getRpcid());
+	else if  (response->getResponseType() == GROUP_GET || response->getResponseType() == OVERLAY_GET)
+		adjustGetSFRatio(it->second, response);
 
 	return;
 }
