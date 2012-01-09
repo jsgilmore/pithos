@@ -47,18 +47,6 @@ class Peer_logic: public cSimpleModule
 {
 	private:
 
-		cMessage *event; /**< An event used to trigger a join request */
-
-		char directory_ip[16]; /**< The IP address of the directory server (specified as a Omnet param value) */
-
-		int directory_port; /**< The port of the directory server (specified as a Omnet param value) */
-
-		double latitude; /**< The latitude of this peer (position in the virtual world) */
-
-		double longitude; /**< The longitude of this peer (position in the virtual world) */
-
-		TransportAddress super_peer_address; /**< The TransPort address of the group super peer (this address is set, after the peer has joined a group) */
-
 		enum PendingRpcsStates {
 			INIT = 0,
 			LOOKUP_STARTED = 1,
@@ -130,11 +118,6 @@ class Peer_logic: public cSimpleModule
 		virtual ~Peer_logic();
 
 		/**
-		 * @returns true if a super peer has been set for this peer and false if not.
-		 */
-		bool hasSuperPeer();
-
-		/**
 		 * Handle a request from the higher layer for store
 		 *
 		 * @param capiPutMsg the request containing the GameObject
@@ -148,31 +131,16 @@ class Peer_logic: public cSimpleModule
 		 */
 		void handleGetCAPIRequest(RootObjectGetCAPICall* capiGetMsg);
 
-		TransportAddress getSuperPeerAddress();
 	protected:
 		virtual void initialize();
 		void finalize();
 		virtual void handleMessage(cMessage *msg);
-
-		/**
-		 * Handle a message received from the group over UDP
-		 *
-		 * @param msg the message received
-		 */
-		void handleP2PMsg(cMessage *msg);
 
 		void processPut(PendingRpcsEntry entry, ResponsePkt *response);
 
 		void processGet(PendingRpcsEntry entry, ResponsePkt *response);
 
 		void handleResponseMsg(cMessage *msg);
-
-		/**
-		 * Send a join request to the directory server or a super peer
-		 *
-		 * @param the destination address of the directory server of super peer
-		 */
-		void joinRequest(const TransportAddress &dest_adr);
 };
 
 #endif /* PEER_LOGIC_H_ */
