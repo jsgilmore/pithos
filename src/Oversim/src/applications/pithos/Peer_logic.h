@@ -161,9 +161,9 @@ class Peer_logic: public cSimpleModule
 		 */
 		void handleP2PMsg(cMessage *msg);
 
-		void adjustPutSFRatio(PendingRpcsEntry entry, unsigned int rpcid);
+		void processPut(PendingRpcsEntry entry, ResponsePkt *response);
 
-		void adjustGetSFRatio(PendingRpcsEntry entry, ResponsePkt *response);
+		void processGet(PendingRpcsEntry entry, ResponsePkt *response);
 
 		void handleResponseMsg(cMessage *msg);
 

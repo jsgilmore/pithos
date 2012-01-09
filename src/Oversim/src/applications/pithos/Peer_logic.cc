@@ -87,7 +87,6 @@ void Peer_logic::handleGetCAPIRequest(RootObjectGetCAPICall* capiGetMsg)
 	Enter_Method("[Peer_logic]: handleGetCAPIRequest()");	//Required for Omnet++ context switching between modules
 	take(capiGetMsg);
 
-
 	EV << getParentModule()->getName() << " " << getParentModule()->getIndex() << " received storage request for overlay key " << capiGetMsg->getKey() << "\n";
 
 	read_pkt = new OverlayKeyPkt();
@@ -169,17 +168,16 @@ void Peer_logic::joinRequest(const TransportAddress &dest_adr)
 	send(boot_p, "comms_gate$o");
 }
 
-void Peer_logic::adjustPutSFRatio(PendingRpcsEntry entry, unsigned int rpcid)
+void Peer_logic::processPut(PendingRpcsEntry entry, ResponsePkt *response)
 {
 	cModule *communicatorModule = getParentModule()->getSubmodule("communicator");
 	//This extra step ensures that the submodules exist and also does any other required error checking
 	Communicator *communicator = check_and_cast<Communicator *>(communicatorModule);
 
-	//Only determine success of failure after all responses have been received
+	//Ensure that the number of successes of both group and overlay stores as greater than or equal to the number of failures
 	if (entry.numGroupPutSucceeded + entry.numGroupPutFailed +
 			entry.numDHTPutSucceeded + entry.numDHTPutFailed == entry.numSent)
 	{
-		//Ensure that more DHT puts succeeded than failed
 		if (entry.numDHTPutSucceeded > entry.numDHTPutFailed)
 		{
 			//Ensure that more group puts succeeded than failed
@@ -188,25 +186,22 @@ void Peer_logic::adjustPutSFRatio(PendingRpcsEntry entry, unsigned int rpcid)
 				RootObjectPutCAPIResponse* capiPutRespMsg = new RootObjectPutCAPIResponse();
 				capiPutRespMsg->setIsSuccess(true);
 				communicator->externallySendRpcResponse(entry.putCallMsg, capiPutRespMsg);
-				pendingRpcs.erase(rpcid);
-			} else
-			{
-				RootObjectPutCAPIResponse* capiPutRespMsg = new RootObjectPutCAPIResponse();
-				capiPutRespMsg->setIsSuccess(false);
-				communicator->externallySendRpcResponse(entry.putCallMsg, capiPutRespMsg);
-				pendingRpcs.erase(rpcid);
+				pendingRpcs.erase(response->getRpcid());
+
+				return;
 			}
-		} else
-		{
-			RootObjectPutCAPIResponse* capiPutRespMsg = new RootObjectPutCAPIResponse();
-			capiPutRespMsg->setIsSuccess(false);
-			communicator->externallySendRpcResponse(entry.putCallMsg, capiPutRespMsg);
-			pendingRpcs.erase(rpcid);
 		}
+
+		//This is the failure response to both situations where either the group messages
+		//failed or the overlay messages failed. Notice the "return" in the success scenario.
+		RootObjectPutCAPIResponse* capiPutRespMsg = new RootObjectPutCAPIResponse();
+		capiPutRespMsg->setIsSuccess(false);
+		communicator->externallySendRpcResponse(entry.putCallMsg, capiPutRespMsg);
+		pendingRpcs.erase(response->getRpcid());
 	}
 }
 
-void Peer_logic::adjustGetSFRatio(PendingRpcsEntry entry, ResponsePkt *response)
+void Peer_logic::processGet(PendingRpcsEntry entry, ResponsePkt *response)
 {
 	cModule *communicatorModule = getParentModule()->getSubmodule("communicator");
 	//This extra step ensures that the submodules exist and also does any other required error checking
@@ -216,12 +211,12 @@ void Peer_logic::adjustGetSFRatio(PendingRpcsEntry entry, ResponsePkt *response)
 	if (entry.numGroupGetSucceeded + entry.numGroupGetFailed +
 			entry.numDHTGetSucceeded + entry.numDHTGetFailed == entry.numSent)
 	{
-		//Ensure that more DHT Gets succeeded than failed
-		if (entry.numDHTGetSucceeded > entry.numDHTGetFailed)
+		//Ensure that the number of successes of both group and overlay stores as greater than or equal to the number of failures
+		if (entry.numDHTGetSucceeded >= entry.numDHTGetFailed)
 		{
-			//Ensure that more group Gets succeeded than failed
 			if (entry.numGroupGetSucceeded >= entry.numGroupGetFailed)
 			{
+				//TODO: Attach the actual GameObject to the RPC response, instead of copying it into a new object
 				GameObject *object = (GameObject *)response->getObject("GameObject");
 				if (object == NULL)
 					error("No object was attached to DHT Storage response message");
@@ -231,20 +226,17 @@ void Peer_logic::adjustGetSFRatio(PendingRpcsEntry entry, ResponsePkt *response)
 				capiGetRespMsg->setResult(*object);	//The value is copied here and not the actual object
 				communicator->externallySendRpcResponse(entry.getCallMsg, capiGetRespMsg);
 				pendingRpcs.erase(response->getRpcid());
-			} else
-			{
-				RootObjectGetCAPIResponse* capiGetRespMsg = new RootObjectGetCAPIResponse();
-				capiGetRespMsg->setIsSuccess(false);
-				communicator->externallySendRpcResponse(entry.getCallMsg, capiGetRespMsg);
-				pendingRpcs.erase(response->getRpcid());
+
+				return;
 			}
-		} else
-		{
-			RootObjectGetCAPIResponse* capiGetRespMsg = new RootObjectGetCAPIResponse();
-			capiGetRespMsg->setIsSuccess(false);
-			communicator->externallySendRpcResponse(entry.getCallMsg, capiGetRespMsg);
-			pendingRpcs.erase(response->getRpcid());
 		}
+
+		//This is the failure response to both situations where either the group messages
+		//failed or the overlay messages failed. Notice the "return" in the success scenario.
+		RootObjectGetCAPIResponse* capiGetRespMsg = new RootObjectGetCAPIResponse();
+		capiGetRespMsg->setIsSuccess(false);
+		communicator->externallySendRpcResponse(entry.getCallMsg, capiGetRespMsg);
+		pendingRpcs.erase(response->getRpcid());
 	}
 }
 
@@ -258,36 +250,36 @@ void Peer_logic::handleResponseMsg(cMessage *msg)
 		return;
 
 	//Check what type of response was received and increment the successes or failures according to type
+	//Then process the RPC relating to the response, by checking whether sufficient responses were received, taking action if this was the case
 	if (response->getResponseType() == GROUP_PUT)
 	{
 		if (response->getIsSuccess())
 			it->second.numGroupPutSucceeded++;
 		else it->second.numGroupPutFailed++;
 
+		processPut(it->second, response);
 	} else if (response->getResponseType() == OVERLAY_PUT)
 	{
 		if (response->getIsSuccess())
 			it->second.numDHTPutSucceeded++;
 		else it->second.numDHTPutFailed++;
+
+		processPut(it->second, response);
 	} else if (response->getResponseType() == OVERLAY_GET)
 	{
 		if (response->getIsSuccess())
 			it->second.numDHTGetSucceeded++;
 		else it->second.numDHTGetFailed++;
+
+		processGet(it->second, response);
 	} else if (response->getResponseType() == GROUP_GET)
-		{
-			if (response->getIsSuccess())
-				it->second.numGroupGetSucceeded++;
-			else it->second.numGroupGetFailed++;
+	{
+		if (response->getIsSuccess())
+			it->second.numGroupGetSucceeded++;
+		else it->second.numGroupGetFailed++;
+
+		processGet(it->second, response);
 	} else error("Unknown response type received");
-
-	//Adjust the success and failure ratio stats of put and get requests
-	if (response->getResponseType() == GROUP_PUT || response->getResponseType() == OVERLAY_PUT)
-		adjustPutSFRatio(it->second, response->getRpcid());
-	else if  (response->getResponseType() == GROUP_GET || response->getResponseType() == OVERLAY_GET)
-		adjustGetSFRatio(it->second, response);
-
-	return;
 }
 
 void Peer_logic::handleMessage(cMessage *msg)

@@ -199,7 +199,6 @@ void PithosTestApp::handleGetResponse(RootObjectGetCAPIResponse* msg, PithosStat
         delete context;
 
         EV << "Received result object: " << msg->getResult() << endl;
-        EV << "Expected result object: " << entry << endl;
 
         if (msg->getResult() == *entry)
         {
