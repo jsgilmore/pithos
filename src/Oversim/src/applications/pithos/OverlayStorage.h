@@ -22,7 +22,7 @@
 #include <omnetpp.h>
 
 #include "BaseApp.h"
-#include "Peer_logic.h"
+#include "GroupStorage.h"
 
 #include "PithosMessages_m.h"
 #include "GameObject.h"

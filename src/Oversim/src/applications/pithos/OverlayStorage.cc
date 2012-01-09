@@ -34,7 +34,7 @@ void OverlayStorage::initialize()
 void OverlayStorage::store(GameObject *go)
 {
 	simtime_t sendDelay;
-	Peer_logic * this_peer = ((Peer_logic *)getParentModule()->getSubmodule("peer_logic"));
+	GroupStorage * this_peer = ((GroupStorage *)getParentModule()->getSubmodule("group_storage"));
 	int overlay_replicas = par("replicas");
 
 	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
