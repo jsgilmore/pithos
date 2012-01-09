@@ -49,9 +49,25 @@ class GroupStorage : public cSimpleModule
 		virtual ~GroupStorage();
 		int getStorageBytes();
 		int getStorageFiles();
+
+		bool hasSuperPeer();
+		TransportAddress getSuperPeerAddress();
+
 	private:
 
+		cMessage *event; /**< An event used to trigger a join request */
+
+		char directory_ip[16]; /**< The IP address of the directory server (specified as a Omnet param value) */
+
+		int directory_port; /**< The port of the directory server (specified as a Omnet param value) */
+
 		cQueue storage; /**< The queue holding all stored GameObjects */
+
+		TransportAddress super_peer_address; /**< The TransPort address of the group super peer (this address is set, after the peer has joined a group) */
+
+		double latitude; /**< The latitude of this peer (position in the virtual world) */
+
+		double longitude; /**< The longitude of this peer (position in the virtual world) */
 
 		std::vector<PeerData> group_peers; /**< The list of peers in the group and which objects they store. */
 
@@ -96,6 +112,20 @@ class GroupStorage : public cSimpleModule
 		void respond_toUpper(cMessage *msg);
 
 		void sendUDPResponse(cMessage *msg);
+
+		/**
+		 * Send a join request to the directory server or a super peer
+		 *
+		 * @param the destination address of the directory server of super peer
+		 */
+		void joinRequest(const TransportAddress &dest_adr);
+
+		/**
+		 * Handle a message received from the group over UDP
+		 *
+		 * @param msg the message received
+		 */
+		void addAndJoinSuperPeer(Packet *packet);
 
 		void store(cMessage *msg);
 

@@ -31,54 +31,12 @@ Peer_logic::~Peer_logic()
 
 void Peer_logic::initialize()
 {
-	strcpy(directory_ip, par("directory_ip"));
-	directory_port = par("directory_port");
 
-	event = new cMessage("event");
-	scheduleAt(simTime()+par("wait_time"), event);
-
-	latitude = uniform(0,100);		//Make this range changeable
-	longitude = uniform(0,100);		//Make this range changeable
 }
 
 void Peer_logic::finalize()
 {
 
-}
-
-bool Peer_logic::hasSuperPeer()
-{
-	if (super_peer_address.isUnspecified())
-		return false;
-	else return true;
-}
-
-TransportAddress Peer_logic::getSuperPeerAddress()
-{
-	return super_peer_address;
-}
-
-void Peer_logic::handleP2PMsg(cMessage *msg)
-{
-	char err_str[50];
-
-	Packet *packet = check_and_cast<Packet *>(msg);
-
-	if (packet->getPayloadType() == INFORM)
-	{
-		bootstrapPkt *boot_p = check_and_cast<bootstrapPkt *>(msg);
-
-		super_peer_address = boot_p->getSuperPeerAdr();
-		EV << "A new super peer has been identified at " << super_peer_address << endl;
-
-		cancelAndDelete(event);		//We've received the data from the directory server, so we can stop harassing them now
-
-		joinRequest(super_peer_address);
-	}
-	else {
-		sprintf(err_str, "Illegal P2P message received (%s)", msg->getName());
-		error (err_str);
-	}
 }
 
 void Peer_logic::handleGetCAPIRequest(RootObjectGetCAPICall* capiGetMsg)
@@ -146,26 +104,6 @@ void Peer_logic::handlePutCAPIRequest(RootObjectPutCAPICall* capiPutMsg)
 	entry.putCallMsg = capiPutMsg;
 	entry.state = PUT_SENT;
 	pendingRpcs.insert(std::make_pair(capiPutMsg->getNonce(), entry));
-}
-
-void Peer_logic::joinRequest(const TransportAddress &dest_adr)
-{
-	if (dest_adr.isUnspecified())
-		error("Destination address is unspecified when requesting a join.\n");
-
-	bootstrapPkt *boot_p = new bootstrapPkt();
-	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
-	TransportAddress sourceAdr(thisNode->getIp(), thisNode->getPort());
-
-	boot_p->setSourceAddress(sourceAdr);
-	boot_p->setDestinationAddress(dest_adr);
-	boot_p->setPayloadType(JOIN_REQ);
-	boot_p->setName("join_req");
-	boot_p->setLatitude(latitude);
-	boot_p->setLongitude(longitude);
-	boot_p->setByteLength(4+4+4+8+8);	//Src IP as #, Dest IP as #, Type, Lat, Long
-
-	send(boot_p, "comms_gate$o");
 }
 
 void Peer_logic::processPut(PendingRpcsEntry entry, ResponsePkt *response)
@@ -284,25 +222,10 @@ void Peer_logic::handleResponseMsg(cMessage *msg)
 
 void Peer_logic::handleMessage(cMessage *msg)
 {
-	if (msg == event)
-	{
-		//For the first join request, a request is sent to the well known directory server
-		IPAddress dest_ip(directory_ip);
-		TransportAddress destAdr(dest_ip, directory_port);
 
-		joinRequest(destAdr);
-
-		scheduleAt(simTime()+1, event);		//TODO: make the 1 second wait time a configuration variable that may be set
-	}
-	else if (strcmp(msg->getArrivalGate()->getName(), "from_upperTier") == 0)
+	if (strcmp(msg->getArrivalGate()->getName(), "from_upperTier") == 0)
 	{
 		error("This gate has been closed down in favor of RPC calls");
-	}
-	else if (strcmp(msg->getArrivalGate()->getName(), "comms_gate$i") == 0)
-	{
-		//Data was received from the UDP layer by the communicator and has been referred to the Peer logic
-		handleP2PMsg(msg);
-		delete(msg);
 	}
 	else if ((strcmp(msg->getArrivalGate()->getName(), "overlay_read") == 0))
 	{

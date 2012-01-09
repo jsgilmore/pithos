@@ -88,6 +88,9 @@ simple GroupStorage
         @class(GroupStorage);
         @display("i=abstract/cache");
         
+        @signal[JoinTime](type="simtime_t");
+        @statistic[JoinTime](title="group join time"; record=last);
+        
         @signal[qlen](type="int");
         @signal[qsize](type="int");
         @signal[queueingTime](type="simtime_t");
@@ -118,6 +121,9 @@ simple GroupStorage
         @statistic[GroupSize](title="Group size"; record=last);
         @statistic[GroupSendFail](title="Group send fails"; record=sum);
         
+        string directory_ip;
+        int directory_port;
+        double wait_time @unit(s);
         int replicas = 3;
     gates:
         inout comms_gate;
@@ -147,14 +153,6 @@ simple Peer_logic
     parameters:
         @class(Peer_logic);
         @display("i=block/cogwheel");
-
-        @signal[JoinTime](type="simtime_t");
-
-        @statistic[JoinTime](title="group join time"; record=last);
-
-        string directory_ip;
-        int directory_port;
-        double wait_time @unit(s);
     gates:
         inout comms_gate;
         
