@@ -80,11 +80,10 @@ class GroupStorage : public cSimpleModule
 		/**
 		 * Send a message to the super peer informing it about a new group object and a list of peers that store it.
 		 *
-		 * @param objectName Name of the newly stored object.
-		 * @param objectSize Size of the newly stored object in bytes.
+		 * @param go The GameObject stored, of which the size and name are used.
 		 * @param send_list A history of all peers selected to store the new object.
 		 */
-		void updateSuperPeerObjects(const char *objectName, unsigned long objectSize, std::vector<TransportAddress> send_list);
+		void updateSuperPeerObjects(GameObject *go, std::vector<TransportAddress> send_list);
 
 		/**
 		 * Select a random TransportAddress within the group that has not be chosen for a replica during the current selection process.
@@ -107,6 +106,8 @@ class GroupStorage : public cSimpleModule
 		 * @param rpcid The RPC ID of the original request from the higher layer
 		 */
 		void send_forstore(GameObject *go, unsigned int rpcid);
+
+		void requestRetrieve(OverlayKeyPkt *retrieve_req);
 
 		/**
 		 * Function is called when the peer is informed by the group super peer that new peers have joined the group.
