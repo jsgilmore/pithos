@@ -67,9 +67,9 @@ void GroupStorage::initialize()
 	WATCH(numPutSuccess);*/
 }
 
-void GroupStorage::updateSuperPeerObjects(const char *objectName, unsigned long objectSize, std::vector<TransportAddress> send_list)
+void GroupStorage::updateSuperPeerObjects(GameObject *go, std::vector<TransportAddress> send_list)
 {
-	simtime_t sendDelay;
+	//simtime_t sendDelay;
 	Peer_logic * this_peer = ((Peer_logic *)getParentModule()->getSubmodule("peer_logic"));
 
 	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
@@ -87,8 +87,8 @@ void GroupStorage::updateSuperPeerObjects(const char *objectName, unsigned long 
 		return;
 	}
 
-	objectAddPkt->setObjectName(objectName);
-	objectAddPkt->setObjectSize(objectSize);
+	objectAddPkt->setObjectName(go->getObjectName());
+	objectAddPkt->setObjectSize(go->getSize());
 	objectAddPkt->setPayloadType(OBJECT_ADD);
 	objectAddPkt->setSourceAddress(sourceAdr);
 	objectAddPkt->setName("object_add");
@@ -210,7 +210,7 @@ void GroupStorage::send_forstore(GameObject *go, unsigned int rpcid)
 
 	delete(write);
 
-	updateSuperPeerObjects(go->getObjectName(), (unsigned long)go->getSize(), send_list);
+	updateSuperPeerObjects(go, send_list);
 }
 
 void GroupStorage::addPeers(cMessage *msg)
@@ -352,6 +352,11 @@ void GroupStorage::respond_toUpper(cMessage *msg)
 	send(msg, "read");
 }
 
+void GroupStorage::requestRetrieve(OverlayKeyPkt *retrieve_req)
+{
+
+}
+
 void GroupStorage::handleMessage(cMessage *msg)
 {
 	Packet *packet = check_and_cast<Packet *>(msg);
@@ -384,6 +389,10 @@ void GroupStorage::handleMessage(cMessage *msg)
 		delete(msg);
 	} else if (packet->getPayloadType() == RETRIEVE_REQ)
 	{
+		OverlayKeyPkt *retrieve_req = check_and_cast<OverlayKeyPkt *>(msg);
+
+		requestRetrieve(retrieve_req);
+
 		delete(msg);	//The group request path should start here
 	}
 	else error("Group storage received an unknown packet");

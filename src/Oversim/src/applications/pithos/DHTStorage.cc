@@ -158,6 +158,7 @@ void DHTStorage::handleGetResponse(DHTgetCAPIResponse* msg, DHTStatsContext* con
 	const DHTEntry* entry = globalDhtTestMap->findEntry(context->key);
 
 
+	//This can occur when a TTL expired
 	if (entry == NULL) {
 		//unexpected key
 		RECORD_STATS(numGetError++);
@@ -202,6 +203,7 @@ void DHTStorage::handleGetResponse(DHTgetCAPIResponse* msg, DHTStatsContext* con
 				return;
 			}
 		} else {
+			//For some reason, there are occasions when the underlying DHT reports a successful retrieval, without attaching any result
 			RECORD_STATS(numGetError++);
 			sendResponse(OVERLAY_GET, context->parent_rpcid, false);
 		}

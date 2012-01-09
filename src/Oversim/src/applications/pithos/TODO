@@ -4,7 +4,9 @@ Upgrade to Omnet++ 4.2
 
 Ensure that all packet sizes are recorded and used for the puposes of calculating storage and retrieval latency.
 
-Extend the pithos test application to add retrieve and modify testing.
+Extend the pithos test application to add modify testing.
+
+Reduce the number of overlay get failures under no churn
 
 Implement object retrieval, update and time to live for group storage.
 Add mechanisms to handle churn in group storage (leaving the game and moving to another group)
