@@ -40,27 +40,18 @@ std::string ObjectInfo::getObjectName()
 	return object_name;
 }
 
-void ObjectInfo::addAddress(const TransportAddress &adr)
+void ObjectInfo::addPeerRef(PeerDataPtr peer_data_ptr)
 {
-	location_list.push_back(adr);
+	PeerDataPtr ptr(peer_data_ptr);
+	location_list.push_back(ptr);
 }
 
-void ObjectInfo::addAddress(const char* ip_str, int port)
-{
-	IPvXAddress ip;
-	TransportAddress adr;
-
-	ip.set(ip_str);
-	adr.setIp(ip, port);
-	location_list.push_back(adr);
-}
-
-TransportAddress ObjectInfo::getAddress(const int &i)
+PeerDataPtr ObjectInfo::getPeerRef(const int &i)
 {
 	return location_list.at(i);
 }
 
-TransportAddress ObjectInfo::getRandAddress()
+PeerDataPtr ObjectInfo::getRandPeerRef()
 {
 	int index = intuniform(0, location_list.size());
 	return location_list.at(index);

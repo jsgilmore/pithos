@@ -104,5 +104,6 @@ packet PeerListPkt extends Packet
     //to make the stored object easily readable
     string objectName;
     unsigned long objectSize;
+    OverlayKey objectKey;
     abstract PeerData peer_list[];
 }

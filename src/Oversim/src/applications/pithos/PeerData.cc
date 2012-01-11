@@ -20,6 +20,11 @@ PeerData::PeerData() {
 
 }
 
+PeerData::PeerData(const TransportAddress& address)
+{
+	this->address = address;
+}
+
 PeerData::PeerData(const PeerData& other)
 {
 	operator=(other);
@@ -44,16 +49,18 @@ PeerData& PeerData::operator=(const PeerData& other)
 	return *this;
 }
 
-bool PeerData::operator==(const PeerData &other) const
+bool operator==(const PeerData& object1, const PeerData& object2)
 {
-	if (address == other.address)
-		return true;
-	else return false;
+	if (object1.address != object2.address)
+		return false;
+
+	return true;
 }
 
-bool PeerData::operator!=(const PeerData &other) const {
-   return !(*this == other);
- }
+bool operator!=(const PeerData& object1, const PeerData& object2)
+{
+	return !(object1 == object2);
+}
 
 void PeerData::setAddress(const char* ip_str, int port)
 {

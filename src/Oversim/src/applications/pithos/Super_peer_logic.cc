@@ -83,6 +83,8 @@ void Super_peer_logic::handleOverlayWrite(cMessage *msg)
 void Super_peer_logic::addObject(cMessage *msg)
 {
 	PeerListPkt *plist_p = check_and_cast<PeerListPkt *>(msg);
+	std::vector<PeerDataPtr>::iterator it;
+	PeerData peer_data_recv;
 
 	//Log the file name and what peers it is stored on
 	ObjectInfo object_info;
@@ -91,10 +93,19 @@ void Super_peer_logic::addObject(cMessage *msg)
 
 	for (unsigned int i = 0 ; i < plist_p->getPeer_listArraySize() ; i++)
 	{
-		object_info.addAddress((PeerData(plist_p->getPeer_list(i)).getAddress()));
+		peer_data_recv = ((PeerData)plist_p->getPeer_list(i));
+
+		for (it = group_peers.begin() ; it != group_peers.end() ; it++)
+		{
+			//*it returns a PeerDataPtr type, which again has to be dereferenced to obtain the PeerData object (**it)
+			if (**it == peer_data_recv)
+				break;
+		}
+
+		object_info.addPeerRef(*it);
 	}
 
-	object_list.push_back(object_info);
+	object_map.insert(std::make_pair(plist_p->getObjectKey(), object_info));
 
 	emit(storeNumberSignal, 1);
 }
@@ -109,7 +120,7 @@ void Super_peer_logic::handleJoinReq(cMessage *msg)
 	EV << "Super peer received bootstrap request from " << boot_req->getSourceAddress() << ", sending list and updating group.\n";
 
 	//IP data entry for the requesting peer to be added to the group peers list.
-	PeerData peer_dat;
+	PeerDataPtr peer_dat_ptr(new PeerData());
 
 	//List packet that will be returned to the requesting peer
 	PeerListPkt *list_p = new PeerListPkt();
@@ -124,25 +135,26 @@ void Super_peer_logic::handleJoinReq(cMessage *msg)
 
 	for (i = 0 ; i < group_peers.size() ; i++)
 	{
-		list_p->addToPeerList(group_peers.at(i));
+		list_p->addToPeerList(*(group_peers.at(i)));	//Send a copy of the object, pointed to by the smart pointer
 	}
 	send(list_p->dup(), "comms_gate$o");	//Send a copy of the peer list, so the original packet may be reused to inform the other nodes
 
-	peer_dat.setAddress(boot_req->getSourceAddress());
+	(*peer_dat_ptr).setAddress(boot_req->getSourceAddress());
 	list_p->clearPeerList();	//This erases all data added to the peer list.
-	list_p->addToPeerList(peer_dat);
+	list_p->addToPeerList(*peer_dat_ptr);
 	list_p->setByteLength(2*sizeof(int)+sizeof(int)*2);	//Value+Type+(IP+Port)
 
 	for (i = 0 ; i < group_peers.size() ; i++)
 	{
-		list_p->setDestinationAddress(((PeerData)group_peers.at(i)).getAddress());
+		//group_peers.at(i) returns a PeerDataPtr, which has to be dereferenced to return a PeerData object
+		list_p->setDestinationAddress((*(group_peers.at(i))).getAddress());
 
 		send(list_p->dup(), "comms_gate$o");
 	}
 	delete(list_p);
 
 	//Add the data of the requesting peer into the list.
-	group_peers.push_back(peer_dat);
+	group_peers.push_back(peer_dat_ptr);
 
 	//The original message is deleted in the calling function.
 }
@@ -153,12 +165,17 @@ void Super_peer_logic::GroupStore(overlayPkt *overlay_p)
 	GameObject *go = (GameObject *)overlay_p->removeObject("GameObject");
 	ValuePkt *group_p;
 	ObjectInfo object_info;
+	PeerDataPtr peer_dat_ptr;
 
 	NodeHandle thisNode = ((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode();
 	TransportAddress sourceAdr(thisNode.getIp(), thisNode.getPort());
 
 	if (group_peers.size() > 0)
-		dest_adr = ((PeerData)group_peers.at(intuniform(0, group_peers.size()-1))).getAddress();		//Choose a random peer in the group for the destination
+	{
+		int peer_nr =  intuniform(0, group_peers.size()-1);		//Choose a random peer in the group for the destination
+		peer_dat_ptr = group_peers.at(peer_nr);
+		dest_adr = (*peer_dat_ptr).getAddress();
+	}
 	else {
 		emit(overlaysStoreFailSignal, 1);
 		delete(go);
@@ -168,8 +185,8 @@ void Super_peer_logic::GroupStore(overlayPkt *overlay_p)
 	//Log the file name and what peers it is stored on
 	object_info.setObjectName(go->getObjectName());
 	object_info.setSize(go->getSize());
-	object_info.addAddress(dest_adr);
-	object_list.push_back(object_info);
+	object_info.addPeerRef(peer_dat_ptr);
+	object_map.insert(std::make_pair(go->getHash(), object_info));
 	emit(overlayNumberSignal, 1);
 
 	go->setType(OVERLAY);

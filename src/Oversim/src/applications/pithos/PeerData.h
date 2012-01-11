@@ -37,10 +37,12 @@ class PeerData
 	public:
 		PeerData();
 		PeerData(const PeerData& other);
+		PeerData(const TransportAddress& address);
 		virtual ~PeerData();
 		PeerData& operator=(const PeerData& other);
-		bool operator==(const PeerData &other) const;
-		bool operator!=(const PeerData &other) const;
+
+		friend bool operator==(const PeerData& object1, const PeerData& object2);
+		friend bool operator!=(const PeerData& object1, const PeerData& object2);
 
 		/**
 		 * Set the TransportAddress

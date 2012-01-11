@@ -26,7 +26,7 @@ Peer_logic::Peer_logic()
 
 Peer_logic::~Peer_logic()
 {
-	//Event does not have to be deleted here, since it is deleted in handleMessage
+
 }
 
 void Peer_logic::initialize()
