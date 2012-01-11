@@ -156,6 +156,7 @@ void GroupStorage::updateSuperPeerObjects(GameObject *go, std::vector<TransportA
 
 	objectAddPkt->setObjectName(go->getObjectName());
 	objectAddPkt->setObjectSize(go->getSize());
+	objectAddPkt->setObjectKey(go->getHash());
 	objectAddPkt->setPayloadType(OBJECT_ADD);
 	objectAddPkt->setSourceAddress(sourceAdr);
 	objectAddPkt->setName("object_add");

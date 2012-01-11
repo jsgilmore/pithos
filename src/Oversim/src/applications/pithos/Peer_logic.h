@@ -85,8 +85,8 @@ class Peer_logic: public cSimpleModule
 					numDHTGetFailed = 0;
 				};
 
-				typedef std::map<uint32_t, PendingRpcsEntry> PendingRpcs;
-				PendingRpcs pendingRpcs; /**< a map of all pending RPC operations */
+				//typedef std::map<uint32_t, PendingRpcsEntry> PendingRpcs;
+				//PendingRpcs pendingRpcs; /**< a map of all pending RPC operations */
 
 				RootObjectGetCAPICall* getCallMsg;
 				RootObjectPutCAPICall* putCallMsg;
