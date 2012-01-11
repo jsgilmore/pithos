@@ -169,7 +169,7 @@ class GroupStorage : public cSimpleModule
 
 		simsignal_t overlayStoreTimeSignal; /**< Signal for recording the time that was required to store an overlay object */
 
-		void finishApp();
+		void finish();
 		virtual void initialize();
 		virtual void handleMessage(cMessage *msg);
 };

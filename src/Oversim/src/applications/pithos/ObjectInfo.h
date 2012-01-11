@@ -21,7 +21,18 @@
 
 #include <string>
 #include <vector>
-#include <TransportAddress.h>
+#include <tr1/memory>
+
+#include "PeerData.h"
+
+/**
+ * PeerDataPtr is a typedef for the shared_ptr smart pointer type, which using
+ * reference counting to ensure that memory is never freed while there are still
+ * pointers pointing to it. It also automatically frees memory if no pointers are
+ * pointing to it anymore. Their use is requried when creating pointers to dynamic
+ * structures like vectors.
+ */
+typedef std::tr1::shared_ptr <PeerData> PeerDataPtr;
 
 /**
  * This class stores the information of a single object, including name,
@@ -41,8 +52,14 @@ class ObjectInfo
 		/** Object size in bytes */
 		int size;
 
-		/** A list of TransPort addresses where this object is stored in the group. */
-		std::vector<TransportAddress> location_list;
+		/**
+		 * A list of peers this object is stored in, in the group.
+		 * A shared_ptr smart pointer is used, because this list is a list of pointers to the vector that stored the actual peer information. Pointers are used,
+		 * because multiple objects will contain sets of overlapping peers, which would create duplicate information.
+		 * Smart pointers are used, because a std::vector's memory addresses may change when more memory is required for an insert.
+		 * Smart pointers ensure that the memory region which is pointed too will always be available.
+		 */
+		std::vector<PeerDataPtr> location_list;
 	public:
 		ObjectInfo();
 		virtual ~ObjectInfo();
@@ -68,22 +85,14 @@ class ObjectInfo
 		 *
 		 * @param adr A TransportAddress containing the IP and port information
 		 */
-		void addAddress(const TransportAddress &adr);
+		void addPeerRef(PeerDataPtr peer_data_ptr);
 
-		/**
-		 * Add a TransportAddress to the list of object locations
-		 *
-		 * @param ip_str A string specifying the IP of the location
-		 * @param port The port of the object location
-		 */
-		void addAddress(const char* ip_str, int port);
-
-		TransportAddress getAddress(const int &i);
+		PeerDataPtr getPeerRef(const int &i);
 
 		/**
 		 * @returns a random address from the list of object locations
 		 */
-		TransportAddress getRandAddress();
+		PeerDataPtr getRandPeerRef();
 
 		void setSize(const int &siz);
 		int getSize();
