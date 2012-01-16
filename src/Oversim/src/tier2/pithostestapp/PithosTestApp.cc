@@ -226,7 +226,6 @@ void PithosTestApp::sendPutRequest()
 	//It is important that this name not contain spaces, otherwise a GameObject cannot be correctly reconstructed from a BinaryValue
 	sprintf(name, "Node:%d,Object:%d", getParentModule()->getParentModule()->getIndex(), numPutSent);	//The name is later combined with the remaining object values
 	go->setObjectName(name);
-	go->setType(ROOT);
 	go->setTTL(ttl);
 
 	RootObjectPutCAPICall* capiPutMsg = new RootObjectPutCAPICall();

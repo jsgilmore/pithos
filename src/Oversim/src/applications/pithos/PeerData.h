@@ -20,6 +20,18 @@
 #define PEERDATA_H_
 
 #include <TransportAddress.h>
+#include <tr1/memory>
+
+class PeerData;
+
+/**
+ * PeerDataPtr is a typedef for the shared_ptr smart pointer type, which using
+ * reference counting to ensure that memory is never freed while there are still
+ * pointers pointing to it. It also automatically frees memory if no pointers are
+ * pointing to it anymore. Their use is requried when creating pointers to dynamic
+ * structures like vectors.
+ */
+typedef std::tr1::shared_ptr <PeerData> PeerDataPtr;
 
 /**
  * Abstract data type that defines a particular peer in the network.

@@ -52,8 +52,6 @@ void OverlayStorage::store(GameObject *go)
 		return;
 	}
 
-	go->setType(OVERLAY);
-
 	overlay_write->setPayloadType(OVERLAY_WRITE_REQ);
 	overlay_write->setSourceAddress(sourceAdr);
 	overlay_write->setValue(overlay_replicas);

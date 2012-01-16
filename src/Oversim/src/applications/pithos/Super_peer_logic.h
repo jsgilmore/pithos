@@ -31,15 +31,6 @@
 #include "PithosMessages_m.h"
 
 /**
- * PeerDataPtr is a typedef for the shared_ptr smart pointer type, which using
- * reference counting to ensure that memory is never freed while there are still
- * pointers pointing to it. It also automatically frees memory if no pointers are
- * pointing to it anymore. Their use is requried when creating pointers to dynamic
- * structures like vectors.
- */
-typedef std::tr1::shared_ptr <PeerData> PeerDataPtr;
-
-/**
  * The implemented super peer logic or super peer intelligence.
  * This includes joining the directory server, allow peers to
  * join the group and maintaining a list of objects stored in
@@ -106,6 +97,10 @@ class Super_peer_logic : public cSimpleModule
 		 * @param msg the message that should be handled
 		 */
 		void handleP2PMsg(cMessage *msg);
+
+		void informGroupPeers(bootstrapPkt *boot_req, TransportAddress sourceAdr);
+
+		void informJoiningPeer(bootstrapPkt *boot_req, TransportAddress sourceAdr);
 
 		/**
 		 * Handle a peer wishing to join the group
