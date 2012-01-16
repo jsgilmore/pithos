@@ -35,16 +35,11 @@ void Storage::initialize()
 	qsizeSignal = registerSignal("qsize");
 
 	storeTimeSignal = registerSignal("storeTime");
-	rootStoreTimeSignal = registerSignal("rootStoreTime");
-	replicaStoreTimeSignal = registerSignal("replicaStoreTime");
-	overlayStoreTimeSignal = registerSignal("overlayStoreTime");
 
 	emit(qlenSignal, storage.length());
 	emit(qsizeSignal, getStorageBytes());
 
-	overlayObjectsSignal = registerSignal("OverlayObject");
-	rootObjectsSignal = registerSignal("RootObject");
-	replicaObjectsSignal = registerSignal("ReplicaObject");
+	objectsSignal = registerSignal("Object");
 }
 
 int Storage::getStorageBytes()
@@ -75,10 +70,7 @@ void Storage::handleMessage(cMessage *msg)
 
 	GameObject *go = (GameObject *)msg->removeObject("GameObject");
 
-	if (go->getType() == ROOT)
-		EV << getName() << " " << getIndex() << " received root Game Object of size " << go->getSize() << "\n";
-	else if (go->getType() == REPLICA)
-		EV << getName() << " " << getIndex() << " received replica Game Object of size " << go->getSize() << "\n";
+	EV << getName() << " " << getIndex() << " received Game Object of size " << go->getSize() << "\n";
 
 	delay = simTime() - go->getCreationTime();
 
@@ -91,22 +83,9 @@ void Storage::handleMessage(cMessage *msg)
 	emit(qlenSignal, storage.length());
 	emit(qsizeSignal, getStorageBytes());
 
-	if (go->getType() == ROOT)
-	{
-		emit(rootObjectsSignal, 1);
-		emit(rootStoreTimeSignal, delay);
-	}
-	else if (go->getType() == REPLICA)
-	{
-		emit(replicaObjectsSignal, 1);
-		emit(replicaStoreTimeSignal, delay);
-	}
-	else if (go->getType() == OVERLAY)
-	{
-		emit(overlayObjectsSignal, 1);
-		emit(overlayStoreTimeSignal, delay);
-	}
-	else error("The game object type was incorrectly set");
+	emit(objectsSignal, 1);
+	emit(storeTimeSignal, delay);
+
 
 	delete(msg);
 }

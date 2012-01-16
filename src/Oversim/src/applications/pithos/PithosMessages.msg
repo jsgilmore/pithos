@@ -36,7 +36,8 @@ enum PacketTypes
     STORE_REQ = 7;			//A packet sent from peer logic to the lower layers, requesting an object be stored
     RETRIEVE_REQ = 8;		//A packet sent from peer logic to the lower layers, requesting an object be retrieved
     OBJECT_ADD = 9;
-    RESPONSE = 10;
+    SP_OBJECT_ADD = 10;
+    RESPONSE = 11;
 };
 
 enum OverlayTypes 

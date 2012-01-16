@@ -21,18 +21,8 @@
 
 #include <string>
 #include <vector>
-#include <tr1/memory>
 
 #include "PeerData.h"
-
-/**
- * PeerDataPtr is a typedef for the shared_ptr smart pointer type, which using
- * reference counting to ensure that memory is never freed while there are still
- * pointers pointing to it. It also automatically frees memory if no pointers are
- * pointing to it anymore. Their use is requried when creating pointers to dynamic
- * structures like vectors.
- */
-typedef std::tr1::shared_ptr <PeerData> PeerDataPtr;
 
 /**
  * This class stores the information of a single object, including name,
@@ -60,6 +50,7 @@ class ObjectInfo
 		 * Smart pointers ensure that the memory region which is pointed too will always be available.
 		 */
 		std::vector<PeerDataPtr> location_list;
+
 	public:
 		ObjectInfo();
 		virtual ~ObjectInfo();
@@ -94,7 +85,12 @@ class ObjectInfo
 		 */
 		PeerDataPtr getRandPeerRef();
 
+		int getPeerListSize();
+
+		bool isPeerPresent(PeerDataPtr peer_ptr);
+
 		void setSize(const int &siz);
+
 		int getSize();
 };
 
