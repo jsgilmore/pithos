@@ -221,7 +221,9 @@ void DHTStorage::sendResponse(int responseType, unsigned int rpcid, bool isSucce
 	response->setPayloadType(RESPONSE);
 	response->setRpcid(rpcid);		//This allows the higher layer to know which RPC call is being acknowledged.
 	response->setIsSuccess(isSuccess);
-	response->addObject(object);
+
+	if (value != BinaryValue::UNSPECIFIED_VALUE)
+		response->addObject(object);
 
 	send(response, "read");
 }
