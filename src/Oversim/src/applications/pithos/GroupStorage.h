@@ -65,6 +65,10 @@ class GroupStorage : public cSimpleModule
 
 		cQueue storage; /**< The queue holding all stored GameObjects */
 
+		/**< A map that stores all game objects on this group peer */
+		typedef std::map<OverlayKey, GameObject> StorageMap;
+		StorageMap storage_map;
+
 		TransportAddress super_peer_address; /**< The TransPort address of the group super peer (this address is set, after the peer has joined a group) */
 
 		double latitude; /**< The latitude of this peer (position in the virtual world) */
@@ -73,9 +77,9 @@ class GroupStorage : public cSimpleModule
 
 		std::vector<PeerDataPtr> group_peers; /**< A vector that records all peers that belong to this super peer's group */
 
-		/**< A map that records all objects that are stored in this super peer's group */
-		typedef std::map<OverlayKey, ObjectInfo> ObjectMap;
-		ObjectMap object_map;
+		/**< A map that records all objects information stored in this super peer's group */
+		typedef std::map<OverlayKey, ObjectInfo> ObjectInfoMap;
+		ObjectInfoMap object_map;
 
 		GlobalStatistics* globalStatistics; /**< pointer to GlobalStatistics module in this node*/
 
@@ -116,7 +120,9 @@ class GroupStorage : public cSimpleModule
 
 		void respond_toUpper(cMessage *msg);
 
-		void sendUDPResponse(cMessage *msg);
+		void sendUDPResponse(TransportAddress src_adr, TransportAddress dest_adr, int responseType, unsigned int rpcid, bool isSuccess, GameObject object = GameObject::UNSPECIFIED_OBJECT);
+
+		void sendUpperResponse(int responseType, unsigned int rpcid, bool isSuccess, GameObject object = GameObject::UNSPECIFIED_OBJECT);
 
 		/**
 		 * Send a join request to the directory server or a super peer

@@ -131,22 +131,87 @@ int GroupStorage::getStorageFiles()
 	return storage.getLength();
 }
 
+void GroupStorage::sendUDPResponse(TransportAddress src_adr, TransportAddress dest_adr, int responseType, unsigned int rpcid, bool isSuccess, GameObject object)
+{
+	GameObject *object_ptr = new GameObject(object);
+	ResponsePkt *response = new ResponsePkt();
+
+	response->setSourceAddress(src_adr);
+	response->setDestinationAddress(dest_adr);
+	response->setByteLength(4 + 4 + 4 + 4 + 4 + 4);	//SourceAddress + DestinationAddress + ResponseType + PayloadType + isSuccess + RPCID
+	response->setResponseType(responseType);
+	response->setPayloadType(RESPONSE);
+	response->setIsSuccess(isSuccess);
+	response->setRpcid(rpcid);		//This allows the higher layer to know which RPC call is being acknowledged.
+
+	if (object != GameObject::UNSPECIFIED_OBJECT)
+		response->addObject(object_ptr);
+
+	send(response, "comms_gate$o");
+}
+
+//TODO: Figure out how group storage will do responses.
+void GroupStorage::sendUpperResponse(int responseType, unsigned int rpcid, bool isSuccess, GameObject object)
+{
+	GameObject *object_ptr = new GameObject(object);
+	EV << "[GroupStorage] returning result: " << object << endl;
+
+	ResponsePkt *response = new ResponsePkt();
+	response->setResponseType(responseType);
+	response->setPayloadType(RESPONSE);
+	response->setRpcid(rpcid);		//This allows the higher layer to know which RPC call is being acknowledged.
+	response->setIsSuccess(isSuccess);
+
+	if (object != GameObject::UNSPECIFIED_OBJECT)
+		response->addObject(object_ptr);
+
+	send(response, "read");
+}
+
+//This is kind of a recursive distributed network function. Keep that in mind when figuring out the code+comments
 void GroupStorage::requestRetrieve(OverlayKeyPkt *retrieve_req)
 {
-	/*OverlayKey *key = &(retrieve_req->getKey());
+	ObjectInfo object_info;
+	int peer_list_size;
+	PeerDataPtr container_peer_ptr;
+	ObjectInfoMap::iterator object_map_it;
 
+	OverlayKey *key = &(retrieve_req->getKey());
+	unsigned int rpcid = retrieve_req->getValue();		//TODO: Make sure the rpcid is required as a separate variable, even if the mesasge is sent out as is.
 
+	StorageMap::iterator storage_map_it = storage_map.find(*key);
 
-	ObjectInfo object_info = (object_map.find(*key))->second;
+	//Check whether the object is on the same peer that sent the request
+	//If the source and destination addresses are the same it means the request comes from the higher layer and not another peer
+	if ((storage_map_it != storage_map.end()) && (retrieve_req->getSourceAddress() == retrieve_req->getDestinationAddress()))
+	{
+		RECORD_STATS(numGetSuccess++);
+		//If the object is stored in local storage, send it to the upper layer without requesting from the group
+		sendUpperResponse(GROUP_GET, rpcid, true, storage_map_it->second);
+		return;
+	}
 
-	int peer_list_size = object_info.getPeerListSize();
+	//Check whether the object is on this peer, but another peer sent the request.
+	if (storage_map_it != storage_map.end())
+	{
+		sendUDPResponse(retrieve_req->getDestinationAddress(), retrieve_req->getSourceAddress(), GROUP_GET, rpcid, true, storage_map_it->second);
+		return;
+	}
 
-	PeerDataPtr container_peer_ptr = object_info.getPeerRef(intuniform(0, peer_list_size-1));
+	object_map_it = object_map.find(*key);
+	if (object_map_it == object_map.end())
+		error("Requested object not found");
+
+	object_info = object_map_it->second;
+
+	peer_list_size = object_info.getPeerListSize();
+
+	container_peer_ptr = object_info.getPeerRef(intuniform(0, peer_list_size-1));
 
 	retrieve_req->setDestinationAddress(container_peer_ptr->getAddress());
 
 	RECORD_STATS(numSent++; numGetSent++);
-	send(retrieve_req, "comms_gate$o");*/
+	send(retrieve_req, "comms_gate$o");
 }
 
 void GroupStorage::addObject(cMessage *msg)
@@ -154,7 +219,7 @@ void GroupStorage::addObject(cMessage *msg)
 	PeerListPkt *plist_p = check_and_cast<PeerListPkt *>(msg);
 
 	std::vector<PeerDataPtr>::iterator peer_it;
-	ObjectMap::iterator object_map_it;
+	ObjectInfoMap::iterator object_map_it;
 	PeerData peer_data_recv;
 	ObjectInfo *object_info;
 
@@ -282,7 +347,7 @@ void GroupStorage::createWritePkt(ValuePkt **write, unsigned int rpcid)
 
 	//Create the packet that will house the game object
 	(*write) = new ValuePkt("write");
-	(*write)->setByteLength(4+4+4+8);	//Source address, dest address, type, object name ID and object size
+	(*write)->setByteLength(4+4+4+8);	//Source address, dest address, object name ID and object size
 	(*write)->setPayloadType(WRITE);
 	(*write)->setValue(rpcid);
 	(*write)->setSourceAddress(sourceAdr);
@@ -367,20 +432,6 @@ void GroupStorage::respond_toUpper(cMessage *msg)
 	send(msg, "read");
 }
 
-void GroupStorage::sendUDPResponse(cMessage *msg)
-{
-	ResponsePkt *response = new ResponsePkt();
-	ValuePkt *store_req = check_and_cast<ValuePkt *>(msg);
-
-	response->setSourceAddress(store_req->getDestinationAddress());
-	response->setDestinationAddress(store_req->getSourceAddress());
-	response->setResponseType(GROUP_PUT);
-	response->setPayloadType(RESPONSE);
-	response->setIsSuccess(true);
-	response->setRpcid(store_req->getValue());		//This allows the higher layer to know which RPC call is being acknowledged.
-	send(response, "comms_gate$o");
-}
-
 int GroupStorage::getStorageBytes()
 {
 	int i;
@@ -399,6 +450,7 @@ int GroupStorage::getStorageBytes()
 void GroupStorage::store(cMessage *msg)
 {
 	simtime_t delay;
+	ValuePkt *value_pkt = check_and_cast<ValuePkt *>(msg);
 
 	if (!(msg->hasObject("GameObject")))
 		error("Storage received a message with no game object attached");
@@ -411,7 +463,7 @@ void GroupStorage::store(cMessage *msg)
 
 	EV << getName() << " " << getIndex() << " received write command of size " << go->getSize() << " with delay " << go->getCreationTime() << "\n";
 
-	storage.insert(go);
+	storage_map.insert(std::make_pair(go->getHash(), *go));
 
 	emit(storeTimeSignal, delay);
 
@@ -420,7 +472,7 @@ void GroupStorage::store(cMessage *msg)
 
 	emit(objectsSignal, 1);
 
-	sendUDPResponse(msg);
+	sendUDPResponse(value_pkt->getSourceAddress(), value_pkt->getDestinationAddress(), GROUP_PUT, value_pkt->getValue(), true);
 
 	updatePeerObjects(*go);
 }

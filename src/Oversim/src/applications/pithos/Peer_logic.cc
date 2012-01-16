@@ -45,11 +45,19 @@ void Peer_logic::handleGetCAPIRequest(RootObjectGetCAPICall* capiGetMsg)
 	Enter_Method("[Peer_logic]: handleGetCAPIRequest()");	//Required for Omnet++ context switching between modules
 	take(capiGetMsg);
 
+	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
+	TransportAddress address(thisNode->getIp(), thisNode->getPort());
+
 	EV << getParentModule()->getName() << " " << getParentModule()->getIndex() << " received storage request for overlay key " << capiGetMsg->getKey() << "\n";
 
 	read_pkt = new OverlayKeyPkt();
 	read_pkt->setName(capiGetMsg->getName());
 	read_pkt->setPayloadType(RETRIEVE_REQ);
+	read_pkt->setByteLength(4 + 4 + 4 + 4 + 4);		//payload type + source address + destination address + rpcid + key
+
+	//These duplicate addresses of the current node are used by group storage to determine whether the higher layer has requested an object, or another peer
+	read_pkt->setSourceAddress(address);
+	read_pkt->setDestinationAddress(address);
 
 	//This is the RPC ID of capiPutMsg and will be added to the response msg which the
 	//peer logic can then use to match the received response to the relevant RPC call.
