@@ -45,19 +45,10 @@ class Storage : public cSimpleModule
 
 		simsignal_t qsizeSignal; /**< Signal for recording the size of objects stored in bytes */
 
-		simsignal_t overlayObjectsSignal; /**< Signal for recording the number of overlay objects stored */
-
-		simsignal_t rootObjectsSignal; /**< Signal for recording the number of root objects stored */
-
-		simsignal_t replicaObjectsSignal; /**< Signal for recording the number of group replica objects stored */
+		simsignal_t objectsSignal; /**< Signal for recording the number of root objects stored */
 
 		simsignal_t storeTimeSignal; /**< Signal for recording the time that was required to store each object */
 
-		simsignal_t rootStoreTimeSignal; /**< Signal for recording the time that was required to store a root object */
-
-		simsignal_t replicaStoreTimeSignal; /**< Signal for recording the time that was required to store a group replica object */
-
-		simsignal_t overlayStoreTimeSignal; /**< Signal for recording the time that was required to store an overlay object */
 
 		virtual void initialize();
 		virtual void handleMessage(cMessage *msg);

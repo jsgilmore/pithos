@@ -27,6 +27,8 @@
 #include "Peer_logic.h"
 #include "Communicator.h"
 
+#include "ObjectInfo.h"
+#include "PeerData.h"
 #include "GameObject.h"
 #include "PeerListPkt.h"
 #include "PithosMessages_m.h"
@@ -69,21 +71,22 @@ class GroupStorage : public cSimpleModule
 
 		double longitude; /**< The longitude of this peer (position in the virtual world) */
 
-		std::vector<PeerData> group_peers; /**< The list of peers in the group and which objects they store. */
+		std::vector<PeerDataPtr> group_peers; /**< A vector that records all peers that belong to this super peer's group */
 
-		simsignal_t groupSizeSignal; /**< The signal recording the statistic of the group size. */
-
-		simsignal_t groupSendFailSignal; /**< The signal recording the statistic of how many times a group storage failed. */
-
-		simsignal_t joinTimeSignal; /**< The signal recording the statistic of the group size. */
+		/**< A map that records all objects that are stored in this super peer's group */
+		typedef std::map<OverlayKey, ObjectInfo> ObjectMap;
+		ObjectMap object_map;
 
 		GlobalStatistics* globalStatistics; /**< pointer to GlobalStatistics module in this node*/
 
 		// statistics
-		//int numSent; /**< number of sent packets*/
-		//int numPutSent; /**< number of put sent*/
-		//int numPutError; /**< number of error in put responses*/
-		//int numPutSuccess; /**< number of success in put responses*/
+		int numSent; /**< number of sent packets*/
+		int numPutSent; /**< number of put sent*/
+		int numGetSent; /**< number of put sent*/
+		int numGetError; /**< number of error in put responses*/
+		int numGetSuccess; /**< number of success in put responses*/
+		int numPutError; /**< number of error in put responses*/
+		int numPutSuccess; /**< number of success in put responses*/
 
 		/**
 		 * The function creates a write packet and fills it with address information, payload type and byte length.
@@ -93,13 +96,15 @@ class GroupStorage : public cSimpleModule
 		 */
 		void createWritePkt(ValuePkt **write, unsigned int rpcid);
 
+		void addObject(cMessage *msg);
+
 		/**
 		 * Send a message to the super peer informing it about a new group object and a list of peers that store it.
 		 *
 		 * @param go The GameObject stored, of which the size and name are used.
 		 * @param send_list A history of all peers selected to store the new object.
 		 */
-		void updateSuperPeerObjects(GameObject *go, std::vector<TransportAddress> send_list);
+		void updatePeerObjects(GameObject go);
 
 		/**
 		 * Select a random TransportAddress within the group that has not be chosen for a replica during the current selection process.
@@ -155,19 +160,15 @@ class GroupStorage : public cSimpleModule
 
 		simsignal_t qsizeSignal; /**< Signal for recording the size of objects stored in bytes */
 
-		simsignal_t overlayObjectsSignal; /**< Signal for recording the number of overlay objects stored */
-
-		simsignal_t rootObjectsSignal; /**< Signal for recording the number of root objects stored */
-
-		simsignal_t replicaObjectsSignal; /**< Signal for recording the number of group replica objects stored */
+		simsignal_t objectsSignal; /**< Signal for recording the number of root objects stored */
 
 		simsignal_t storeTimeSignal; /**< Signal for recording the time that was required to store each object */
 
-		simsignal_t rootStoreTimeSignal; /**< Signal for recording the time that was required to store a root object */
+		simsignal_t groupSizeSignal; /**< The signal recording the statistic of the group size. */
 
-		simsignal_t replicaStoreTimeSignal; /**< Signal for recording the time that was required to store a group replica object */
+		simsignal_t groupSendFailSignal; /**< The signal recording the statistic of how many times a group storage failed. */
 
-		simsignal_t overlayStoreTimeSignal; /**< Signal for recording the time that was required to store an overlay object */
+		simsignal_t joinTimeSignal; /**< The signal recording the statistic of the group size. */
 
 		void finish();
 		virtual void initialize();

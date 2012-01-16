@@ -26,10 +26,9 @@ GameObject::~GameObject()
 
 }
 
-GameObject::GameObject(const char *name, int o_type, int64_t o_size, simtime_t o_creationTime, int o_ttl) : cOwnedObject(name)
+GameObject::GameObject(const char *name, int64_t o_size, simtime_t o_creationTime, int o_ttl) : cOwnedObject(name)
 {
 	strcpy(objectName, "Unspecified");
-	type = o_type;
 	size = o_size;
 	creationTime = o_creationTime;
 	ttl = o_ttl;
@@ -47,7 +46,6 @@ GameObject& GameObject::operator=(const GameObject& other)
 	cOwnedObject::operator=(other);
 
 	size = other.size;
-	type = other.type;
 	ttl = other.ttl;
 	strcpy(objectName, other.objectName);
 	creationTime = other.creationTime;
@@ -60,9 +58,6 @@ bool operator==(const GameObject& object1, const GameObject& object2)
 	if (object1.size != object2.size)
 		return false;
 
-	if (object1.type != object2.type)
-		return false;
-
 	if (object1.ttl != object2.ttl)
 		return false;
 
@@ -71,6 +66,8 @@ bool operator==(const GameObject& object1, const GameObject& object2)
 
 	//A creation time difference of no more than one is used to account for inaccuracies when converting from the float string of the BinaryValue to a float variable
 	if ((object1.creationTime - object2.creationTime) > 1)
+		return false;
+	if ((object2.creationTime - object1.creationTime) > 1)
 		return false;
 
 	return true;
@@ -93,7 +90,6 @@ GameObject& GameObject::operator=(const BinaryValue& binval)
 	{
 		strcpy(objectName, "Unspecified");
 		size = 0;
-		type = ROOT;
 		creationTime = SIMTIME_ZERO;
 		ttl = 0;
 
@@ -113,9 +109,8 @@ GameObject& GameObject::operator=(const BinaryValue& binval)
 	//After the string has been tokenised, we have to use the tokens to populate the variables
 	strcpy(objectName, (tokens[0]).c_str());
 	size = atol((tokens[1]).c_str());		//TODO: I'm quite sure this long will be 64 bits in a 64 bit system, but unsure about 32 bit systems
-	type = atoi((tokens[2]).c_str());
-	creationTime = atof((tokens[3]).c_str());
-	ttl = atoi((tokens[4]).c_str());
+	creationTime = atof((tokens[2]).c_str());
+	ttl = atoi((tokens[3]).c_str());
 
 	return *this;
 }
@@ -123,10 +118,18 @@ GameObject& GameObject::operator=(const BinaryValue& binval)
 //The following functions are required by the cOwnedObject type from which this object inherits.
 std::string GameObject::info()
 {
-	//It's important that this function is kept up to date, since the BinaryValue of the object is generated using it
-	//Also, space delimiting is used by the C++ string streams to tokenise the input for reconstruction
+	/**
+	 * It's important that this function is kept up to date,
+	 * since the BinaryValue and hash of the object is generated using it.
+	 *
+	 * Space delimiting is used by the C++ string streams to tokenise the input for reconstruction
+	 *
+	 * The info attribute is intentionally not present,
+	 * since the hash of an object should not depend on whether it's a root, replica or overlay object
+	 */
+
 	std::stringstream out;
-	out << objectName << " " << size << " " << type << " " << creationTime << " " << ttl;
+	out << objectName << " " << size << " " << creationTime << " " << ttl;
 	return out.str();
 }
 
@@ -135,7 +138,6 @@ std::ostream& operator<<(std::ostream& stream, const GameObject go)
 {
     return stream << /*This will state the node number and object number: */ go.objectName
 					<< " Size: " << go.size
-					<< " Type: " << go.type
                   << " CreationTime: " << go.creationTime
                   << " TTL: " << go.ttl;
 }
@@ -172,16 +174,6 @@ int64_t GameObject::getSize()
 void GameObject::setSize(const int64_t &o_size)
 {
 	size = o_size;
-}
-
-int GameObject::getType()
-{
-	return type;
-}
-
-void GameObject::setType(const int &o_type)
-{
-	type = o_type;
 }
 
 int GameObject::getTTL()

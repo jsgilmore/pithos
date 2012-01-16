@@ -57,6 +57,25 @@ PeerDataPtr ObjectInfo::getRandPeerRef()
 	return location_list.at(index);
 }
 
+bool ObjectInfo::isPeerPresent(PeerDataPtr peer_ptr)
+{
+	std::vector<PeerDataPtr>::iterator list_ptr;
+
+	for (list_ptr = location_list.begin() ; list_ptr != location_list.end() ; list_ptr++)
+	{
+		//This checks whether the PeerData object have the same values
+		if (**list_ptr == *peer_ptr)
+			return true;
+	}
+
+	return false;
+}
+
+int ObjectInfo::getPeerListSize()
+{
+	return location_list.size();
+}
+
 void ObjectInfo::setSize(const int &siz)
 {
 	size = siz;

@@ -25,12 +25,6 @@
 #include "OverlayKey.h"
 #include "BinaryValue.h"
 
-enum ObjectTypes {
-    ROOT = 1,
-    REPLICA = 2,
-    OVERLAY = 3
-};
-
 /**
  * The game object class stores the information of a game object.
  * These are the atomic objects that are stored in Pithos.
@@ -45,8 +39,6 @@ class GameObject : public cOwnedObject
 
 		int64_t size; 			/**< The size in bytes of the object */
 
-		int type; 				/**< The type of object (root,replica,overlay) */
-
 		simtime_t creationTime; /**< The time when the object was created */
 		int ttl;				/**< The time-to-live of the object */
 
@@ -57,7 +49,7 @@ class GameObject : public cOwnedObject
 
 		//If no ttl is given and the object is stored, it will not be able to exist in storage
 		//creationTime is initialised to an empty simtime_t object. Values such as zero do not work, since the scale exponent for simtime_t might not have been defined.
-		GameObject(const char *name="GameObject", int o_type=ROOT, int64_t o_size=0, simtime_t o_creationTime=SIMTIME_ZERO, int o_ttl=0);
+		GameObject(const char *name="GameObject", int64_t o_size=0, simtime_t o_creationTime=SIMTIME_ZERO, int o_ttl=0);
 		GameObject(const GameObject& other);
 		GameObject(const BinaryValue& binval);
 		virtual ~GameObject();
@@ -78,10 +70,6 @@ class GameObject : public cOwnedObject
 
 		/** @param o_size The size of the object in bytes */
 		void setSize(const int64_t &o_size);
-
-		int getType();
-
-		void setType(const int &o_type);
 
 		int getTTL();
 		int getTTL() const;

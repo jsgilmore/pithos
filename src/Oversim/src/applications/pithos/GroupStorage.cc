@@ -48,18 +48,13 @@ void GroupStorage::initialize()
 
 	//Register the signals that record the time required for a specific type of object to be stored
 	storeTimeSignal = registerSignal("storeTime");
-	rootStoreTimeSignal = registerSignal("rootStoreTime");
-	replicaStoreTimeSignal = registerSignal("replicaStoreTime");
-	overlayStoreTimeSignal = registerSignal("overlayStoreTime");
 
 	//Record the initial zero lengths of the object storage
 	emit(qlenSignal, storage.length());
 	emit(qsizeSignal, getStorageBytes());
 
 	//Register the signals that record the number of different types of objects in storage
-	overlayObjectsSignal = registerSignal("OverlayObject");
-	rootObjectsSignal = registerSignal("RootObject");
-	replicaObjectsSignal = registerSignal("ReplicaObject");
+	objectsSignal = registerSignal("Object");
 
 	//Read the IP address and port of the directory server from the NED file.
 	strcpy(directory_ip, par("directory_ip"));
@@ -73,46 +68,50 @@ void GroupStorage::initialize()
 	latitude = uniform(0,100);		//Make this range changeable
 	longitude = uniform(0,100);		//Make this range changeable
 
-	/*globalStatistics = GlobalStatisticsAccess().get();
+	globalStatistics = GlobalStatisticsAccess().get();
 
 	// statistics
 	numSent = 0;
 	numPutSent = 0;
 	numPutError = 0;
 	numPutSuccess = 0;
+	numGetSent = 0;
+	numGetError = 0;
+	numGetSuccess = 0;
 
 	//initRpcs();
 	WATCH(numSent);
 	WATCH(numPutSent);
 	WATCH(numPutError);
-	WATCH(numPutSuccess);*/
+	WATCH(numPutSuccess);
+	WATCH(numGetSent);
+	WATCH(numGetError);
+	WATCH(numGetSuccess);
 }
 
 void GroupStorage::finish()
 {
-	/*cModule *communicatorModule = getParentModule()->getSubmodule("communicator");
+	cModule *communicatorModule = getParentModule()->getSubmodule("communicator");
 	Communicator *communicator = check_and_cast<Communicator *>(communicatorModule);
 
     simtime_t time = globalStatistics->calcMeasuredLifetime(communicator->getCreationTime());
 
     if (time >= GlobalStatistics::MIN_MEASURED) {
         // record scalar data
-        globalStatistics->addStdDev("GroupStorage: Sent Total Messages/s",
-                                    numSent / time);
+        globalStatistics->addStdDev("GroupStorage: Sent Total Messages/s", numSent / time);
 
-        globalStatistics->addStdDev("GroupStorage: Sent PUT Messages/s",
-                                    numPutSent / time);
-        globalStatistics->addStdDev("GroupStorage: Failed PUT Requests/s",
-                                    numPutError / time);
-        globalStatistics->addStdDev("GroupStorage: Successful PUT Requests/s",
-                                    numPutSuccess / time);
+        globalStatistics->addStdDev("GroupStorage: Sent PUT Messages/s", numPutSent / time);
+        globalStatistics->addStdDev("GroupStorage: Failed PUT Requests/s", numPutError / time);
+        globalStatistics->addStdDev("GroupStorage: Successful PUT Requests/s", numPutSuccess / time);
+
+        globalStatistics->addStdDev("GroupStorage: Sent GET Messages/s", numGetSent / time);
+		globalStatistics->addStdDev("GroupStorage: Failed GET Requests/s", numGetError / time);
+		globalStatistics->addStdDev("GroupStorage: Successful GET Requests/s", numGetSuccess / time);
 
         if ((numGetSuccess + numGetError) > 0) {
-            globalStatistics->addStdDev("GroupStorage: GET Success Ratio",
-                                        (double) numGetSuccess
-                                        / (double) (numGetSuccess + numGetError));
+            globalStatistics->addStdDev("GroupStorage: GET Success Ratio", (double) numGetSuccess / (double) (numGetSuccess + numGetError));
         }
-    }*/
+    }
 }
 
 bool GroupStorage::hasSuperPeer()
@@ -134,42 +133,125 @@ int GroupStorage::getStorageFiles()
 
 void GroupStorage::requestRetrieve(OverlayKeyPkt *retrieve_req)
 {
+	/*OverlayKey *key = &(retrieve_req->getKey());
 
+
+
+	ObjectInfo object_info = (object_map.find(*key))->second;
+
+	int peer_list_size = object_info.getPeerListSize();
+
+	PeerDataPtr container_peer_ptr = object_info.getPeerRef(intuniform(0, peer_list_size-1));
+
+	retrieve_req->setDestinationAddress(container_peer_ptr->getAddress());
+
+	RECORD_STATS(numSent++; numGetSent++);
+	send(retrieve_req, "comms_gate$o");*/
 }
 
-void GroupStorage::updateSuperPeerObjects(GameObject *go, std::vector<TransportAddress> send_list)
+void GroupStorage::addObject(cMessage *msg)
+{
+	PeerListPkt *plist_p = check_and_cast<PeerListPkt *>(msg);
+
+	std::vector<PeerDataPtr>::iterator peer_it;
+	ObjectMap::iterator object_map_it;
+	PeerData peer_data_recv;
+	ObjectInfo *object_info;
+
+	//Check whether the received object information is already stored in the super peer
+	object_map_it = object_map.find(plist_p->getObjectKey());
+
+	//If the object is not already known, have the iterator point to a new object instead.
+	if (object_map_it == object_map.end())
+	{
+		//TODO: The fact that a duplicate key was received should be logged
+		object_info = new ObjectInfo();
+
+		//Log the file name and what peers it is stored on
+		object_info->setObjectName(plist_p->getObjectName());
+		object_info->setSize(plist_p->getObjectSize());
+
+	} else object_info = &(object_map_it->second);
+
+	//Iterate through all PeerData objects received in the PeerListPkt
+	for (unsigned int i = 0 ; i < plist_p->getPeer_listArraySize() ; i++)
+	{
+		peer_data_recv = ((PeerData)plist_p->getPeer_list(i));
+
+		for (peer_it = group_peers.begin() ; peer_it != group_peers.end() ; peer_it++)
+		{
+			//*peer_it returns a PeerDataPtr type, which again has to be dereferenced to obtain the PeerData object (**peer_it)
+			if (**peer_it == peer_data_recv)
+				break;
+		}
+
+		//If an object is stored on an unknown peer, first add that peer to the peer list
+		if (peer_it == group_peers.end())
+		{
+			//TODO: Log this exception
+			PeerDataPtr peer_dat_ptr(new PeerData(peer_data_recv));
+			group_peers.push_back(peer_dat_ptr);
+
+			//Make sure this peer is not listed in the object info peer vector
+			if (object_info->isPeerPresent(peer_dat_ptr))
+				error("This peer is already known to this object");
+
+			object_info->addPeerRef(peer_dat_ptr);	//Add a peer to the ObjectInfo object's peer vector
+
+		} else {
+
+			//Make sure this peer is not listed in the object info peer vector
+			if (object_info->isPeerPresent(*peer_it))
+				error("This peer is already known to this object");
+
+			object_info->addPeerRef(*peer_it);	//Add a peer to the ObjectInfo object's peer vector
+		}
+	}
+
+	if (object_map_it == object_map.end())
+	{
+		object_map.insert(std::make_pair(plist_p->getObjectKey(), *object_info));
+		delete(object_info);
+	}
+}
+
+void GroupStorage::updatePeerObjects(GameObject go)
 {
 	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
 	TransportAddress sourceAdr(thisNode->getIp(), thisNode->getPort());
 
 	PeerListPkt *objectAddPkt = new PeerListPkt();
-	objectAddPkt->setByteLength(4+4+4+8+(send_list.size()*4));	//Source address, dest address, type, object name ID, storage peer addresses
-
+	objectAddPkt->setByteLength(4+4+4+8+4);	//Source address, dest address, type, object name ID, storage peer address
 
 	if (super_peer_address.isUnspecified())
 	{
 		//TODO: This error condition should be logged
-		EV << "No super peer has been identified. The object will not be replicated in the Overlay\n";
+		EV << "No super peer has been identified. The group object will not be stored on this peer\n";
 		delete(objectAddPkt);
 		return;
 	}
 
-	objectAddPkt->setObjectName(go->getObjectName());
-	objectAddPkt->setObjectSize(go->getSize());
-	objectAddPkt->setObjectKey(go->getHash());
+	objectAddPkt->setObjectName(go.getObjectName());
+	objectAddPkt->setObjectSize(go.getSize());
+	objectAddPkt->setObjectKey(go.getHash());
 	objectAddPkt->setPayloadType(OBJECT_ADD);
 	objectAddPkt->setSourceAddress(sourceAdr);
 	objectAddPkt->setName("object_add");
-	objectAddPkt->setDestinationAddress(super_peer_address);
 
-	//Add the addresses of the other peers that have stored the data to the message
-	for (unsigned int i = 0 ; i < send_list.size() ; i++)
+	objectAddPkt->addToPeerList(PeerData(sourceAdr));
+
+	//Inform all group peers about the new object and where it is stored
+	for (unsigned int i = 0 ; i < group_peers.size() ; i++)
 	{
-		PeerData peer_d;
-		peer_d.setAddress(send_list.at(i));
-		objectAddPkt->addToPeerList(peer_d);
+		TransportAddress dest_adr = (*(group_peers.at(i))).getAddress();
+		objectAddPkt->setDestinationAddress(dest_adr);
+		send(objectAddPkt->dup(), "comms_gate$o");		//Set address
 	}
 
+	//Inform the super peer of the new object and the peer that contains it
+	//The super peer object type must be different to the group object type for communicator routing purposes
+	objectAddPkt->setPayloadType(SP_OBJECT_ADD);
+	objectAddPkt->setDestinationAddress(super_peer_address);
 	send(objectAddPkt, "comms_gate$o");		//Set address
 }
 
@@ -180,7 +262,7 @@ void GroupStorage::selectDestination(TransportAddress *dest_adr, std::vector<Tra
 
 	while(!original_address)
 	{
-		*dest_adr = ((PeerData)group_peers.at(intuniform(0, group_peers.size()-1))).getAddress();		//Choose a random peer in the group for the destination
+		*dest_adr = (*(group_peers.at(intuniform(0, group_peers.size()-1)))).getAddress();		//Choose a random peer in the group for the destination
 
 		//Check all previous chosen addresses to determine whether this address is unique
 		original_address = true;
@@ -199,7 +281,7 @@ void GroupStorage::createWritePkt(ValuePkt **write, unsigned int rpcid)
 	TransportAddress sourceAdr(thisNode->getIp(), thisNode->getPort());
 
 	//Create the packet that will house the game object
-	(*write) = new ValuePkt();
+	(*write) = new ValuePkt("write");
 	(*write)->setByteLength(4+4+4+8);	//Source address, dest address, type, object name ID and object size
 	(*write)->setPayloadType(WRITE);
 	(*write)->setValue(rpcid);
@@ -227,7 +309,7 @@ int GroupStorage::getReplicaNr(unsigned int rpcid)
 		send(response, "read");
 
 		emit(groupSendFailSignal, replicas - group_peers.size());
-		//RECORD_STATS(numPutError++);
+		RECORD_STATS(numPutError++);
 		replicas = group_peers.size();
 	}
 
@@ -256,15 +338,6 @@ void GroupStorage::send_forstore(GameObject *go, unsigned int rpcid)
 		go_dup = go->dup();
 		write_dup = write->dup();
 
-		if (i > 0) {
-			go_dup->setType(REPLICA);
-			write_dup->setName("replica_write");
-		}
-		else {
-			//The default type is already ROOT
-			write_dup->setName("write");
-		}
-
 		write_dup->addObject(go_dup);
 
 		selectDestination(&dest_adr, send_list);
@@ -272,26 +345,24 @@ void GroupStorage::send_forstore(GameObject *go, unsigned int rpcid)
 
 		send_list.push_back(dest_adr);
 
-		//RECORD_STATS(numSent++; numPutSent++; numPutSuccess++);
+		RECORD_STATS(numSent++; numPutSent++);
 		send(write_dup, "comms_gate$o");
 	}
 
 	delete(write);
-
-	updateSuperPeerObjects(go, send_list);
 }
 
 void GroupStorage::respond_toUpper(cMessage *msg)
 {
-	//ResponsePkt *response = check_and_cast<ResponsePkt *>(msg);
+	ResponsePkt *response = check_and_cast<ResponsePkt *>(msg);
 
-	//TODO: Perhaps collect some statistics at this point, that is not worth collecting in the higher layer.
-	/*if (response->getIsSuccess()) {
+	if (response->getIsSuccess()) {
 		RECORD_STATS(numPutSuccess++);
-		RECORD_STATS(globalStatistics->addStdDev("GroupStorage: PUT Latency (s)", SIMTIME_DBL(simTime() - context->requestTime)));
+		//FIXME: Record the group put latency
+		//RECORD_STATS(globalStatistics->addStdDev("GroupStorage: PUT Latency (s)", SIMTIME_DBL(simTime() - context->requestTime)));
 	} else {
-		RECORD_STATS(numPutError++);
-	}*/
+		RECORD_STATS(numPutError++);		//These errors are currently all caused by an insufficient number of group peers to store all replicas.
+	}
 
 	send(msg, "read");
 }
@@ -334,46 +405,31 @@ void GroupStorage::store(cMessage *msg)
 
 	GameObject *go = (GameObject *)msg->removeObject("GameObject");
 
-	if (go->getType() == ROOT)
-		EV << getName() << " " << getIndex() << " received root Game Object of size " << go->getSize() << "\n";
-	else if (go->getType() == REPLICA)
-		EV << getName() << " " << getIndex() << " received replica Game Object of size " << go->getSize() << "\n";
+	EV << getName() << " " << getIndex() << " received Game Object of size " << go->getSize() << "\n";
 
 	delay = simTime() - go->getCreationTime();
 
 	EV << getName() << " " << getIndex() << " received write command of size " << go->getSize() << " with delay " << go->getCreationTime() << "\n";
 
-	emit(storeTimeSignal, delay);
-
 	storage.insert(go);
+
+	emit(storeTimeSignal, delay);
 
 	emit(qlenSignal, storage.length());
 	emit(qsizeSignal, getStorageBytes());
 
-	if (go->getType() == ROOT)
-	{
-		emit(rootObjectsSignal, 1);
-		emit(rootStoreTimeSignal, delay);
-	}
-	else if (go->getType() == REPLICA)
-	{
-		emit(replicaObjectsSignal, 1);
-		emit(replicaStoreTimeSignal, delay);
-	}
-	else if (go->getType() == OVERLAY)
-	{
-		emit(overlayObjectsSignal, 1);
-		emit(overlayStoreTimeSignal, delay);
-	}
-	else error("The game object type was incorrectly set");
+	emit(objectsSignal, 1);
 
 	sendUDPResponse(msg);
+
+	updatePeerObjects(*go);
 }
 
 void GroupStorage::addPeers(cMessage *msg)
 {
 	PeerListPkt *list_p = check_and_cast<PeerListPkt *>(msg);
-	PeerData *peer_dat;
+	PeerData peer_dat;
+	PeerDataPtr peer_dat_ptr;
 	unsigned int i;
 	bool found;
 	simtime_t joinTime = simTime();
@@ -390,13 +446,13 @@ void GroupStorage::addPeers(cMessage *msg)
 
 	for ( i = 0 ; i < list_p->getPeer_listArraySize() ; i++)
 	{
-		peer_dat = &(list_p->getPeer_list(i));
+		peer_dat = list_p->getPeer_list(i);
 		found = false;
 
 		//First check whether this peer is already known
 		for (unsigned int j = 0 ; j < group_peers.size() ; j++)
 		{
-			if (group_peers.at(j) == *peer_dat)
+			if (*(group_peers.at(j)) == peer_dat)
 			{
 				found = true;
 				break;
@@ -406,7 +462,8 @@ void GroupStorage::addPeers(cMessage *msg)
 		//If the peer is not known, add it to the peer list
 		if (!found)
 		{
-			group_peers.push_back(*peer_dat);
+			peer_dat_ptr.reset(new PeerData(peer_dat));
+			group_peers.push_back(peer_dat_ptr);
 		}
 	}
 
@@ -460,6 +517,13 @@ void GroupStorage::handleMessage(cMessage *msg)
 {
 	if (msg == event)
 	{
+		//Add the nodes own IP to its list of known group peers
+		/*PeerDataPtr peer_dat_ptr;
+		const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
+
+		peer_dat_ptr.reset(new PeerData(thisNode->getIp()));
+		group_peers.push_back(peer_dat_ptr);*/
+
 		//For the first join request, a request is sent to the well known directory server
 		IPAddress dest_ip(directory_ip);
 		TransportAddress destAdr(dest_ip, directory_port);
@@ -481,17 +545,14 @@ void GroupStorage::handleMessage(cMessage *msg)
 		{
 			addPeers(msg);
 			delete(msg);
-		}
-		else if (packet->getPayloadType() == WRITE)
+		} else if (packet->getPayloadType() == WRITE)
 		{
 			store(msg);
 			delete(msg);
-		}
-		else if (packet->getPayloadType() == RESPONSE)
+		} else if (packet->getPayloadType() == RESPONSE)
 		{
 			respond_toUpper(msg);
-		}
-		else if (packet->getPayloadType() == STORE_REQ)
+		} else if (packet->getPayloadType() == STORE_REQ)
 		{
 			ValuePkt *store_req = check_and_cast<ValuePkt *>(msg);
 
@@ -510,6 +571,9 @@ void GroupStorage::handleMessage(cMessage *msg)
 			requestRetrieve(retrieve_req);
 
 			delete(msg);	//The group request path should start here
+		} else if (packet->getPayloadType() == OBJECT_ADD)
+		{
+			addObject(msg);
 		}
 		else error("Group storage received an unknown packet");
 	}
