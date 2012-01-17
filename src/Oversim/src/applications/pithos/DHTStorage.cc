@@ -212,9 +212,6 @@ void DHTStorage::handleGetResponse(DHTgetCAPIResponse* msg, DHTStatsContext* con
 
 void DHTStorage::sendResponse(int responseType, unsigned int rpcid, bool isSuccess, const BinaryValue& value)
 {
-	GameObject *object = new GameObject(value);
-
-	EV << "[DHTStorage] returning result: " << object << endl;
 
 	ResponsePkt *response = new ResponsePkt();
 	response->setResponseType(responseType);
@@ -223,7 +220,11 @@ void DHTStorage::sendResponse(int responseType, unsigned int rpcid, bool isSucce
 	response->setIsSuccess(isSuccess);
 
 	if (value != BinaryValue::UNSPECIFIED_VALUE)
+	{
+		GameObject *object = new GameObject(value);
+		EV << "[DHTStorage] returning result: " << object << endl;
 		response->addObject(object);
+	}
 
 	send(response, "read");
 }
