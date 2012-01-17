@@ -230,6 +230,8 @@ void PithosTestApp::sendPutRequest()
 
 	RootObjectPutCAPICall* capiPutMsg = new RootObjectPutCAPICall();
 
+	//std::cout << "[PithosTestApp] Storing object with key " << go->getHash() << endl;
+
 	capiPutMsg->addObject(go);
 	capiPutMsg->setTtl(ttl);		//The TTL is set in the RPC call as well as the GameObject, for interoperability with the DHT application
 	capiPutMsg->setIsModifiable(true);
@@ -294,6 +296,8 @@ void PithosTestApp::handleTimerEvent(cMessage* msg)
         }
 
         const OverlayKey& key = globalPithosTestMap->getRandomKey();
+
+        //std::cout << "[PithosTestApp] Retrieving object with key: " << key << endl;
 
         EV << "Retrieving key: " << key << endl;
 

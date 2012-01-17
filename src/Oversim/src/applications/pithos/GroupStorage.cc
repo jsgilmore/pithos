@@ -133,7 +133,6 @@ int GroupStorage::getStorageFiles()
 
 void GroupStorage::sendUDPResponse(TransportAddress src_adr, TransportAddress dest_adr, int responseType, unsigned int rpcid, bool isSuccess, GameObject object)
 {
-	GameObject *object_ptr = new GameObject(object);
 	ResponsePkt *response = new ResponsePkt();
 
 	response->setSourceAddress(src_adr);
@@ -145,7 +144,10 @@ void GroupStorage::sendUDPResponse(TransportAddress src_adr, TransportAddress de
 	response->setRpcid(rpcid);		//This allows the higher layer to know which RPC call is being acknowledged.
 
 	if (object != GameObject::UNSPECIFIED_OBJECT)
+	{
+		GameObject *object_ptr =  new GameObject(object);
 		response->addObject(object_ptr);
+	}
 
 	send(response, "comms_gate$o");
 }
@@ -153,7 +155,6 @@ void GroupStorage::sendUDPResponse(TransportAddress src_adr, TransportAddress de
 //TODO: Figure out how group storage will do responses.
 void GroupStorage::sendUpperResponse(int responseType, unsigned int rpcid, bool isSuccess, GameObject object)
 {
-	GameObject *object_ptr = new GameObject(object);
 	EV << "[GroupStorage] returning result: " << object << endl;
 
 	ResponsePkt *response = new ResponsePkt();
@@ -163,7 +164,10 @@ void GroupStorage::sendUpperResponse(int responseType, unsigned int rpcid, bool 
 	response->setIsSuccess(isSuccess);
 
 	if (object != GameObject::UNSPECIFIED_OBJECT)
+	{
+		GameObject *object_ptr =  new GameObject(object);
 		response->addObject(object_ptr);
+	}
 
 	send(response, "read");
 }
@@ -181,7 +185,19 @@ void GroupStorage::requestRetrieve(OverlayKeyPkt *retrieve_req)
 
 	StorageMap::iterator storage_map_it = storage_map.find(*key);
 
-	//Check whether the object is on the same peer that sent the request
+	RECORD_STATS(numSent++; numGetSent++);
+
+	//Check whether this is a group object
+	object_map_it = object_map.find(*key);
+	if (object_map_it == object_map.end())
+	{
+		RECORD_STATS(numGetError++);
+		//If the object is not stored in the group, send a failure response to the higher layer
+		sendUpperResponse(GROUP_GET, rpcid, false);
+		return;
+	}
+
+	//If the object is stored in the group, check whether the object is on the same peer that sent the request
 	//If the source and destination addresses are the same it means the request comes from the higher layer and not another peer
 	if ((storage_map_it != storage_map.end()) && (retrieve_req->getSourceAddress() == retrieve_req->getDestinationAddress()))
 	{
@@ -198,19 +214,15 @@ void GroupStorage::requestRetrieve(OverlayKeyPkt *retrieve_req)
 		return;
 	}
 
-	object_map_it = object_map.find(*key);
-	if (object_map_it == object_map.end())
-		error("Requested object not found");
-
 	object_info = object_map_it->second;
 
 	peer_list_size = object_info.getPeerListSize();
 
 	container_peer_ptr = object_info.getPeerRef(intuniform(0, peer_list_size-1));
 
+	//Send a retrieve request to the group peer storing the object
 	retrieve_req->setDestinationAddress(container_peer_ptr->getAddress());
 
-	RECORD_STATS(numSent++; numGetSent++);
 	send(retrieve_req, "comms_gate$o");
 }
 
@@ -455,13 +467,15 @@ void GroupStorage::store(cMessage *msg)
 	if (!(msg->hasObject("GameObject")))
 		error("Storage received a message with no game object attached");
 
-	GameObject *go = (GameObject *)msg->removeObject("GameObject");
+	GameObject *go = (GameObject *)msg->getObject("GameObject");		//We're not removing the object here, because we're only using the value and then the object is deleted with the message.
 
 	EV << getName() << " " << getIndex() << " received Game Object of size " << go->getSize() << "\n";
 
 	delay = simTime() - go->getCreationTime();
 
 	EV << getName() << " " << getIndex() << " received write command of size " << go->getSize() << " with delay " << go->getCreationTime() << "\n";
+
+	//std::cout << "[GroupStorageTarget] Stored object with key " << go->getHash() << endl;
 
 	storage_map.insert(std::make_pair(go->getHash(), *go));
 
@@ -626,6 +640,7 @@ void GroupStorage::handleMessage(cMessage *msg)
 		} else if (packet->getPayloadType() == OBJECT_ADD)
 		{
 			addObject(msg);
+			delete(msg);
 		}
 		else error("Group storage received an unknown packet");
 	}

@@ -64,6 +64,8 @@ void Peer_logic::handleGetCAPIRequest(RootObjectGetCAPICall* capiGetMsg)
 	read_pkt->setValue(capiGetMsg->getNonce());
 	read_pkt->setKey(capiGetMsg->getKey());
 
+	//std::cout << "[Peer_logic] Retrieving object with key: " << capiGetMsg->getKey() << endl;
+
 	//Send the game object to be stored in the group.
 	send(read_pkt->dup(), "group_write");
 
@@ -90,6 +92,8 @@ void Peer_logic::handlePutCAPIRequest(RootObjectPutCAPICall* capiPutMsg)
 	EV << getParentModule()->getName() << " " << getParentModule()->getIndex() << " received game object to store of size " << go->getSize() << "\n";
 
 	EV << "Object to be sent: " << go->getObjectName() << endl;
+
+	//std::cout << "[Peer_logic] Storing object with key " << go->getHash() << endl;
 
 	write_pkt = new ValuePkt();
 	write_pkt->setName(capiPutMsg->getName());
@@ -153,30 +157,21 @@ void Peer_logic::processGet(PendingRpcsEntry entry, ResponsePkt *response)
 	//This extra step ensures that the submodules exist and also does any other required error checking
 	Communicator *communicator = check_and_cast<Communicator *>(communicatorModule);
 
-	//Only determine success of failure after all responses have been received
-	if (entry.numGroupGetSucceeded + entry.numGroupGetFailed +
-			entry.numDHTGetSucceeded + entry.numDHTGetFailed == entry.numSent)
+	if ((entry.numGroupGetSucceeded == 1) || (entry.numDHTGetSucceeded == 1))
 	{
-		//Ensure that the number of successes of both group and overlay stores as greater than or equal to the number of failures
-		if (entry.numDHTGetSucceeded >= entry.numDHTGetFailed)
-		{
-			if (entry.numGroupGetSucceeded >= entry.numGroupGetFailed)
-			{
-				//TODO: Attach the actual GameObject to the RPC response, instead of copying it into a new object
-				GameObject *object = (GameObject *)response->getObject("GameObject");
-				if (object == NULL)
-					error("No object was attached to DHT Storage response message");
+		//TODO: Attach the actual GameObject to the RPC response, instead of copying it into a new object
+		GameObject *object = (GameObject *)response->getObject("GameObject");
+		if (object == NULL)
+			error("No object was attached to DHT Storage response message");
 
-				RootObjectGetCAPIResponse* capiGetRespMsg = new RootObjectGetCAPIResponse();
-				capiGetRespMsg->setIsSuccess(true);
-				capiGetRespMsg->setResult(*object);	//The value is copied here and not the actual object
-				communicator->externallySendRpcResponse(entry.getCallMsg, capiGetRespMsg);
-				pendingRpcs.erase(response->getRpcid());
+		RootObjectGetCAPIResponse* capiGetRespMsg = new RootObjectGetCAPIResponse();
+		capiGetRespMsg->setIsSuccess(true);
+		capiGetRespMsg->setResult(*object);	//The value is copied here and not the actual object
+		communicator->externallySendRpcResponse(entry.getCallMsg, capiGetRespMsg);
+		pendingRpcs.erase(response->getRpcid());
 
-				return;
-			}
-		}
-
+	} else if ((entry.numDHTGetFailed == 1) && (entry.numGroupGetFailed == 1))
+	{
 		//This is the failure response to both situations where either the group messages
 		//failed or the overlay messages failed. Notice the "return" in the success scenario.
 		RootObjectGetCAPIResponse* capiGetRespMsg = new RootObjectGetCAPIResponse();
