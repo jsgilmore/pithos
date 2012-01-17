@@ -185,8 +185,6 @@ void GroupStorage::requestRetrieve(OverlayKeyPkt *retrieve_req)
 
 	StorageMap::iterator storage_map_it = storage_map.find(*key);
 
-	RECORD_STATS(numSent++; numGetSent++);
-
 	//Check whether this is a group object
 	object_map_it = object_map.find(*key);
 	if (object_map_it == object_map.end())
@@ -194,6 +192,7 @@ void GroupStorage::requestRetrieve(OverlayKeyPkt *retrieve_req)
 		RECORD_STATS(numGetError++);
 		//If the object is not stored in the group, send a failure response to the higher layer
 		sendUpperResponse(GROUP_GET, rpcid, false);
+		delete(retrieve_req);
 		return;
 	}
 
@@ -204,6 +203,7 @@ void GroupStorage::requestRetrieve(OverlayKeyPkt *retrieve_req)
 		RECORD_STATS(numGetSuccess++);
 		//If the object is stored in local storage, send it to the upper layer without requesting from the group
 		sendUpperResponse(GROUP_GET, rpcid, true, storage_map_it->second);
+		delete(retrieve_req);
 		return;
 	}
 
@@ -211,8 +211,11 @@ void GroupStorage::requestRetrieve(OverlayKeyPkt *retrieve_req)
 	if (storage_map_it != storage_map.end())
 	{
 		sendUDPResponse(retrieve_req->getDestinationAddress(), retrieve_req->getSourceAddress(), GROUP_GET, rpcid, true, storage_map_it->second);
+		delete(retrieve_req);
 		return;
 	}
+
+	RECORD_STATS(numSent++; numGetSent++);
 
 	object_info = object_map_it->second;
 
@@ -486,7 +489,7 @@ void GroupStorage::store(cMessage *msg)
 
 	emit(objectsSignal, 1);
 
-	sendUDPResponse(value_pkt->getSourceAddress(), value_pkt->getDestinationAddress(), GROUP_PUT, value_pkt->getValue(), true);
+	sendUDPResponse(value_pkt->getDestinationAddress(), value_pkt->getSourceAddress(), GROUP_PUT, value_pkt->getValue(), true);
 
 	updatePeerObjects(*go);
 }
@@ -635,8 +638,6 @@ void GroupStorage::handleMessage(cMessage *msg)
 			OverlayKeyPkt *retrieve_req = check_and_cast<OverlayKeyPkt *>(msg);
 
 			requestRetrieve(retrieve_req);
-
-			delete(msg);	//The group request path should start here
 		} else if (packet->getPayloadType() == OBJECT_ADD)
 		{
 			addObject(msg);
