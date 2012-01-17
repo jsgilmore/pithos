@@ -166,6 +166,7 @@ void Communicator::handleUDPMessage(cMessage* msg)
 			(packet->getPayloadType() == RESPONSE) ||
 			(packet->getPayloadType() == JOIN_ACCEPT) ||
 			(packet->getPayloadType() == INFORM) ||
+			(packet->getPayloadType() == RETRIEVE_REQ) ||
 			(packet->getPayloadType() == OBJECT_ADD))
 	{
 		send(msg, "gs_gate$o");
