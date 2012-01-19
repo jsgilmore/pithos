@@ -21,6 +21,7 @@
 
 #include <omnetpp.h>
 #include <SHA1.h>
+#include <TransportAddress.h>
 
 #include "OverlayKey.h"
 #include "BinaryValue.h"
@@ -41,6 +42,8 @@ class GameObject : public cOwnedObject
 
 		simtime_t creationTime; /**< The time when the object was created */
 		int ttl;				/**< The time-to-live of the object */
+
+		TransportAddress group_address;
 
 		friend std::ostream& operator<<(std::ostream& Stream, const GameObject entry);
 
@@ -71,9 +74,8 @@ class GameObject : public cOwnedObject
 		/** @param o_size The size of the object in bytes */
 		void setSize(const int64_t &o_size);
 
-		int getTTL();
 		int getTTL() const;
-
+		int getTTL();
 		void setTTL(const int &o_ttl);
 
 		void setObjectName(const char *o_Name);
@@ -86,6 +88,10 @@ class GameObject : public cOwnedObject
 		simtime_t getCreationTime() const;
 
 		BinaryValue getBinaryValue();
+
+		TransportAddress getGroupAddress();
+		TransportAddress getGroupAddress() const;
+		void setGroupAddress(const TransportAddress &gr_adr);
 
 		bool isUnspecified();
 };

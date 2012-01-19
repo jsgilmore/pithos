@@ -74,6 +74,8 @@ public:
      */
     void eraseEntry(const OverlayKey& key);
 
+    OverlayKey getRandomGroupKey(TransportAddress group_address);
+
     /*
      * Returns the key of a random currently stored Pithos record from the global
      * list of all currently stored Pithos records.
@@ -93,7 +95,11 @@ private:
     static const int TEST_MAP_INTERVAL = 10; /**< interval in seconds for writing periodic statistical information */
 
     GlobalStatistics* globalStatistics; /**< pointer to GlobalStatistics module in this node */
+
     std::map<OverlayKey, GameObject> dataMap; /**< The map contains all currently stored Pithos records */
+
+    std::map<TransportAddress, std::vector<GameObject> > groupMap; /**< The map contains all currently stored Pithos records, stored as vectors in a map sorted by group ID */
+
     cMessage *periodicTimer; /**< timer self-message for writing periodic statistical information */
 };
 

@@ -63,6 +63,11 @@ packet overlayPkt
     int type enum(OverlayTypes);      	// message type
 }
 
+packet AddressPkt
+{
+    TransportAddress address;
+}
+
 packet Packet
 {
     TransportAddress sourceAddress;
@@ -86,6 +91,7 @@ message ResponsePkt extends Packet
 {
     unsigned int rpcid;
     bool isSuccess;
+    TransportAddress groupAddress;
     int responseType enum(ResponseTypes);
 }
 

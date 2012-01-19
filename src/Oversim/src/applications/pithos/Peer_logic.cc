@@ -135,6 +135,7 @@ void Peer_logic::processPut(PendingRpcsEntry entry, ResponsePkt *response)
 			{
 				RootObjectPutCAPIResponse* capiPutRespMsg = new RootObjectPutCAPIResponse();
 				capiPutRespMsg->setIsSuccess(true);
+				capiPutRespMsg->setGroupAddress(entry.group_address);
 				communicator->externallySendRpcResponse(entry.putCallMsg, capiPutRespMsg);
 				pendingRpcs.erase(response->getRpcid());
 
@@ -197,6 +198,19 @@ void Peer_logic::handleResponseMsg(cMessage *msg)
 		if (response->getIsSuccess())
 			it->second.numGroupPutSucceeded++;
 		else it->second.numGroupPutFailed++;
+
+		//Check whether a group address is known.
+		if (it->second.group_address.isUnspecified())
+		{
+			//If not, record it.
+			//This logs the group address to enable the higher layer to generate group specific requests
+			it->second.group_address = response->getGroupAddress();
+		}
+		else if (it->second.group_address != response->getGroupAddress())
+		{
+			//If it is, check that both match.
+			error("Group address received does not match known group address");
+		}
 
 		processPut(it->second, response);
 	} else if (response->getResponseType() == OVERLAY_PUT)

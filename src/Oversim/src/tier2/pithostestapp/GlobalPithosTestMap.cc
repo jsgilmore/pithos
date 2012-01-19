@@ -42,6 +42,7 @@ GlobalPithosTestMap::~GlobalPithosTestMap()
 {
     cancelAndDelete(periodicTimer);
     dataMap.clear();
+    groupMap.clear();
 }
 
 void GlobalPithosTestMap::initialize()
@@ -63,13 +64,17 @@ void GlobalPithosTestMap::handleMessage(cMessage* msg)
     //cleanupDataMap();
     DhtTestEntryTimer *entryTimer = NULL;
 
-    if (msg == periodicTimer) {
+    if (msg == periodicTimer)
+    {
         RECORD_STATS(globalStatistics->recordOutVector(
            "GlobalPithosTestMap: Number of stored Pithos entries", dataMap.size()));
         scheduleAt(simTime() + TEST_MAP_INTERVAL, msg);
-    } else if ((entryTimer = dynamic_cast<DhtTestEntryTimer*>(msg)) != NULL) {
-        dataMap.erase(entryTimer->getKey());
+
+    } else if ((entryTimer = dynamic_cast<DhtTestEntryTimer*>(msg)) != NULL)
+    {
+    	eraseEntry(entryTimer->getKey());
         delete msg;
+
     } else {
         throw cRuntimeError("GlobalPithosTestMap::handleMessage(): "
                                 "Unknown message type!");
@@ -80,6 +85,23 @@ void GlobalPithosTestMap::insertEntry(const OverlayKey& key, const GameObject& e
 {
     Enter_Method_Silent();
 
+    //Insert the entry into the groupMap
+    std::map<TransportAddress, std::vector<GameObject> >::iterator it;
+
+    //std::cout << "Inserted new object with group address: " << entry.getGroupAddress() << endl;
+
+    it = groupMap.find(entry.getGroupAddress());
+    if (it == groupMap.end())
+    {
+    	std::vector<GameObject> object_list;
+    	object_list.push_back(entry);
+    	groupMap.insert(std::make_pair(entry.getGroupAddress(), object_list));
+
+    } else {
+    	it->second.push_back(entry);
+    }
+
+    //Insert the entry into the key map
     dataMap.erase(key);
     dataMap.insert(make_pair(key, entry));
 
@@ -91,6 +113,27 @@ void GlobalPithosTestMap::insertEntry(const OverlayKey& key, const GameObject& e
 
 void GlobalPithosTestMap::eraseEntry(const OverlayKey& key)
 {
+	std::map<OverlayKey, GameObject>::iterator key_it;
+	std::map<TransportAddress, std::vector<GameObject> >::iterator group_it;
+	std::vector<GameObject>::iterator object_it;
+
+	key_it = dataMap.find(key);
+	if (key_it == dataMap.end())
+		error("[GlobalPithosTestMap] Key not found in key map.");
+
+	group_it = groupMap.find(key_it->second.getGroupAddress());
+	if (group_it == groupMap.end())
+		error("[GlobalPithosTestMap] Could not resolve super peer address for given overlay key.");
+
+	for (object_it = (group_it->second).begin() ; object_it != (group_it->second).end() ; object_it++)
+	{
+		if (*object_it == key_it->second)
+		{
+			group_it->second.erase(object_it);
+			break;
+		}
+	}
+
     dataMap.erase(key);
 }
 
@@ -103,6 +146,23 @@ const GameObject* GlobalPithosTestMap::findEntry(const OverlayKey& key)
     } else {
         return &(it->second);
     }
+}
+
+OverlayKey GlobalPithosTestMap::getRandomGroupKey(TransportAddress group_address)
+{
+	std::map<TransportAddress, std::vector<GameObject> >::iterator it;
+	GameObject object;
+
+	it = groupMap.find(group_address);
+	if (it == groupMap.end())
+	{
+		//TODO: Log that a group could not be found
+		return OverlayKey::UNSPECIFIED_KEY;
+	}
+
+	object = (it->second).at(intuniform(0, it->second.size()-1));
+
+	return object.getHash();
 }
 
 const OverlayKey& GlobalPithosTestMap::getRandomKey()

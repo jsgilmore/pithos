@@ -172,7 +172,6 @@ void DHTStorage::handleGetResponse(DHTgetCAPIResponse* msg, DHTStatsContext* con
 		//this key doesn't exist anymore in the DHT, delete it in our hashtable
 
 		globalDhtTestMap->eraseEntry(context->key);
-		delete context;
 
 		if (msg->getResultArraySize() > 0) {
 			RECORD_STATS(numGetError++);
@@ -185,8 +184,8 @@ void DHTStorage::handleGetResponse(DHTgetCAPIResponse* msg, DHTStatsContext* con
 			//cout << "DHTTestApp: success (1)" << endl;
 			return;
 		}
-	} else {
 		delete context;
+	} else {
 		if (msg->getResultArraySize() > 0)
 		{
 			if (msg->getResult(0).getValue() != entry->value)
@@ -198,7 +197,7 @@ void DHTStorage::handleGetResponse(DHTgetCAPIResponse* msg, DHTStatsContext* con
 				return;
 			} else {
 				RECORD_STATS(numGetSuccess++);
-				sendResponse(OVERLAY_GET, context->parent_rpcid, true, msg->getResult(0).getValue());
+				sendResponse(OVERLAY_GET, context->parent_rpcid, true, msg->getResult(0).getValue());	//FIXME: Valgrind seems to show an invalid read of size 4 here
 				//cout << "DHTTestApp: success (2)" << endl;
 				return;
 			}
@@ -207,6 +206,7 @@ void DHTStorage::handleGetResponse(DHTgetCAPIResponse* msg, DHTStatsContext* con
 			RECORD_STATS(numGetError++);
 			sendResponse(OVERLAY_GET, context->parent_rpcid, false);
 		}
+		delete context;
 	}
 }
 

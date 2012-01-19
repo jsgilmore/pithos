@@ -16,6 +16,7 @@
 cplusplus {{
 #include "CommonMessages_m.h"
 #include "GameObject.h"
+#include "TransportAddress.h"
 }}
 
 class BaseCallMessage;
@@ -23,6 +24,7 @@ class BaseResponseMessage;
 class GameObject;
 
 class noncobject OverlayKey;
+class noncobject TransportAddress;
 class noncobject DhtDumpEntry;
 
 //
@@ -59,6 +61,7 @@ packet RootObjectGetCAPICall extends BaseCallMessage
 packet RootObjectPutCAPIResponse extends BaseResponseMessage
 {
     bool isSuccess;
+    TransportAddress groupAddress;
 }
 
 //
