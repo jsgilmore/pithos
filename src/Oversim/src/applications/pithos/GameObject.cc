@@ -49,6 +49,7 @@ GameObject& GameObject::operator=(const GameObject& other)
 	ttl = other.ttl;
 	strcpy(objectName, other.objectName);
 	creationTime = other.creationTime;
+	group_address = other.group_address;
 
 	return *this;
 }
