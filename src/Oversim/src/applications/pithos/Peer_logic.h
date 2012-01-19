@@ -94,6 +94,9 @@ class Peer_logic: public cSimpleModule
 				NodeVector replica;
 				NodeVector* hashVector;
 				std::map<GameObject, NodeVector> hashes;
+
+				TransportAddress group_address;
+
 				int numSent;
 				int numAvailableReplica;
 

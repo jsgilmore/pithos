@@ -223,6 +223,21 @@ BinaryValue GameObject::getBinaryValue()
 	return binval;
 }
 
+TransportAddress GameObject::getGroupAddress()
+{
+	return group_address;
+}
+
+TransportAddress GameObject::getGroupAddress() const
+{
+	return group_address;
+}
+
+void GameObject::setGroupAddress(const TransportAddress &gr_adr)
+{
+	group_address = gr_adr;
+}
+
 bool GameObject::isUnspecified()
 {
 	return (*this == GameObject::UNSPECIFIED_OBJECT);

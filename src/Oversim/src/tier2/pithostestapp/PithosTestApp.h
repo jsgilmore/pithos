@@ -38,6 +38,7 @@
 #include <sstream>
 
 #include "PithosTestMessages_m.h"
+#include "PithosMessages_m.h"
 #include "GlobalPithosTestMap.h"
 #include "GameObject.h"
 
@@ -81,6 +82,8 @@ private:
      * Get a random key of the hashmap
      */
     OverlayKey getRandomKey();
+
+    OverlayKey getKey();
 
     void finishApp();
 
@@ -155,6 +158,8 @@ private:
     bool nodeIsLeavingSoon; //!< true if the node is going to be killed shortly
 
     static const int DHTTESTAPP_VALUE_LEN = 20;
+
+    TransportAddress super_peer_address;
 
 public:
     PithosTestApp();
