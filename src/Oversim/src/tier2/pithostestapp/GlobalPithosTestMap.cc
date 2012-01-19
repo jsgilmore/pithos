@@ -116,10 +116,15 @@ void GlobalPithosTestMap::eraseEntry(const OverlayKey& key)
 	std::map<OverlayKey, GameObject>::iterator key_it;
 	std::map<TransportAddress, std::vector<GameObject> >::iterator group_it;
 	std::vector<GameObject>::iterator object_it;
+	TransportAddress group_address;
 
 	key_it = dataMap.find(key);
 	if (key_it == dataMap.end())
 		error("[GlobalPithosTestMap] Key not found in key map.");
+
+	group_address = key_it->second.getGroupAddress();
+	if (group_address.isUnspecified())
+		error("[GlobalPithosTestMap] Group address is unspecified when erasing.");
 
 	group_it = groupMap.find(key_it->second.getGroupAddress());
 	if (group_it == groupMap.end())
