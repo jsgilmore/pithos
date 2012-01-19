@@ -140,6 +140,9 @@ void PithosTestApp::handlePutResponse(RootObjectPutCAPIResponse* msg, PithosStat
     {
         GameObject object(context->go);
 
+        if (msg->getGroupAddress().isUnspecified())
+        	error("Received unspecified group address for stored object from Pithos.");
+
         //This allows us to perform group specific queries (Changing the group address does not change the object hash)
         object.setGroupAddress(msg->getGroupAddress());
 

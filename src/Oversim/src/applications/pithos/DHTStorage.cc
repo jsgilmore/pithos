@@ -177,14 +177,15 @@ void DHTStorage::handleGetResponse(DHTgetCAPIResponse* msg, DHTStatsContext* con
 			RECORD_STATS(numGetError++);
 			sendResponse(OVERLAY_GET, context->parent_rpcid, false);
 			//cout << "DHTTestApp: deleted key still available" << endl;
+			delete context;
 			return;
 		} else {
 			RECORD_STATS(numGetSuccess++);
 			sendResponse(OVERLAY_GET, context->parent_rpcid, true);	//A success is returned here, although no data are attached, since the data has expired
 			//cout << "DHTTestApp: success (1)" << endl;
+			delete context;
 			return;
 		}
-		delete context;
 	} else {
 		if (msg->getResultArraySize() > 0)
 		{
@@ -194,19 +195,21 @@ void DHTStorage::handleGetResponse(DHTgetCAPIResponse* msg, DHTStatsContext* con
 				sendResponse(OVERLAY_GET, context->parent_rpcid, false);
 				//cout << "DHTTestApp: wrong value" << endl;
 				//cout << "value: " << msg->getResult(0).getValue() << endl;
+				delete context;
 				return;
 			} else {
 				RECORD_STATS(numGetSuccess++);
-				sendResponse(OVERLAY_GET, context->parent_rpcid, true, msg->getResult(0).getValue());	//FIXME: Valgrind seems to show an invalid read of size 4 here
+				sendResponse(OVERLAY_GET, context->parent_rpcid, true, msg->getResult(0).getValue());
 				//cout << "DHTTestApp: success (2)" << endl;
+				delete context;
 				return;
 			}
 		} else {
 			//For some reason, there are occasions when the underlying DHT reports a successful retrieval, without attaching any result
 			RECORD_STATS(numGetError++);
 			sendResponse(OVERLAY_GET, context->parent_rpcid, false);
+			delete context;
 		}
-		delete context;
 	}
 }
 

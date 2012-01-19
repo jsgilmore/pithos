@@ -102,7 +102,9 @@ void GlobalPithosTestMap::insertEntry(const OverlayKey& key, const GameObject& e
     }
 
     //Insert the entry into the key map
-    dataMap.erase(key);
+    if (dataMap.find(key) != dataMap.end())
+    	error("Trying to insert overlay ket that already exists.");
+
     dataMap.insert(make_pair(key, entry));
 
     DhtTestEntryTimer* msg = new DhtTestEntryTimer("dhtEntryTimer");
@@ -138,6 +140,12 @@ void GlobalPithosTestMap::eraseEntry(const OverlayKey& key)
 			break;
 		}
 	}
+
+	if (object_it == group_it->second.end())
+		error("Object not found in group vector for removal.");
+
+	if (group_it->second.size() == 0)
+			groupMap.erase(group_address);
 
     dataMap.erase(key);
 }
