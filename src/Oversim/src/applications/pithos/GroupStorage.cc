@@ -131,23 +131,33 @@ int GroupStorage::getStorageFiles()
 	return storage.getLength();
 }
 
+void GroupStorage::createResponseMsg(ResponsePkt **response, int responseType, unsigned int rpcid, bool isSuccess, GameObject object)
+{
+	//Create the packet that will house the game object
+	(*response) = new ResponsePkt();
+	(*response)->setGroupAddress(super_peer_address);	//This records the group (super peer) address for use by PithosTestApp to generate group requests
+	(*response)->setResponseType(responseType);
+	(*response)->setPayloadType(RESPONSE);
+	(*response)->setIsSuccess(isSuccess);
+	(*response)->setRpcid(rpcid);		//This allows the higher layer to know which RPC call is being acknowledged.
+
+	if (object != GameObject::UNSPECIFIED_OBJECT)
+	{
+		EV << "[GroupStorage] returning result: " << object << endl;
+		GameObject *object_ptr =  new GameObject(object);
+		(*response)->addObject(object_ptr);
+	}
+}
+
 void GroupStorage::sendUDPResponse(TransportAddress src_adr, TransportAddress dest_adr, int responseType, unsigned int rpcid, bool isSuccess, GameObject object)
 {
-	ResponsePkt *response = new ResponsePkt();
+	ResponsePkt *response;
+
+	createResponseMsg(&response, responseType, rpcid, isSuccess, object);
 
 	response->setSourceAddress(src_adr);
 	response->setDestinationAddress(dest_adr);
 	response->setByteLength(4 + 4 + 4 + 4 + 4 + 4);	//SourceAddress + DestinationAddress + ResponseType + PayloadType + isSuccess + RPCID
-	response->setResponseType(responseType);
-	response->setPayloadType(RESPONSE);
-	response->setIsSuccess(isSuccess);
-	response->setRpcid(rpcid);		//This allows the higher layer to know which RPC call is being acknowledged.
-
-	if (object != GameObject::UNSPECIFIED_OBJECT)
-	{
-		GameObject *object_ptr =  new GameObject(object);
-		response->addObject(object_ptr);
-	}
 
 	send(response, "comms_gate$o");
 }
@@ -155,19 +165,9 @@ void GroupStorage::sendUDPResponse(TransportAddress src_adr, TransportAddress de
 //TODO: Figure out how group storage will do responses.
 void GroupStorage::sendUpperResponse(int responseType, unsigned int rpcid, bool isSuccess, GameObject object)
 {
-	EV << "[GroupStorage] returning result: " << object << endl;
+	ResponsePkt *response;
 
-	ResponsePkt *response = new ResponsePkt();
-	response->setResponseType(responseType);
-	response->setPayloadType(RESPONSE);
-	response->setRpcid(rpcid);		//This allows the higher layer to know which RPC call is being acknowledged.
-	response->setIsSuccess(isSuccess);
-
-	if (object != GameObject::UNSPECIFIED_OBJECT)
-	{
-		GameObject *object_ptr =  new GameObject(object);
-		response->addObject(object_ptr);
-	}
+	createResponseMsg(&response, responseType, rpcid, isSuccess, object);
 
 	send(response, "read");
 }
@@ -472,6 +472,8 @@ void GroupStorage::store(cMessage *msg)
 
 	GameObject *go = (GameObject *)msg->getObject("GameObject");		//We're not removing the object here, because we're only using the value and then the object is deleted with the message.
 
+	go->setGroupAddress(super_peer_address);
+
 	EV << getName() << " " << getIndex() << " received Game Object of size " << go->getSize() << "\n";
 
 	delay = simTime() - go->getCreationTime();
@@ -507,7 +509,8 @@ void GroupStorage::addPeers(cMessage *msg)
 	//This is also the time when we record that we've successfully joined a group (When we've joined a super peer and we know of other peers in the group).
 	if ((group_peers.size() == 0) && (list_p->getPeer_listArraySize() > 0))
 	{
-		cPacket *request_start = new cPacket("request_start");
+		AddressPkt *request_start = new AddressPkt("request_start");
+		request_start->setAddress(super_peer_address);
 		send(request_start, "to_upperTier");
 
 		emit(joinTimeSignal, joinTime);

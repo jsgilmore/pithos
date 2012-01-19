@@ -120,6 +120,8 @@ class GroupStorage : public cSimpleModule
 
 		void respond_toUpper(cMessage *msg);
 
+		void createResponseMsg(ResponsePkt **response, int responseType, unsigned int rpcid, bool isSuccess, GameObject object);
+
 		void sendUDPResponse(TransportAddress src_adr, TransportAddress dest_adr, int responseType, unsigned int rpcid, bool isSuccess, GameObject object = GameObject::UNSPECIFIED_OBJECT);
 
 		void sendUpperResponse(int responseType, unsigned int rpcid, bool isSuccess, GameObject object = GameObject::UNSPECIFIED_OBJECT);

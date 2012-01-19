@@ -128,13 +128,6 @@ void PithosTestApp::handleRpcResponse(BaseResponseMessage* msg, const RpcState& 
 
 void PithosTestApp::handlePutResponse(RootObjectPutCAPIResponse* msg, PithosStatsContext* context)
 {
-    GameObject object(context->go);
-
-    //globalPithosTestMap->insertEntry(context->go.getHash(), context->go);
-    globalPithosTestMap->insertEntry(object.getHash(), object);
-
-    EV << "Storing pithos entry: " << object.getHash() << endl;
-
     if (context->measurementPhase == false) {
         // don't count response, if the request was not sent
         // in the measurement phase
@@ -142,7 +135,19 @@ void PithosTestApp::handlePutResponse(RootObjectPutCAPIResponse* msg, PithosStat
         return;
     }
 
-    if (msg->getIsSuccess()) {
+    //Only add the object to the global test map if it was successful
+    if (msg->getIsSuccess())
+    {
+        GameObject object(context->go);
+
+        //This allows us to perform group specific queries (Changing the group address does not change the object hash)
+        object.setGroupAddress(msg->getGroupAddress());
+
+        //globalPithosTestMap->insertEntry(context->go.getHash(), context->go);
+        globalPithosTestMap->insertEntry(object.getHash(), object);
+
+        EV << "Storing pithos entry: " << object.getHash() << endl;
+
         RECORD_STATS(numPutSuccess++);
         RECORD_STATS(globalStatistics->addStdDev("PithosTestApp: PUT Latency (s)", SIMTIME_DBL(simTime() - context->requestTime)));
     } else {
@@ -244,6 +249,9 @@ void PithosTestApp::handleLowerMessage (cMessage *msg)
 {
 	if (strcmp(msg->getName(), "request_start") == 0)
 	{
+		AddressPkt *request_start = check_and_cast<AddressPkt *>(msg);
+		super_peer_address = request_start->getAddress();
+
 		join_time = simTime() - wait_time;		//Adding join time gives every game module the same time to send successful requests
 
 		if ((!pithostestput_timer->isScheduled()) && (!pithostestget_timer->isScheduled()) && (!pithostestmod_timer->isScheduled()))
@@ -264,6 +272,18 @@ void PithosTestApp::handleLowerMessage (cMessage *msg)
 		delete(msg);
 	}
 	else error("Game received unknown message\n");
+}
+
+OverlayKey PithosTestApp::getKey()
+{
+	if (intuniform(0,10) > 4)
+	{
+		OverlayKey key = globalPithosTestMap->getRandomGroupKey(super_peer_address);
+		if (key.isUnspecified())
+			return globalPithosTestMap->getRandomKey();
+		return key;
+	}
+	else return globalPithosTestMap->getRandomKey();
 }
 
 void PithosTestApp::handleTimerEvent(cMessage* msg)
@@ -295,7 +315,7 @@ void PithosTestApp::handleTimerEvent(cMessage* msg)
             return;
         }
 
-        const OverlayKey& key = globalPithosTestMap->getRandomKey();
+        const OverlayKey& key = getKey();
 
         //std::cout << "[PithosTestApp] Retrieving object with key: " << key << endl;
 
