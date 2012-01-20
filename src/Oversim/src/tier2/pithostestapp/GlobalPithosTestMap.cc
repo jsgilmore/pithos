@@ -90,6 +90,7 @@ void GlobalPithosTestMap::insertEntry(const OverlayKey& key, const GameObject& e
 
     //std::cout << "Inserted new object with group address: " << entry.getGroupAddress() << endl;
 
+    //Find group in group map in O(log m), where m is the number of groups
     it = groupMap.find(entry.getGroupAddress());
     if (it == groupMap.end())
     {
@@ -101,10 +102,11 @@ void GlobalPithosTestMap::insertEntry(const OverlayKey& key, const GameObject& e
     	it->second.push_back(entry);
     }
 
-    //Insert the entry into the key map
+    //Check whether the key has already been inserted (this might be unnecessary and require extra O(log n), but it's for safety's sake)
     if (dataMap.find(key) != dataMap.end())
     	error("Trying to insert overlay key that already exists.");
 
+    //Insert the entry into the key map
     dataMap.insert(make_pair(key, entry));
 
     DhtTestEntryTimer* msg = new DhtTestEntryTimer("dhtEntryTimer");
@@ -121,6 +123,7 @@ void GlobalPithosTestMap::eraseEntry(const OverlayKey& key)
 	TransportAddress group_address;
 	bool found = false;
 
+	//Find key in O(log n)
 	key_it = dataMap.find(key);
 	if (key_it == dataMap.end())
 		error("[GlobalPithosTestMap] Key not found in key map.");
@@ -129,10 +132,12 @@ void GlobalPithosTestMap::eraseEntry(const OverlayKey& key)
 	if (group_address.isUnspecified())
 		error("[GlobalPithosTestMap] Group address is unspecified when erasing.");
 
+	//Find group corresponding to the key in O(log m), where m is the number of groups
 	group_it = groupMap.find(key_it->second.getGroupAddress());
 	if (group_it == groupMap.end())
 		error("[GlobalPithosTestMap] Could not resolve super peer address for given overlay key.");
 
+	//Find object in group in O(l/2), where l is the number of objects stored in the group
 	for (object_it = (group_it->second).begin() ; object_it != (group_it->second).end() ; object_it++)
 	{
 		if (*object_it == key_it->second)
@@ -154,12 +159,15 @@ void GlobalPithosTestMap::eraseEntry(const OverlayKey& key)
 	if (group_it->second.size() == 0)
 			groupMap.erase(group_address);
 
+	//erase's order complexity depends on the container
     dataMap.erase(key);
 }
 
 const GameObject* GlobalPithosTestMap::findEntry(const OverlayKey& key)
 {
     std::map<OverlayKey, GameObject>::iterator it = dataMap.find(key);
+
+    //Find uniform random entry in O(log n)
 
     if (it == dataMap.end()) {
         return NULL;
@@ -173,6 +181,7 @@ OverlayKey GlobalPithosTestMap::getRandomGroupKey(TransportAddress group_address
 	std::map<TransportAddress, std::vector<GameObject> >::iterator it;
 	GameObject object;
 
+	//Find group key in O(log m), where m is number of groups
 	it = groupMap.find(group_address);
 	if (it == groupMap.end())
 	{
@@ -180,6 +189,7 @@ OverlayKey GlobalPithosTestMap::getRandomGroupKey(TransportAddress group_address
 		return OverlayKey::UNSPECIFIED_KEY;
 	}
 
+	//Select object within group in O(1)
 	object = (it->second).at(intuniform(0, it->second.size()-1));
 
 	return object.getHash();
@@ -191,25 +201,9 @@ const OverlayKey& GlobalPithosTestMap::getRandomKey()
         return OverlayKey::UNSPECIFIED_KEY;
     }
 
-    // return random OverlayKey in O(log n)
+    //return uniform random OverlayKey in O(n/2)
     std::map<OverlayKey, GameObject>::iterator it = dataMap.begin();
-
     std::advance(it, intuniform(0, dataMap.size()-1));
-
-    /*GameObject tempEntry;
-
-    OverlayKey randomKey = OverlayKey::random();
-    it = dataMap.find(randomKey);
-
-    if (it == dataMap.end())
-    {
-        it = dataMap.insert(make_pair(randomKey, tempEntry)).first;
-        dataMap.erase(it++);
-    }
-
-    if (it == dataMap.end()) {
-        it = dataMap.begin();
-    }*/
 
     return it->first;
 }
