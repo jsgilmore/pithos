@@ -59,6 +59,8 @@ void PithosTestApp::initializeApp(int stage)
     debugOutput = par("debugOutput");
     activeNetwInitPhase = par("activeNetwInitPhase");
 
+    groupProbability = par("groupProbability");
+
     objectSize_av = par("avObjectSize");
 	wait_time = par("wait_time");
 	generationTime = par("generation_time");
@@ -279,12 +281,12 @@ void PithosTestApp::handleLowerMessage (cMessage *msg)
 
 OverlayKey PithosTestApp::getKey()
 {
-	if (intuniform(0,10) > 4)
+	if (intuniform(0,100) <= groupProbability)
 	{
 		OverlayKey key = globalPithosTestMap->getRandomGroupKey(super_peer_address);
 		if (key.isUnspecified())
 			return globalPithosTestMap->getRandomKey();
-		return key;
+		else return key;
 	}
 	else return globalPithosTestMap->getRandomKey();
 }
