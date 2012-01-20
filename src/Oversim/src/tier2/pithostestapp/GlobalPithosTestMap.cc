@@ -103,7 +103,7 @@ void GlobalPithosTestMap::insertEntry(const OverlayKey& key, const GameObject& e
 
     //Insert the entry into the key map
     if (dataMap.find(key) != dataMap.end())
-    	error("Trying to insert overlay ket that already exists.");
+    	error("Trying to insert overlay key that already exists.");
 
     dataMap.insert(make_pair(key, entry));
 
@@ -119,6 +119,7 @@ void GlobalPithosTestMap::eraseEntry(const OverlayKey& key)
 	std::map<TransportAddress, std::vector<GameObject> >::iterator group_it;
 	std::vector<GameObject>::iterator object_it;
 	TransportAddress group_address;
+	bool found = false;
 
 	key_it = dataMap.find(key);
 	if (key_it == dataMap.end())
@@ -137,12 +138,18 @@ void GlobalPithosTestMap::eraseEntry(const OverlayKey& key)
 		if (*object_it == key_it->second)
 		{
 			group_it->second.erase(object_it);
+			found = true;
 			break;
 		}
 	}
 
-	if (object_it == group_it->second.end())
-		error("Object not found in group vector for removal.");
+	if (!found)
+	{
+		//We can't check for it == end, because when the item is deleted and the vector is left empty, the iterator also points to the end
+		std::ostringstream err_str;
+		err_str << "Object not found in group vector for (size: "<< group_it->second.size() << ") removal. Object details: " << key_it->second << endl;
+		error(err_str.str().c_str());
+	}
 
 	if (group_it->second.size() == 0)
 			groupMap.erase(group_address);
@@ -185,20 +192,24 @@ const OverlayKey& GlobalPithosTestMap::getRandomKey()
     }
 
     // return random OverlayKey in O(log n)
-    std::map<OverlayKey, GameObject>::iterator it = dataMap.end();
-    GameObject tempEntry;
+    std::map<OverlayKey, GameObject>::iterator it = dataMap.begin();
+
+    std::advance(it, intuniform(0, dataMap.size()-1));
+
+    /*GameObject tempEntry;
 
     OverlayKey randomKey = OverlayKey::random();
     it = dataMap.find(randomKey);
 
-    if (it == dataMap.end()) {
+    if (it == dataMap.end())
+    {
         it = dataMap.insert(make_pair(randomKey, tempEntry)).first;
         dataMap.erase(it++);
     }
 
     if (it == dataMap.end()) {
         it = dataMap.begin();
-    }
+    }*/
 
     return it->first;
 }
