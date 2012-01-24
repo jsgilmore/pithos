@@ -85,7 +85,7 @@ class GroupStorage : public cSimpleModule
 				int numGroupGetSucceeded;
 		};
 
-		friend std::ostream& operator<<(std::ostream& Stream, const PendingRequestsEntry& entry);
+		//friend std::ostream& operator<<(std::ostream& Stream, const PendingRequestsEntry& entry);
 
 		typedef std::map<uint32_t, PendingRequestsEntry> PendingRequests;
 		PendingRequests pendingRequests; /**< a map of all pending requests */

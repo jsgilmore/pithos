@@ -436,6 +436,7 @@ void GroupStorage::send_forstore(GameObject *go, unsigned int rpcid)
 		send(write_dup, "comms_gate$o");
 	}
 
+	//std::cout << "Inserting pending put requets with rpcid: " << rpcid << endl;
 	PendingRequestsEntry entry;
 	entry.numPutSent = replicas; //TODO:This numSent should be calculated from the required group and overlay writes
 	pendingRequests.insert(std::make_pair(rpcid, entry));
@@ -449,41 +450,41 @@ void GroupStorage::respond_toUpper(cMessage *msg)
 
 	PendingRequests::iterator it = pendingRequests.find(response->getRpcid());
 
-	if (it == pendingRequests.end()) // unknown request or request for already erased call
-		error("[GroupStorage] Response could not be matched to a call.");
-
-	//TODO: Record the group put latency (This will merely require that the response packet be expanded with the initiation time of the request)
-
-	if (response->getResponseType() == GROUP_PUT)
+	if (it != pendingRequests.end()) // unknown request or request for already erased call
 	{
-		if (response->getIsSuccess())
-		{
-			it->second.numGroupPutSucceeded++;
-			RECORD_STATS(numPutSuccess++);
-		}
-		else {
-			it->second.numGroupPutFailed++;
-			RECORD_STATS(numPutError++);		//These errors are currently all caused by an insufficient number of group peers to store all replicas.
-		}
+		//TODO: Record the group put latency (This will merely require that the response packet be expanded with the initiation time of the request)
 
-		pendingRequests.erase(it);
-	} else if (response->getResponseType() == GROUP_GET)
-	{
-		if (response->getIsSuccess())
+		if (response->getResponseType() == GROUP_PUT)
 		{
-			it->second.numGroupGetSucceeded++;
-			RECORD_STATS(numGetSuccess++);
-		}
-		else {
-			it->second.numGroupGetFailed++;
-			RECORD_STATS(numGetError++);
-		}
+			if (response->getIsSuccess())
+			{
+				it->second.numGroupPutSucceeded++;
+				RECORD_STATS(numPutSuccess++);
+			}
+			else {
+				it->second.numGroupPutFailed++;
+				RECORD_STATS(numPutError++);		//These errors are currently all caused by an insufficient number of group peers to store all replicas.
+			}
 
-		if (it->second.numGroupPutSucceeded + it->second.numGroupPutFailed == it->second.numPutSent)
-		{
 			pendingRequests.erase(it);
-		}
-	} else error("Unknown response type received");
+		} else if (response->getResponseType() == GROUP_GET)
+		{
+			if (response->getIsSuccess())
+			{
+				it->second.numGroupGetSucceeded++;
+				RECORD_STATS(numGetSuccess++);
+			}
+			else {
+				it->second.numGroupGetFailed++;
+				RECORD_STATS(numGetError++);
+			}
+
+			if (it->second.numGroupPutSucceeded + it->second.numGroupPutFailed == it->second.numPutSent)
+			{
+				pendingRequests.erase(it);
+			}
+		} else error("Unknown response type received");
+	}
 
 	send(msg, "read");
 }
