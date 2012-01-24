@@ -69,10 +69,7 @@ class Peer_logic: public cSimpleModule
 				{
 					getCallMsg = NULL;
 					putCallMsg = NULL;
-					state = INIT;
-					hashVector = NULL;
 					numSent = 0;
-					numAvailableReplica = 0;
 
 					numGroupPutFailed = 0;
 					numGroupPutSucceeded = 0;
@@ -85,20 +82,12 @@ class Peer_logic: public cSimpleModule
 					numDHTGetFailed = 0;
 				};
 
-				//typedef std::map<uint32_t, PendingRpcsEntry> PendingRpcs;
-				//PendingRpcs pendingRpcs; /**< a map of all pending RPC operations */
-
 				RootObjectGetCAPICall* getCallMsg;
 				RootObjectPutCAPICall* putCallMsg;
-				PendingRpcsStates state;
-				NodeVector replica;
-				NodeVector* hashVector;
-				std::map<GameObject, NodeVector> hashes;
 
 				TransportAddress group_address;
 
 				int numSent;
-				int numAvailableReplica;
 
 				int numGroupPutFailed;
 				int numGroupPutSucceeded;

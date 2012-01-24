@@ -142,8 +142,8 @@ void DHTStorage::handleGetResponse(DHTgetCAPIResponse* msg, DHTStatsContext* con
 		return;
 	}
 
-	RECORD_STATS(globalStatistics->addStdDev("DHTStorage: GET Latency (s)",
-							   SIMTIME_DBL(simTime() - context->requestTime)));
+	RECORD_STATS(globalStatistics->addStdDev("DHTStorage: GET Latency (s)", SIMTIME_DBL(simTime() - context->requestTime)));
+	RECORD_STATS(globalStatistics->recordHistogram("DHTStorage: GET Latency (s)", SIMTIME_DBL(simTime() - context->requestTime)));
 
 	if (!(msg->getIsSuccess())) {
 		//cout << "DHTTestApp: success == false" << endl;
@@ -234,13 +234,8 @@ void DHTStorage::sendResponse(int responseType, unsigned int rpcid, bool isSucce
 
 void DHTStorage::handlePutResponse(DHTputCAPIResponse* msg, DHTStatsContext* context)
 {
-    DHTEntry entry = {context->object.getBinaryValue(), simTime() + context->object.getTTL()};
-
     //TODO: The complete global DHT test map should be removed from the DHT storage component for the real-world application.
     //This is ONLY required to test the correctness of the overlay itself and is effectively storing all data inserted into the overlay two-fold.
-    globalDhtTestMap->insertEntry(context->key, entry);
-
-    EV << "Storing DHT entry: " << context->object.getBinaryValue() << endl;
 
     if (context->measurementPhase == false) {
         // don't count response, if the request was not sent
@@ -249,9 +244,18 @@ void DHTStorage::handlePutResponse(DHTputCAPIResponse* msg, DHTStatsContext* con
         return;
     }
 
-    if (msg->getIsSuccess()) {
+    if (msg->getIsSuccess())
+    {
+    	DHTEntry entry = {context->object.getBinaryValue(), simTime() + context->object.getTTL()};
+
+        globalDhtTestMap->insertEntry(context->key, entry);
+
+        EV << "Storing DHT entry: " << context->object.getBinaryValue() << endl;
+
         RECORD_STATS(numPutSuccess++);
         RECORD_STATS(globalStatistics->addStdDev("DHTTestApp: PUT Latency (s)", SIMTIME_DBL(simTime() - context->requestTime)));
+        RECORD_STATS(globalStatistics->recordHistogram("DHTTestApp: PUT Latency (s)", SIMTIME_DBL(simTime() - context->requestTime)));
+
         sendResponse(OVERLAY_PUT, context->parent_rpcid, true);
     } else {
         RECORD_STATS(numPutError++);
