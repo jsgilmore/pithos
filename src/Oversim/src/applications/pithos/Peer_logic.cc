@@ -75,7 +75,6 @@ void Peer_logic::handleGetCAPIRequest(RootObjectGetCAPICall* capiGetMsg)
     PendingRpcsEntry entry;
     entry.getCallMsg = capiGetMsg;
     entry.numSent = 1;		//TODO:This numSent should be calculated from the required group and overlay writes
-    entry.state = LOOKUP_STARTED;
     pendingRpcs.insert(std::make_pair(capiGetMsg->getNonce(), entry));
 }
 
@@ -114,7 +113,6 @@ void Peer_logic::handlePutCAPIRequest(RootObjectPutCAPICall* capiPutMsg)
 	PendingRpcsEntry entry;
 	entry.numSent = 4;		//TODO:This numSent should be calculated from the required group and overlay writes
 	entry.putCallMsg = capiPutMsg;
-	entry.state = PUT_SENT;
 	pendingRpcs.insert(std::make_pair(capiPutMsg->getNonce(), entry));
 }
 
