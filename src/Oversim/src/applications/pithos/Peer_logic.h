@@ -100,7 +100,7 @@ class Peer_logic: public cSimpleModule
 				int numDHTGetFailed;
 		};
 
-		friend std::ostream& operator<<(std::ostream& Stream, const PendingRpcsEntry& entry);
+		//friend std::ostream& operator<<(std::ostream& Stream, const PendingRpcsEntry& entry);
 
 		typedef std::map<uint32_t, PendingRpcsEntry> PendingRpcs;
 		PendingRpcs pendingRpcs; /**< a map of all pending RPC operations */
