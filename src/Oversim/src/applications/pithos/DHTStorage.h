@@ -46,7 +46,7 @@ class DHTStorage : public cSimpleModule
 		 * A container used by the DHTTestApp to
 		 * store context information for statistics
 		 *
-		 * @author Ingmar Baumgart
+		 * @author John Gilmore Ingmar Baumgart
 		 */
 		class DHTStatsContext : public cPolymorphic
 		{

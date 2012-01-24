@@ -149,7 +149,7 @@ void Super_peer_logic::informGroupPeers(bootstrapPkt *boot_req, TransportAddress
 	list_p->setSourceAddress(sourceAdr);
 
 	list_p->addToPeerList(peer_data);
-	list_p->setByteLength(2*sizeof(int)+sizeof(int)*2);	//Value+Type+(IP+Port)
+	list_p->setByteLength(4 + 4 + 4);	//Value+Type+IP
 
 	for (unsigned int i = 0 ; i < group_peers.size() ; i++)
 	{
@@ -169,7 +169,7 @@ void Super_peer_logic::informJoiningPeer(bootstrapPkt *boot_req, TransportAddres
 	list_p->setName("join_accept");
 	list_p->setPayloadType(JOIN_ACCEPT);
 	list_p->setSourceAddress(sourceAdr);
-	list_p->setByteLength(2*sizeof(int)+sizeof(int)*2*group_peers.size());	//Value+Type+(IP+Port)*list_length FIXME: The size needs to still be multiplied by the size of the peer list.
+	list_p->setByteLength(2*sizeof(int)+sizeof(int)*group_peers.size());	//Value+Type+(IP)*list_length FIXME: The size needs to still be multiplied by the size of the peer list.
 	list_p->setDestinationAddress(boot_req->getSourceAddress());
 
 	for (unsigned int i = 0 ; i < group_peers.size() ; i++)

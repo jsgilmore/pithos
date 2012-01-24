@@ -29,9 +29,6 @@ GroupStorage::~GroupStorage() {
 
 void GroupStorage::initialize()
 {
-	storage.setName("queue");
-	take(&storage);
-
 	//Register the signal that records the size of the group the peer is currently in
 	groupSizeSignal = registerSignal("GroupSize");
 
@@ -50,7 +47,7 @@ void GroupStorage::initialize()
 	storeTimeSignal = registerSignal("storeTime");
 
 	//Record the initial zero lengths of the object storage
-	emit(qlenSignal, storage.length());
+	emit(qlenSignal, storage_map.size());
 	emit(qsizeSignal, getStorageBytes());
 
 	//Register the signals that record the number of different types of objects in storage
@@ -128,7 +125,7 @@ TransportAddress GroupStorage::getSuperPeerAddress()
 
 int GroupStorage::getStorageFiles()
 {
-	return storage.getLength();
+	return storage_map.size();
 }
 
 void GroupStorage::createResponseMsg(ResponsePkt **response, int responseType, unsigned int rpcid, bool isSuccess, GameObject object)
@@ -146,6 +143,12 @@ void GroupStorage::createResponseMsg(ResponsePkt **response, int responseType, u
 		EV << "[GroupStorage] returning result: " << object << endl;
 		GameObject *object_ptr =  new GameObject(object);
 		(*response)->addObject(object_ptr);
+
+		//SourceAddress + DestinationAddress + ResponseType + PayloadType + isSuccess + RPCID
+		(*response)->setByteLength(4 + 4 + 4 + 4 + 4 + 4 + object.getSize());
+	} else {
+		//SourceAddress + DestinationAddress + ResponseType + PayloadType + isSuccess + RPCID
+		(*response)->setByteLength(4 + 4 + 4 + 4 + 4 + 4);
 	}
 }
 
@@ -157,7 +160,6 @@ void GroupStorage::sendUDPResponse(TransportAddress src_adr, TransportAddress de
 
 	response->setSourceAddress(src_adr);
 	response->setDestinationAddress(dest_adr);
-	response->setByteLength(4 + 4 + 4 + 4 + 4 + 4);	//SourceAddress + DestinationAddress + ResponseType + PayloadType + isSuccess + RPCID
 
 	send(response, "comms_gate$o");
 }
@@ -227,6 +229,10 @@ void GroupStorage::requestRetrieve(OverlayKeyPkt *retrieve_req)
 	retrieve_req->setDestinationAddress(container_peer_ptr->getAddress());
 
 	send(retrieve_req, "comms_gate$o");
+
+	PendingRequestsEntry entry;
+	entry.numGetSent = 1; //TODO:This numSent should be calculated from the required group and overlay writes
+	pendingRequests.insert(std::make_pair(rpcid, entry));
 }
 
 void GroupStorage::addObject(cMessage *msg)
@@ -382,6 +388,7 @@ int GroupStorage::getReplicaNr(unsigned int rpcid)
 		response->setPayloadType(RESPONSE);
 		response->setIsSuccess(false);
 		response->setRpcid(rpcid);		//This allows the higher layer to know which RPC call is being acknowledged.
+		//This packet is sent internally, so no size is required
 
 		//Send one failure response packet for each replica that cannot be stored
 		for (i = 0 ; i < replicas - group_peers.size() - 1 ; i++)
@@ -429,6 +436,10 @@ void GroupStorage::send_forstore(GameObject *go, unsigned int rpcid)
 		send(write_dup, "comms_gate$o");
 	}
 
+	PendingRequestsEntry entry;
+	entry.numPutSent = replicas; //TODO:This numSent should be calculated from the required group and overlay writes
+	pendingRequests.insert(std::make_pair(rpcid, entry));
+
 	delete(write);
 }
 
@@ -436,27 +447,58 @@ void GroupStorage::respond_toUpper(cMessage *msg)
 {
 	ResponsePkt *response = check_and_cast<ResponsePkt *>(msg);
 
-	if (response->getIsSuccess()) {
-		RECORD_STATS(numPutSuccess++);
-		//FIXME: Record the group put latency
-		//RECORD_STATS(globalStatistics->addStdDev("GroupStorage: PUT Latency (s)", SIMTIME_DBL(simTime() - context->requestTime)));
-	} else {
-		RECORD_STATS(numPutError++);		//These errors are currently all caused by an insufficient number of group peers to store all replicas.
-	}
+	PendingRequests::iterator it = pendingRequests.find(response->getRpcid());
+
+	if (it == pendingRequests.end()) // unknown request or request for already erased call
+		error("[GroupStorage] Response could not be matched to a call.");
+
+	//TODO: Record the group put latency (This will merely require that the response packet be expanded with the initiation time of the request)
+
+	if (response->getResponseType() == GROUP_PUT)
+	{
+		if (response->getIsSuccess())
+		{
+			it->second.numGroupPutSucceeded++;
+			RECORD_STATS(numPutSuccess++);
+		}
+		else {
+			it->second.numGroupPutFailed++;
+			RECORD_STATS(numPutError++);		//These errors are currently all caused by an insufficient number of group peers to store all replicas.
+		}
+
+		pendingRequests.erase(it);
+	} else if (response->getResponseType() == GROUP_GET)
+	{
+		if (response->getIsSuccess())
+		{
+			it->second.numGroupGetSucceeded++;
+			RECORD_STATS(numGetSuccess++);
+		}
+		else {
+			it->second.numGroupGetFailed++;
+			RECORD_STATS(numGetError++);
+		}
+
+		if (it->second.numGroupPutSucceeded + it->second.numGroupPutFailed == it->second.numPutSent)
+		{
+			pendingRequests.erase(it);
+		}
+	} else error("Unknown response type received");
 
 	send(msg, "read");
 }
 
 int GroupStorage::getStorageBytes()
 {
-	int i;
 	int total_size = 0;
+
+	StorageMap::iterator it;
 
 	//This is inefficient, since a sequential search will be done for every element in the queue.
 	//TODO: The "forEachChild" method should rather be implemented with an appropriate visitor class.
-	for (i = 0 ; i < storage.getLength() ; i++)
+	for (it = storage_map.begin() ; it != storage_map.end() ; it++)
 	{
-		total_size += ((GameObject *)storage.get(i))->getSize();
+		total_size += it->second.getSize();
 	}
 
 	return total_size;
@@ -486,7 +528,7 @@ void GroupStorage::store(cMessage *msg)
 
 	emit(storeTimeSignal, delay);
 
-	emit(qlenSignal, storage.length());
+	emit(qlenSignal, storage_map.size());
 	emit(qsizeSignal, getStorageBytes());
 
 	emit(objectsSignal, 1);
@@ -511,6 +553,7 @@ void GroupStorage::addPeers(cMessage *msg)
 	{
 		AddressPkt *request_start = new AddressPkt("request_start");
 		request_start->setAddress(super_peer_address);
+		request_start->setByteLength(4);	//The super peer IP
 		send(request_start, "to_upperTier");
 
 		emit(joinTimeSignal, joinTime);

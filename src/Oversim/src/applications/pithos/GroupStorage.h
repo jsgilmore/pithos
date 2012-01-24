@@ -57,13 +57,43 @@ class GroupStorage : public cSimpleModule
 
 	private:
 
+		/**
+		 * This class provides a means to store all information about pending requests sent to the group.
+		 * A map of all pending requests are maintained and matched against responses received. If a response for
+		 * a pending request is received, the original caller can be informed about the outcome of the request.
+		 *
+		 * @author John Gilmore
+		 */
+		class PendingRequestsEntry
+		{
+			public:
+				PendingRequestsEntry()
+				{
+					numGetSent = 0;
+					numPutSent = 0;
+					numGroupPutFailed = 0;
+					numGroupPutSucceeded = 0;
+					numGroupGetFailed = 0;
+					numGroupGetSucceeded = 0;
+				};
+
+				int numGetSent;
+				int numPutSent;
+				int numGroupPutFailed;
+				int numGroupPutSucceeded;
+				int numGroupGetFailed;
+				int numGroupGetSucceeded;
+		};
+
+		friend std::ostream& operator<<(std::ostream& Stream, const PendingRequestsEntry& entry);
+
+		typedef std::map<uint32_t, PendingRequestsEntry> PendingRequests;
+		PendingRequests pendingRequests; /**< a map of all pending requests */
+
 		cMessage *event; /**< An event used to trigger a join request */
 
-		char directory_ip[16]; /**< The IP address of the directory server (specified as a Omnet param value) */
-
-		int directory_port; /**< The port of the directory server (specified as a Omnet param value) */
-
-		cQueue storage; /**< The queue holding all stored GameObjects */
+		char directory_ip[16]; /**< The IP address of the directory server (specified as an Omnet param value) */
+		int directory_port; /**< The port of the directory server (specified as an Omnet param value) */
 
 		/**< A map that stores all game objects on this group peer */
 		typedef std::map<OverlayKey, GameObject> StorageMap;
