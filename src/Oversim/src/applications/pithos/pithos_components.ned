@@ -103,7 +103,8 @@ simple GroupStorage
         
         string directory_ip;
         int directory_port;
-        double wait_time @unit(s);
+        double joinTime @unit(s) = default(30s);
+        double requestTimeout @unit(ms) = default(400ms);
         int replicas = 3;
     gates:
         inout comms_gate;

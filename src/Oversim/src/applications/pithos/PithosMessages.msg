@@ -114,3 +114,8 @@ packet PeerListPkt extends Packet
     OverlayKey objectKey;
     abstract PeerData peer_list[];
 }
+
+message ResponseTimeoutEvent
+{
+    unsigned int rpcid;
+}

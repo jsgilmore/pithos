@@ -75,6 +75,7 @@ class GroupStorage : public cSimpleModule
 					numGroupPutSucceeded = 0;
 					numGroupGetFailed = 0;
 					numGroupGetSucceeded = 0;
+					timeout = NULL;
 				};
 
 				int numGetSent;
@@ -83,6 +84,8 @@ class GroupStorage : public cSimpleModule
 				int numGroupPutSucceeded;
 				int numGroupGetFailed;
 				int numGroupGetSucceeded;
+
+				ResponseTimeoutEvent *timeout;
 		};
 
 		//friend std::ostream& operator<<(std::ostream& Stream, const PendingRequestsEntry& entry);
@@ -121,6 +124,8 @@ class GroupStorage : public cSimpleModule
 		int numGetSuccess; /**< number of success in put responses*/
 		int numPutError; /**< number of error in put responses*/
 		int numPutSuccess; /**< number of success in put responses*/
+
+		simtime_t requestTimeout;	/**< The amount of time to wait for a response to a request, before a node is removed from the group*/
 
 		/**
 		 * The function creates a write packet and fills it with address information, payload type and byte length.
