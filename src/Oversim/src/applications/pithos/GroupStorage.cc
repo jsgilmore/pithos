@@ -59,7 +59,9 @@ void GroupStorage::initialize()
 
 	//Set the event that will initiate the group join procedure.
 	event = new cMessage("event");
-	scheduleAt(simTime()+par("wait_time"), event);
+	scheduleAt(simTime()+par("joinTime"), event);
+
+	requestTimeout = par("requestTimeout");
 
 	//Assign a random location to the peer in the virtual world
 	latitude = uniform(0,100);		//Make this range changeable
@@ -230,8 +232,13 @@ void GroupStorage::requestRetrieve(OverlayKeyPkt *retrieve_req)
 
 	send(retrieve_req, "comms_gate$o");
 
+	ResponseTimeoutEvent *timeout = new ResponseTimeoutEvent("timeout");
+	timeout->setRpcid(rpcid);
+	scheduleAt(simTime()+requestTimeout, timeout);
+
 	PendingRequestsEntry entry;
 	entry.numGetSent = 1; //TODO:This numSent should be calculated from the required group and overlay writes
+	entry.timeout = timeout;
 	pendingRequests.insert(std::make_pair(rpcid, entry));
 }
 
@@ -436,9 +443,15 @@ void GroupStorage::send_forstore(GameObject *go, unsigned int rpcid)
 		send(write_dup, "comms_gate$o");
 	}
 
-	//std::cout << "Inserting pending put requets with rpcid: " << rpcid << endl;
+	ResponseTimeoutEvent *timeout = new ResponseTimeoutEvent("timeout");
+	timeout->setRpcid(rpcid);
+	scheduleAt(simTime()+requestTimeout, timeout);
+
+	//Add a new request for which at least one response is required
+	//std::cout << "Inserting pending put request with rpcid: " << rpcid << endl;
 	PendingRequestsEntry entry;
 	entry.numPutSent = replicas; //TODO:This numSent should be calculated from the required group and overlay writes
+	entry.timeout = timeout;
 	pendingRequests.insert(std::make_pair(rpcid, entry));
 
 	delete(write);
@@ -452,6 +465,12 @@ void GroupStorage::respond_toUpper(cMessage *msg)
 
 	if (it != pendingRequests.end()) // unknown request or request for already erased call
 	{
+		//Cancel the timeout that monitors disconnected peers
+		if (it->second.timeout != NULL)
+		{
+			cancelAndDelete(it->second.timeout);
+			it->second.timeout = NULL;
+		}
 		//TODO: Record the group put latency (This will merely require that the response packet be expanded with the initiation time of the request)
 
 		if (response->getResponseType() == GROUP_PUT)
@@ -466,7 +485,10 @@ void GroupStorage::respond_toUpper(cMessage *msg)
 				RECORD_STATS(numPutError++);		//These errors are currently all caused by an insufficient number of group peers to store all replicas.
 			}
 
-			pendingRequests.erase(it);
+			if (it->second.numGroupPutSucceeded + it->second.numGroupPutFailed == it->second.numPutSent)
+			{
+				pendingRequests.erase(it);
+			}
 		} else if (response->getResponseType() == GROUP_GET)
 		{
 			if (response->getIsSuccess())
@@ -479,12 +501,9 @@ void GroupStorage::respond_toUpper(cMessage *msg)
 				RECORD_STATS(numGetError++);
 			}
 
-			if (it->second.numGroupPutSucceeded + it->second.numGroupPutFailed == it->second.numPutSent)
-			{
-				pendingRequests.erase(it);
-			}
+			pendingRequests.erase(it);
 		} else error("Unknown response type received");
-	}
+	} else error("Unknown response received.");
 
 	send(msg, "read");
 }
@@ -648,6 +667,14 @@ void GroupStorage::handleMessage(cMessage *msg)
 
 		scheduleAt(simTime()+1, event);		//TODO: make the 1 second wait time a configuration variable that may be set
 
+	}
+	else if (strcmp(msg->getName(), "timeout") == 0)
+	{
+		ResponseTimeoutEvent *timeout = check_and_cast<ResponseTimeoutEvent *>(msg);
+
+		std::cout << "Timeout received for RPCID " << timeout->getRpcid() << endl;
+
+		delete(msg);
 	} else {
 
 		Packet *packet = check_and_cast<Packet *>(msg);
