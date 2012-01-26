@@ -48,6 +48,7 @@ enum OverlayTypes
 
 enum ResponseTypes 
 {
+    UNSPECIFIED = 0;
     OVERLAY_PUT = 1;
     OVERLAY_GET = 2;
     OVERLAY_MOD = 3;
