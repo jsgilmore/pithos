@@ -61,12 +61,14 @@ void Communicator::finishApp()
 
 void Communicator::handleTraceMessage(cMessage* msg)
 {
-	cModule *dht_storageModule = getParentModule()->getSubmodule("dht_storage");
+	/*cModule *dht_storageModule = getParentModule()->getSubmodule("dht_storage");
 
 	//This extra step ensures that the submodules exist and also does any other required error checking
 	DHTStorage *dht_storage = check_and_cast<DHTStorage *>(dht_storageModule);
 
-    dht_storage->handleTraceMessage(msg);
+    dht_storage->handleTraceMessage(msg);*/
+
+	error("Unexpected trace message received at the communicator.");
 }
 
 // handleTimerEvent is called when a timer event triggers
@@ -79,18 +81,6 @@ void Communicator::handleUpperMessage (cMessage *msg)
 {
 	send(msg, "toPeer_fromUpper");		//This is the storage request from the game module
 }
-
-/*void Communicator::handlePutRequest(RootObjectPutCall* dhtMsg)
-{
-	//TODO: Add functionality to handle this RPC call
-	return;
-}
-
-void Communicator::handleGetRequest(RootObjectGetCall* dhtMsg)
-{
-	//TODO: Add functionality to handle this RPC call
-	return;
-}*/
 
 simtime_t Communicator::getCreationTime()
 {
@@ -117,6 +107,11 @@ void Communicator::handlePutCAPIRequest(RootObjectPutCAPICall* capiPutMsg)
 
 bool Communicator::handleRpcCall(BaseCallMessage *msg)
 {
+	if (underlayConfigurator->isInInitPhase())
+	{
+		delete(msg);
+		error("Underlay configurator is still in init phase, extend wait time.\n");
+	}
 
     // There are many macros to simplify the handling of RPCs. The full list is in <OverSim>/src/common/RpcMacros.h.
 
@@ -183,6 +178,12 @@ void Communicator::overlayStore(cMessage *msg)
 {
 	CSHA1 hash;
 	char hash_str[41];		//SHA-1 produces a 160 bit/20 byte hash
+
+	if (underlayConfigurator->isInInitPhase())
+	{
+		delete(msg);
+		error("Underlay configurator is still in init phase, extend wait time.\n");
+	}
 
 	for (int i = 0 ; i < 41 ; i++)	//The string has to be cleared for the OverlayKey constructor to correctly handle it.
 		hash_str[i] = 0;
