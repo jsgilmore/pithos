@@ -24,7 +24,12 @@ GroupStorage::GroupStorage() {
 }
 
 GroupStorage::~GroupStorage() {
-	// TODO Auto-generated destructor stub
+	PendingRequests::iterator it;
+
+	for (it = pendingRequests.begin(); it != pendingRequests.end(); it++)
+		cancelAndDelete(it->second.timeout);
+
+	pendingRequests.clear();
 }
 
 void GroupStorage::initialize()
@@ -693,6 +698,7 @@ void GroupStorage::handleMessage(cMessage *msg)
 		} else sendUpperResponse(it->second.responseType, timeout->getRpcid(), false);
 
 		delete(msg);
+		pendingRequests.erase(it);
 	} else {
 
 		Packet *packet = check_and_cast<Packet *>(msg);
