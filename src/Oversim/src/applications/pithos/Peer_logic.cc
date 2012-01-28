@@ -26,7 +26,14 @@ Peer_logic::Peer_logic()
 
 Peer_logic::~Peer_logic()
 {
+    PendingRpcs::iterator it;
 
+    for (it = pendingRpcs.begin(); it != pendingRpcs.end(); it++) {
+        delete(it->second.putCallMsg);
+        delete(it->second.getCallMsg);
+    }
+
+    pendingRpcs.clear();
 }
 
 void Peer_logic::initialize()

@@ -59,7 +59,7 @@ void GroupStorage::initialize()
 
 	//Set the event that will initiate the group join procedure.
 	event = new cMessage("event");
-	scheduleAt(simTime()+par("joinTime"), event);
+	scheduleAt(simTime()+par("wait_time"), event);
 
 	requestTimeout = par("requestTimeout");
 
@@ -238,6 +238,7 @@ void GroupStorage::requestRetrieve(OverlayKeyPkt *retrieve_req)
 
 	PendingRequestsEntry entry;
 	entry.numGetSent = 1; //TODO:This numSent should be calculated from the required group and overlay writes
+	entry.responseType = GROUP_GET;
 	entry.timeout = timeout;
 	pendingRequests.insert(std::make_pair(rpcid, entry));
 }
@@ -451,6 +452,7 @@ void GroupStorage::send_forstore(GameObject *go, unsigned int rpcid)
 	//std::cout << "Inserting pending put request with rpcid: " << rpcid << endl;
 	PendingRequestsEntry entry;
 	entry.numPutSent = replicas; //TODO:This numSent should be calculated from the required group and overlay writes
+	entry.responseType = GROUP_PUT;
 	entry.timeout = timeout;
 	pendingRequests.insert(std::make_pair(rpcid, entry));
 
@@ -670,9 +672,25 @@ void GroupStorage::handleMessage(cMessage *msg)
 	}
 	else if (strcmp(msg->getName(), "timeout") == 0)
 	{
+		//If a response has timed out.
 		ResponseTimeoutEvent *timeout = check_and_cast<ResponseTimeoutEvent *>(msg);
 
-		std::cout << "Timeout received for RPCID " << timeout->getRpcid() << endl;
+		//std::cout << "Timeout received for RPCID " << timeout->getRpcid() << endl;
+
+		PendingRequests::iterator it = pendingRequests.find(timeout->getRpcid());
+
+		//Inform the higher layer that the group request has failed
+		//TODO: A retry mechanism should be added here to improve the success rate under heavy churn.
+		//TODO: Multiple requests to multiple nodes can be sent to improve reliability.
+		if (it->second.responseType == GROUP_PUT)
+		{
+			unsigned int replicas = par("replicas");
+			//The higher layer expects a report of every sent put request and replica request
+			for (unsigned int i = 0 ; i < replicas ; i++)
+			{
+				sendUpperResponse(it->second.responseType, timeout->getRpcid(), false);
+			}
+		} else sendUpperResponse(it->second.responseType, timeout->getRpcid(), false);
 
 		delete(msg);
 	} else {
