@@ -76,6 +76,7 @@ class GroupStorage : public cSimpleModule
 					numGroupGetFailed = 0;
 					numGroupGetSucceeded = 0;
 					timeout = NULL;
+					responseType = UNSPECIFIED;
 				};
 
 				int numGetSent;
@@ -84,6 +85,7 @@ class GroupStorage : public cSimpleModule
 				int numGroupPutSucceeded;
 				int numGroupGetFailed;
 				int numGroupGetSucceeded;
+				int responseType;
 
 				ResponseTimeoutEvent *timeout;
 		};
