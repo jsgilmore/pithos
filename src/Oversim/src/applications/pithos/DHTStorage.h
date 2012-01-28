@@ -55,10 +55,19 @@ class DHTStorage : public cSimpleModule
 				simtime_t requestTime;
 				OverlayKey key;
 				unsigned int parent_rpcid;
-				GameObject object;
+				GameObject *object;
 
-				DHTStatsContext(bool measurementPhase, simtime_t requestTime, const OverlayKey& key, unsigned int parent_rpcid=0, const GameObject& object = GameObject::UNSPECIFIED_OBJECT) :
-					measurementPhase(measurementPhase), requestTime(requestTime), key(key), parent_rpcid(parent_rpcid), object(object) {};
+				DHTStatsContext(bool measurementPhase, simtime_t requestTime, const OverlayKey& key, unsigned int parent_rpcid=0, GameObject *object = new GameObject(GameObject::UNSPECIFIED_OBJECT)) :
+					measurementPhase(measurementPhase), requestTime(requestTime), key(key), parent_rpcid(parent_rpcid), object(object)
+				{
+						take(object);
+				}
+
+				~DHTStatsContext()
+				{
+					drop(object);
+					delete(object);
+				}
 		};
 
 		DHTStorage();

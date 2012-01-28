@@ -246,11 +246,11 @@ void DHTStorage::handlePutResponse(DHTputCAPIResponse* msg, DHTStatsContext* con
 
     if (msg->getIsSuccess())
     {
-    	DHTEntry entry = {context->object.getBinaryValue(), simTime() + context->object.getTTL()};
+    	DHTEntry entry = {context->object->getBinaryValue(), simTime() + context->object->getTTL()};
 
         globalDhtTestMap->insertEntry(context->key, entry);
 
-        EV << "Storing DHT entry: " << context->object.getBinaryValue() << endl;
+        EV << "Storing DHT entry: " << context->object->getBinaryValue() << endl;
 
         RECORD_STATS(numPutSuccess++);
         RECORD_STATS(globalStatistics->addStdDev("DHTTestApp: PUT Latency (s)", SIMTIME_DBL(simTime() - context->requestTime)));
@@ -341,9 +341,7 @@ void DHTStorage::send_forstore(Packet *pkt)
 	RECORD_STATS(numSent++; numPutSent++);
 
 	EV << "Sending object with name: " << go->getObjectName() << endl;
-	communicator->externallySendInternalRpcCall(OVERLAYSTORAGE_COMP, dhtPutMsg, new DHTStatsContext(globalStatistics->isMeasuring(), simTime(), destkey, parent_rpcid, *go));
-
-	delete(go);
+	communicator->externallySendInternalRpcCall(OVERLAYSTORAGE_COMP, dhtPutMsg, new DHTStatsContext(globalStatistics->isMeasuring(), simTime(), destkey, parent_rpcid, go));
 }
 
 void DHTStorage::handleMessage(cMessage *msg)
