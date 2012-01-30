@@ -19,11 +19,11 @@ cplusplus {{
 #include "OverlayKey.h"
 }}
 
-
 // import the IP Address class
 class noncobject TransportAddress;
 class noncobject OverlayKey;
 class noncobject PeerData;
+class noncobject PeerDataPtr;
 
 enum PacketTypes
 {
@@ -119,4 +119,5 @@ packet PeerListPkt extends Packet
 message ResponseTimeoutEvent
 {
     unsigned int rpcid;
+    PeerDataPtr peerDataPtr;
 }
