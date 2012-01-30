@@ -472,7 +472,7 @@ void GroupStorage::respond_toUpper(cMessage *msg)
 
 	if (it != pendingRequests.end()) // unknown request or request for already erased call
 	{
-		//Cancel the timeout that monitors disconnected peers
+		//Cancel the timeout that monitors disconnected peers as soon as a response is received
 		if (it->second.timeout != NULL)
 		{
 			cancelAndDelete(it->second.timeout);
