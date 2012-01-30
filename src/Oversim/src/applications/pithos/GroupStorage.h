@@ -217,6 +217,7 @@ class GroupStorage : public cSimpleModule
 
 		void finish();
 		virtual void initialize();
+		void handleTimeout(ResponseTimeoutEvent *timeout);
 		void handlePacket(Packet *packet);
 		virtual void handleMessage(cMessage *msg);
 };
