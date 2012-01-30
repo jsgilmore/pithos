@@ -75,11 +75,7 @@ void GroupStorage::initialize()
 	event = new cMessage("event");
 	scheduleAt(simTime()+par("wait_time"), event);
 
-	double requestTimeout_ms = par("requestTimeout");
-
-	std::cout << "The set timeout is: " << requestTimeout_ms << endl;
-
-	requestTimeout = requestTimeout_ms/1000;	//Devide by a thousands to convert from seconds to milliseconds
+	requestTimeout = par("requestTimeout");
 
 	//Assign a random location to the peer in the virtual world
 	latitude = uniform(0,100);		//Make this range changeable
@@ -738,6 +734,44 @@ void GroupStorage::handlePacket(Packet *packet)
 	else error("Group storage received an unknown packet");
 }
 
+void GroupStorage::handleTimeout(ResponseTimeoutEvent *timeout)
+{
+	//TODO: A retry mechanism should be added here to improve the success rate under heavy churn.
+	//TODO: Multiple requests to multiple nodes can be sent to improve reliability.
+	bool found;
+	std::vector<ResponseTimeoutEvent *>::iterator timeout_it;
+
+	//std::cout << "Timeout received for RPCID " << timeout->getRpcid() << endl;
+
+	//Locate the timeout in the pending requets list
+	PendingRequests::iterator it = pendingRequests.find(timeout->getRpcid());
+
+	//Send a failure response to the higher layer for the received timeout
+	sendUpperResponse(it->second.responseType, timeout->getRpcid(), false);
+
+	//Locate and delete the timeout in the timeout vector in the pending requests list
+	for (timeout_it = it->second.timeouts.begin() ; timeout_it != it->second.timeouts.end() ; timeout_it++)
+	{
+		PeerDataPtr peerDataPtr = (*timeout_it)->getPeerDataPtr();
+
+		//timeout_it is an iterator to a pointer, so it has to be dereferenced once to get to the ResponseTimeoutEvent pointer
+		if (peerDataPtr == timeout->getPeerDataPtr())
+		{
+			delete(timeout);
+			it->second.timeouts.erase(timeout_it);
+			found = true;
+			break;
+		}
+	}
+
+	if (!found)
+		error("When a timeout expired, its linked peer data could not be located.");
+
+	//If there are no more timeouts outstanding, remove the pending request item form the requests vector
+	if (it->second.timeouts.size() == 0)
+		pendingRequests.erase(it);
+}
+
 void GroupStorage::handleMessage(cMessage *msg)
 {
 	if (msg == event)
@@ -753,28 +787,10 @@ void GroupStorage::handleMessage(cMessage *msg)
 	}
 	else if (strcmp(msg->getName(), "timeout") == 0)
 	{
-		//If a response has timed out.
 		ResponseTimeoutEvent *timeout = check_and_cast<ResponseTimeoutEvent *>(msg);
 
-		//std::cout << "Timeout received for RPCID " << timeout->getRpcid() << endl;
+		handleTimeout(timeout);
 
-		PendingRequests::iterator it = pendingRequests.find(timeout->getRpcid());
-
-		//Inform the higher layer that the group request has failed
-		//TODO: A retry mechanism should be added here to improve the success rate under heavy churn.
-		//TODO: Multiple requests to multiple nodes can be sent to improve reliability.
-		if (it->second.responseType == GROUP_PUT)
-		{
-			unsigned int replicas = par("replicas");
-			//The higher layer expects a report of every sent put request and replica request
-			for (unsigned int i = 0 ; i < replicas ; i++)
-			{
-				sendUpperResponse(it->second.responseType, timeout->getRpcid(), false);
-			}
-		} else sendUpperResponse(it->second.responseType, timeout->getRpcid(), false);
-
-		delete(msg);
-		pendingRequests.erase(it);
 	} else {
 		Packet *packet = check_and_cast<Packet *>(msg);
 
