@@ -75,7 +75,6 @@ class GroupStorage : public cSimpleModule
 					numGroupPutSucceeded = 0;
 					numGroupGetFailed = 0;
 					numGroupGetSucceeded = 0;
-					timeout = NULL;
 					responseType = UNSPECIFIED;
 				};
 
@@ -87,7 +86,8 @@ class GroupStorage : public cSimpleModule
 				int numGroupGetSucceeded;
 				int responseType;
 
-				ResponseTimeoutEvent *timeout;
+				//Smart pointers are not required here, since the pointers do not point to elements in dynamic containers
+				std::vector<ResponseTimeoutEvent *> timeouts;
 		};
 
 		//friend std::ostream& operator<<(std::ostream& Stream, const PendingRequestsEntry& entry);
@@ -153,7 +153,7 @@ class GroupStorage : public cSimpleModule
 		 * @param dest_adr The selected destination address to which an object should be written.
 		 * @param send_list A history of peers selected to store the particular GameObject.
 		 */
-		void selectDestination(TransportAddress *dest_adr, std::vector<TransportAddress> send_list);
+		PeerDataPtr selectDestination(std::vector<TransportAddress> send_list);
 
 		void respond_toUpper(cMessage *msg);
 
@@ -217,6 +217,7 @@ class GroupStorage : public cSimpleModule
 
 		void finish();
 		virtual void initialize();
+		void handlePacket(Packet *packet);
 		virtual void handleMessage(cMessage *msg);
 };
 

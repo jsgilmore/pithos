@@ -23,11 +23,20 @@ GroupStorage::GroupStorage() {
 
 }
 
-GroupStorage::~GroupStorage() {
-	PendingRequests::iterator it;
+GroupStorage::~GroupStorage()
+{
+	PendingRequests::iterator requests_it;
+	std::vector<ResponseTimeoutEvent *>::iterator timeout_it;
 
-	for (it = pendingRequests.begin(); it != pendingRequests.end(); it++)
-		cancelAndDelete(it->second.timeout);
+
+	for (requests_it = pendingRequests.begin(); requests_it != pendingRequests.end(); requests_it++)
+	{
+		for (timeout_it = requests_it->second.timeouts.begin() ; timeout_it != requests_it->second.timeouts.end() ; timeout_it++)
+		{
+			cancelAndDelete(*timeout_it);
+		}
+		requests_it->second.timeouts.clear();
+	}
 
 	pendingRequests.clear();
 }
@@ -66,7 +75,11 @@ void GroupStorage::initialize()
 	event = new cMessage("event");
 	scheduleAt(simTime()+par("wait_time"), event);
 
-	requestTimeout = par("requestTimeout");
+	double requestTimeout_ms = par("requestTimeout");
+
+	std::cout << "The set timeout is: " << requestTimeout_ms << endl;
+
+	requestTimeout = requestTimeout_ms/1000;	//Devide by a thousands to convert from seconds to milliseconds
 
 	//Assign a random location to the peer in the virtual world
 	latitude = uniform(0,100);		//Make this range changeable
@@ -239,12 +252,13 @@ void GroupStorage::requestRetrieve(OverlayKeyPkt *retrieve_req)
 
 	ResponseTimeoutEvent *timeout = new ResponseTimeoutEvent("timeout");
 	timeout->setRpcid(rpcid);
+	timeout->setPeerDataPtr(container_peer_ptr);
 	scheduleAt(simTime()+requestTimeout, timeout);
 
 	PendingRequestsEntry entry;
 	entry.numGetSent = 1; //TODO:This numSent should be calculated from the required group and overlay writes
 	entry.responseType = GROUP_GET;
-	entry.timeout = timeout;
+	entry.timeouts.push_back(timeout);
 	pendingRequests.insert(std::make_pair(rpcid, entry));
 }
 
@@ -354,24 +368,27 @@ void GroupStorage::updatePeerObjects(GameObject go)
 	send(objectAddPkt, "comms_gate$o");		//Set address
 }
 
-void GroupStorage::selectDestination(TransportAddress *dest_adr, std::vector<TransportAddress> send_list)
+PeerDataPtr GroupStorage::selectDestination(std::vector<TransportAddress> send_list)
 {
 	unsigned int j;
 	bool original_address = false;
+	PeerDataPtr peerDataPtr;
 
 	while(!original_address)
 	{
-		*dest_adr = (*(group_peers.at(intuniform(0, group_peers.size()-1)))).getAddress();		//Choose a random peer in the group for the destination
+		peerDataPtr = group_peers.at(intuniform(0, group_peers.size()-1));		//Choose a random peer in the group for the destination
 
 		//Check all previous chosen addresses to determine whether this address is unique
 		original_address = true;
 
 		for (j = 0 ; j < send_list.size() ; j++)
 		{
-			if (send_list.at(j) == *dest_adr)
+			if (send_list.at(j) == peerDataPtr->getAddress())
 				original_address = false;
 		}
 	}
+
+	return peerDataPtr;
 }
 
 void GroupStorage::createWritePkt(ValuePkt **write, unsigned int rpcid)
@@ -425,12 +442,20 @@ void GroupStorage::send_forstore(GameObject *go, unsigned int rpcid)
 	ValuePkt *write_dup;
 
 	unsigned int replicas;
-	TransportAddress dest_adr;
 	std::vector<TransportAddress> send_list;
+
+	PendingRequestsEntry entry;
+	ResponseTimeoutEvent *timeout;
+	PeerDataPtr destAdrPtr;
 
 	replicas = getReplicaNr(rpcid);
 
 	createWritePkt(&write, rpcid);
+
+	//Add a new request for which at least one response is required
+	//std::cout << "Inserting pending put request with rpcid: " << rpcid << endl;
+	entry.numPutSent = replicas;
+	entry.responseType = GROUP_PUT;
 
 	for (i = 0 ; i < replicas ; i++)
 	{
@@ -440,25 +465,22 @@ void GroupStorage::send_forstore(GameObject *go, unsigned int rpcid)
 
 		write_dup->addObject(go_dup);
 
-		selectDestination(&dest_adr, send_list);
-		write_dup->setDestinationAddress(dest_adr);
+		destAdrPtr = selectDestination(send_list);
+		write_dup->setDestinationAddress(destAdrPtr->getAddress());
 
-		send_list.push_back(dest_adr);
+		send_list.push_back(destAdrPtr->getAddress());
 
 		RECORD_STATS(numSent++; numPutSent++);
 		send(write_dup, "comms_gate$o");
+
+		timeout = new ResponseTimeoutEvent("timeout");
+		timeout->setRpcid(rpcid);
+		timeout->setPeerDataPtr(destAdrPtr);
+		scheduleAt(simTime()+requestTimeout, timeout);
+
+		entry.timeouts.push_back(timeout);
 	}
 
-	ResponseTimeoutEvent *timeout = new ResponseTimeoutEvent("timeout");
-	timeout->setRpcid(rpcid);
-	scheduleAt(simTime()+requestTimeout, timeout);
-
-	//Add a new request for which at least one response is required
-	//std::cout << "Inserting pending put request with rpcid: " << rpcid << endl;
-	PendingRequestsEntry entry;
-	entry.numPutSent = replicas; //TODO:This numSent should be calculated from the required group and overlay writes
-	entry.responseType = GROUP_PUT;
-	entry.timeout = timeout;
 	pendingRequests.insert(std::make_pair(rpcid, entry));
 
 	delete(write);
@@ -466,18 +488,35 @@ void GroupStorage::send_forstore(GameObject *go, unsigned int rpcid)
 
 void GroupStorage::respond_toUpper(cMessage *msg)
 {
+	bool found = false;
 	ResponsePkt *response = check_and_cast<ResponsePkt *>(msg);
 
+	std::vector<ResponseTimeoutEvent *>::iterator timeout_it;
 	PendingRequests::iterator it = pendingRequests.find(response->getRpcid());
 
 	if (it != pendingRequests.end()) // unknown request or request for already erased call
 	{
-		//Cancel the timeout that monitors disconnected peers as soon as a response is received
-		if (it->second.timeout != NULL)
+		//Cancel the timeout for the responding peer
+		for (timeout_it = it->second.timeouts.begin() ; timeout_it != it->second.timeouts.end() ; timeout_it++)
 		{
-			cancelAndDelete(it->second.timeout);
-			it->second.timeout = NULL;
+			ResponseTimeoutEvent * timeout = *timeout_it;
+			PeerDataPtr peerDataPtr = timeout->getPeerDataPtr();
+			TransportAddress address = peerDataPtr->getAddress();
+
+
+			//timeout_it is an iterator to a pointer, so it has to be dereferenced once to get to the ResponseTimeoutEvent pointer
+			if (address == response->getSourceAddress())
+			{
+				cancelAndDelete(timeout);
+				it->second.timeouts.erase(timeout_it);
+				found = true;
+				break;
+			}
 		}
+
+		if (!found)
+			error("No timeout found for response message from peer.");
+
 		//TODO: Record the group put latency (This will merely require that the response packet be expanded with the initiation time of the request)
 
 		if (response->getResponseType() == GROUP_PUT)
@@ -655,17 +694,54 @@ void GroupStorage::addAndJoinSuperPeer(Packet *packet)
 	}
 }
 
+void GroupStorage::handlePacket(Packet *packet)
+{
+
+	if (packet->getPayloadType() == INFORM)
+	{
+		//Data was received from the UDP layer by the communicator and has been referred to the Peer logic
+		addAndJoinSuperPeer(packet);
+		delete(packet);
+	} else if (packet->getPayloadType() == JOIN_ACCEPT)
+	{
+		addPeers(packet);
+		delete(packet);
+	} else if (packet->getPayloadType() == WRITE)
+	{
+		store(packet);
+		delete(packet);
+	} else if (packet->getPayloadType() == RESPONSE)
+	{
+		respond_toUpper(packet);
+	} else if (packet->getPayloadType() == STORE_REQ)
+	{
+		ValuePkt *store_req = check_and_cast<ValuePkt *>(packet);
+
+		GameObject *go = (GameObject *)packet->removeObject("GameObject");
+		if (go == NULL)
+			error("No object was attached to be stored in group storage");
+
+		send_forstore(go, store_req->getValue());
+
+		delete(go);		//Only duplicates of the game object are stored, so the original must be deleted
+		delete(packet);
+	} else if (packet->getPayloadType() == RETRIEVE_REQ)
+	{
+		OverlayKeyPkt *retrieve_req = check_and_cast<OverlayKeyPkt *>(packet);
+
+		requestRetrieve(retrieve_req);
+	} else if (packet->getPayloadType() == OBJECT_ADD)
+	{
+		addObject(packet);
+		delete(packet);
+	}
+	else error("Group storage received an unknown packet");
+}
+
 void GroupStorage::handleMessage(cMessage *msg)
 {
 	if (msg == event)
 	{
-		//Add the nodes own IP to its list of known group peers
-		/*PeerDataPtr peer_dat_ptr;
-		const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
-
-		peer_dat_ptr.reset(new PeerData(thisNode->getIp()));
-		group_peers.push_back(peer_dat_ptr);*/
-
 		//For the first join request, a request is sent to the well known directory server
 		IPAddress dest_ip(directory_ip);
 		TransportAddress destAdr(dest_ip, directory_port);
@@ -700,47 +776,8 @@ void GroupStorage::handleMessage(cMessage *msg)
 		delete(msg);
 		pendingRequests.erase(it);
 	} else {
-
 		Packet *packet = check_and_cast<Packet *>(msg);
 
-		if (packet->getPayloadType() == INFORM)
-		{
-			//Data was received from the UDP layer by the communicator and has been referred to the Peer logic
-			addAndJoinSuperPeer(packet);
-			delete(msg);
-		} else if (packet->getPayloadType() == JOIN_ACCEPT)
-		{
-			addPeers(msg);
-			delete(msg);
-		} else if (packet->getPayloadType() == WRITE)
-		{
-			store(msg);
-			delete(msg);
-		} else if (packet->getPayloadType() == RESPONSE)
-		{
-			respond_toUpper(msg);
-		} else if (packet->getPayloadType() == STORE_REQ)
-		{
-			ValuePkt *store_req = check_and_cast<ValuePkt *>(msg);
-
-			GameObject *go = (GameObject *)msg->removeObject("GameObject");
-			if (go == NULL)
-				error("No object was attached to be stored in group storage");
-
-			send_forstore(go, store_req->getValue());
-
-			delete(go);		//Only duplicates of the game object are stored, so the original must be deleted
-			delete(msg);
-		} else if (packet->getPayloadType() == RETRIEVE_REQ)
-		{
-			OverlayKeyPkt *retrieve_req = check_and_cast<OverlayKeyPkt *>(msg);
-
-			requestRetrieve(retrieve_req);
-		} else if (packet->getPayloadType() == OBJECT_ADD)
-		{
-			addObject(msg);
-			delete(msg);
-		}
-		else error("Group storage received an unknown packet");
+		handlePacket(packet);
 	}
 }
