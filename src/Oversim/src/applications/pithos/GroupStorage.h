@@ -196,6 +196,10 @@ class GroupStorage : public cSimpleModule
 		 */
 		void addPeers(cMessage *msg);
 
+		void removePeer(PeerDataPtr peerDataPtr);
+
+		void peerLeftInform(PeerDataPtr peerDataPtr);
+
 		/**
 		 * @returns the number of required replicas or the number of group peers, if this number is less than the required replicas (this case is also logged).
 		 */

@@ -734,27 +734,59 @@ void GroupStorage::handlePacket(Packet *packet)
 	else error("Group storage received an unknown packet");
 }
 
+void GroupStorage::removePeer(PeerDataPtr peerDataPtr)
+{
+
+}
+
+void GroupStorage::peerLeftInform(PeerData peerData)
+{
+	std::vector<PeerDataPtr>::iterator it;
+	PeerDataPkt *pkt = new PeerDataPkt("peerLeft");
+
+	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
+	TransportAddress sourceAdr(thisNode->getIp(), thisNode->getPort());
+
+	pkt->setSourceAddress(sourceAdr);
+	pkt->setPayloadType(PEER_LEFT);
+	pkt->setPeerData(peerData);
+	pkt->setByteLength(4+4+4+4);	//Source IP + Dest IP + type + left peer IP
+
+	for (it = group_peers.begin() ; it != group_peers.end() ; it++)
+	{
+		//Dereference it to get PeerDataPtr and use -> operator to get PeerData
+		pkt->setDestinationAddress((*it)->getAddress());
+
+		send(pkt->dup(), "comms_gate$o");
+	}
+
+	pkt->setDestinationAddress(super_peer_address);
+	send(pkt, "comms_gate$o");
+}
+
 void GroupStorage::handleTimeout(ResponseTimeoutEvent *timeout)
 {
 	//TODO: A retry mechanism should be added here to improve the success rate under heavy churn.
 	//TODO: Multiple requests to multiple nodes can be sent to improve reliability.
-	bool found;
+	bool found = false;
 	std::vector<ResponseTimeoutEvent *>::iterator timeout_it;
+	PeerDataPtr peerDataPtr;
 
 	//std::cout << "Timeout received for RPCID " << timeout->getRpcid() << endl;
 
-	//Locate the timeout in the pending requets list
+	//Locate the timeout in the pending requests list
 	PendingRequests::iterator it = pendingRequests.find(timeout->getRpcid());
 
-	//Send a failure response to the higher layer for the received timeout
+	// a failure response to the higher layer for the received timeout
 	sendUpperResponse(it->second.responseType, timeout->getRpcid(), false);
 
 	//Locate and delete the timeout in the timeout vector in the pending requests list
+	//(This is a small list, no larger than the number of required replicas and gets only have one item)
 	for (timeout_it = it->second.timeouts.begin() ; timeout_it != it->second.timeouts.end() ; timeout_it++)
 	{
-		PeerDataPtr peerDataPtr = (*timeout_it)->getPeerDataPtr();
-
 		//timeout_it is an iterator to a pointer, so it has to be dereferenced once to get to the ResponseTimeoutEvent pointer
+		peerDataPtr = (*timeout_it)->getPeerDataPtr();
+
 		if (peerDataPtr == timeout->getPeerDataPtr())
 		{
 			delete(timeout);
@@ -770,6 +802,12 @@ void GroupStorage::handleTimeout(ResponseTimeoutEvent *timeout)
 	//If there are no more timeouts outstanding, remove the pending request item form the requests vector
 	if (it->second.timeouts.size() == 0)
 		pendingRequests.erase(it);
+
+	removePeer(peerDataPtr);
+
+	//The peerDataPtr in this scope prevents the memory from being freed in the removePeer function.
+	//This is only done when the current function is left
+	peerLeftInform(*peerDataPtr);
 }
 
 void GroupStorage::handleMessage(cMessage *msg)
