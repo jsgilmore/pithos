@@ -38,6 +38,7 @@ enum PacketTypes
     OBJECT_ADD = 9;
     SP_OBJECT_ADD = 10;
     RESPONSE = 11;
+    PEER_LEFT = 12;
 };
 
 enum OverlayTypes 
@@ -114,6 +115,11 @@ packet PeerListPkt extends Packet
     unsigned long objectSize;
     OverlayKey objectKey;
     abstract PeerData peer_list[];
+}
+
+packet PeerDataPkt extends Packet
+{
+    PeerData peerData;
 }
 
 message ResponseTimeoutEvent
