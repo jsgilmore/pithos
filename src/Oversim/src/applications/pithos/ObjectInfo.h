@@ -21,8 +21,20 @@
 
 #include <string>
 #include <vector>
+#include <tr1/memory>
 
 #include "PeerData.h"
+
+class ObjectInfo;
+
+/**
+ * ObjectInfoPtr is a typedef for the shared_ptr smart pointer type, which using
+ * reference counting to ensure that memory is never freed while there are still
+ * pointers pointing to it. It also automatically frees memory if no pointers are
+ * pointing to it anymore. Their use is required when creating pointers to dynamic
+ * structures like vectors.
+ */
+typedef std::tr1::shared_ptr <ObjectInfo> ObjectInfoPtr;
 
 /**
  * This class stores the information of a single object, including name,
