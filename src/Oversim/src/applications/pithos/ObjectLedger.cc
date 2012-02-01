@@ -13,51 +13,35 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#include "ObjectInfo.h"
+#include "ObjectLedger.h"
 
-ObjectInfo::ObjectInfo() {
+ObjectLedger::ObjectLedger() {
 	// TODO Auto-generated constructor stub
 
 }
 
-ObjectInfo::~ObjectInfo() {
+ObjectLedger::~ObjectLedger() {
 	// TODO Auto-generated destructor stub
 }
 
-void ObjectInfo::setObjectName(const std::string &o_name)
-{
-	object_name = o_name;
-}
-
-void ObjectInfo::setObjectName(char *o_name)
-{
-
-	object_name = o_name;
-}
-
-std::string ObjectInfo::getObjectName()
-{
-	return object_name;
-}
-
-void ObjectInfo::addPeerRef(PeerDataPtr peer_data_ptr)
+void ObjectLedger::addPeerRef(PeerDataPtr peer_data_ptr)
 {
 	PeerDataPtr ptr(peer_data_ptr);
 	location_list.push_back(ptr);
 }
 
-PeerDataPtr ObjectInfo::getPeerRef(const int &i)
+PeerDataPtr ObjectLedger::getPeerRef(const int &i)
 {
 	return location_list.at(i);
 }
 
-PeerDataPtr ObjectInfo::getRandPeerRef()
+PeerDataPtr ObjectLedger::getRandPeerRef()
 {
 	int index = intuniform(0, location_list.size());
 	return location_list.at(index);
 }
 
-bool ObjectInfo::isPeerPresent(PeerDataPtr peer_ptr)
+bool ObjectLedger::isPeerPresent(PeerDataPtr peer_ptr)
 {
 	std::vector<PeerDataPtr>::iterator list_ptr;
 
@@ -71,17 +55,7 @@ bool ObjectInfo::isPeerPresent(PeerDataPtr peer_ptr)
 	return false;
 }
 
-int ObjectInfo::getPeerListSize()
+int ObjectLedger::getPeerListSize()
 {
 	return location_list.size();
-}
-
-void ObjectInfo::setSize(const int &siz)
-{
-	size = siz;
-}
-
-int ObjectInfo::getSize()
-{
-	return size;
 }
