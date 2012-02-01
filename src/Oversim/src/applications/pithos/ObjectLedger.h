@@ -16,25 +16,15 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 
-#ifndef OBJECTINFO_H_
-#define OBJECTINFO_H_
+#ifndef OBJECTLEDGER_H_
+#define OBJECTLEDGER_H_
 
 #include <string>
 #include <vector>
-#include <tr1/memory>
+
 
 #include "PeerData.h"
-
-class ObjectInfo;
-
-/**
- * ObjectInfoPtr is a typedef for the shared_ptr smart pointer type, which using
- * reference counting to ensure that memory is never freed while there are still
- * pointers pointing to it. It also automatically frees memory if no pointers are
- * pointing to it anymore. Their use is required when creating pointers to dynamic
- * structures like vectors.
- */
-typedef std::tr1::shared_ptr <ObjectInfo> ObjectInfoPtr;
+#include "ObjectData.h"
 
 /**
  * This class stores the information of a single object, including name,
@@ -44,15 +34,9 @@ typedef std::tr1::shared_ptr <ObjectInfo> ObjectInfoPtr;
  *
  * @author John Gilmore
  */
-class ObjectInfo
+class ObjectLedger
 {
 	private:
-
-		/** Object name */
-		std::string object_name;
-
-		/** Object size in bytes */
-		int size;
 
 		/**
 		 * A list of peers this object is stored in, in the group.
@@ -64,24 +48,11 @@ class ObjectInfo
 		std::vector<PeerDataPtr> location_list;
 
 	public:
-		ObjectInfo();
-		virtual ~ObjectInfo();
 
-		/**
-		 * Set the object name
-		 *
-		 * @param o_name A std::string value containing the object name
-		 */
-		void setObjectName(const std::string &o_name);
+		ObjectDataPtr objectDataPtr;
 
-		/**
-		 * Set the object name
-		 *
-		 * @param o_name A char* value containing the object name
-		 */
-		void setObjectName(char *o_name);
-
-		std::string getObjectName();
+		ObjectLedger();
+		virtual ~ObjectLedger();
 
 		/**
 		 * Add a TransportAddress to the list of object locations
@@ -100,10 +71,6 @@ class ObjectInfo
 		int getPeerListSize();
 
 		bool isPeerPresent(PeerDataPtr peer_ptr);
-
-		void setSize(const int &siz);
-
-		int getSize();
 };
 
-#endif /* OBJECTINFO_H_ */
+#endif /* OBJECTLEDGER_H_ */
