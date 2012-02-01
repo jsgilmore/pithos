@@ -27,7 +27,7 @@
 #include "Peer_logic.h"
 #include "Communicator.h"
 
-#include "ObjectInfo.h"
+#include "GroupLedger.h"
 #include "PeerData.h"
 #include "GameObject.h"
 #include "PeerListPkt.h"
@@ -110,11 +110,7 @@ class GroupStorage : public cSimpleModule
 
 		double longitude; /**< The longitude of this peer (position in the virtual world) */
 
-		std::vector<PeerDataPtr> group_peers; /**< A vector that records all peers that belong to this super peer's group */
-
-		/**< A map that records all objects information stored in this super peer's group */
-		typedef std::map<OverlayKey, ObjectInfo> ObjectInfoMap;
-		ObjectInfoMap object_map;
+		GroupLedger group_ledger;
 
 		GlobalStatistics* globalStatistics; /**< pointer to GlobalStatistics module in this node*/
 
@@ -198,7 +194,7 @@ class GroupStorage : public cSimpleModule
 
 		void removePeer(PeerDataPtr peerDataPtr);
 
-		void peerLeftInform(PeerDataPtr peerDataPtr);
+		void peerLeftInform(PeerData peerData);
 
 		/**
 		 * @returns the number of required replicas or the number of group peers, if this number is less than the required replicas (this case is also logged).
