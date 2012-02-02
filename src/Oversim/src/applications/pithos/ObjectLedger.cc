@@ -21,7 +21,7 @@ ObjectLedger::ObjectLedger() {
 }
 
 ObjectLedger::~ObjectLedger() {
-	// TODO Auto-generated destructor stub
+	location_list.clear();
 }
 
 void ObjectLedger::addPeerRef(PeerDataPtr peer_data_ptr)
@@ -58,7 +58,29 @@ bool ObjectLedger::isPeerPresent(PeerDataPtr peer_ptr)
 	return false;
 }
 
-int ObjectLedger::getPeerListSize()
+unsigned int ObjectLedger::getPeerListSize()
 {
 	return location_list.size();
+}
+
+void ObjectLedger::erasePeerRef(const int &i)
+{
+	location_list.erase(location_list.begin()+i);
+}
+
+void ObjectLedger::erasePeerRef(PeerDataPtr peer_data_ptr)
+{
+	bool found = false;
+	for (unsigned int i = 0 ; i < location_list.size() ; i++)
+	{
+		if (peer_data_ptr == location_list.at(i))
+		{
+			found = true;
+			location_list.erase(location_list.begin()+i);
+			break;
+		}
+	}
+
+	if (!found)
+		opp_error("Peer pointer not found when erasing.");
 }

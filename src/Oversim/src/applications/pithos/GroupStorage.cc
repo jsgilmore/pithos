@@ -654,11 +654,13 @@ void GroupStorage::handlePacket(Packet *packet)
 	{
 		addObject(packet);
 		delete(packet);
-	}/* else if (packet->getPayloadType() == PEER_LEFT)
+	} else if (packet->getPayloadType() == PEER_LEFT)
 	{
-		removePeer(packet);
+		PeerDataPkt *peer_data_pkt = check_and_cast<PeerDataPkt *>(packet);
+		group_ledger.removePeer(peer_data_pkt->getPeerData());
+		emit(groupSizeSignal, group_ledger.getGroupSize() + 1);	//The peer's perceived group size is one larger, because itself is part of the group it is in
 		delete(packet);
-	}*/
+	}
 	else error("Group storage received an unknown packet");
 }
 
@@ -731,7 +733,7 @@ void GroupStorage::handleTimeout(ResponseTimeoutEvent *timeout)
 
 	//The peerDataPtr in this scope prevents the memory from being freed in the removePeer function.
 	//This is only done when the current function is left
-	//peerLeftInform(*peerDataPtr);
+	peerLeftInform(*peerDataPtr);
 }
 
 void GroupStorage::handleMessage(cMessage *msg)
