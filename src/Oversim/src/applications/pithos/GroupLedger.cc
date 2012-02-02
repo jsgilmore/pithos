@@ -88,6 +88,8 @@ void GroupLedger::removePeer(PeerData peer_dat)
 	ObjectDataPtr object_data_ptr;
 	ObjectLedgerMap::iterator object_ledger_it;
 
+	//std::cout << "Peer slated for removal: " << peer_dat.getAddress() << endl;
+
 	//Find the peer in the peer list
 	for (peer_ledger_it = peer_list.begin() ; peer_ledger_it != peer_list.end() ; peer_ledger_it++)
 	{
@@ -98,7 +100,10 @@ void GroupLedger::removePeer(PeerData peer_dat)
 	}
 
 	if (peer_ledger_it == peer_list.end())
-		opp_error("Peer slated for removal not found in group.");
+	{
+		//opp_error("Peer slated for removal not found in group.");
+		return;
+	}
 
 	//Iterate through all object references listed for the peer
 	for (unsigned int i = 0 ; i < peer_ledger_it->getObjectListSize() ; i++)
