@@ -43,6 +43,8 @@ class GroupLedger
 		void addObject(ObjectData objectData, PeerData peer_data_recv);
 		unsigned int getGroupSize();
 		PeerDataPtr getPeerPtr(const int &i);
+		void removePeer(PeerData peer_dat);
+		void removeObject(ObjectData object_data);
 };
 
 #endif /* GROUPLEDGER_H_ */

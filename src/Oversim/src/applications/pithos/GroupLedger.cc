@@ -82,23 +82,74 @@ void GroupLedger::addPeer(PeerData peer_dat)
 	}// else opp_error("Peer is already in group.");
 }
 
-/*void GroupLedger::removePeer(PeerData peer_dat)
+void GroupLedger::removePeer(PeerData peer_dat)
 {
 	PeerLedgerList::iterator peer_ledger_it;
+	ObjectDataPtr object_data_ptr;
+	ObjectLedgerMap::iterator object_ledger_it;
 
+	//Find the peer in the peer list
 	for (peer_ledger_it = peer_list.begin() ; peer_ledger_it != peer_list.end() ; peer_ledger_it++)
 	{
 		if (*(peer_ledger_it->peerDataPtr) == peer_dat)
 		{
-
+			break;
 		}
 	}
+
+	if (peer_ledger_it == peer_list.end())
+		opp_error("Peer slated for removal not found in group.");
+
+	//Iterate through all object references listed for the peer
+	for (unsigned int i = 0 ; i < peer_ledger_it->getObjectListSize() ; i++)
+	{
+		object_data_ptr = peer_ledger_it->getObjectRef(i);
+
+		//Retrieve the object ledger for the listed object reference
+		object_ledger_it = object_map.find(object_data_ptr->getKey());
+
+		//Remove the specific peer reference from the object ledger
+		object_ledger_it->second.erasePeerRef(peer_ledger_it->peerDataPtr);
+		//If the peer is removed and there are now no peers on which the object is stored, remove the object ledger entry
+		if (object_ledger_it->second.getPeerListSize() == 0)
+			object_map.erase(object_ledger_it);
+	}
+
+	peer_list.erase(peer_ledger_it);
 }
 
 void GroupLedger::removeObject(ObjectData object_data)
 {
+	ObjectLedgerMap::iterator object_ledger_it;
+	PeerDataPtr peer_data_ptr;
+	PeerLedgerList::iterator peer_ledger_it;
 
-}*/
+	object_ledger_it = object_map.find(object_data.getKey());
+	if (object_ledger_it == object_map.end())
+			opp_error("Object slated for removal not found in group.");
+
+	//Iterate through all peer references listed for the object
+	for (unsigned int i = 0 ; i < object_ledger_it->second.getPeerListSize() ; i++)
+	{
+		peer_data_ptr = object_ledger_it->second.getPeerRef(i);
+
+		//Find the peer in the peer list
+		for (peer_ledger_it = peer_list.begin() ; peer_ledger_it != peer_list.end() ; peer_ledger_it++)
+		{
+			if (peer_ledger_it->peerDataPtr == peer_data_ptr)
+			{
+				break;
+			}
+		}
+
+		//Remove the specific peer reference from the object ledger
+		peer_ledger_it->eraseObjectRef(object_ledger_it->second.objectDataPtr);
+
+		//Peers do not have to house objects to exist. A peer can exist, even if it stores no objects.
+	}
+
+	object_map.erase(object_ledger_it);
+}
 
 void GroupLedger::addObject(ObjectData objectData, PeerData peer_data_recv)
 {

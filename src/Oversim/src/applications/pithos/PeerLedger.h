@@ -44,9 +44,13 @@ class PeerLedger
 
 		ObjectDataPtr getObjectRef(const int &i);
 
-		int getObjectListSize();
+		unsigned int getObjectListSize();
 
 		bool isObjectPresent(ObjectDataPtr object_ptr);
+
+		void eraseObjectRef(const int &i);
+
+		void eraseObjectRef(ObjectDataPtr object_data_ptr);
 };
 
 #endif /* PEERLEDGER_H_ */

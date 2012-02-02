@@ -205,7 +205,10 @@ void Super_peer_logic::handleMessage(cMessage *msg)
 			addObject(msg);
 		} else if (packet->getPayloadType() == SP_PEER_LEFT)
 		{
-			addObject(msg);
+			PeerDataPkt *peer_data_pkt = check_and_cast<PeerDataPkt *>(packet);
+			group_ledger.removePeer(peer_data_pkt->getPeerData());
+
+			emit(groupSizeSignal, group_ledger.getGroupSize());
 		} else if (packet->getPayloadType() == JOIN_REQ)
 		{
 			handleJoinReq(msg);
