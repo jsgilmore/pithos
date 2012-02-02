@@ -21,7 +21,7 @@ PeerLedger::PeerLedger() {
 }
 
 PeerLedger::~PeerLedger() {
-	// TODO Auto-generated destructor stub
+	objectDataList.clear();
 }
 
 void PeerLedger::addObjectRef(ObjectDataPtr object_data_ptr)
@@ -49,7 +49,29 @@ bool PeerLedger::isObjectPresent(ObjectDataPtr object_ptr)
 	return false;
 }
 
-int PeerLedger::getObjectListSize()
+unsigned int PeerLedger::getObjectListSize()
 {
 	return objectDataList.size();
+}
+
+void PeerLedger::eraseObjectRef(const int &i)
+{
+	objectDataList.erase(objectDataList.begin()+i);
+}
+
+void PeerLedger::eraseObjectRef(ObjectDataPtr object_data_ptr)
+{
+	bool found = false;
+	for (unsigned int i = 0 ; i < objectDataList.size() ; i++)
+	{
+		if (object_data_ptr == objectDataList.at(i))
+		{
+			found = true;
+			objectDataList.erase(objectDataList.begin()+i);
+			break;
+		}
+	}
+
+	if (!found)
+		opp_error("Peer pointer not found when erasing.");
 }

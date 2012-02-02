@@ -69,9 +69,13 @@ class ObjectLedger
 		 */
 		PeerDataPtr getRandPeerRef();
 
-		int getPeerListSize();
+		unsigned int getPeerListSize();
 
 		bool isPeerPresent(PeerDataPtr peer_ptr);
+
+		void erasePeerRef(const int &i);
+
+		void erasePeerRef(PeerDataPtr peer_data_ptr);
 };
 
 #endif /* OBJECTLEDGER_H_ */
