@@ -26,8 +26,11 @@ ObjectLedger::~ObjectLedger() {
 
 void ObjectLedger::addPeerRef(PeerDataPtr peer_data_ptr)
 {
-	PeerDataPtr ptr(peer_data_ptr);
-	location_list.push_back(ptr);
+	if (!isPeerPresent(peer_data_ptr))
+	{
+		PeerDataPtr ptr(peer_data_ptr);
+		location_list.push_back(ptr);
+	}
 }
 
 PeerDataPtr ObjectLedger::getPeerRef(const int &i)

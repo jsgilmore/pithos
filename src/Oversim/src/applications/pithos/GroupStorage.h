@@ -200,6 +200,9 @@ class GroupStorage : public cSimpleModule
 		 * @returns the number of required replicas or the number of group peers, if this number is less than the required replicas (this case is also logged).
 		 */
 		int getReplicaNr(unsigned int rpcid);
+
+		void removePeer(Packet *packet);
+
 	protected:
 		simsignal_t qlenSignal; /**< Signal for recording the number of objects stored */
 

@@ -162,11 +162,13 @@ void Communicator::handleUDPMessage(cMessage* msg)
 			(packet->getPayloadType() == JOIN_ACCEPT) ||
 			(packet->getPayloadType() == INFORM) ||
 			(packet->getPayloadType() == RETRIEVE_REQ) ||
+			(packet->getPayloadType() == PEER_LEFT) ||
 			(packet->getPayloadType() == OBJECT_ADD))
 	{
 		send(msg, "gs_gate$o");
 	} else if ((packet->getPayloadType() == JOIN_REQ) ||
 			(packet->getPayloadType() == SP_OBJECT_ADD) ||
+			(packet->getPayloadType() == SP_PEER_LEFT) ||
 			(packet->getPayloadType() == OVERLAY_WRITE_REQ))
 	{
 		send(msg, "sp_group_gate$o");

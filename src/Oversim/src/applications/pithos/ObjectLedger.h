@@ -19,6 +19,7 @@
 #ifndef OBJECTLEDGER_H_
 #define OBJECTLEDGER_H_
 
+#include <omnetpp.h>
 #include <string>
 #include <vector>
 

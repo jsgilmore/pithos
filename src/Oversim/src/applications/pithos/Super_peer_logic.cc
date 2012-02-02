@@ -82,61 +82,16 @@ void Super_peer_logic::handleOverlayWrite(cMessage *msg)
 void Super_peer_logic::addObject(cMessage *msg)
 {
 	PeerListPkt *plist_p = check_and_cast<PeerListPkt *>(msg);
-	std::vector<PeerDataPtr>::iterator peer_it;
-	ObjectMap::iterator object_map_it;
 	PeerData peer_data_recv;
-	ObjectInfo *object_info;
-	bool found;
-
-	//Check whether the received object information is already stored in the super peer
-	object_map_it = object_map.find(plist_p->getObjectKey());
-
-	//If the object is not already known, have the iterator point to a new object instead.
-	if (object_map_it == object_map.end())
-	{
-		//TODO: The fact that a duplicate key was received should be logged
-		object_info = new ObjectInfo();
-
-		//Log the file name and what peers it is stored on
-		object_info->setObjectName(plist_p->getObjectName());
-		object_info->setSize(plist_p->getObjectSize());
-
-	} else object_info = &(object_map_it->second);
 
 	//Iterate through all PeerData objects received in the PeerListPkt
 	for (unsigned int i = 0 ; i < plist_p->getPeer_listArraySize() ; i++)
 	{
 		peer_data_recv = ((PeerData)plist_p->getPeer_list(i));
-		found = false;
 
-		for (peer_it = group_peers.begin() ; peer_it != group_peers.end() ; peer_it++)
-		{
-			//*peer_it returns a PeerDataPtr type, which again has to be dereferenced to obtain the PeerData object (**peer_it)
-			if (**peer_it == peer_data_recv)
-			{
-				found = true;
-				break;
-			}
-		}
-
-		//The peer should always be known, since it can only be one of the known group peers
-		if (!found)
-			error("Object stored on unknown group peer.");
-
-		//Make sure this peer was not known to this object
-		if (object_info->isPeerPresent(*peer_it))
-			error("This peer is already known to this object");
-
-		object_info->addPeerRef(*peer_it);	//Add a peer to the ObjectInfo object's peer vector
+		//Both the object and peer data have to be sent, because the two are linked in the ledger
+		group_ledger.addObject(plist_p->getObjectData(), peer_data_recv);
 	}
-
-	if (object_map_it == object_map.end())
-	{
-		object_map.insert(std::make_pair(plist_p->getObjectKey(), *object_info));
-		delete(object_info);
-	}
-
-	emit(storeNumberSignal, 1);
 }
 
 void Super_peer_logic::informGroupPeers(bootstrapPkt *boot_req, TransportAddress sourceAdr)
@@ -151,10 +106,10 @@ void Super_peer_logic::informGroupPeers(bootstrapPkt *boot_req, TransportAddress
 	list_p->addToPeerList(peer_data);
 	list_p->setByteLength(4 + 4 + 4);	//Value+Type+IP
 
-	for (unsigned int i = 0 ; i < group_peers.size() ; i++)
+	for (unsigned int i = 0 ; i < group_ledger.getGroupSize() ; i++)
 	{
 		//group_peers.at(i) returns a PeerDataPtr, which has to be dereferenced to return a PeerData object
-		list_p->setDestinationAddress((*(group_peers.at(i))).getAddress());
+		list_p->setDestinationAddress((*(group_ledger.getPeerPtr(i))).getAddress());
 
 		send(list_p->dup(), "comms_gate$o");
 	}
@@ -169,12 +124,12 @@ void Super_peer_logic::informJoiningPeer(bootstrapPkt *boot_req, TransportAddres
 	list_p->setName("join_accept");
 	list_p->setPayloadType(JOIN_ACCEPT);
 	list_p->setSourceAddress(sourceAdr);
-	list_p->setByteLength(2*sizeof(int)+sizeof(int)*group_peers.size());	//Value+Type+(IP)*list_length FIXME: The size needs to still be multiplied by the size of the peer list.
+	list_p->setByteLength(2*sizeof(int)+sizeof(int)*group_ledger.getGroupSize());	//Value+Type+(IP)*list_length FIXME: The size needs to still be multiplied by the size of the peer list.
 	list_p->setDestinationAddress(boot_req->getSourceAddress());
 
-	for (unsigned int i = 0 ; i < group_peers.size() ; i++)
+	for (unsigned int i = 0 ; i < group_ledger.getGroupSize() ; i++)
 	{
-		list_p->addToPeerList(*(group_peers.at(i)));	//Send a copy of the object, pointed to by the smart pointer
+		list_p->addToPeerList(*(group_ledger.getPeerPtr(i)));	//Send a copy of the object, pointed to by the smart pointer
 	}
 	send(list_p, "comms_gate$o");	//Send a copy of the peer list, so the original packet may be reused to inform the other nodes
 }
@@ -187,9 +142,6 @@ void Super_peer_logic::handleJoinReq(cMessage *msg)
 
 	EV << "Super peer received bootstrap request from " << boot_req->getSourceAddress() << ", sending list and updating group.\n";
 
-	//IP data entry for the requesting peer to be added to the group peers list.
-	PeerDataPtr peer_dat_ptr(new PeerData(boot_req->getSourceAddress()));
-
 	//Inform all other nodes in the group of the joining node
 	informGroupPeers(boot_req, sourceAdr);
 
@@ -200,52 +152,9 @@ void Super_peer_logic::handleJoinReq(cMessage *msg)
 	 * This ensures that the joining peer only ads its own IP after successfully joining a group and only then
 	 * informs the higher layer that it has successfully joined a group.
 	**/
-	group_peers.push_back(peer_dat_ptr);
+	group_ledger.addPeer(PeerData(boot_req->getSourceAddress()));
 
 	informJoiningPeer(boot_req, sourceAdr);
-
-	//The original message is deleted in the calling function.
-}
-
-void Super_peer_logic::GroupStore(overlayPkt *overlay_p)
-{
-	TransportAddress dest_adr;
-	GameObject *go = (GameObject *)overlay_p->removeObject("GameObject");
-	ValuePkt *group_p;
-	ObjectInfo object_info;
-	PeerDataPtr peer_dat_ptr;
-
-	NodeHandle thisNode = ((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode();
-	TransportAddress sourceAdr(thisNode.getIp(), thisNode.getPort());
-
-	if (group_peers.size() > 0)
-	{
-		int peer_nr =  intuniform(0, group_peers.size()-1);		//Choose a random peer in the group for the destination
-		peer_dat_ptr = group_peers.at(peer_nr);
-		dest_adr = (*peer_dat_ptr).getAddress();
-	}
-	else {
-		emit(overlaysStoreFailSignal, 1);
-		delete(go);
-		return;
-	}
-
-	//Log the file name and what peers it is stored on
-	object_info.setObjectName(go->getObjectName());
-	object_info.setSize(go->getSize());
-	object_info.addPeerRef(peer_dat_ptr);
-	object_map.insert(std::make_pair(go->getHash(), object_info));
-	emit(overlayNumberSignal, 1);
-
-	group_p = new ValuePkt();
-	group_p->setSourceAddress(sourceAdr);
-	group_p->setDestinationAddress(dest_adr);
-	group_p->setPayloadType(WRITE);
-	group_p->setName("write");
-	group_p->setByteLength(4+4+4 + go->getSize());	//Src IP as #, Dest IP as #, Type, Game Object size
-	group_p->addObject(go);
-
-	send(group_p, "comms_gate$o");		//Set sender address
 
 	//The original message is deleted in the calling function.
 }
@@ -291,26 +200,22 @@ void Super_peer_logic::handleMessage(cMessage *msg)
 		if (packet->getPayloadType() == OVERLAY_WRITE_REQ)
 		{
 			handleOverlayWrite(msg);
-		}
-		else if (packet->getPayloadType() == SP_OBJECT_ADD)
+		} else if (packet->getPayloadType() == SP_OBJECT_ADD)
 		{
 			addObject(msg);
-		}
-		else if (packet->getPayloadType() == JOIN_REQ)
+		} else if (packet->getPayloadType() == SP_PEER_LEFT)
+		{
+			addObject(msg);
+		} else if (packet->getPayloadType() == JOIN_REQ)
 		{
 			handleJoinReq(msg);
 
-			emit(groupSizeSignal, group_peers.size());
-		}
-		else error("Super peer received unknown group message from communicator");
+			emit(groupSizeSignal, group_ledger.getGroupSize());
+		} else error("Super peer received unknown group message from communicator");
 	}
 	else if (strcmp(msg->getArrivalGate()->getName(), "overlay_gate$i") == 0)
 	{
-		overlayPkt *overlay_p = check_and_cast<overlayPkt *>(msg);
-
-		GroupStore(overlay_p);
-
-		emit(OverlayDeliveredSignal, 1);
+		error("Unknown message received from overlay.");
 	}
 	else {
 		char msg_str[100];
