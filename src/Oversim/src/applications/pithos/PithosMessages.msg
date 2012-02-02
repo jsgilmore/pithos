@@ -16,6 +16,7 @@
 cplusplus {{
 #include <TransportAddress.h>
 #include "PeerData.h"
+#include "ObjectData.h"
 #include "OverlayKey.h"
 }}
 
@@ -23,6 +24,7 @@ cplusplus {{
 class noncobject TransportAddress;
 class noncobject OverlayKey;
 class noncobject PeerData;
+class noncobject ObjectData;
 class noncobject PeerDataPtr;
 
 enum PacketTypes
@@ -39,6 +41,7 @@ enum PacketTypes
     SP_OBJECT_ADD = 10;
     RESPONSE = 11;
     PEER_LEFT = 12;
+    SP_PEER_LEFT = 13;
 };
 
 enum OverlayTypes 
@@ -111,9 +114,8 @@ packet PeerListPkt extends Packet
     //This string is actually modelled as a long long int (64 bits)
     //for the purposes of packet transmission, but a string is used
     //to make the stored object easily readable
-    string objectName;
-    unsigned long objectSize;
-    OverlayKey objectKey;
+    ObjectData objectData;
+    
     abstract PeerData peer_list[];
 }
 

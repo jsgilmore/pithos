@@ -16,6 +16,7 @@
 #ifndef OBJECTDATA_H_
 #define OBJECTDATA_H_
 
+#include <omnetpp.h>
 #include <tr1/memory>
 
 #include "OverlayKey.h"
@@ -44,7 +45,13 @@ private:
 
 public:
 	ObjectData();
+	ObjectData(std::string name , int siz = 0, OverlayKey k = OverlayKey::UNSPECIFIED_KEY);
 	virtual ~ObjectData();
+
+	ObjectData& operator=(const ObjectData& other);
+
+	friend bool operator==(const ObjectData& object1, const ObjectData& object2);
+	friend bool operator!=(const ObjectData& object1, const ObjectData& object2);
 
 	/**
 	 * Set the object name
@@ -65,6 +72,10 @@ public:
 	void setSize(const int &siz);
 
 	int getSize();
+
+	void setKey(const OverlayKey &k);
+
+	OverlayKey getKey();
 };
 
 #endif /* OBJECTDATA_H_ */

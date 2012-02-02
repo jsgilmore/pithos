@@ -17,8 +17,15 @@
 
 ObjectData::ObjectData()
 {
-	// TODO Auto-generated constructor stub
+	size = 0;
+	key = OverlayKey::UNSPECIFIED_KEY;
+}
 
+ObjectData::ObjectData(std::string name, int siz, OverlayKey k)
+{
+	object_name = name;
+	size = siz;
+	key = k;
 }
 
 ObjectData::~ObjectData()
@@ -26,6 +33,36 @@ ObjectData::~ObjectData()
 	// TODO Auto-generated destructor stub
 }
 
+ObjectData& ObjectData::operator=(const ObjectData& other)
+{
+	if (&other==this)
+		return *this;
+
+	object_name = other.object_name;
+	size = other.size;
+	key = other.key;
+
+	return *this;
+}
+
+bool operator==(const ObjectData& object1, const ObjectData& object2)
+{
+	if (object1.object_name != object2.object_name)
+		return false;
+
+	if (object1.size != object2.size)
+			return false;
+
+	if (object1.key != object2.key)
+			return false;
+
+	return true;
+}
+
+bool operator!=(const ObjectData& object1, const ObjectData& object2)
+{
+	return !(object1 == object2);
+}
 
 void ObjectData::setObjectName(const std::string &o_name)
 {
@@ -51,4 +88,14 @@ void ObjectData::setSize(const int &siz)
 int ObjectData::getSize()
 {
 	return size;
+}
+
+void ObjectData::setKey(const OverlayKey &k)
+{
+	key = k;
+}
+
+OverlayKey ObjectData::getKey()
+{
+	return key;
 }
