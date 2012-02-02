@@ -34,6 +34,15 @@ class GroupLedger
 	public:
 		GroupLedger();
 		virtual ~GroupLedger();
+
+		bool isObjectInGroup(OverlayKey key);
+		bool isPeerInGroup(PeerData peerData);
+		PeerDataPtr getRandomPeer(OverlayKey key);
+		PeerDataPtr getRandomPeer();
+		void addPeer(PeerData peer_dat);
+		void addObject(ObjectData objectData, PeerData peer_data_recv);
+		unsigned int getGroupSize();
+		PeerDataPtr getPeerPtr(const int &i);
 };
 
 #endif /* GROUPLEDGER_H_ */

@@ -193,10 +193,8 @@ void GroupStorage::sendUpperResponse(int responseType, unsigned int rpcid, bool 
 //This is kind of a recursive distributed network function. Keep that in mind when figuring out the code+comments
 void GroupStorage::requestRetrieve(OverlayKeyPkt *retrieve_req)
 {
-	ObjectInfo object_info;
-	int peer_list_size;
+	bool group_object;
 	PeerDataPtr container_peer_ptr;
-	ObjectInfoMap::iterator object_map_it;
 
 	OverlayKey *key = &(retrieve_req->getKey());
 	unsigned int rpcid = retrieve_req->getValue();		//TODO: Make sure the rpcid is required as a separate variable, even if the mesasge is sent out as is.
@@ -204,8 +202,9 @@ void GroupStorage::requestRetrieve(OverlayKeyPkt *retrieve_req)
 	StorageMap::iterator storage_map_it = storage_map.find(*key);
 
 	//Check whether this is a group object
-	object_map_it = object_map.find(*key);
-	if (object_map_it == object_map.end())
+	group_object = group_ledger.isObjectInGroup(*key);
+
+	if (!group_object)
 	{
 		RECORD_STATS(numGetError++);
 		//If the object is not stored in the group, send a failure response to the higher layer
@@ -235,11 +234,7 @@ void GroupStorage::requestRetrieve(OverlayKeyPkt *retrieve_req)
 
 	RECORD_STATS(numSent++; numGetSent++);
 
-	object_info = object_map_it->second;
-
-	peer_list_size = object_info.getPeerListSize();
-
-	container_peer_ptr = object_info.getPeerRef(intuniform(0, peer_list_size-1));
+	container_peer_ptr = group_ledger.getRandomPeer(*key);
 
 	//Send a retrieve request to the group peer storing the object
 	retrieve_req->setDestinationAddress(container_peer_ptr->getAddress());
@@ -261,66 +256,15 @@ void GroupStorage::requestRetrieve(OverlayKeyPkt *retrieve_req)
 void GroupStorage::addObject(cMessage *msg)
 {
 	PeerListPkt *plist_p = check_and_cast<PeerListPkt *>(msg);
-
-	std::vector<PeerDataPtr>::iterator peer_it;
-	ObjectInfoMap::iterator object_map_it;
 	PeerData peer_data_recv;
-	ObjectInfo *object_info;
-
-	//Check whether the received object information is already stored in the super peer
-	object_map_it = object_map.find(plist_p->getObjectKey());
-
-	//If the object is not already known, have the iterator point to a new object instead.
-	if (object_map_it == object_map.end())
-	{
-		//TODO: The fact that a duplicate key was received should be logged
-		object_info = new ObjectInfo();
-
-		//Log the file name and what peers it is stored on
-		object_info->setObjectName(plist_p->getObjectName());
-		object_info->setSize(plist_p->getObjectSize());
-
-	} else object_info = &(object_map_it->second);
 
 	//Iterate through all PeerData objects received in the PeerListPkt
 	for (unsigned int i = 0 ; i < plist_p->getPeer_listArraySize() ; i++)
 	{
 		peer_data_recv = ((PeerData)plist_p->getPeer_list(i));
 
-		for (peer_it = group_peers.begin() ; peer_it != group_peers.end() ; peer_it++)
-		{
-			//*peer_it returns a PeerDataPtr type, which again has to be dereferenced to obtain the PeerData object (**peer_it)
-			if (**peer_it == peer_data_recv)
-				break;
-		}
-
-		//If an object is stored on an unknown peer, first add that peer to the peer list
-		if (peer_it == group_peers.end())
-		{
-			//TODO: Log this exception
-			PeerDataPtr peer_dat_ptr(new PeerData(peer_data_recv));
-			group_peers.push_back(peer_dat_ptr);
-
-			//Make sure this peer is not listed in the object info peer vector
-			if (object_info->isPeerPresent(peer_dat_ptr))
-				error("This peer is already known to this object");
-
-			object_info->addPeerRef(peer_dat_ptr);	//Add a peer to the ObjectInfo object's peer vector
-
-		} else {
-
-			//Make sure this peer is not listed in the object info peer vector
-			if (object_info->isPeerPresent(*peer_it))
-				error("This peer is already known to this object");
-
-			object_info->addPeerRef(*peer_it);	//Add a peer to the ObjectInfo object's peer vector
-		}
-	}
-
-	if (object_map_it == object_map.end())
-	{
-		object_map.insert(std::make_pair(plist_p->getObjectKey(), *object_info));
-		delete(object_info);
+		//Both the object and peer data have to be sent, because the two are linked in the ledger
+		group_ledger.addObject(plist_p->getObjectData(), peer_data_recv);
 	}
 }
 
@@ -340,9 +284,7 @@ void GroupStorage::updatePeerObjects(GameObject go)
 		return;
 	}
 
-	objectAddPkt->setObjectName(go.getObjectName());
-	objectAddPkt->setObjectSize(go.getSize());
-	objectAddPkt->setObjectKey(go.getHash());
+	objectAddPkt->setObjectData(ObjectData(go.getObjectName(), go.getSize(), go.getHash()));
 	objectAddPkt->setPayloadType(OBJECT_ADD);
 	objectAddPkt->setSourceAddress(sourceAdr);
 	objectAddPkt->setName("object_add");
@@ -350,9 +292,9 @@ void GroupStorage::updatePeerObjects(GameObject go)
 	objectAddPkt->addToPeerList(PeerData(sourceAdr));
 
 	//Inform all group peers about the new object and where it is stored
-	for (unsigned int i = 0 ; i < group_peers.size() ; i++)
+	for (unsigned int i = 0 ; i < group_ledger.getGroupSize() ; i++)
 	{
-		TransportAddress dest_adr = (*(group_peers.at(i))).getAddress();
+		TransportAddress dest_adr = (*(group_ledger.getPeerPtr(i))).getAddress();
 		objectAddPkt->setDestinationAddress(dest_adr);
 		send(objectAddPkt->dup(), "comms_gate$o");		//Set address
 	}
@@ -372,7 +314,7 @@ PeerDataPtr GroupStorage::selectDestination(std::vector<TransportAddress> send_l
 
 	while(!original_address)
 	{
-		peerDataPtr = group_peers.at(intuniform(0, group_peers.size()-1));		//Choose a random peer in the group for the destination
+		peerDataPtr = group_ledger.getRandomPeer();		//Choose a random peer in the group for the destination
 
 		//Check all previous chosen addresses to determine whether this address is unique
 		original_address = true;
@@ -405,7 +347,7 @@ int GroupStorage::getReplicaNr(unsigned int rpcid)
 	unsigned int replicas = par("replicas");
 
 	//This ensures that an infinite while loop situation will never occur, but it also constrains the number of replicas to the number of known nodes
-	if (replicas > group_peers.size())
+	if (replicas > group_ledger.getGroupSize())
 	{
 		unsigned int i;
 		ResponsePkt *response = new ResponsePkt();
@@ -417,13 +359,13 @@ int GroupStorage::getReplicaNr(unsigned int rpcid)
 		//This packet is sent internally, so no size is required
 
 		//Send one failure response packet for each replica that cannot be stored
-		for (i = 0 ; i < replicas - group_peers.size() - 1 ; i++)
+		for (i = 0 ; i < replicas - group_ledger.getGroupSize() - 1 ; i++)
 			send(response->dup(), "read");
 		send(response, "read");
 
-		emit(groupSendFailSignal, replicas - group_peers.size());
+		emit(groupSendFailSignal, replicas - group_ledger.getGroupSize());
 		RECORD_STATS(numPutError++);
-		replicas = group_peers.size();
+		replicas = group_ledger.getGroupSize();
 	}
 
 	return replicas;
@@ -605,13 +547,11 @@ void GroupStorage::addPeers(cMessage *msg)
 	PeerListPkt *list_p = check_and_cast<PeerListPkt *>(msg);
 	PeerData peer_dat;
 	PeerDataPtr peer_dat_ptr;
-	unsigned int i;
-	bool found;
 	simtime_t joinTime = simTime();
 
 	//If we didn't know of any peers in our group and we've now been informed of some, inform the game module to start producing requests
 	//This is also the time when we record that we've successfully joined a group (When we've joined a super peer and we know of other peers in the group).
-	if ((group_peers.size() == 0) && (list_p->getPeer_listArraySize() > 0))
+	if ((group_ledger.getGroupSize() == 0) && (list_p->getPeer_listArraySize() > 0))
 	{
 		AddressPkt *request_start = new AddressPkt("request_start");
 		request_start->setAddress(super_peer_address);
@@ -621,30 +561,14 @@ void GroupStorage::addPeers(cMessage *msg)
 		emit(joinTimeSignal, joinTime);
 	}
 
-	for ( i = 0 ; i < list_p->getPeer_listArraySize() ; i++)
+	for (unsigned int i = 0 ; i < list_p->getPeer_listArraySize() ; i++)
 	{
 		peer_dat = list_p->getPeer_list(i);
-		found = false;
 
-		//First check whether this peer is already known
-		for (unsigned int j = 0 ; j < group_peers.size() ; j++)
-		{
-			if (*(group_peers.at(j)) == peer_dat)
-			{
-				found = true;
-				break;
-			}
-		}
-
-		//If the peer is not known, add it to the peer list
-		if (!found)
-		{
-			peer_dat_ptr.reset(new PeerData(peer_dat));
-			group_peers.push_back(peer_dat_ptr);
-		}
+		group_ledger.addPeer(peer_dat);
 	}
 
-	emit(groupSizeSignal, group_peers.size() + 1);	//The peer's perceived group size is one larger, because itself is part of the group it is in
+	emit(groupSizeSignal, group_ledger.getGroupSize() + 1);	//The peer's perceived group size is one larger, because itself is part of the group it is in
 
 	EV << "Added " << list_p->getPeer_listArraySize() << " new peers to the list.\n";
 }
@@ -730,13 +654,12 @@ void GroupStorage::handlePacket(Packet *packet)
 	{
 		addObject(packet);
 		delete(packet);
-	}
+	}/* else if (packet->getPayloadType() == PEER_LEFT)
+	{
+		removePeer(packet);
+		delete(packet);
+	}*/
 	else error("Group storage received an unknown packet");
-}
-
-void GroupStorage::removePeer(PeerDataPtr peerDataPtr)
-{
-
 }
 
 void GroupStorage::peerLeftInform(PeerData peerData)
@@ -752,15 +675,16 @@ void GroupStorage::peerLeftInform(PeerData peerData)
 	pkt->setPeerData(peerData);
 	pkt->setByteLength(4+4+4+4);	//Source IP + Dest IP + type + left peer IP
 
-	for (it = group_peers.begin() ; it != group_peers.end() ; it++)
+	for (unsigned int i = 0 ; i < group_ledger.getGroupSize() ; i++)
 	{
 		//Dereference it to get PeerDataPtr and use -> operator to get PeerData
-		pkt->setDestinationAddress((*it)->getAddress());
+		pkt->setDestinationAddress(group_ledger.getPeerPtr(i)->getAddress());
 
 		send(pkt->dup(), "comms_gate$o");
 	}
 
 	pkt->setDestinationAddress(super_peer_address);
+	pkt->setPayloadType(SP_PEER_LEFT);
 	send(pkt, "comms_gate$o");
 }
 
@@ -803,11 +727,11 @@ void GroupStorage::handleTimeout(ResponseTimeoutEvent *timeout)
 	if (it->second.timeouts.size() == 0)
 		pendingRequests.erase(it);
 
-	removePeer(peerDataPtr);
+	//removePeer(*peerDataPtr);
 
 	//The peerDataPtr in this scope prevents the memory from being freed in the removePeer function.
 	//This is only done when the current function is left
-	peerLeftInform(*peerDataPtr);
+	//peerLeftInform(*peerDataPtr);
 }
 
 void GroupStorage::handleMessage(cMessage *msg)

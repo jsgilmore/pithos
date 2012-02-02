@@ -24,7 +24,7 @@
 #include "GameObject.h"
 #include "Peer_logic.h"
 #include "OverlayKey.h"
-#include "ObjectInfo.h"
+#include "GroupLedger.h"
 
 #include "PeerListPkt.h"
 #include "PeerData.h"
@@ -52,11 +52,7 @@ class Super_peer_logic : public cSimpleModule
 
 		int directory_port; /**< The port of the directory server */
 
-		std::vector<PeerDataPtr> group_peers; /**< A vector that records all peers that belong to this super peer's group */
-
-		/**< A map that records all objects that are stored in this super peer's group */
-		typedef std::map<OverlayKey, ObjectInfo> ObjectMap;
-		ObjectMap object_map;
+		GroupLedger group_ledger;
 
 		simsignal_t groupSizeSignal; /**< A signal that records the group size over time */
 
@@ -108,13 +104,6 @@ class Super_peer_logic : public cSimpleModule
 		 * @param msg the message containing the joining peer's information
 		 */
 		void handleJoinReq(cMessage *msg);
-
-		/**
-		 * Store an object received from the overlay in the group
-		 *
-		 * @param overlay_p the message received from the overlay, containing the game object
-		 */
-		void GroupStore(overlayPkt *overlay_p);
 
 		/** Send a message to add this super peer to the directory server */
 		void addSuperPeer();
