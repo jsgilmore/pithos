@@ -88,6 +88,9 @@ void PithosTestApp::initializeApp(int stage)
     numPutError = 0;
     numPutSuccess = 0;
 
+    numGroupGet = 0;
+    numOverlayGet = 0;
+
     //initRpcs();
     WATCH(numSent);
     WATCH(numGetSent);
@@ -96,6 +99,8 @@ void PithosTestApp::initializeApp(int stage)
     WATCH(numPutSent);
     WATCH(numPutError);
     WATCH(numPutSuccess);
+    WATCH(numGroupGet);
+    WATCH(numOverlayGet);
 
     nodeIsLeavingSoon = false;
 
@@ -288,10 +293,18 @@ OverlayKey PithosTestApp::getKey()
 	{
 		OverlayKey key = globalPithosTestMap->getRandomGroupKey(super_peer_address);
 		if (key.isUnspecified())
+		{
+			RECORD_STATS(numOverlayGet++);
 			return globalPithosTestMap->getRandomKey();
-		else return key;
+		} else {
+			RECORD_STATS(numGroupGet++);
+			return key;
+		}
 	}
-	else return globalPithosTestMap->getRandomKey();
+	else {
+		RECORD_STATS(numOverlayGet++);
+		return globalPithosTestMap->getRandomKey();
+	}
 }
 
 void PithosTestApp::handleTimerEvent(cMessage* msg)
@@ -387,6 +400,12 @@ void PithosTestApp::finishApp()
 		globalStatistics->addStdDev("PithosTestApp: Sent PUT Messages", numPutSent);
 		globalStatistics->addStdDev("PithosTestApp: Failed PUT Requests", numPutError);
 		globalStatistics->addStdDev("PithosTestApp: Successful PUT Requests", numPutSuccess);
+
+		if ((numGroupGet + numOverlayGet) > 0)
+		{
+			globalStatistics->addStdDev("PithosTestApp: Group probability", (double)numGroupGet/(double)(numGroupGet + numOverlayGet));
+		}
+
 
         if ((numGetSuccess + numGetError) > 0)
         {

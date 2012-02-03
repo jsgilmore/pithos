@@ -34,6 +34,7 @@
 #include "PithosMessages_m.h"
 
 class GlobalStatistics;
+class GroupLedger;
 
 /**
  * The GroupStorage module is responsible for handling all aspects of group
@@ -110,7 +111,7 @@ class GroupStorage : public cSimpleModule
 
 		double longitude; /**< The longitude of this peer (position in the virtual world) */
 
-		GroupLedger group_ledger;
+		GroupLedger *group_ledger;
 
 		GlobalStatistics* globalStatistics; /**< pointer to GlobalStatistics module in this node*/
 

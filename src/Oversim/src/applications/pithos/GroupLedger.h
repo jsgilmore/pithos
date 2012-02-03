@@ -16,12 +16,22 @@
 #ifndef GROUPLEDGER_H_
 #define GROUPLEDGER_H_
 
+#include <GlobalStatistics.h>
+#include <GlobalStatisticsAccess.h>
+#include <DHTTestAppMessages_m.h>
+
 #include "ObjectLedger.h"
+#include "Communicator.h"
+#include "GroupStorage.h"
 #include "PeerLedger.h"
 
-class GroupLedger
+class GroupLedger : public cSimpleModule
 {
 	private:
+
+		void initialize();
+	    void handleMessage(cMessage* msg);
+	    void finish();
 
 		/**< A map that records all peers that belong to this peer's group */
 		typedef std::vector<PeerLedger> PeerLedgerList;
@@ -30,6 +40,16 @@ class GroupLedger
 		/**< A map that records all objects information stored in this super peer's group */
 		typedef std::map<OverlayKey, ObjectLedger> ObjectLedgerMap;
 		ObjectLedgerMap object_map;
+
+		GlobalStatistics* globalStatistics; /**< pointer to GlobalStatistics module in this node*/
+
+		static const int TEST_MAP_INTERVAL = 10; /**< interval in seconds for writing periodic statistical information */
+
+		cMessage *periodicTimer; /**< timer self-message for writing periodic statistical information */
+
+		int numPeerGetFail;
+		int numObjectGetFail;
+		int numPeerKnownError;
 
 	public:
 		GroupLedger();
@@ -44,7 +64,7 @@ class GroupLedger
 		unsigned int getGroupSize();
 		PeerDataPtr getPeerPtr(const int &i);
 		void removePeer(PeerData peer_dat);
-		void removeObject(ObjectData object_data);
+		void removeObject(OverlayKey key);
 };
 
 #endif /* GROUPLEDGER_H_ */

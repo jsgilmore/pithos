@@ -129,6 +129,12 @@ simple OverlayStorage
         input write;
 }
 
+simple GroupLedger
+{
+    parameters:
+        @class(GroupLedger);
+}
+
 simple Peer_logic
 {
     parameters:

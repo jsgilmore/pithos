@@ -38,6 +38,13 @@ void Super_peer_logic::initialize()
 
 	overlaysStoreFailSignal =  registerSignal("overlaysStoreFail");
 
+	cModule *groupLedgerModule = getParentModule()->getSubmodule("sp_group_ledger");
+	group_ledger = check_and_cast<GroupLedger *>(groupLedgerModule);
+
+    if (group_ledger == NULL) {
+        throw cRuntimeError("Super peer logic::initializeApp(): Group ledger module not found!");
+    }
+
 	latitude = uniform(0,100);		//Make this range changeable
 	longitude = uniform(0,100);		//Make this range changeable
 
@@ -90,7 +97,7 @@ void Super_peer_logic::addObject(cMessage *msg)
 		peer_data_recv = ((PeerData)plist_p->getPeer_list(i));
 
 		//Both the object and peer data have to be sent, because the two are linked in the ledger
-		group_ledger.addObject(plist_p->getObjectData(), peer_data_recv);
+		group_ledger->addObject(plist_p->getObjectData(), peer_data_recv);
 	}
 }
 
@@ -106,10 +113,10 @@ void Super_peer_logic::informGroupPeers(bootstrapPkt *boot_req, TransportAddress
 	list_p->addToPeerList(peer_data);
 	list_p->setByteLength(4 + 4 + 4);	//Value+Type+IP
 
-	for (unsigned int i = 0 ; i < group_ledger.getGroupSize() ; i++)
+	for (unsigned int i = 0 ; i < group_ledger->getGroupSize() ; i++)
 	{
 		//group_peers.at(i) returns a PeerDataPtr, which has to be dereferenced to return a PeerData object
-		list_p->setDestinationAddress((*(group_ledger.getPeerPtr(i))).getAddress());
+		list_p->setDestinationAddress((*(group_ledger->getPeerPtr(i))).getAddress());
 
 		send(list_p->dup(), "comms_gate$o");
 	}
@@ -124,12 +131,12 @@ void Super_peer_logic::informJoiningPeer(bootstrapPkt *boot_req, TransportAddres
 	list_p->setName("join_accept");
 	list_p->setPayloadType(JOIN_ACCEPT);
 	list_p->setSourceAddress(sourceAdr);
-	list_p->setByteLength(2*sizeof(int)+sizeof(int)*group_ledger.getGroupSize());	//Value+Type+(IP)*list_length FIXME: The size needs to still be multiplied by the size of the peer list.
+	list_p->setByteLength(2*sizeof(int)+sizeof(int)*group_ledger->getGroupSize());	//Value+Type+(IP)*list_length FIXME: The size needs to still be multiplied by the size of the peer list.
 	list_p->setDestinationAddress(boot_req->getSourceAddress());
 
-	for (unsigned int i = 0 ; i < group_ledger.getGroupSize() ; i++)
+	for (unsigned int i = 0 ; i < group_ledger->getGroupSize() ; i++)
 	{
-		list_p->addToPeerList(*(group_ledger.getPeerPtr(i)));	//Send a copy of the object, pointed to by the smart pointer
+		list_p->addToPeerList(*(group_ledger->getPeerPtr(i)));	//Send a copy of the object, pointed to by the smart pointer
 	}
 	send(list_p, "comms_gate$o");	//Send a copy of the peer list, so the original packet may be reused to inform the other nodes
 }
@@ -152,7 +159,7 @@ void Super_peer_logic::handleJoinReq(cMessage *msg)
 	 * This ensures that the joining peer only ads its own IP after successfully joining a group and only then
 	 * informs the higher layer that it has successfully joined a group.
 	**/
-	group_ledger.addPeer(PeerData(boot_req->getSourceAddress()));
+	group_ledger->addPeer(PeerData(boot_req->getSourceAddress()));
 
 	informJoiningPeer(boot_req, sourceAdr);
 
@@ -206,14 +213,14 @@ void Super_peer_logic::handleMessage(cMessage *msg)
 		} else if (packet->getPayloadType() == SP_PEER_LEFT)
 		{
 			PeerDataPkt *peer_data_pkt = check_and_cast<PeerDataPkt *>(packet);
-			group_ledger.removePeer(peer_data_pkt->getPeerData());
+			group_ledger->removePeer(peer_data_pkt->getPeerData());
 
-			emit(groupSizeSignal, group_ledger.getGroupSize());
+			emit(groupSizeSignal, group_ledger->getGroupSize());
 		} else if (packet->getPayloadType() == JOIN_REQ)
 		{
 			handleJoinReq(msg);
 
-			emit(groupSizeSignal, group_ledger.getGroupSize());
+			emit(groupSizeSignal, group_ledger->getGroupSize());
 		} else error("Super peer received unknown group message from communicator");
 	}
 	else if (strcmp(msg->getArrivalGate()->getName(), "overlay_gate$i") == 0)
