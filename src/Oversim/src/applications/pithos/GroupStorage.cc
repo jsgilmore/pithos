@@ -81,6 +81,13 @@ void GroupStorage::initialize()
 	latitude = uniform(0,100);		//Make this range changeable
 	longitude = uniform(0,100);		//Make this range changeable
 
+	cModule *groupLedgerModule = getParentModule()->getSubmodule("group_ledger");
+	group_ledger = check_and_cast<GroupLedger *>(groupLedgerModule);
+
+    if (group_ledger == NULL) {
+        throw cRuntimeError("GroupStorage::initializeApp(): Group ledger module not found!");
+    }
+
 	globalStatistics = GlobalStatisticsAccess().get();
 
 	// statistics
@@ -111,15 +118,15 @@ void GroupStorage::finish()
 
     if (time >= GlobalStatistics::MIN_MEASURED) {
         // record scalar data
-        globalStatistics->addStdDev("GroupStorage: Sent Total Messages/s", numSent / time);
+        globalStatistics->addStdDev("GroupStorage: Sent Total Messages", numSent);
 
-        globalStatistics->addStdDev("GroupStorage: Sent PUT Messages/s", numPutSent / time);
-        globalStatistics->addStdDev("GroupStorage: Failed PUT Requests/s", numPutError / time);
-        globalStatistics->addStdDev("GroupStorage: Successful PUT Requests/s", numPutSuccess / time);
+        globalStatistics->addStdDev("GroupStorage: Sent PUT Messages", numPutSent);
+        globalStatistics->addStdDev("GroupStorage: Failed PUT Requests", numPutError);
+        globalStatistics->addStdDev("GroupStorage: Successful PUT Requests", numPutSuccess);
 
-        globalStatistics->addStdDev("GroupStorage: Sent GET Messages/s", numGetSent / time);
-		globalStatistics->addStdDev("GroupStorage: Failed GET Requests/s", numGetError / time);
-		globalStatistics->addStdDev("GroupStorage: Successful GET Requests/s", numGetSuccess / time);
+        globalStatistics->addStdDev("GroupStorage: Sent GET Messages", numGetSent);
+		globalStatistics->addStdDev("GroupStorage: Failed GET Requests", numGetError);
+		globalStatistics->addStdDev("GroupStorage: Successful GET Requests", numGetSuccess);
 
         if ((numGetSuccess + numGetError) > 0) {
             globalStatistics->addStdDev("GroupStorage: GET Success Ratio", (double) numGetSuccess / (double) (numGetSuccess + numGetError));
@@ -130,7 +137,7 @@ void GroupStorage::finish()
 bool GroupStorage::hasSuperPeer()
 {
 	if (super_peer_address.isUnspecified())
-	return false;
+		return false;
 	else return true;
 }
 
@@ -202,7 +209,7 @@ void GroupStorage::requestRetrieve(OverlayKeyPkt *retrieve_req)
 	StorageMap::iterator storage_map_it = storage_map.find(*key);
 
 	//Check whether this is a group object
-	group_object = group_ledger.isObjectInGroup(*key);
+	group_object = group_ledger->isObjectInGroup(*key);
 
 	if (!group_object)
 	{
@@ -214,27 +221,27 @@ void GroupStorage::requestRetrieve(OverlayKeyPkt *retrieve_req)
 	}
 
 	//If the object is stored in the group, check whether the object is on the same peer that sent the request
-	//If the source and destination addresses are the same it means the request comes from the higher layer and not another peer
-	if ((storage_map_it != storage_map.end()) && (retrieve_req->getSourceAddress() == retrieve_req->getDestinationAddress()))
-	{
-		RECORD_STATS(numGetSuccess++);
-		//If the object is stored in local storage, send it to the upper layer without requesting from the group
-		sendUpperResponse(GROUP_GET, rpcid, true, storage_map_it->second);
-		delete(retrieve_req);
-		return;
-	}
-
-	//Check whether the object is on this peer, but another peer sent the request.
 	if (storage_map_it != storage_map.end())
 	{
-		sendUDPResponse(retrieve_req->getDestinationAddress(), retrieve_req->getSourceAddress(), GROUP_GET, rpcid, true, storage_map_it->second);
-		delete(retrieve_req);
-		return;
+		if (retrieve_req->getSourceAddress() == retrieve_req->getDestinationAddress())
+		{
+			//If the source and destination addresses are the same it means the request comes from the higher layer and not another peer
+			RECORD_STATS(numGetSuccess++);
+			//If the object is stored in local storage, send it to the upper layer without requesting from the group
+			sendUpperResponse(GROUP_GET, rpcid, true, storage_map_it->second);
+			delete(retrieve_req);
+			return;
+		} else {
+			//Check whether the object is on this peer, but another peer sent the request.
+			sendUDPResponse(retrieve_req->getDestinationAddress(), retrieve_req->getSourceAddress(), GROUP_GET, rpcid, true, storage_map_it->second);
+			delete(retrieve_req);
+			return;
+		}
 	}
 
 	RECORD_STATS(numSent++; numGetSent++);
 
-	container_peer_ptr = group_ledger.getRandomPeer(*key);
+	container_peer_ptr = group_ledger->getRandomPeer(*key);
 
 	//Send a retrieve request to the group peer storing the object
 	retrieve_req->setDestinationAddress(container_peer_ptr->getAddress());
@@ -264,7 +271,7 @@ void GroupStorage::addObject(cMessage *msg)
 		peer_data_recv = ((PeerData)plist_p->getPeer_list(i));
 
 		//Both the object and peer data have to be sent, because the two are linked in the ledger
-		group_ledger.addObject(plist_p->getObjectData(), peer_data_recv);
+		group_ledger->addObject(plist_p->getObjectData(), peer_data_recv);
 	}
 }
 
@@ -292,9 +299,9 @@ void GroupStorage::updatePeerObjects(GameObject go)
 	objectAddPkt->addToPeerList(PeerData(sourceAdr));
 
 	//Inform all group peers about the new object and where it is stored
-	for (unsigned int i = 0 ; i < group_ledger.getGroupSize() ; i++)
+	for (unsigned int i = 0 ; i < group_ledger->getGroupSize() ; i++)
 	{
-		TransportAddress dest_adr = (*(group_ledger.getPeerPtr(i))).getAddress();
+		TransportAddress dest_adr = (*(group_ledger->getPeerPtr(i))).getAddress();
 		objectAddPkt->setDestinationAddress(dest_adr);
 		send(objectAddPkt->dup(), "comms_gate$o");		//Set address
 	}
@@ -314,7 +321,7 @@ PeerDataPtr GroupStorage::selectDestination(std::vector<TransportAddress> send_l
 
 	while(!original_address)
 	{
-		peerDataPtr = group_ledger.getRandomPeer();		//Choose a random peer in the group for the destination
+		peerDataPtr = group_ledger->getRandomPeer();		//Choose a random peer in the group for the destination
 
 		//Check all previous chosen addresses to determine whether this address is unique
 		original_address = true;
@@ -347,7 +354,7 @@ int GroupStorage::getReplicaNr(unsigned int rpcid)
 	unsigned int replicas = par("replicas");
 
 	//This ensures that an infinite while loop situation will never occur, but it also constrains the number of replicas to the number of known nodes
-	if (replicas > group_ledger.getGroupSize())
+	if (replicas > group_ledger->getGroupSize())
 	{
 		unsigned int i;
 		ResponsePkt *response = new ResponsePkt();
@@ -359,13 +366,13 @@ int GroupStorage::getReplicaNr(unsigned int rpcid)
 		//This packet is sent internally, so no size is required
 
 		//Send one failure response packet for each replica that cannot be stored
-		for (i = 0 ; i < replicas - group_ledger.getGroupSize() - 1 ; i++)
+		for (i = 0 ; i < replicas - group_ledger->getGroupSize() - 1 ; i++)
 			send(response->dup(), "read");
 		send(response, "read");
 
-		emit(groupSendFailSignal, replicas - group_ledger.getGroupSize());
+		emit(groupSendFailSignal, replicas - group_ledger->getGroupSize());
 		RECORD_STATS(numPutError++);
-		replicas = group_ledger.getGroupSize();
+		replicas = group_ledger->getGroupSize();
 	}
 
 	return replicas;
@@ -487,7 +494,8 @@ void GroupStorage::respond_toUpper(cMessage *msg)
 
 			pendingRequests.erase(it);
 		} else error("Unknown response type received");
-	} else error("Unknown response received.");
+
+	} //else error("Unknown response received.");
 
 	send(msg, "read");
 }
@@ -551,7 +559,7 @@ void GroupStorage::addPeers(cMessage *msg)
 
 	//If we didn't know of any peers in our group and we've now been informed of some, inform the game module to start producing requests
 	//This is also the time when we record that we've successfully joined a group (When we've joined a super peer and we know of other peers in the group).
-	if ((group_ledger.getGroupSize() == 0) && (list_p->getPeer_listArraySize() > 0))
+	if ((group_ledger->getGroupSize() == 0) && (list_p->getPeer_listArraySize() > 0))
 	{
 		AddressPkt *request_start = new AddressPkt("request_start");
 		request_start->setAddress(super_peer_address);
@@ -565,10 +573,10 @@ void GroupStorage::addPeers(cMessage *msg)
 	{
 		peer_dat = list_p->getPeer_list(i);
 
-		group_ledger.addPeer(peer_dat);
+		group_ledger->addPeer(peer_dat);
 	}
 
-	emit(groupSizeSignal, group_ledger.getGroupSize() + 1);	//The peer's perceived group size is one larger, because itself is part of the group it is in
+	emit(groupSizeSignal, group_ledger->getGroupSize() + 1);	//The peer's perceived group size is one larger, because itself is part of the group it is in
 
 	EV << "Added " << list_p->getPeer_listArraySize() << " new peers to the list.\n";
 }
@@ -657,8 +665,8 @@ void GroupStorage::handlePacket(Packet *packet)
 	} else if (packet->getPayloadType() == PEER_LEFT)
 	{
 		PeerDataPkt *peer_data_pkt = check_and_cast<PeerDataPkt *>(packet);
-		group_ledger.removePeer(peer_data_pkt->getPeerData());
-		emit(groupSizeSignal, group_ledger.getGroupSize() + 1);	//The peer's perceived group size is one larger, because itself is part of the group it is in
+		group_ledger->removePeer(peer_data_pkt->getPeerData());
+		emit(groupSizeSignal, group_ledger->getGroupSize() + 1);	//The peer's perceived group size is one larger, because itself is part of the group it is in
 		delete(packet);
 	}
 	else error("Group storage received an unknown packet");
@@ -677,10 +685,10 @@ void GroupStorage::peerLeftInform(PeerData peerData)
 	pkt->setPeerData(peerData);
 	pkt->setByteLength(4+4+4+4);	//Source IP + Dest IP + type + left peer IP
 
-	for (unsigned int i = 0 ; i < group_ledger.getGroupSize() ; i++)
+	for (unsigned int i = 0 ; i < group_ledger->getGroupSize() ; i++)
 	{
 		//Dereference it to get PeerDataPtr and use -> operator to get PeerData
-		pkt->setDestinationAddress(group_ledger.getPeerPtr(i)->getAddress());
+		pkt->setDestinationAddress(group_ledger->getPeerPtr(i)->getAddress());
 
 		send(pkt->dup(), "comms_gate$o");
 	}
@@ -729,7 +737,7 @@ void GroupStorage::handleTimeout(ResponseTimeoutEvent *timeout)
 	if (it->second.timeouts.size() == 0)
 		pendingRequests.erase(it);
 
-	group_ledger.removePeer(*peerDataPtr);
+	group_ledger->removePeer(*peerDataPtr);
 
 	//The peerDataPtr in this scope prevents the memory from being freed in the removePeer function.
 	//This is only done when the current function is left

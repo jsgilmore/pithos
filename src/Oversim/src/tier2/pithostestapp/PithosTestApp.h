@@ -155,6 +155,9 @@ private:
     int numPutError; /**< number of error in put responses*/
     int numPutSuccess; /**< number of success in put responses*/
 
+    int numGroupGet; /**< number of group gets*/
+    int numOverlayGet; /**< number of overlay gets*/
+
     cMessage *pithostestput_timer, *pithostestget_timer, *pithostestmod_timer;
     bool nodeIsLeavingSoon; //!< true if the node is going to be killed shortly
 

@@ -15,16 +15,80 @@
 
 #include "GroupLedger.h"
 
+Define_Module(GroupLedger);
+
 GroupLedger::GroupLedger()
 {
-	// TODO Auto-generated constructor stub
-
+	periodicTimer = NULL;
 }
 
 GroupLedger::~GroupLedger()
 {
+	cancelAndDelete(periodicTimer);
+
 	object_map.clear();
 	peer_list.clear();
+}
+
+void GroupLedger::initialize()
+{
+	globalStatistics = GlobalStatisticsAccess().get();
+
+	numPeerGetFail = 0;
+	numObjectGetFail = 0;
+	numPeerKnownError = 0;
+
+	periodicTimer = new cMessage("PithosTestMapTimer");
+
+	scheduleAt(simTime(), periodicTimer);
+}
+
+void GroupLedger::handleMessage(cMessage* msg)
+{
+    //cleanupDataMap();
+    //DhtTestEntryTimer *entryTimer = NULL;
+
+    if (msg == periodicTimer)
+    {
+    	cModule *groupStorageModule = getParentModule()->getSubmodule("group_storage");
+    	GroupStorage *groupStorage = check_and_cast<GroupStorage *>(groupStorageModule);
+
+    	std::ostringstream group_name;
+    	group_name << "GroupLedger (" << groupStorage->getSuperPeerAddress() << "): ";
+
+        RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of known group peers")).c_str(), peer_list.size()));
+        RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of known group objects")).c_str(), object_map.size()));
+        scheduleAt(simTime() + TEST_MAP_INTERVAL, msg);
+
+    }/* else if ((entryTimer = dynamic_cast<DhtTestEntryTimer*>(msg)) != NULL)
+    {
+    	removeObject(entryTimer->getKey());
+        delete msg;
+
+    } */else {
+        throw cRuntimeError("GlobalPithosTestMap::handleMessage(): Unknown message type!");
+    }
+}
+
+void GroupLedger::finish()
+{
+    // record scalar data
+	cModule *communicatorModule = getParentModule()->getSubmodule("communicator");
+	Communicator *communicator = check_and_cast<Communicator *>(communicatorModule);
+
+    simtime_t time = globalStatistics->calcMeasuredLifetime(communicator->getCreationTime());
+
+    if (time >= GlobalStatistics::MIN_MEASURED) {
+    	cModule *groupStorageModule = getParentModule()->getSubmodule("group_storage");
+    	GroupStorage *groupStorage = check_and_cast<GroupStorage *>(groupStorageModule);
+
+    	std::ostringstream group_name;
+    	group_name << "GroupLedger (" << groupStorage->getSuperPeerAddress() << "): ";
+
+    	globalStatistics->addStdDev((group_name.str() + std::string("GroupLedger: Failed object gets")).c_str() , numObjectGetFail);
+		globalStatistics->addStdDev((group_name.str() + std::string("GroupLedger: Failed peer gets")).c_str(), numPeerGetFail);
+		globalStatistics->addStdDev((group_name.str() + std::string("GroupLedger: Number of known peer insertion attempts")).c_str(), numPeerKnownError);
+    }
 }
 
 bool GroupLedger::isObjectInGroup(OverlayKey key)
@@ -53,7 +117,7 @@ PeerDataPtr GroupLedger::getRandomPeer(OverlayKey key)
 
 	object_map_it = object_map.find(key);
 	if (object_map_it == object_map.end())
-		opp_error("Object could not be found in group.");
+		error("Object could not be found in group.");
 
 	object_ledger_entry = object_map_it->second;
 
@@ -65,7 +129,7 @@ PeerDataPtr GroupLedger::getRandomPeer(OverlayKey key)
 PeerDataPtr GroupLedger::getRandomPeer()
 {
     if (peer_list.size() == 0)
-        opp_error("No peers in group.");
+        error("No peers in group.");
 
     return (peer_list.at(intuniform(0, peer_list.size()-1))).peerDataPtr;
 }
@@ -79,7 +143,10 @@ void GroupLedger::addPeer(PeerData peer_dat)
 		PeerLedger peer_ledger;
 		peer_ledger.peerDataPtr = PeerDataPtr(new PeerData(peer_dat));
 		peer_list.push_back(peer_ledger);
-	}// else opp_error("Peer is already in group.");
+	} else {
+		//error("Peer is already in group.");
+		RECORD_STATS(numPeerKnownError++);
+	}
 }
 
 void GroupLedger::removePeer(PeerData peer_dat)
@@ -101,7 +168,8 @@ void GroupLedger::removePeer(PeerData peer_dat)
 
 	if (peer_ledger_it == peer_list.end())
 	{
-		//opp_error("Peer slated for removal not found in group.");
+		//error("Peer slated for removal not found in group.");
+		RECORD_STATS(numPeerGetFail++);
 		return;
 	}
 
@@ -112,6 +180,11 @@ void GroupLedger::removePeer(PeerData peer_dat)
 
 		//Retrieve the object ledger for the listed object reference
 		object_ledger_it = object_map.find(object_data_ptr->getKey());
+		if (object_ledger_it == object_map.end())
+		{
+			RECORD_STATS(numObjectGetFail++);
+			error("Object not found when removing peer.");
+		}
 
 		//Remove the specific peer reference from the object ledger
 		object_ledger_it->second.erasePeerRef(peer_ledger_it->peerDataPtr);
@@ -123,15 +196,15 @@ void GroupLedger::removePeer(PeerData peer_dat)
 	peer_list.erase(peer_ledger_it);
 }
 
-void GroupLedger::removeObject(ObjectData object_data)
+void GroupLedger::removeObject(OverlayKey key)
 {
 	ObjectLedgerMap::iterator object_ledger_it;
 	PeerDataPtr peer_data_ptr;
 	PeerLedgerList::iterator peer_ledger_it;
 
-	object_ledger_it = object_map.find(object_data.getKey());
+	object_ledger_it = object_map.find(key);
 	if (object_ledger_it == object_map.end())
-			opp_error("Object slated for removal not found in group.");
+			error("Object slated for removal not found in group.");
 
 	//Iterate through all peer references listed for the object
 	for (unsigned int i = 0 ; i < object_ledger_it->second.getPeerListSize() ; i++)
@@ -146,6 +219,9 @@ void GroupLedger::removeObject(ObjectData object_data)
 				break;
 			}
 		}
+
+		if (peer_ledger_it == peer_list.end())
+			error("Peer not found when removing object.");
 
 		//Remove the specific peer reference from the object ledger
 		peer_ledger_it->eraseObjectRef(object_ledger_it->second.objectDataPtr);
