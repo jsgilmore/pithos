@@ -52,7 +52,7 @@ class Super_peer_logic : public cSimpleModule
 
 		int directory_port; /**< The port of the directory server */
 
-		GroupLedger group_ledger;
+		GroupLedger *group_ledger;
 
 		simsignal_t groupSizeSignal; /**< A signal that records the group size over time */
 

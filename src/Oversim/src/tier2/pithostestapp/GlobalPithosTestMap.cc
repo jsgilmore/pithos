@@ -185,7 +185,6 @@ OverlayKey GlobalPithosTestMap::getRandomGroupKey(TransportAddress group_address
 	it = groupMap.find(group_address);
 	if (it == groupMap.end())
 	{
-		//TODO: Log that a group could not be found
 		return OverlayKey::UNSPECIFIED_KEY;
 	}
 

@@ -53,6 +53,7 @@ module PeerSelectDHT like ITier_overlay
     submodules:
         peer_logic: Peer_logic;
         group_storage: GroupStorage;
+        group_ledger: GroupLedger;
         dht_storage: DHTStorage;
         communicator: Communicator;
     connections allowunconnected:
@@ -87,6 +88,7 @@ module Super_peerSelectDHT extends PeerSelectDHT
         @display("i=device/pc_l");
     submodules:
         super_peer_logic: Super_peer_logic;
+        sp_group_ledger: GroupLedger;
     connections allowunconnected:
         communicator.sp_group_gate <--> super_peer_logic.comms_gate;
         communicator.sp_overlay_gate <--> super_peer_logic.overlay_gate;
