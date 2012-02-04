@@ -287,7 +287,22 @@ unsigned int GroupLedger::getGroupSize()
 	return peer_list.size();
 }
 
+unsigned int GroupLedger::getNumGroupObjects()
+{
+	return object_map.size();
+}
+
 PeerDataPtr GroupLedger::getPeerPtr(const int &i)
 {
 	return (peer_list.at(i)).peerDataPtr;
+}
+
+ObjectLedgerMap::iterator GroupLedger::getObjectMapBegin()
+{
+	return object_map.begin();
+}
+
+ObjectLedgerMap::iterator GroupLedger::getObjectMapEnd()
+{
+	return object_map.end();
 }

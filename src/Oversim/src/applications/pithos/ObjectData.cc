@@ -15,11 +15,13 @@
 
 #include "ObjectData.h"
 
-ObjectData::ObjectData()
+const ObjectData ObjectData::UNSPECIFIED_OBJECT;
+
+/*ObjectData::ObjectData()
 {
 	size = 0;
 	key = OverlayKey::UNSPECIFIED_KEY;
-}
+}*/
 
 ObjectData::ObjectData(std::string name, int siz, OverlayKey k)
 {
@@ -98,4 +100,9 @@ void ObjectData::setKey(const OverlayKey &k)
 OverlayKey ObjectData::getKey()
 {
 	return key;
+}
+
+bool ObjectData::isUnspecified()
+{
+	return (*this == ObjectData::UNSPECIFIED_OBJECT);
 }

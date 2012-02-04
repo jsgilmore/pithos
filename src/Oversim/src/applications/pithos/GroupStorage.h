@@ -191,7 +191,7 @@ class GroupStorage : public cSimpleModule
 		 *
 		 * @param msg A message containing the information of the new peers and what objects they host.
 		 */
-		void addPeers(cMessage *msg);
+		void addToGroup(cMessage *msg);
 
 		void removePeer(PeerDataPtr peerDataPtr);
 

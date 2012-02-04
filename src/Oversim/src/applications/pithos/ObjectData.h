@@ -44,8 +44,11 @@ private:
 	OverlayKey key;
 
 public:
-	ObjectData();
-	ObjectData(std::string name , int siz = 0, OverlayKey k = OverlayKey::UNSPECIFIED_KEY);
+
+	static const ObjectData UNSPECIFIED_OBJECT;
+
+	//ObjectData();
+	ObjectData(std::string name = "Unspecified" , int siz = 0, OverlayKey k = OverlayKey::ZERO);
 	virtual ~ObjectData();
 
 	ObjectData& operator=(const ObjectData& other);
@@ -76,6 +79,8 @@ public:
 	void setKey(const OverlayKey &k);
 
 	OverlayKey getKey();
+
+	bool isUnspecified();
 };
 
 #endif /* OBJECTDATA_H_ */

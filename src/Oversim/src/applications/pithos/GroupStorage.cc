@@ -550,10 +550,11 @@ void GroupStorage::store(cMessage *msg)
 	updatePeerObjects(*go);
 }
 
-void GroupStorage::addPeers(cMessage *msg)
+void GroupStorage::addToGroup(cMessage *msg)
 {
 	PeerListPkt *list_p = check_and_cast<PeerListPkt *>(msg);
 	PeerData peer_dat;
+	ObjectData object_dat;
 	PeerDataPtr peer_dat_ptr;
 	simtime_t joinTime = simTime();
 
@@ -569,11 +570,15 @@ void GroupStorage::addPeers(cMessage *msg)
 		emit(joinTimeSignal, joinTime);
 	}
 
+	object_dat = list_p->getObjectData();
+
 	for (unsigned int i = 0 ; i < list_p->getPeer_listArraySize() ; i++)
 	{
 		peer_dat = list_p->getPeer_list(i);
 
-		group_ledger->addPeer(peer_dat);
+		if (list_p->getObjectData().isUnspecified())
+			group_ledger->addPeer(peer_dat);
+		else group_ledger->addObject(object_dat, peer_dat);
 	}
 
 	emit(groupSizeSignal, group_ledger->getGroupSize() + 1);	//The peer's perceived group size is one larger, because itself is part of the group it is in
@@ -630,9 +635,9 @@ void GroupStorage::handlePacket(Packet *packet)
 		//Data was received from the UDP layer by the communicator and has been referred to the Peer logic
 		addAndJoinSuperPeer(packet);
 		delete(packet);
-	} else if (packet->getPayloadType() == JOIN_ACCEPT)
+	} else if ((packet->getPayloadType() == JOIN_ACCEPT) || (packet->getPayloadType() == PEER_JOIN))
 	{
-		addPeers(packet);
+		addToGroup(packet);
 		delete(packet);
 	} else if (packet->getPayloadType() == WRITE)
 	{
