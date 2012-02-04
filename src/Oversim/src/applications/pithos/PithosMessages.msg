@@ -35,13 +35,14 @@ enum PacketTypes
     SUPER_PEER_ADD = 4;
     JOIN_REQ = 5;
     JOIN_ACCEPT = 6;
-    STORE_REQ = 7;			//A packet sent from peer logic to the lower layers, requesting an object be stored
-    RETRIEVE_REQ = 8;		//A packet sent from peer logic to the lower layers, requesting an object be retrieved
-    OBJECT_ADD = 9;
-    SP_OBJECT_ADD = 10;
-    RESPONSE = 11;
-    PEER_LEFT = 12;
-    SP_PEER_LEFT = 13;
+    PEER_JOIN = 7;
+    STORE_REQ = 8;			//A packet sent from peer logic to the lower layers, requesting an object be stored
+    RETRIEVE_REQ = 9;		//A packet sent from peer logic to the lower layers, requesting an object be retrieved
+    OBJECT_ADD = 10;
+    SP_OBJECT_ADD = 11;
+    RESPONSE = 12;
+    PEER_LEFT = 13;
+    SP_PEER_LEFT = 14;
 };
 
 enum OverlayTypes 
@@ -122,6 +123,11 @@ packet PeerListPkt extends Packet
 packet PeerDataPkt extends Packet
 {
     PeerData peerData;
+}
+
+packet ObjectDataPkt extends Packet
+{
+    ObjectData objectData;
 }
 
 message ResponseTimeoutEvent
