@@ -25,6 +25,9 @@
 #include "GroupStorage.h"
 #include "PeerLedger.h"
 
+typedef std::vector<PeerLedger> PeerLedgerList;
+typedef std::map<OverlayKey, ObjectLedger> ObjectLedgerMap;
+
 class GroupLedger : public cSimpleModule
 {
 	private:
@@ -34,11 +37,9 @@ class GroupLedger : public cSimpleModule
 	    void finish();
 
 		/**< A map that records all peers that belong to this peer's group */
-		typedef std::vector<PeerLedger> PeerLedgerList;
 		PeerLedgerList peer_list;
 
 		/**< A map that records all objects information stored in this super peer's group */
-		typedef std::map<OverlayKey, ObjectLedger> ObjectLedgerMap;
 		ObjectLedgerMap object_map;
 
 		GlobalStatistics* globalStatistics; /**< pointer to GlobalStatistics module in this node*/
@@ -62,9 +63,12 @@ class GroupLedger : public cSimpleModule
 		void addPeer(PeerData peer_dat);
 		void addObject(ObjectData objectData, PeerData peer_data_recv);
 		unsigned int getGroupSize();
+		unsigned int getNumGroupObjects();
 		PeerDataPtr getPeerPtr(const int &i);
 		void removePeer(PeerData peer_dat);
 		void removeObject(OverlayKey key);
+		ObjectLedgerMap::iterator getObjectMapBegin();
+		ObjectLedgerMap::iterator getObjectMapEnd();
 };
 
 #endif /* GROUPLEDGER_H_ */
