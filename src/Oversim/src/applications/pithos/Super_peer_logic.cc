@@ -106,7 +106,7 @@ void Super_peer_logic::informGroupPeers(bootstrapPkt *boot_req, TransportAddress
 	PeerData peer_data(boot_req->getSourceAddress());
 	PeerListPkt *list_p = new PeerListPkt();
 
-	list_p->setName("join_accept");
+	list_p->setName("peer_join");
 	list_p->setPayloadType(PEER_JOIN);
 	list_p->setSourceAddress(sourceAdr);
 	list_p->setObjectData(ObjectData::UNSPECIFIED_OBJECT);
@@ -134,34 +134,31 @@ void Super_peer_logic::informJoiningPeer(bootstrapPkt *boot_req, TransportAddres
 	list_p->setSourceAddress(sourceAdr);
 	list_p->setDestinationAddress(boot_req->getSourceAddress());
 
-	if (group_ledger->getNumGroupObjects() > 0)
+	//If there are already objects stored in the group, inform the joining peer of all objects and of the peers they are stored on
+	for (object_map_it = group_ledger->getObjectMapBegin() ; object_map_it != group_ledger->getObjectMapEnd() ; object_map_it++)
 	{
-		//If there are already objects stored in the group, inform the joining peer of all objects and of the peers they are stored on
-		for (object_map_it = group_ledger->getObjectMapBegin() ; object_map_it != group_ledger->getObjectMapEnd() ; object_map_it++)
+		list_p->setObjectData(*(object_map_it->second.objectDataPtr));
+
+		for (unsigned int j = 0 ; j < object_map_it->second.getPeerListSize() ; j++)
 		{
-			list_p->setObjectData(*(object_map_it->second.objectDataPtr));
-
-			for (unsigned int j = 0 ; j < object_map_it->second.getPeerListSize() ; j++)
-			{
-				list_p->addToPeerList(*(object_map_it->second.getPeerRef(j)));	//Send a copy of the object, pointed to by the smart pointer
-			}
-
-			list_p->setByteLength(2*sizeof(int)+sizeof(ObjectData)+sizeof(int)*(object_map_it->second.getPeerListSize()));	//Value+Type+ObjectData+(IP)*list_length
-
-			send(list_p->dup(), "comms_gate$o");	//Send a copy of the peer list, so the original packet may be reused to inform the other nodes
+			list_p->addToPeerList(*(object_map_it->second.getPeerRef(j)));	//Send a copy of the object, pointed to by the smart pointer
 		}
-		delete (list_p);
-	} else {
 
-		list_p->setObjectData(ObjectData::UNSPECIFIED_OBJECT);
+		list_p->setByteLength(2*sizeof(int)+sizeof(ObjectData)+sizeof(int)*(object_map_it->second.getPeerListSize()));	//Value+Type+ObjectData+(IP)*list_length
 
-		//If there are no objects stored in the group, only inform the joining peer of the other peers if any
-		for (unsigned int i = 0 ; i < group_ledger->getGroupSize() ; i++)
-		{
-			list_p->addToPeerList(*(group_ledger->getPeerPtr(i)));	//Send a copy of the object, pointed to by the smart pointer
-		}
-		send(list_p, "comms_gate$o");	//Send a copy of the peer list, so the original packet may be reused to inform the other nodes
+		send(list_p->dup(), "comms_gate$o");	//Send a copy of the peer list, so the original packet may be reused to inform the other nodes
+		list_p->clearPeerList();
 	}
+
+	list_p->setObjectData(ObjectData::UNSPECIFIED_OBJECT);
+	list_p->setByteLength(2*sizeof(int)+sizeof(ObjectData)+sizeof(int)*(group_ledger->getGroupSize()));	//Value+Type+ObjectData+(IP)*list_length
+
+	//If there are no objects stored in the group, only inform the joining peer of the other peers if any
+	for (unsigned int i = 0 ; i < group_ledger->getGroupSize() ; i++)
+	{
+		list_p->addToPeerList(*(group_ledger->getPeerPtr(i)));	//Send a copy of the object, pointed to by the smart pointer
+	}
+	send(list_p, "comms_gate$o");	//Send a copy of the peer list, so the original packet may be reused to inform the other nodes
 }
 
 void Super_peer_logic::handleJoinReq(cMessage *msg)

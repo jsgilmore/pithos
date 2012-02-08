@@ -43,6 +43,8 @@ private:
 
 	OverlayKey key;
 
+	friend std::ostream& operator<<(std::ostream& Stream, const ObjectData object_data);
+
 public:
 
 	static const ObjectData UNSPECIFIED_OBJECT;
