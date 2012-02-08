@@ -26,8 +26,25 @@ PeerLedger::~PeerLedger() {
 
 void PeerLedger::addObjectRef(ObjectDataPtr object_data_ptr)
 {
-	ObjectDataPtr ptr(object_data_ptr);
-	objectDataList.push_back(ptr);
+	std::vector<ObjectDataPtr>::iterator it;
+
+	//std::cout << "Trying to store object: " << *object_data_ptr << endl;
+
+	/*if (objectDataList.size() == 0)
+		std::cout << "No objects currently stored.\n";
+
+	for (it = objectDataList.begin() ; it != objectDataList.end() ; it++)
+	{
+		std::cout << "Already stored game object: " << **it << endl;
+	}*/
+
+	if (!isObjectPresent(object_data_ptr))
+	{
+		ObjectDataPtr ptr(object_data_ptr);
+		objectDataList.push_back(ptr);
+	} else {
+		opp_error("[PeerLedger]: Object already present in object list.");
+	}
 }
 
 ObjectDataPtr PeerLedger::getObjectRef(const int &i)

@@ -73,6 +73,8 @@ void Peer_logic::handleGetCAPIRequest(RootObjectGetCAPICall* capiGetMsg)
 
 	//std::cout << "[Peer_logic] Retrieving object with key: " << capiGetMsg->getKey() << endl;
 
+	read_pkt->setHops(0);
+
 	//Send the game object to be stored in the group.
 	send(read_pkt->dup(), "group_write");
 
