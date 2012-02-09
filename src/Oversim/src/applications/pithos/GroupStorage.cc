@@ -250,7 +250,7 @@ void GroupStorage::requestRetrieve(OverlayKeyPkt *retrieve_req)
 
 	ResponseTimeoutEvent *timeout = new ResponseTimeoutEvent("timeout");
 	timeout->setRpcid(rpcid);
-	timeout->setPeerDataPtr(container_peer_ptr);
+	timeout->setPeerData(*container_peer_ptr);
 	scheduleAt(simTime()+requestTimeout, timeout);
 
 	PendingRequestsEntry entry;
@@ -420,7 +420,7 @@ void GroupStorage::send_forstore(GameObject *go, unsigned int rpcid)
 
 		timeout = new ResponseTimeoutEvent("timeout");
 		timeout->setRpcid(rpcid);
-		timeout->setPeerDataPtr(destAdrPtr);
+		timeout->setPeerData(*destAdrPtr);
 		scheduleAt(simTime()+requestTimeout, timeout);
 
 		entry.timeouts.push_back(timeout);
@@ -441,12 +441,16 @@ void GroupStorage::respond_toUpper(cMessage *msg)
 
 	if (it != pendingRequests.end()) // unknown request or request for already erased call
 	{
+		std::cout << "Received response timeout address: " << response->getSourceAddress() << endl;
+
 		//Cancel the timeout for the responding peer
 		for (timeout_it = it->second.timeouts.begin() ; timeout_it != it->second.timeouts.end() ; timeout_it++)
 		{
 			ResponseTimeoutEvent * timeout = *timeout_it;
-			PeerDataPtr peerDataPtr = timeout->getPeerDataPtr();
-			TransportAddress address = peerDataPtr->getAddress();
+			PeerData peerData = timeout->getPeerData();
+			TransportAddress address = peerData.getAddress();
+
+			std::cout << "Stored response timeout address: " << address << endl;
 
 
 			//timeout_it is an iterator to a pointer, so it has to be dereferenced once to get to the ResponseTimeoutEvent pointer
@@ -460,7 +464,9 @@ void GroupStorage::respond_toUpper(cMessage *msg)
 		}
 
 		if (!found)
+		{
 			error("No timeout found for response message from peer.");
+		}
 
 		//TODO: Record the group put latency (This will merely require that the response packet be expanded with the initiation time of the request)
 
@@ -709,7 +715,7 @@ void GroupStorage::handleTimeout(ResponseTimeoutEvent *timeout)
 	//TODO: Multiple requests to multiple nodes can be sent to improve reliability.
 	bool found = false;
 	std::vector<ResponseTimeoutEvent *>::iterator timeout_it;
-	PeerDataPtr peerDataPtr;
+	PeerData peerData;
 
 	//std::cout << "Timeout received for RPCID " << timeout->getRpcid() << endl;
 
@@ -724,9 +730,9 @@ void GroupStorage::handleTimeout(ResponseTimeoutEvent *timeout)
 	for (timeout_it = it->second.timeouts.begin() ; timeout_it != it->second.timeouts.end() ; timeout_it++)
 	{
 		//timeout_it is an iterator to a pointer, so it has to be dereferenced once to get to the ResponseTimeoutEvent pointer
-		peerDataPtr = (*timeout_it)->getPeerDataPtr();
+		peerData = (*timeout_it)->getPeerData();
 
-		if (peerDataPtr == timeout->getPeerDataPtr())
+		if (peerData == timeout->getPeerData())
 		{
 			delete(timeout);
 			it->second.timeouts.erase(timeout_it);
@@ -742,11 +748,11 @@ void GroupStorage::handleTimeout(ResponseTimeoutEvent *timeout)
 	if (it->second.timeouts.size() == 0)
 		pendingRequests.erase(it);
 
-	group_ledger->removePeer(*peerDataPtr);
+	group_ledger->removePeer(peerData);
 
 	//The peerDataPtr in this scope prevents the memory from being freed in the removePeer function.
 	//This is only done when the current function is left
-	peerLeftInform(*peerDataPtr);
+	peerLeftInform(peerData);
 }
 
 void GroupStorage::handleMessage(cMessage *msg)
