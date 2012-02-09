@@ -26,12 +26,10 @@
 Define_Module(DHTStorage);
 
 DHTStorage::DHTStorage() {
-	// TODO Auto-generated constructor stub
 
 }
 
 DHTStorage::~DHTStorage() {
-	// TODO Auto-generated destructor stub
 }
 
 void DHTStorage::initialize()
@@ -234,7 +232,7 @@ void DHTStorage::sendResponse(int responseType, unsigned int rpcid, bool isSucce
 
 void DHTStorage::handlePutResponse(DHTputCAPIResponse* msg, DHTStatsContext* context)
 {
-    //TODO: The complete global DHT test map should be removed from the DHT storage component for the real-world application.
+    //The complete global DHT test map should be removed from the DHT storage component for the real-world application.
     //This is ONLY required to test the correctness of the overlay itself and is effectively storing all data inserted into the overlay two-fold.
 
     if (context->measurementPhase == false) {

@@ -73,6 +73,7 @@ class GroupLedger : public cSimpleModule
 		ObjectLedgerMap::iterator getObjectMapBegin();
 		ObjectLedgerMap::iterator getNextObject();
 		ObjectLedgerMap::iterator getObjectMapEnd();
+		bool isSuperPeerLedger();
 };
 
 #endif /* GROUPLEDGER_H_ */

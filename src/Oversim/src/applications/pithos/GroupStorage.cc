@@ -190,7 +190,6 @@ void GroupStorage::sendUDPResponse(TransportAddress src_adr, TransportAddress de
 	send(response, "comms_gate$o");
 }
 
-//TODO: Figure out how group storage will do responses.
 void GroupStorage::sendUpperResponse(int responseType, unsigned int rpcid, bool isSuccess, GameObject object)
 {
 	ResponsePkt *response;
@@ -207,7 +206,7 @@ void GroupStorage::requestRetrieve(OverlayKeyPkt *retrieve_req)
 	PeerDataPtr container_peer_ptr;
 
 	OverlayKey *key = &(retrieve_req->getKey());
-	unsigned int rpcid = retrieve_req->getValue();		//TODO: Make sure the rpcid is required as a separate variable, even if the mesasge is sent out as is.
+	unsigned int rpcid = retrieve_req->getValue();
 
 	StorageMap::iterator storage_map_it;
 
@@ -249,10 +248,7 @@ void GroupStorage::requestRetrieve(OverlayKeyPkt *retrieve_req)
 	//TODO: This check can later be removed if a partially connected group is required with recursive routing within the group.
 	//Such a grouping could have nodes connected to a certain percentage of other nodes, reducing group bandwidth usage and only slightly increasing latency.
 	if (retrieve_req->getHops() > 0)
-	{
-
 		error("[GroupStorage]: Object not found on destination node in group.");
-	}
 
 	RECORD_STATS(numSent++; numGetSent++);
 
@@ -549,8 +545,6 @@ int GroupStorage::getStorageBytes()
 
 	StorageMap::iterator it;
 
-	//This is inefficient, since a sequential search will be done for every element in the queue.
-	//TODO: The "forEachChild" method should rather be implemented with an appropriate visitor class.
 	for (it = storage_map.begin() ; it != storage_map.end() ; it++)
 	{
 		total_size += it->second.getSize();
