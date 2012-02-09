@@ -19,7 +19,10 @@
 #ifndef PEERLEDGER_H_
 #define PEERLEDGER_H_
 
+#include <omnetpp.h>
+
 #include "PeerData.h"
+#include "Communicator.h"
 #include "ObjectData.h"
 
 class PeerLedger

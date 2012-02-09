@@ -42,6 +42,8 @@ class GroupLedger : public cSimpleModule
 		/**< A map that records all objects information stored in this super peer's group */
 		ObjectLedgerMap object_map;
 
+		ObjectLedgerMap::iterator object_map_it;
+
 		GlobalStatistics* globalStatistics; /**< pointer to GlobalStatistics module in this node*/
 
 		static const int TEST_MAP_INTERVAL = 10; /**< interval in seconds for writing periodic statistical information */
@@ -58,6 +60,7 @@ class GroupLedger : public cSimpleModule
 
 		bool isObjectInGroup(OverlayKey key);
 		bool isPeerInGroup(PeerData peerData);
+		bool isObjectOnPeer(ObjectData object_data, PeerData peer_data);
 		PeerDataPtr getRandomPeer(OverlayKey key);
 		PeerDataPtr getRandomPeer();
 		void addPeer(PeerData peer_dat);
@@ -68,6 +71,7 @@ class GroupLedger : public cSimpleModule
 		void removePeer(PeerData peer_dat);
 		void removeObject(OverlayKey key);
 		ObjectLedgerMap::iterator getObjectMapBegin();
+		ObjectLedgerMap::iterator getNextObject();
 		ObjectLedgerMap::iterator getObjectMapEnd();
 };
 

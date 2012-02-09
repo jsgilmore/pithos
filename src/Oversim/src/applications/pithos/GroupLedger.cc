@@ -109,6 +109,62 @@ bool GroupLedger::isPeerInGroup(PeerData peerData)
 	return false;
 }
 
+//****Careful, this is a very expensive function and should only be used for debugging purposes****
+bool GroupLedger::isObjectOnPeer(ObjectData object_data, PeerData peer_data)
+{
+	unsigned int i;
+	ObjectLedgerMap::iterator object_map_it;
+	ObjectLedger object_ledger_entry;
+	PeerDataPtr peer_ptr;
+
+	PeerLedger peer_ledger_entry;
+	ObjectDataPtr object_ptr;
+	bool found = true;
+
+	//Firstly check whether the peer is listed in the object's peer list.
+	object_map_it = object_map.find(object_data.getKey());
+	if (object_map_it == object_map.end())
+		error("Object could not be found in group.");
+
+	object_ledger_entry = object_map_it->second;
+
+	for (i = 0; i < object_ledger_entry.getPeerListSize() ; i++)
+	{
+		peer_ptr = object_ledger_entry.getPeerRef(i);
+
+		if (*peer_ptr == peer_data)
+			break;
+	}
+
+	if (i == object_ledger_entry.getPeerListSize())
+		found = false;
+
+	//Secondly, check whether the object is listed in the peer's object map
+	for (i = 0 ; i < peer_list.size() ; i++)
+	{
+		peer_ledger_entry = peer_list.at(i);
+
+		if (*(peer_ledger_entry.peerDataPtr) == peer_data)
+			break;
+	}
+
+	if (i == peer_list.size())
+		error("Peer data not found in peer list.");
+
+	for (i = 0; i < peer_ledger_entry.getObjectListSize() ; i++)
+	{
+		object_ptr = peer_ledger_entry.getObjectRef(i);
+
+		if (*object_ptr == object_data)
+			break;
+	}
+
+	if (i == peer_ledger_entry.getObjectListSize())
+			found = false;
+
+	return found;
+}
+
 PeerDataPtr GroupLedger::getRandomPeer(OverlayKey key)
 {
 	ObjectLedgerMap::iterator object_map_it;
@@ -121,7 +177,7 @@ PeerDataPtr GroupLedger::getRandomPeer(OverlayKey key)
 
 	object_ledger_entry = object_map_it->second;
 
-	peer_ptr = object_ledger_entry.getPeerRef(intuniform(0, object_ledger_entry.getPeerListSize()-1));
+	peer_ptr = object_ledger_entry.getRandPeerRef();
 
 	return peer_ptr;
 }
@@ -238,6 +294,9 @@ void GroupLedger::addObject(ObjectData objectData, PeerData peer_data_recv)
 	ObjectLedgerMap::iterator object_map_it;
 	ObjectLedger *object_ledger;
 
+	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
+	TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
+
 	//Check whether the received object information is already stored in the super peer
 	object_map_it = object_map.find(objectData.getKey());
 
@@ -248,7 +307,7 @@ void GroupLedger::addObject(ObjectData objectData, PeerData peer_data_recv)
 		object_ledger = new ObjectLedger();
 
 		//Log the file name and what peers it is stored on
-		object_ledger->objectDataPtr = ObjectDataPtr(new ObjectData(objectData));
+		object_ledger->objectDataPtr.reset(new ObjectData(objectData));
 
 	} else object_ledger = &(object_map_it->second);
 
@@ -263,7 +322,9 @@ void GroupLedger::addObject(ObjectData objectData, PeerData peer_data_recv)
 	{
 		//TODO: Log this exception
 		PeerLedger peer_ledger;
-		peer_ledger.peerDataPtr = PeerDataPtr(new PeerData(peer_data_recv));
+		peer_ledger.peerDataPtr.reset(new PeerData(peer_data_recv));
+
+		//std::cout << "[" << thisAdr << "]: ";
 		peer_ledger.addObjectRef(object_ledger->objectDataPtr);
 		peer_list.push_back(peer_ledger);
 
@@ -271,6 +332,7 @@ void GroupLedger::addObject(ObjectData objectData, PeerData peer_data_recv)
 
 	} else {
 
+		//std::cout << "[" << thisAdr << "]: ";
 		peer_ledger_it->addObjectRef(object_ledger->objectDataPtr);
 		object_ledger->addPeerRef(peer_ledger_it->peerDataPtr);	//Add a peer to the ObjectInfo object's peer vector
 	}
@@ -299,7 +361,13 @@ PeerDataPtr GroupLedger::getPeerPtr(const int &i)
 
 ObjectLedgerMap::iterator GroupLedger::getObjectMapBegin()
 {
+	object_map_it = object_map.begin();
 	return object_map.begin();
+}
+
+ObjectLedgerMap::iterator GroupLedger::getNextObject()
+{
+	return ++object_map_it;
 }
 
 ObjectLedgerMap::iterator GroupLedger::getObjectMapEnd()
