@@ -90,6 +90,7 @@ packet ValuePkt extends Packet
 packet OverlayKeyPkt extends Packet
 {
     unsigned int value;
+    unsigned int hops;
     OverlayKey key;
 }
 

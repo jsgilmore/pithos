@@ -134,7 +134,7 @@ class GroupStorage : public cSimpleModule
 		 */
 		void createWritePkt(ValuePkt **write, unsigned int rpcid);
 
-		void addObject(cMessage *msg);
+		//void addObject(cMessage *msg);
 
 		/**
 		 * Send a message to the super peer informing it about a new group object and a list of peers that store it.
