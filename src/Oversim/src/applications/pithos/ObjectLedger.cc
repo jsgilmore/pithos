@@ -30,6 +30,16 @@ void ObjectLedger::addPeerRef(PeerDataPtr peer_data_ptr)
 	{
 		PeerDataPtr ptr(peer_data_ptr);
 		location_list.push_back(ptr);
+	} else {
+
+		std::vector<PeerDataPtr>::iterator it;
+
+		/*for (it = location_list.begin() ; it != location_list.end() ; it++)
+		{
+			std::cout << "Address: " << (*it)->getAddress() << endl;
+		}*/
+
+		opp_error("[ObjectLedger]: Peer not found for insertion.");
 	}
 }
 
@@ -40,7 +50,7 @@ PeerDataPtr ObjectLedger::getPeerRef(const int &i)
 
 PeerDataPtr ObjectLedger::getRandPeerRef()
 {
-	int index = intuniform(0, location_list.size());
+	int index = intuniform(0, location_list.size()-1);
 	return location_list.at(index);
 }
 

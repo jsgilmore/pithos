@@ -66,6 +66,13 @@ bool operator!=(const ObjectData& object1, const ObjectData& object2)
 	return !(object1 == object2);
 }
 
+std::ostream& operator<<(std::ostream& stream, const ObjectData object_data)
+{
+    return stream << /*This will state the node number and object number: */ object_data.object_name
+					<< " Size: " << object_data.size
+                  << " Key: " << object_data.key;
+}
+
 void ObjectData::setObjectName(const std::string &o_name)
 {
 	object_name = o_name;
