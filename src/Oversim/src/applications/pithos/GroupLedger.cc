@@ -50,11 +50,26 @@ void GroupLedger::handleMessage(cMessage* msg)
 
     if (msg == periodicTimer)
     {
-    	cModule *groupStorageModule = getParentModule()->getSubmodule("group_storage");
-    	GroupStorage *groupStorage = check_and_cast<GroupStorage *>(groupStorageModule);
-
     	std::ostringstream group_name;
-    	group_name << "GroupLedger (" << groupStorage->getSuperPeerAddress() << "): ";
+
+    	if (!isSuperPeerLedger())
+    	{
+    		//If the peer is a node within a group, show its super peer address and its own address
+    		cModule *groupStorageModule = getParentModule()->getSubmodule("group_storage");
+			GroupStorage *groupStorage = check_and_cast<GroupStorage *>(groupStorageModule);
+
+			const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
+			TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
+
+			group_name << "GroupLedger (" << groupStorage->getSuperPeerAddress() << ":" << thisAdr <<"): ";
+    	} else {
+    		//If a peer is the super peer of a group, show its own address as both super peer address and peer address
+			const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
+			TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
+
+			group_name << "GroupLedger (" << thisAdr << ":" << thisAdr <<"): ";
+    	}
+
 
         RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of known group peers")).c_str(), peer_list.size()));
         RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of known group objects")).c_str(), object_map.size()));
@@ -70,6 +85,17 @@ void GroupLedger::handleMessage(cMessage* msg)
     }
 }
 
+bool GroupLedger::isSuperPeerLedger()
+{
+	if (strcmp(getName(), "sp_group_ledger") == 0)
+		return true;
+	else if  (strcmp(getName(), "group_ledger") == 0)
+		return false;
+
+	error("Group ledger named incorrectly, expecting 'group_ledger' or 'sp_group_ledger'.");
+	return false;	//This value will never be returned.
+}
+
 void GroupLedger::finish()
 {
     // record scalar data
@@ -78,12 +104,22 @@ void GroupLedger::finish()
 
     simtime_t time = globalStatistics->calcMeasuredLifetime(communicator->getCreationTime());
 
-    if (time >= GlobalStatistics::MIN_MEASURED) {
-    	cModule *groupStorageModule = getParentModule()->getSubmodule("group_storage");
-    	GroupStorage *groupStorage = check_and_cast<GroupStorage *>(groupStorageModule);
-
+    if (time >= GlobalStatistics::MIN_MEASURED)
+    {
     	std::ostringstream group_name;
-    	group_name << "GroupLedger (" << groupStorage->getSuperPeerAddress() << "): ";
+
+    	if (isSuperPeerLedger())
+    	{
+    		const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
+    		TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
+
+    		group_name << "GroupLedger (" << thisAdr << "): ";
+    	} else {
+        	cModule *groupStorageModule = getParentModule()->getSubmodule("group_storage");
+        	GroupStorage *groupStorage = check_and_cast<GroupStorage *>(groupStorageModule);
+
+        	group_name << "GroupLedger (" << groupStorage->getSuperPeerAddress() << "): ";
+    	}
 
     	globalStatistics->addStdDev((group_name.str() + std::string("GroupLedger: Failed object gets")).c_str() , numObjectGetFail);
 		globalStatistics->addStdDev((group_name.str() + std::string("GroupLedger: Failed peer gets")).c_str(), numPeerGetFail);

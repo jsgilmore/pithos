@@ -25,7 +25,6 @@
 
 #include "BaseApp.h"
 #include "Peer_logic.h"
-#include "Communicator.h"
 
 #include "GroupLedger.h"
 #include "PeerData.h"

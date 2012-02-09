@@ -32,7 +32,6 @@ ObjectData::ObjectData(std::string name, int siz, OverlayKey k)
 
 ObjectData::~ObjectData()
 {
-	// TODO Auto-generated destructor stub
 }
 
 ObjectData& ObjectData::operator=(const ObjectData& other)
