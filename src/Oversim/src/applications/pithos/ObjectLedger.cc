@@ -16,8 +16,6 @@
 #include "ObjectLedger.h"
 
 ObjectLedger::ObjectLedger() {
-	// TODO Auto-generated constructor stub
-
 }
 
 ObjectLedger::~ObjectLedger() {
