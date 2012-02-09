@@ -133,5 +133,5 @@ packet ObjectDataPkt extends Packet
 message ResponseTimeoutEvent
 {
     unsigned int rpcid;
-    PeerDataPtr peerDataPtr;
+    PeerData peerData;
 }
