@@ -63,7 +63,7 @@ module PeerSelectDHT like ITier_overlay
         peer_logic.overlay_read <-- dht_storage.read;
         
         communicator.peer_gate <--> peer_logic.comms_gate;
-        communicator.toPeer_fromUpper --> peer_logic.from_upperTier;
+        communicator.toPeer_fromUpper --> group_storage.from_upperTier;
         communicator.fromPeer_toUpper <-- group_storage.to_upperTier;
         communicator.gs_gate <--> group_storage.comms_gate;
         communicator.os_gate <--> dht_storage.comms_gate;

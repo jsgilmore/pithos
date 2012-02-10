@@ -41,6 +41,8 @@ PithosTestApp::~PithosTestApp()
     cancelAndDelete(pithostestput_timer);
     cancelAndDelete(pithostestget_timer);
     cancelAndDelete(pithostestmod_timer);
+    cancelAndDelete(join_timer);
+    cancelAndDelete(position_update_timer);
 }
 
 PithosTestApp::PithosTestApp()
@@ -48,6 +50,8 @@ PithosTestApp::PithosTestApp()
     pithostestput_timer = NULL;
     pithostestget_timer = NULL;
     pithostestmod_timer = NULL;
+    join_timer = NULL;
+    position_update_timer = NULL;
 }
 
 void PithosTestApp::initializeApp(int stage)
@@ -108,6 +112,9 @@ void PithosTestApp::initializeApp(int stage)
     pithostestput_timer = new cMessage("pithostest_put_timer");
     pithostestget_timer = new cMessage("pithostest_get_timer");
     pithostestmod_timer = new cMessage("pithostest_mod_timer");
+
+    position_update_timer = new cMessage("position_update_timer");
+    scheduleAt(simTime()+wait_time, position_update_timer);
 }
 
 void PithosTestApp::handleRpcResponse(BaseResponseMessage* msg, const RpcState& state, simtime_t rtt)
@@ -260,27 +267,24 @@ void PithosTestApp::sendPutRequest()
 
 void PithosTestApp::handleLowerMessage (cMessage *msg)
 {
-	if (strcmp(msg->getName(), "request_start") == 0)
+	if (msg->isName("request_start"))
 	{
 		AddressPkt *request_start = check_and_cast<AddressPkt *>(msg);
 		super_peer_address = request_start->getAddress();
 
-		join_time = simTime() - wait_time;		//Adding join time gives every game module the same time to send successful requests
-
+		//If this is the first time we've received the message from the lower tier, schedule the timers.
 		if ((!pithostestput_timer->isScheduled()) && (!pithostestget_timer->isScheduled()) && (!pithostestmod_timer->isScheduled()))
 		{
-			if (simTime() < generationTime + wait_time + join_time)
-			{
-				sendPutRequest();
-
-			    if (mean > 0) {
-			        scheduleAt(simTime() + truncnormal(mean, deviation), pithostestput_timer);
-			        scheduleAt(simTime() + truncnormal(mean + mean / 3, deviation), pithostestget_timer);
-			        //scheduleAt(simTime() + truncnormal(mean + 2 * mean / 3, deviation), pithostestmod_timer);
-			    }
-			    else error("The mean message creation time must be greater than zero.");
+			if (mean > 0) {
+				scheduleAt(simTime() + truncnormal(mean, deviation), pithostestput_timer);
+				scheduleAt(simTime() + truncnormal(mean + mean / 3, deviation), pithostestget_timer);
+				//scheduleAt(simTime() + truncnormal(mean + 2 * mean / 3, deviation), pithostestmod_timer);
 			}
-		} else error("Duplicate request start messages received");
+			else error("The mean message creation time must be greater than zero.");
+		}
+
+		if (simTime() < generationTime + simTime())
+			sendPutRequest();
 
 		delete(msg);
 	}
@@ -309,8 +313,24 @@ OverlayKey PithosTestApp::getKey()
 
 void PithosTestApp::handleTimerEvent(cMessage* msg)
 {
-    if (msg->isName("pithostest_put_timer"))
+	if (msg->isName("position_update_timer"))
+	{
+		scheduleAt(simTime()+truncnormal(500, 10), position_update_timer);		//TODO: These parameters should be made configurable
+
+		PositionUpdatePkt *update_pkt = new PositionUpdatePkt();
+		update_pkt->setLatitude(uniform(0,100));	//TODO: These parameters should be made configurable
+		update_pkt->setLongitude(uniform(0,100));	//TODO: These parameters should be made configurable
+
+		send(update_pkt, "to_lowerTier");
+	}
+	else if (msg->isName("pithostest_put_timer"))
     {
+    	if (simTime() > generationTime + simTime())	//This has the module only generate requests for a finite amount of time
+    	{
+    		delete(msg);
+    		return;
+    	}
+
         // schedule next timer event
         scheduleAt(simTime() + truncnormal(mean, deviation), msg);
 
@@ -319,9 +339,6 @@ void PithosTestApp::handleTimerEvent(cMessage* msg)
                 || underlayConfigurator->isSimulationEndingSoon()
                 || nodeIsLeavingSoon)
             return;
-
-        if (simTime() > generationTime + wait_time + join_time)	//This has the module only generate requests for a finite amount of time
-        	return;
 
         sendPutRequest();
 
@@ -379,7 +396,7 @@ void PithosTestApp::handleTimerEvent(cMessage* msg)
 
         RECORD_STATS(numSent++; numPutSent++);
         sendInternalRpcCall(OVERLAYSTORAGE_COMP, dhtPutMsg, new DHTStatsContext(globalStatistics->isMeasuring(), simTime(), key, dhtPutMsg->getValue()));
-    }*/
+    }*/else error("Unknown timer event received");
 }
 
 void PithosTestApp::handleNodeLeaveNotification()

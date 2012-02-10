@@ -79,7 +79,7 @@ void Communicator::handleTimerEvent(cMessage* msg)
 
 void Communicator::handleUpperMessage (cMessage *msg)
 {
-	send(msg, "toPeer_fromUpper");		//This is the storage request from the game module
+	send(msg, "toPeer_fromUpper");		//This is the position update from the higher layer
 }
 
 simtime_t Communicator::getCreationTime()

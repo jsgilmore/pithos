@@ -43,6 +43,7 @@ enum PacketTypes
     RESPONSE = 12;
     PEER_LEFT = 13;
     SP_PEER_LEFT = 14;
+    POSITION_UPDATE = 15;
 };
 
 enum OverlayTypes 
@@ -105,6 +106,12 @@ message ResponsePkt extends Packet
 packet bootstrapPkt extends Packet
 {
     TransportAddress superPeerAdr;
+    double latitude;
+    double longitude;
+}
+
+packet PositionUpdatePkt extends Packet
+{
     double latitude;
     double longitude;
 }
