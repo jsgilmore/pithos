@@ -103,7 +103,6 @@ simple GroupStorage
         
         string directory_ip;
         int directory_port;
-        double wait_time @unit(s);
         double requestTimeout @unit(s) = default(10s);
         int replicas = 3;
     gates:
@@ -113,6 +112,7 @@ simple GroupStorage
         input write;
         
         output to_upperTier;     // gate to the upper tier
+        input from_upperTier;    // gate from the upper tier
 }
 
 simple OverlayStorage

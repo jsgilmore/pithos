@@ -19,7 +19,7 @@
 Define_Module(GroupStorage);
 
 GroupStorage::GroupStorage() {
-
+	event = NULL;
 }
 
 GroupStorage::~GroupStorage()
@@ -72,15 +72,7 @@ void GroupStorage::initialize()
 	strcpy(directory_ip, par("directory_ip"));
 	directory_port = par("directory_port");
 
-	//Set the event that will initiate the group join procedure.
-	event = new cMessage("event");
-	scheduleAt(simTime()+par("wait_time"), event);
-
 	requestTimeout = par("requestTimeout");
-
-	//Assign a random location to the peer in the virtual world
-	latitude = uniform(0,100);		//TODO: Make this range changeable
-	longitude = uniform(0,100);		//TODO: Make this range changeable
 
 	cModule *groupLedgerModule = getParentModule()->getSubmodule("group_ledger");
 	group_ledger = check_and_cast<GroupLedger *>(groupLedgerModule);
@@ -649,25 +641,31 @@ void GroupStorage::joinRequest(const TransportAddress &dest_adr)
 	send(boot_p, "comms_gate$o");
 }
 
+void GroupStorage::leaveGroup()
+{
+	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
+	TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
+
+	//The peerDataPtr in this scope prevents the memory from being freed in the removePeer function.
+	//This is only done when the current function is left
+	peerLeftInform(PeerData(thisAdr));
+
+	group_ledger->clear();
+}
+
 void GroupStorage::addAndJoinSuperPeer(Packet *packet)
 {
-	char err_str[50];
+	bootstrapPkt *boot_p = check_and_cast<bootstrapPkt *>(packet);
 
-	if (packet->getPayloadType() == INFORM)
-	{
-		bootstrapPkt *boot_p = check_and_cast<bootstrapPkt *>(packet);
+	if (!(super_peer_address.isUnspecified()))
+		leaveGroup();
 
-		super_peer_address = boot_p->getSuperPeerAdr();
-		EV << "A new super peer has been identified at " << super_peer_address << endl;
+	super_peer_address = boot_p->getSuperPeerAdr();
+	EV << "A new super peer has been identified at " << super_peer_address << endl;
 
-		cancelAndDelete(event);		//We've received the data from the directory server, so we can stop harassing them now
+	cancelAndDelete(event);		//We've received the data from the directory server, so we can stop harassing them now
 
-		joinRequest(super_peer_address);
-	}
-	else {
-		sprintf(err_str, "Illegal P2P message received (%s)", packet->getName());
-		error (err_str);
-	}
+	joinRequest(super_peer_address);
 }
 
 void GroupStorage::handlePacket(Packet *packet)
@@ -802,19 +800,34 @@ void GroupStorage::handleMessage(cMessage *msg)
 	if (msg == event)
 	{
 		//For the first join request, a request is sent to the well known directory server
-		IPAddress dest_ip(directory_ip);
-		TransportAddress destAdr(dest_ip, directory_port);
+		TransportAddress destAdr(IPAddress(directory_ip), directory_port);
 
 		joinRequest(destAdr);
 
 		scheduleAt(simTime()+1, event);		//TODO: make the 1 second wait time a configuration variable that may be set
-
 	}
 	else if (strcmp(msg->getName(), "timeout") == 0)
 	{
 		ResponseTimeoutEvent *timeout = check_and_cast<ResponseTimeoutEvent *>(msg);
 
 		handleTimeout(timeout);
+
+	} else if (strcmp(msg->getArrivalGate()->getName(), "from_upperTier") == 0)
+	{
+		PositionUpdatePkt *update_pkt = check_and_cast<PositionUpdatePkt *>(msg);
+
+		latitude = update_pkt->getLatitude();
+		longitude = update_pkt->getLongitude();
+
+		//For the first join request, a request is sent to the well known directory server
+		TransportAddress destAdr(IPAddress(directory_ip), directory_port);
+
+		joinRequest(destAdr);
+
+		event = new cMessage();	//This is the join retry timer.
+		scheduleAt(simTime()+1, event);		//TODO: make the 1 second wait time a configuration variable that may be set
+
+		delete(msg);
 
 	} else {
 		Packet *packet = check_and_cast<Packet *>(msg);
