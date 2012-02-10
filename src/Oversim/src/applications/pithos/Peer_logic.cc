@@ -247,11 +247,7 @@ void Peer_logic::handleResponseMsg(cMessage *msg)
 void Peer_logic::handleMessage(cMessage *msg)
 {
 
-	if (strcmp(msg->getArrivalGate()->getName(), "from_upperTier") == 0)
-	{
-		error("This gate has been closed down in favor of RPC calls");
-	}
-	else if ((strcmp(msg->getArrivalGate()->getName(), "overlay_read") == 0))
+	if ((strcmp(msg->getArrivalGate()->getName(), "overlay_read") == 0))
 	{
 		//Data was received from the UDP layer by the communicator and has been referred to the Peer logic
 		handleResponseMsg(msg);

@@ -95,8 +95,6 @@ class GroupStorage : public cSimpleModule
 		typedef std::map<uint32_t, PendingRequestsEntry> PendingRequests;
 		PendingRequests pendingRequests; /**< a map of all pending requests */
 
-		cMessage *event; /**< An event used to trigger a join request */
-
 		char directory_ip[16]; /**< The IP address of the directory server (specified as an Omnet param value) */
 		int directory_port; /**< The port of the directory server (specified as an Omnet param value) */
 
@@ -105,6 +103,8 @@ class GroupStorage : public cSimpleModule
 		StorageMap storage_map;
 
 		TransportAddress super_peer_address; /**< The TransPort address of the group super peer (this address is set, after the peer has joined a group) */
+
+		cMessage *event;	//This event is required
 
 		double latitude; /**< The latitude of this peer (position in the virtual world) */
 
@@ -165,6 +165,8 @@ class GroupStorage : public cSimpleModule
 		 * @param the destination address of the directory server of super peer
 		 */
 		void joinRequest(const TransportAddress &dest_adr);
+
+		void leaveGroup();
 
 		/**
 		 * Handle a message received from the group over UDP

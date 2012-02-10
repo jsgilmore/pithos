@@ -79,10 +79,8 @@ private:
     void initializeApp(int stage);
 
     /**
-     * Get a random key of the hashmap
+     * Get a random group or system wide key of of one of the stored objects, depending on the group probability variable.
      */
-    OverlayKey getRandomKey();
-
     OverlayKey getKey();
 
     void finishApp();
@@ -142,7 +140,6 @@ private:
 
     simtime_t writeTime_av;
 	simtime_t wait_time;
-	simtime_t join_time;
 	simtime_t generationTime;
 	double objectSize_av;
 
@@ -160,6 +157,9 @@ private:
 
     cMessage *pithostestput_timer, *pithostestget_timer, *pithostestmod_timer;
     bool nodeIsLeavingSoon; //!< true if the node is going to be killed shortly
+
+    cMessage *join_timer;
+    cMessage *position_update_timer;
 
     static const int DHTTESTAPP_VALUE_LEN = 20;
 

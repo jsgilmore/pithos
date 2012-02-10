@@ -43,6 +43,12 @@ void GroupLedger::initialize()
 	scheduleAt(simTime(), periodicTimer);
 }
 
+void GroupLedger::clear()
+{
+	object_map.clear();
+	peer_list.clear();
+}
+
 void GroupLedger::handleMessage(cMessage* msg)
 {
     //cleanupDataMap();
@@ -50,38 +56,37 @@ void GroupLedger::handleMessage(cMessage* msg)
 
     if (msg == periodicTimer)
     {
-    	std::ostringstream group_name;
+    	//If the peer is a node within a group, show its super peer address and its own address
+		cModule *groupStorageModule = getParentModule()->getSubmodule("group_storage");
+		GroupStorage *groupStorage = check_and_cast<GroupStorage *>(groupStorageModule);
 
-    	if (!isSuperPeerLedger())
-    	{
-    		//If the peer is a node within a group, show its super peer address and its own address
-    		cModule *groupStorageModule = getParentModule()->getSubmodule("group_storage");
-			GroupStorage *groupStorage = check_and_cast<GroupStorage *>(groupStorageModule);
+    	if (!(groupStorage->getSuperPeerAddress().isUnspecified()))
+		{
+			std::ostringstream group_name;
 
-			const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
-			TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
+			if (!isSuperPeerLedger())
+			{
+				const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
+				TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
 
-			group_name << "GroupLedger (" << groupStorage->getSuperPeerAddress() << ":" << thisAdr <<"): ";
-    	} else {
-    		//If a peer is the super peer of a group, show its own address as both super peer address and peer address
-			const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
-			TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
+				group_name << "GroupLedger (" << groupStorage->getSuperPeerAddress() << ":" << thisAdr <<"): ";
+			} else {
+				//If a peer is the super peer of a group, show its own address as both super peer address and peer address
+				const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
+				TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
 
-			group_name << "GroupLedger (" << thisAdr << ":" << thisAdr <<"): ";
-    	}
+				group_name << "GroupLedger (" << thisAdr << ":" << thisAdr <<"): ";
+			}
 
 
-        RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of known group peers")).c_str(), peer_list.size()));
-        RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of known group objects")).c_str(), object_map.size()));
-        scheduleAt(simTime() + TEST_MAP_INTERVAL, msg);
+			RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of known group peers")).c_str(), peer_list.size()));
+			RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of known group objects")).c_str(), object_map.size()));
+			scheduleAt(simTime() + TEST_MAP_INTERVAL, msg);
 
-    }/* else if ((entryTimer = dynamic_cast<DhtTestEntryTimer*>(msg)) != NULL)
-    {
-    	removeObject(entryTimer->getKey());
-        delete msg;
+		}
 
-    } */else {
-        throw cRuntimeError("GlobalPithosTestMap::handleMessage(): Unknown message type!");
+    } else {
+        throw cRuntimeError("[GroupLedger::handleMessage()]: Unknown message type!");
     }
 }
 
@@ -102,9 +107,12 @@ void GroupLedger::finish()
 	cModule *communicatorModule = getParentModule()->getSubmodule("communicator");
 	Communicator *communicator = check_and_cast<Communicator *>(communicatorModule);
 
+    cModule *groupStorageModule = getParentModule()->getSubmodule("group_storage");
+    GroupStorage *groupStorage = check_and_cast<GroupStorage *>(groupStorageModule);
+
     simtime_t time = globalStatistics->calcMeasuredLifetime(communicator->getCreationTime());
 
-    if (time >= GlobalStatistics::MIN_MEASURED)
+    if ((time >= GlobalStatistics::MIN_MEASURED) && !(groupStorage->getSuperPeerAddress().isUnspecified()))
     {
     	std::ostringstream group_name;
 
@@ -115,8 +123,6 @@ void GroupLedger::finish()
 
     		group_name << "GroupLedger (" << thisAdr << "): ";
     	} else {
-        	cModule *groupStorageModule = getParentModule()->getSubmodule("group_storage");
-        	GroupStorage *groupStorage = check_and_cast<GroupStorage *>(groupStorageModule);
 
         	group_name << "GroupLedger (" << groupStorage->getSuperPeerAddress() << "): ";
     	}
