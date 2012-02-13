@@ -697,6 +697,10 @@ void GroupStorage::addAndJoinSuperPeer(Packet *packet)
 		leaveGroup();
 
 	super_peer_address = boot_p->getSuperPeerAdr();
+
+	if (getSuperPeerAddress().isUnspecified())
+		error("The address is unspecified.");
+
 	EV << "A new super peer has been identified at " << super_peer_address << endl;
 
 	joinRequest(super_peer_address);
