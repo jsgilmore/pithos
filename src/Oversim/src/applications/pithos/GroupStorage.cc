@@ -205,6 +205,19 @@ void GroupStorage::requestRetrieve(OverlayKeyPkt *retrieve_req)
 	//Check whether this is a group object
 	group_object = group_ledger->isObjectInGroup(*key);
 
+	//This can happen if this peer switched groups, after being selected to retrieve a packet
+	//It should also be noted that this if and the next is required, otherwise an upper response will be sent, instead of a UDP response.
+	//The first request to come from the upper layer will have an unspecified group address and has to be ignored. An illegal compare eror wil be generated if it's not the first hop
+	if (!(retrieve_req->getGroupAddress().isUnspecified()) || (retrieve_req->getHops() != 0))
+	{
+		if (retrieve_req->getGroupAddress() != super_peer_address)
+		{
+			sendUDPResponse(retrieve_req->getDestinationAddress(), retrieve_req->getSourceAddress(), GROUP_GET, rpcid, false);
+			delete(retrieve_req);
+			return;
+		}
+	}
+
 	//Is this object actually stored in this group
 	if (!group_object)
 	{
@@ -248,6 +261,7 @@ void GroupStorage::requestRetrieve(OverlayKeyPkt *retrieve_req)
 
 	//Send a retrieve request to the group peer storing the object
 	retrieve_req->setDestinationAddress(container_peer_ptr->getAddress());
+	retrieve_req->setGroupAddress(super_peer_address);
 
 	retrieve_req->setHops(retrieve_req->getHops()+1);
 
@@ -311,6 +325,7 @@ void GroupStorage::updatePeerObjects(GameObject go)
 	objectAddPkt->setPayloadType(OBJECT_ADD);
 	objectAddPkt->setSourceAddress(sourceAdr);
 	objectAddPkt->setName("object_add");
+	objectAddPkt->setGroupAddress(super_peer_address);
 
 	objectAddPkt->addToPeerList(PeerData(sourceAdr));
 
@@ -337,7 +352,7 @@ PeerDataPtr GroupStorage::selectDestination(std::vector<TransportAddress> send_l
 
 	while(!original_address)
 	{
-		peerDataPtr = group_ledger->getRandomPeer();		//Choose a random peer in the group for the destination
+		peerDataPtr = group_ledger->getRandomPeer();		//Choose a uniform random peer in the group for the destination
 
 		//Check all previous chosen addresses to determine whether this address is unique
 		original_address = true;
@@ -363,6 +378,7 @@ void GroupStorage::createWritePkt(ValuePkt **write, unsigned int rpcid)
 	(*write)->setPayloadType(WRITE);
 	(*write)->setValue(rpcid);
 	(*write)->setSourceAddress(sourceAdr);
+	(*write)->setGroupAddress(super_peer_address);
 }
 
 int GroupStorage::getReplicaNr(unsigned int rpcid)
@@ -551,8 +567,16 @@ void GroupStorage::store(cMessage *msg)
 	ValuePkt *value_pkt = check_and_cast<ValuePkt *>(msg);
 	std::pair<StorageMap::iterator,bool> ret;
 
+	//This happens when a group peer changes groups, after being selected to store a file
+	if (value_pkt->getGroupAddress() != super_peer_address)
+	{
+		//error("[GroupStorage::store]: Received packet from a different group.");
+		sendUDPResponse(value_pkt->getDestinationAddress(), value_pkt->getSourceAddress(), GROUP_PUT, value_pkt->getValue(), false);
+		return;
+	}
+
 	if (!(msg->hasObject("GameObject")))
-		error("Storage received a message with no game object attached");
+		error("[GroupStorage::store]: Storage received a message with no game object attached");
 
 	GameObject *go = (GameObject *)msg->getObject("GameObject");		//We're not removing the object here, because we're only using the value and then the object is deleted with the message.
 
@@ -570,7 +594,7 @@ void GroupStorage::store(cMessage *msg)
 
 	//Ensure that a duplicate key wasn't inserted
 	if (ret.second == false)
-		error("Duplicate key inserted into storage.");
+		error("[GroupStorage::store]: Duplicate key inserted into storage.");
 
 	emit(storeTimeSignal, delay);
 
@@ -590,6 +614,10 @@ void GroupStorage::addToGroup(cMessage *msg)
 	PeerData peer_dat;
 	ObjectData object_dat;
 	simtime_t joinTime = simTime();
+
+	//If a packet was received from another group, ignore it.
+	if (list_p->getGroupAddress() != super_peer_address)
+		return;
 
 	//If we didn't know of any peers in our group and we've now been informed of some, inform the game module to start producing requests
 	//This is also the time when we record that we've successfully joined a group (When we've joined a super peer and we know of other peers in the group).
@@ -657,13 +685,19 @@ void GroupStorage::addAndJoinSuperPeer(Packet *packet)
 {
 	bootstrapPkt *boot_p = check_and_cast<bootstrapPkt *>(packet);
 
+	//TODO: It should be considered how this repeating event will be affected by repeated calls to join different groups
+	cancelAndDelete(event);		//We've received the data from the directory server, so we can stop harassing them now
+
+	if (!(super_peer_address.isUnspecified()) && (super_peer_address == boot_p->getSuperPeerAdr()))
+	{
+		return;
+	}
+
 	if (!(super_peer_address.isUnspecified()))
 		leaveGroup();
 
 	super_peer_address = boot_p->getSuperPeerAdr();
 	EV << "A new super peer has been identified at " << super_peer_address << endl;
-
-	cancelAndDelete(event);		//We've received the data from the directory server, so we can stop harassing them now
 
 	joinRequest(super_peer_address);
 }
@@ -715,6 +749,13 @@ void GroupStorage::handlePacket(Packet *packet)
 		requestRetrieve(retrieve_req);
 	} else if (packet->getPayloadType() == PEER_LEFT)
 	{
+		//If a packet was received from another group, ignore it.
+		if (packet->getGroupAddress() != super_peer_address)
+		{
+			delete(packet);
+			return;
+		}
+
 		PeerDataPkt *peer_data_pkt = check_and_cast<PeerDataPkt *>(packet);
 		group_ledger->removePeer(peer_data_pkt->getPeerData());
 		emit(groupSizeSignal, group_ledger->getGroupSize() + 1);	//The peer's perceived group size is one larger, because itself is part of the group it is in
@@ -732,6 +773,7 @@ void GroupStorage::peerLeftInform(PeerData peerData)
 	TransportAddress sourceAdr(thisNode->getIp(), thisNode->getPort());
 
 	pkt->setSourceAddress(sourceAdr);
+	pkt->setGroupAddress(super_peer_address);
 	pkt->setPayloadType(PEER_LEFT);
 	pkt->setPeerData(peerData);
 	pkt->setByteLength(4+4+4+4);	//Source IP + Dest IP + type + left peer IP
@@ -819,7 +861,7 @@ void GroupStorage::handleMessage(cMessage *msg)
 		latitude = update_pkt->getLatitude();
 		longitude = update_pkt->getLongitude();
 
-		//For the first join request, a request is sent to the well known directory server
+		//A request is sent to the well known directory server
 		TransportAddress destAdr(IPAddress(directory_ip), directory_port);
 
 		joinRequest(destAdr);

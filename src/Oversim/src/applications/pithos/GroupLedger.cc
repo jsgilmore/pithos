@@ -35,8 +35,11 @@ void GroupLedger::initialize()
 	globalStatistics = GlobalStatisticsAccess().get();
 
 	numPeerGetFail = 0;
+	numPeerGetSuccess = 0;
 	numObjectGetFail = 0;
+	numObjectGetSuccess = 0;
 	numPeerKnownError = 0;
+	numPeerKnownSuccess = 0;
 
 	periodicTimer = new cMessage("PithosTestMapTimer");
 
@@ -45,6 +48,13 @@ void GroupLedger::initialize()
 
 void GroupLedger::clear()
 {
+	numPeerGetFail = 0;
+	numPeerGetSuccess = 0;
+	numObjectGetFail = 0;
+	numObjectGetSuccess = 0;
+	numPeerKnownError = 0;
+	numPeerKnownSuccess = 0;
+
 	object_map.clear();
 	peer_list.clear();
 }
@@ -128,8 +138,11 @@ void GroupLedger::finish()
     	}
 
     	globalStatistics->addStdDev((group_name.str() + std::string("GroupLedger: Failed object gets")).c_str() , numObjectGetFail);
+    	globalStatistics->addStdDev((group_name.str() + std::string("GroupLedger: Successful object gets")).c_str() , numObjectGetSuccess);
 		globalStatistics->addStdDev((group_name.str() + std::string("GroupLedger: Failed peer gets")).c_str(), numPeerGetFail);
+		globalStatistics->addStdDev((group_name.str() + std::string("GroupLedger: Successful peer gets")).c_str(), numPeerGetSuccess);
 		globalStatistics->addStdDev((group_name.str() + std::string("GroupLedger: Number of known peer insertion attempts")).c_str(), numPeerKnownError);
+		globalStatistics->addStdDev((group_name.str() + std::string("GroupLedger: Number of unknown peer insertions")).c_str(), numPeerKnownSuccess);
     }
 }
 
@@ -241,6 +254,7 @@ void GroupLedger::addPeer(PeerData peer_dat)
 		PeerLedger peer_ledger;
 		peer_ledger.peerDataPtr = PeerDataPtr(new PeerData(peer_dat));
 		peer_list.push_back(peer_ledger);
+		RECORD_STATS(numPeerKnownSuccess++);
 	} else {
 		//error("Peer is already in group.");
 		RECORD_STATS(numPeerKnownError++);
@@ -269,7 +283,7 @@ void GroupLedger::removePeer(PeerData peer_dat)
 		//error("Peer slated for removal not found in group.");
 		RECORD_STATS(numPeerGetFail++);
 		return;
-	}
+	} else RECORD_STATS(numPeerGetSuccess++);
 
 	//Iterate through all object references listed for the peer
 	for (unsigned int i = 0 ; i < peer_ledger_it->getObjectListSize() ; i++)
@@ -282,7 +296,7 @@ void GroupLedger::removePeer(PeerData peer_dat)
 		{
 			RECORD_STATS(numObjectGetFail++);
 			error("Object not found when removing peer.");
-		}
+		} else RECORD_STATS(numObjectGetSuccess++);
 
 		//Remove the specific peer reference from the object ledger
 		object_ledger_it->second.erasePeerRef(peer_ledger_it->peerDataPtr);
