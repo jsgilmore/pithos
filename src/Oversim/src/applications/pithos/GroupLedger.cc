@@ -70,30 +70,26 @@ void GroupLedger::handleMessage(cMessage* msg)
 		cModule *groupStorageModule = getParentModule()->getSubmodule("group_storage");
 		GroupStorage *groupStorage = check_and_cast<GroupStorage *>(groupStorageModule);
 
-    	if (!(groupStorage->getSuperPeerAddress().isUnspecified()))
+		std::ostringstream group_name;
+
+		if (isSuperPeerLedger())
 		{
-			std::ostringstream group_name;
+			//If a peer is the super peer of a group, show its own address as both super peer address and peer address
+			const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
+			TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
 
-			if (!isSuperPeerLedger())
-			{
-				const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
-				TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
+			group_name << "GroupLedger (" << thisAdr << ":" << thisAdr <<"): ";
+		} else if (!(groupStorage->getSuperPeerAddress().isUnspecified())) {
+			const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
+			TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
 
-				group_name << "GroupLedger (" << groupStorage->getSuperPeerAddress() << ":" << thisAdr <<"): ";
-			} else {
-				//If a peer is the super peer of a group, show its own address as both super peer address and peer address
-				const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
-				TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
-
-				group_name << "GroupLedger (" << thisAdr << ":" << thisAdr <<"): ";
-			}
-
-
-			RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of known group peers")).c_str(), peer_list.size()));
-			RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of known group objects")).c_str(), object_map.size()));
-			scheduleAt(simTime() + TEST_MAP_INTERVAL, msg);
-
+			group_name << "GroupLedger (" << groupStorage->getSuperPeerAddress() << ":" << thisAdr <<"): ";
 		}
+
+
+		RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of known group peers")).c_str(), peer_list.size()));
+		RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of known group objects")).c_str(), object_map.size()));
+		scheduleAt(simTime() + TEST_MAP_INTERVAL, msg);
 
     } else {
         throw cRuntimeError("[GroupLedger::handleMessage()]: Unknown message type!");
