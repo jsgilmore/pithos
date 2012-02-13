@@ -109,6 +109,7 @@ void Super_peer_logic::informGroupPeers(bootstrapPkt *boot_req, TransportAddress
 	list_p->setName("peer_join");
 	list_p->setPayloadType(PEER_JOIN);
 	list_p->setSourceAddress(sourceAdr);
+	list_p->setGroupAddress(sourceAdr);
 	list_p->setObjectData(ObjectData::UNSPECIFIED_OBJECT);
 	list_p->addToPeerList(peer_data);
 	list_p->setByteLength(4 + 4 + 4);	//Value+Type+IP
@@ -132,6 +133,7 @@ void Super_peer_logic::informJoiningPeer(bootstrapPkt *boot_req, TransportAddres
 	list_p->setName("join_accept");
 	list_p->setPayloadType(JOIN_ACCEPT);
 	list_p->setSourceAddress(sourceAdr);
+	list_p->setGroupAddress(sourceAdr);
 	list_p->setDestinationAddress(boot_req->getSourceAddress());
 
 	//If there are already objects stored in the group, inform the joining peer of all objects and of the peers they are stored on

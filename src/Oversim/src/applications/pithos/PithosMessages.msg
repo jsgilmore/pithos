@@ -79,6 +79,7 @@ packet Packet
 {
     TransportAddress sourceAddress;
     TransportAddress destinationAddress;
+    TransportAddress groupAddress;
     
     int payloadType enum(PacketTypes);
 }
@@ -99,7 +100,6 @@ message ResponsePkt extends Packet
 {
     unsigned int rpcid;
     bool isSuccess;
-    TransportAddress groupAddress;
     int responseType enum(ResponseTypes);
 }
 

@@ -203,21 +203,23 @@ void Peer_logic::handleResponseMsg(cMessage *msg)
 	if (response->getResponseType() == GROUP_PUT)
 	{
 		if (response->getIsSuccess())
+		{
 			it->second.numGroupPutSucceeded++;
-		else it->second.numGroupPutFailed++;
 
-		//Check whether a group address is known.
-		if (it->second.group_address.isUnspecified())
-		{
-			//If not, record it.
-			//This logs the group address to enable the higher layer to generate group specific requests
-			it->second.group_address = response->getGroupAddress();
-		}
-		else if (it->second.group_address != response->getGroupAddress())
-		{
-			//If it is, check that both match.
-			error("Group address received does not match known group address");
-		}
+			//Check whether a group address is known.
+			if (it->second.group_address.isUnspecified())
+			{
+				//If not, record it.
+				//This logs the group address to enable the higher layer to generate group specific requests
+				it->second.group_address = response->getGroupAddress();
+			}
+			else if (it->second.group_address != response->getGroupAddress())
+			{
+				//If it is, check that both match.
+				error("Group address received does not match known group address");
+			}
+			//Group addresses are not checked for a failure, since the failure could have been caused by a packet sent to the wrong group.
+		} else it->second.numGroupPutFailed++;
 
 		processPut(it->second, response);
 	} else if (response->getResponseType() == OVERLAY_PUT)

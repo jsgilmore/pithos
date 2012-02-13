@@ -215,13 +215,13 @@ void Communicator::sendPacket(cMessage *msg)
 	if (underlayConfigurator->isInInitPhase())
 	{
 		delete(msg);
-		error("Underlay configurator is still in init phase, extend wait time.\n");
+		error("Underlay configurator is still in init phase, extend wait time.");
 	}
 
 	if (pkt->getDestinationAddress().isUnspecified())
 	{
 		delete(msg);
-		error("Communicator cannot send a packet over UDP with an unspecified destination address.\n");
+		error("Communicator cannot send a packet over UDP with an unspecified destination address.");
 	}
 
 	sendMessageToUDP(pkt->getDestinationAddress(), pkt);
