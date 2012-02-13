@@ -51,8 +51,11 @@ class GroupLedger : public cSimpleModule
 		cMessage *periodicTimer; /**< timer self-message for writing periodic statistical information */
 
 		int numPeerGetFail;
+		int numPeerGetSuccess;
 		int numObjectGetFail;
+		int numObjectGetSuccess;
 		int numPeerKnownError;
+		int numPeerKnownSuccess;
 
 	public:
 		GroupLedger();
