@@ -46,8 +46,11 @@ void GroupLedger::initialize()
 	scheduleAt(simTime(), periodicTimer);
 }
 
-void GroupLedger::clear()
+void GroupLedger::recordAndClear()
 {
+	//Every time the group ledger is clear, the statistics are recorded for the time leading up to the clear.
+	finish();
+
 	numPeerGetFail = 0;
 	numPeerGetSuccess = 0;
 	numObjectGetFail = 0;
@@ -79,13 +82,14 @@ void GroupLedger::handleMessage(cMessage* msg)
 			TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
 
 			group_name << "GroupLedger (" << thisAdr << ":" << thisAdr <<"): ";
-		} else if (!(groupStorage->getSuperPeerAddress().isUnspecified())) {
+		}
+		else if (!(groupStorage->getSuperPeerAddress().isUnspecified()))
+		{
 			const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
 			TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
 
 			group_name << "GroupLedger (" << groupStorage->getSuperPeerAddress() << ":" << thisAdr <<"): ";
 		}
-
 
 		RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of known group peers")).c_str(), peer_list.size()));
 		RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of known group objects")).c_str(), object_map.size()));
@@ -109,6 +113,8 @@ bool GroupLedger::isSuperPeerLedger()
 
 void GroupLedger::finish()
 {
+	//Bear in mind that whenever recordAndClear() is called, finish() is also called.
+
     // record scalar data
 	cModule *communicatorModule = getParentModule()->getSubmodule("communicator");
 	Communicator *communicator = check_and_cast<Communicator *>(communicatorModule);
@@ -131,7 +137,7 @@ void GroupLedger::finish()
     	} else {
 
         	group_name << "GroupLedger (" << groupStorage->getSuperPeerAddress() << "): ";
-    	}
+    	} return;
 
     	globalStatistics->addStdDev((group_name.str() + std::string("GroupLedger: Failed object gets")).c_str() , numObjectGetFail);
     	globalStatistics->addStdDev((group_name.str() + std::string("GroupLedger: Successful object gets")).c_str() , numObjectGetSuccess);
@@ -413,13 +419,7 @@ PeerDataPtr GroupLedger::getPeerPtr(const int &i)
 
 ObjectLedgerMap::iterator GroupLedger::getObjectMapBegin()
 {
-	object_map_it = object_map.begin();
 	return object_map.begin();
-}
-
-ObjectLedgerMap::iterator GroupLedger::getNextObject()
-{
-	return ++object_map_it;
 }
 
 ObjectLedgerMap::iterator GroupLedger::getObjectMapEnd()
