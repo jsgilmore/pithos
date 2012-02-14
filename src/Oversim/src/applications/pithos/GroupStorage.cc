@@ -678,7 +678,7 @@ void GroupStorage::leaveGroup()
 	//This is only done when the current function is left
 	peerLeftInform(PeerData(thisAdr));
 
-	group_ledger->clear();
+	group_ledger->recordAndClear();
 }
 
 void GroupStorage::addAndJoinSuperPeer(Packet *packet)
