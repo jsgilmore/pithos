@@ -89,7 +89,7 @@ void GroupLedger::handleMessage(cMessage* msg)
 			TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
 
 			group_name << "GroupLedger (" << groupStorage->getSuperPeerAddress() << ":" << thisAdr <<"): ";
-		}
+		} else return;
 
 		RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of known group peers")).c_str(), peer_list.size()));
 		RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of known group objects")).c_str(), object_map.size()));
