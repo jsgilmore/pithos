@@ -174,8 +174,6 @@ void Super_peer_logic::handleJoinReq(cMessage *msg)
 	//Inform all other nodes in the group of the joining node
 	informGroupPeers(boot_req, sourceAdr);
 
-	informJoiningPeer(boot_req, sourceAdr);
-
 	/**
 	 * Add the data of the requesting peer into the list.
 	 *
@@ -184,6 +182,8 @@ void Super_peer_logic::handleJoinReq(cMessage *msg)
 	 * informs the higher layer that it has successfully joined a group.
 	**/
 	group_ledger->addPeer(PeerData(boot_req->getSourceAddress()));
+
+	informJoiningPeer(boot_req, sourceAdr);
 
 	//The original message is deleted in the calling function.
 }

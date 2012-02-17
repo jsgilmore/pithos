@@ -697,8 +697,9 @@ void GroupStorage::addAndJoinSuperPeer(Packet *packet)
 		leaveGroup();
 
 	super_peer_address = boot_p->getSuperPeerAdr();
+	//std::cout << "Adding new group address: " << super_peer_address << endl;
 
-	if (getSuperPeerAddress().isUnspecified())
+	if (super_peer_address.isUnspecified())
 		error("The address is unspecified.");
 
 	EV << "A new super peer has been identified at " << super_peer_address << endl;
