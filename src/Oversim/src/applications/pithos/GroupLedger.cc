@@ -34,8 +34,8 @@ void GroupLedger::initialize()
 {
 	globalStatistics = GlobalStatisticsAccess().get();
 
-	numPeerGetFail = 0;
-	numPeerGetSuccess = 0;
+	numPeerRemoveFail = 0;
+	numPeerRemoveSuccess = 0;
 	numObjectGetFail = 0;
 	numObjectGetSuccess = 0;
 	numPeerKnownError = 0;
@@ -51,8 +51,8 @@ void GroupLedger::recordAndClear()
 	//Every time the group ledger is clear, the statistics are recorded for the time leading up to the clear.
 	finish();
 
-	numPeerGetFail = 0;
-	numPeerGetSuccess = 0;
+	numPeerRemoveFail = 0;
+	numPeerRemoveSuccess = 0;
 	numObjectGetFail = 0;
 	numObjectGetSuccess = 0;
 	numPeerKnownError = 0;
@@ -147,8 +147,8 @@ void GroupLedger::finish()
 
     	globalStatistics->addStdDev((group_name.str() + std::string("GroupLedger: Failed object gets")).c_str() , numObjectGetFail);
     	globalStatistics->addStdDev((group_name.str() + std::string("GroupLedger: Successful object gets")).c_str() , numObjectGetSuccess);
-		globalStatistics->addStdDev((group_name.str() + std::string("GroupLedger: Failed peer gets")).c_str(), numPeerGetFail);
-		globalStatistics->addStdDev((group_name.str() + std::string("GroupLedger: Successful peer gets")).c_str(), numPeerGetSuccess);
+		globalStatistics->addStdDev((group_name.str() + std::string("GroupLedger: Failed peer gets")).c_str(), numPeerRemoveFail);
+		globalStatistics->addStdDev((group_name.str() + std::string("GroupLedger: Successful peer gets")).c_str(), numPeerRemoveSuccess);
 		globalStatistics->addStdDev((group_name.str() + std::string("GroupLedger: Number of known peer insertion attempts")).c_str(), numPeerKnownError);
 		globalStatistics->addStdDev((group_name.str() + std::string("GroupLedger: Number of unknown peer insertions")).c_str(), numPeerKnownSuccess);
     }
@@ -286,12 +286,21 @@ void GroupLedger::removePeer(PeerData peer_dat)
 		}
 	}
 
+	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
+	TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
+	std::ostringstream msg;
+	msg << "[" << thisAdr << "]: Peer remove error\n";
+
 	if (peer_ledger_it == peer_list.end())
 	{
 		//error("Peer slated for removal not found in group.");
-		RECORD_STATS(numPeerGetFail++);
+		RECORD_STATS(numPeerRemoveFail++);
+		RECORD_STATS(globalStatistics->recordOutVector(msg.str().c_str(), 10));
 		return;
-	} else RECORD_STATS(numPeerGetSuccess++);
+	} else {
+		RECORD_STATS(numPeerRemoveSuccess++);
+		RECORD_STATS(globalStatistics->recordOutVector(msg.str().c_str(), 0));
+	}
 
 	//Iterate through all object references listed for the peer
 	for (unsigned int i = 0 ; i < peer_ledger_it->getObjectListSize() ; i++)
