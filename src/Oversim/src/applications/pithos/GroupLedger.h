@@ -48,8 +48,8 @@ class GroupLedger : public cSimpleModule
 
 		cMessage *periodicTimer; /**< timer self-message for writing periodic statistical information */
 
-		int numPeerGetFail;
-		int numPeerGetSuccess;
+		int numPeerRemoveFail;
+		int numPeerRemoveSuccess;
 		int numObjectGetFail;
 		int numObjectGetSuccess;
 		int numPeerKnownError;
