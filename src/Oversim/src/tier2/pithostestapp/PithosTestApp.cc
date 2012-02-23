@@ -315,7 +315,8 @@ void PithosTestApp::handleTimerEvent(cMessage* msg)
 {
 	if (msg->isName("position_update_timer"))
 	{
-		scheduleAt(simTime()+uniform(250, 750), position_update_timer);		//TODO: These parameters should be made configurable
+		//TODO: Uncomment this to simulate group migration again.
+		//scheduleAt(simTime()+uniform(250, 750), position_update_timer);		//TODO: These parameters should be made configurable
 
 		PositionUpdatePkt *update_pkt = new PositionUpdatePkt();
 		update_pkt->setLatitude(uniform(0,100));	//TODO: These parameters should be made configurable

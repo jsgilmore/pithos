@@ -42,7 +42,9 @@ void PeerLedger::addObjectRef(ObjectDataPtr object_data_ptr)
 	{
 		ObjectDataPtr ptr(object_data_ptr);
 		objectDataList.push_back(ptr);
-	}/* else {
+	}
+	//FIXME: Replace this error checking when group sizes bug has been fixed.
+	/* else {
 		opp_error("[PeerLedger]: Object already present in object list.");
 	}*/
 }
