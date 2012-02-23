@@ -674,6 +674,8 @@ void GroupStorage::leaveGroup()
 	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
 	TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
 
+	group_ledger->removePeer(PeerData(thisAdr));
+
 	peerLeftInform(PeerData(thisAdr));
 
 	group_ledger->recordAndClear();
