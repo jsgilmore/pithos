@@ -674,8 +674,6 @@ void GroupStorage::leaveGroup()
 	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
 	TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
 
-	//The peerDataPtr in this scope prevents the memory from being freed in the removePeer function.
-	//This is only done when the current function is left
 	peerLeftInform(PeerData(thisAdr));
 
 	group_ledger->recordAndClear();
@@ -685,16 +683,19 @@ void GroupStorage::addAndJoinSuperPeer(Packet *packet)
 {
 	bootstrapPkt *boot_p = check_and_cast<bootstrapPkt *>(packet);
 
-	//TODO: It should be considered how this repeating event will be affected by repeated calls to join different groups
+	//This event should only repeat while we don't receive responses from the directory server.
+	//This is on account of there not being any super peers known to the server. When we do receive a message, we cancel the event.
 	cancelAndDelete(event);		//We've received the data from the directory server, so we can stop harassing them now
 
-	if (!(super_peer_address.isUnspecified()) && (super_peer_address == boot_p->getSuperPeerAdr()))
+	if (!(super_peer_address.isUnspecified()))
 	{
-		return;
+		//If the super peer address provided by the directory server remains the same, don't do anything
+		if (super_peer_address == boot_p->getSuperPeerAdr())
+			return;
+
+		leaveGroup();
 	}
 
-	if (!(super_peer_address.isUnspecified()))
-		leaveGroup();
 
 	super_peer_address = boot_p->getSuperPeerAdr();
 	//std::cout << "Adding new group address: " << super_peer_address << endl;
@@ -755,11 +756,11 @@ void GroupStorage::handlePacket(Packet *packet)
 	} else if (packet->getPayloadType() == PEER_LEFT)
 	{
 		//If a packet was received from another group, ignore it.
-		if (packet->getGroupAddress() != super_peer_address)
+		/*if (packet->getGroupAddress() != super_peer_address)
 		{
 			delete(packet);
 			return;
-		}
+		}*/
 
 		PeerDataPkt *peer_data_pkt = check_and_cast<PeerDataPkt *>(packet);
 		group_ledger->removePeer(peer_data_pkt->getPeerData());
@@ -867,9 +868,7 @@ void GroupStorage::handleMessage(cMessage *msg)
 		longitude = update_pkt->getLongitude();
 
 		//A request is sent to the well known directory server
-		TransportAddress destAdr(IPAddress(directory_ip), directory_port);
-
-		joinRequest(destAdr);
+		joinRequest(TransportAddress(IPAddress(directory_ip), directory_port));
 
 		event = new cMessage();	//This is the join retry timer.
 		scheduleAt(simTime()+1, event);		//TODO: make the 1 second wait time a configuration variable that may be set
