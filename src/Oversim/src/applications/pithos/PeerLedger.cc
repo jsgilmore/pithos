@@ -42,9 +42,9 @@ void PeerLedger::addObjectRef(ObjectDataPtr object_data_ptr)
 	{
 		ObjectDataPtr ptr(object_data_ptr);
 		objectDataList.push_back(ptr);
-	} else {
+	}/* else {
 		opp_error("[PeerLedger]: Object already present in object list.");
-	}
+	}*/
 }
 
 ObjectDataPtr PeerLedger::getObjectRef(const int &i)
