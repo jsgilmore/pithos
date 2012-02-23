@@ -69,6 +69,8 @@ void GroupLedger::handleMessage(cMessage* msg)
 
     if (msg == periodicTimer)
     {
+    	scheduleAt(simTime() + TEST_MAP_INTERVAL, msg);
+
     	//If the peer is a node within a group, show its super peer address and its own address
 		cModule *groupStorageModule = getParentModule()->getSubmodule("group_storage");
 		GroupStorage *groupStorage = check_and_cast<GroupStorage *>(groupStorageModule);
@@ -85,15 +87,18 @@ void GroupLedger::handleMessage(cMessage* msg)
 		}
 		else if (!(groupStorage->getSuperPeerAddress().isUnspecified()))
 		{
+			//std::cout << "Peer address in group is: " << groupStorage->getSuperPeerAddress() << endl;
 			const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
 			TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
 
 			group_name << "GroupLedger (" << groupStorage->getSuperPeerAddress() << ":" << thisAdr <<"): ";
-		} else return;
+		} else {
+			//std::cout << "Unspecified address is: " << groupStorage->getSuperPeerAddress() << endl;
+			return;
+		}
 
 		RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of known group peers")).c_str(), peer_list.size()));
 		RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of known group objects")).c_str(), object_map.size()));
-		scheduleAt(simTime() + TEST_MAP_INTERVAL, msg);
 
     } else {
         throw cRuntimeError("[GroupLedger::handleMessage()]: Unknown message type!");
@@ -106,6 +111,7 @@ bool GroupLedger::isSuperPeerLedger()
 		return true;
 	else if  (strcmp(getName(), "group_ledger") == 0)
 		return false;
+
 
 	error("Group ledger named incorrectly, expecting 'group_ledger' or 'sp_group_ledger'.");
 	return false;	//This value will never be returned.
