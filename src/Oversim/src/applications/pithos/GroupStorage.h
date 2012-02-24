@@ -110,6 +110,8 @@ class GroupStorage : public cSimpleModule
 
 		double longitude; /**< The longitude of this peer (position in the virtual world) */
 
+		PeerData lastPeerLeft;	/**< The peer data of the last peer that left the group */
+
 		GroupLedger *group_ledger;
 
 		GlobalStatistics* globalStatistics; /**< pointer to GlobalStatistics module in this node*/

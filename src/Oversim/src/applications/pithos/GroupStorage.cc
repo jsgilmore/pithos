@@ -641,7 +641,11 @@ void GroupStorage::addToGroup(cMessage *msg)
 
 		if ((list_p->getObjectData()).isUnspecified())
 			group_ledger->addPeer(peer_dat);
-		else group_ledger->addObject(object_dat, peer_dat);
+		else {
+			if ((lastPeerLeft.getAddress().isUnspecified()) || (peer_dat != lastPeerLeft))	//Check whether this peer didn't just leave the group and this message is in fact a delayed out dated message
+				group_ledger->addObject(object_dat, peer_dat);
+		}
+
 	}
 
 	emit(groupSizeSignal, group_ledger->getGroupSize() + 1);	//The peer's group size is one peer larger than its perceived group size, because itself is part of the group it is in
@@ -767,6 +771,8 @@ void GroupStorage::handlePacket(Packet *packet)
 		PeerDataPkt *peer_data_pkt = check_and_cast<PeerDataPkt *>(packet);
 		group_ledger->removePeer(peer_data_pkt->getPeerData());
 		emit(groupSizeSignal, group_ledger->getGroupSize() + 1);	//The peer's perceived group size is one larger, because itself is part of the group it is in
+
+		lastPeerLeft = peer_data_pkt->getPeerData();	//Record the data of the last peer that left, in case we get an outdated object add message from that peer
 		delete(packet);
 	}
 	else error("Group storage received an unknown packet");
@@ -785,6 +791,11 @@ void GroupStorage::peerLeftInform(PeerData peerData)
 	pkt->setPayloadType(PEER_LEFT);
 	pkt->setPeerData(peerData);
 	pkt->setByteLength(4+4+4+4);	//Source IP + Dest IP + type + left peer IP
+
+	std::ostringstream msg;
+	msg << "[" << sourceAdr << "]: Leaving peer group size\n";
+
+	RECORD_STATS(globalStatistics->recordOutVector(msg.str().c_str(), group_ledger->getGroupSize()));
 
 	for (unsigned int i = 0 ; i < group_ledger->getGroupSize() ; i++)
 	{
@@ -838,6 +849,7 @@ void GroupStorage::handleTimeout(ResponseTimeoutEvent *timeout)
 	if (it->second.timeouts.size() == 0)
 		pendingRequests.erase(it);
 
+	//FIXME: Because a peer is listed in its own group ledger, it will also receive a "PEER_LEFT" message sent to himself.
 	group_ledger->removePeer(peerData);
 
 	//The peerDataPtr in this scope prevents the memory from being freed in the removePeer function.
