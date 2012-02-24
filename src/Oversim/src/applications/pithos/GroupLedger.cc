@@ -275,7 +275,10 @@ void GroupLedger::removePeer(PeerData peer_dat)
 	ObjectDataPtr object_data_ptr;
 	ObjectLedgerMap::iterator object_ledger_it;
 
-	//std::cout << "Peer slated for removal: " << peer_dat.getAddress() << endl;
+	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
+	TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
+
+	std::cout << "[" << simTime() << ":" << thisAdr << "]: Peer slated for removal: " << peer_dat.getAddress();
 
 	//Find the peer in the peer list
 	for (peer_ledger_it = peer_list.begin() ; peer_ledger_it != peer_list.end() ; peer_ledger_it++)
@@ -286,8 +289,6 @@ void GroupLedger::removePeer(PeerData peer_dat)
 		}
 	}
 
-	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
-	TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
 	std::ostringstream msg;
 	msg << "[" << thisAdr << "]: Peer remove error\n";
 
@@ -322,7 +323,9 @@ void GroupLedger::removePeer(PeerData peer_dat)
 			object_map.erase(object_ledger_it);
 	}
 
+	std::cout << " before erase: " << peer_list.size();
 	peer_list.erase(peer_ledger_it);
+	std::cout << " after erase: " << peer_list.size() << endl;
 }
 
 void GroupLedger::removeObject(OverlayKey key)
@@ -400,6 +403,8 @@ void GroupLedger::addObject(ObjectData objectData, PeerData peer_data_recv)
 		//std::cout << "[" << thisAdr << "]: ";
 		peer_ledger.addObjectRef(object_ledger->objectDataPtr);
 		peer_list.push_back(peer_ledger);
+
+		std::cout << "[" << simTime() << ":" << thisAdr << "]: Added peer because of unknown object: " << peer_ledger.peerDataPtr->getAddress() << endl;
 
 		object_ledger->addPeerRef(peer_ledger.peerDataPtr);	//Add a peer to the ObjectInfo object's peer vector
 

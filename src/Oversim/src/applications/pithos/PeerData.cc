@@ -16,7 +16,6 @@
 #include "PeerData.h"
 
 PeerData::PeerData() {
-	// TODO Auto-generated constructor stub
 
 }
 
@@ -31,7 +30,6 @@ PeerData::PeerData(const PeerData& other)
 }
 
 PeerData::~PeerData() {
-	// TODO Auto-generated destructor stub
 }
 
 void PeerData::setAddress(TransportAddress adr)
