@@ -467,6 +467,7 @@ void GroupStorage::respond_toUpper(cMessage *msg)
 {
 	bool found = false;
 	ResponsePkt *response = check_and_cast<ResponsePkt *>(msg);
+	PeerData peerData;
 	ResponseTimeoutEvent * timeout;
 
 	std::vector<ResponseTimeoutEvent *>::iterator timeout_it;
@@ -488,13 +489,12 @@ void GroupStorage::respond_toUpper(cMessage *msg)
 		for (timeout_it = it->second.timeouts.begin() ; timeout_it != it->second.timeouts.end() ; timeout_it++)
 		{
 			timeout = *timeout_it;
-			PeerData peerData = timeout->getPeerData();
-			TransportAddress address = peerData.getAddress();
+			peerData = timeout->getPeerData();
 
 			//std::cout << "Response address in timeout vector: " << address << endl;
 
 			//timeout_it is an iterator to a pointer, so it has to be dereferenced once to get to the ResponseTimeoutEvent pointer
-			if (address == response->getSourceAddress())
+			if (peerData.getAddress() == response->getSourceAddress())
 			{
 				cancelAndDelete(timeout);
 				it->second.timeouts.erase(timeout_it);
@@ -504,10 +504,20 @@ void GroupStorage::respond_toUpper(cMessage *msg)
 		}
 
 		if (!found)
-		{
 			error("No timeout found for response message from peer.");
-		}
 
+		/**
+		 * If a response is received from a peer outside the current group, remove that peer from the group ledger
+		 * This can occur when a peer leaves the group, just as this peer joins it. The joining peer is informed of
+		 * the leaving peer by an object that is stored on that peer.
+		 * The leaving peer does not yet know about the joining peer, so cannot inform the joining peer that the leaving peer is leaving the group.
+		 */
+		if (response->getGroupAddress() != super_peer_address)
+		{
+			//PeerData wil here be equal to the peer data found in the appropriate timeout
+			group_ledger->removePeer(peerData);
+			//LastPeerLeft should not be updated here, since it might have been this peer that left
+		}
 
 		//TODO: Record the group put latency (This will merely require that the response packet be expanded with the initiation time of the request)
 
@@ -639,11 +649,19 @@ void GroupStorage::addToGroup(cMessage *msg)
 	{
 		peer_dat = list_p->getPeer_list(i);
 
-		if ((list_p->getObjectData()).isUnspecified())
-			group_ledger->addPeer(peer_dat);
-		else {
-			if ((lastPeerLeft.getAddress().isUnspecified()) || (peer_dat != lastPeerLeft))	//Check whether this peer didn't just leave the group and this message is in fact a delayed out dated message
-				group_ledger->addObject(object_dat, peer_dat);
+		//Check whether this peer didn't just leave the group and this message is in fact a delayed out dated message
+		if ((lastPeerLeft.getAddress().isUnspecified()) || (peer_dat != lastPeerLeft))
+		{
+			if ((list_p->getObjectData()).isUnspecified())
+				group_ledger->addPeer(peer_dat);
+			else {
+					group_ledger->addObject(object_dat, peer_dat);
+			}
+		} else {
+			const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
+			TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
+
+			std::cout << "[" << simTime() << ":" << thisAdr <<"]: Unsuccessful add, peer was last peer that left (" << peer_dat.getAddress() << ")\n";
 		}
 
 	}
@@ -683,6 +701,8 @@ void GroupStorage::leaveGroup()
 	peerLeftInform(PeerData(thisAdr));
 
 	group_ledger->recordAndClear();
+
+	lastPeerLeft = PeerData();	//Sets the transport address to unspecified
 }
 
 void GroupStorage::addAndJoinSuperPeer(Packet *packet)
@@ -762,11 +782,11 @@ void GroupStorage::handlePacket(Packet *packet)
 	} else if (packet->getPayloadType() == PEER_LEFT)
 	{
 		//If a packet was received from another group, ignore it.
-		/*if (packet->getGroupAddress() != super_peer_address)
+		if (packet->getGroupAddress() != super_peer_address)
 		{
 			delete(packet);
 			return;
-		}*/
+		}
 
 		PeerDataPkt *peer_data_pkt = check_and_cast<PeerDataPkt *>(packet);
 		group_ledger->removePeer(peer_data_pkt->getPeerData());
@@ -818,8 +838,6 @@ void GroupStorage::handleTimeout(ResponseTimeoutEvent *timeout)
 	std::vector<ResponseTimeoutEvent *>::iterator timeout_it;
 	PeerData peerData;
 
-	//std::cout << "Timeout received for RPCID " << timeout->getRpcid() << endl;
-
 	//Locate the timeout in the pending requests list
 	PendingRequests::iterator it = pendingRequests.find(timeout->getRpcid());
 
@@ -845,15 +863,21 @@ void GroupStorage::handleTimeout(ResponseTimeoutEvent *timeout)
 	if (!found)
 		error("When a timeout expired, its linked peer data could not be located.");
 
-	//If there are no more timeouts outstanding, remove the pending request item form the requests vector
+	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
+	TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
+
+	if (it->second.numGetSent > 0)
+		std::cout << "[" << simTime() << ":" << thisAdr <<"]: GET timeout received for peer (" << peerData.getAddress() << ")\n";
+	else if (it->second.numPutSent > 0)
+		std::cout << "[" << simTime() << ":" << thisAdr <<"]: PUT timeout received for peer (" << peerData.getAddress() << ")\n";
+	else error("Unknown timeout type.");
+
+	//If there are no more timeouts outstanding, remove the pending request item from the requests vector
 	if (it->second.timeouts.size() == 0)
 		pendingRequests.erase(it);
 
-	//FIXME: Because a peer is listed in its own group ledger, it will also receive a "PEER_LEFT" message sent to himself.
-	group_ledger->removePeer(peerData);
+	//The peer is not removed from the group ledger here. Since the peer itself is contained in its own group ledger, a message is just sent to itself to remove the peer.
 
-	//The peerDataPtr in this scope prevents the memory from being freed in the removePeer function.
-	//This is only done when the current function is left
 	peerLeftInform(peerData);
 }
 

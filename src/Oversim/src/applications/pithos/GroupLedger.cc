@@ -255,6 +255,9 @@ PeerDataPtr GroupLedger::getRandomPeer()
 
 void GroupLedger::addPeer(PeerData peer_dat)
 {
+	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
+	TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
+
 	//std::cout << "Adding peer with address: " << peer_dat.getAddress() << endl;
 	//If the peer is not known, add it to the peer list
 	if (!isPeerInGroup(peer_dat))
@@ -262,9 +265,16 @@ void GroupLedger::addPeer(PeerData peer_dat)
 		PeerLedger peer_ledger;
 		peer_ledger.peerDataPtr = PeerDataPtr(new PeerData(peer_dat));
 		peer_list.push_back(peer_ledger);
+
+		if (isSuperPeerLedger())
+			std::cout << "[" << simTime() << ":super peer " << thisAdr << "]: Added peer from super peer: " << peer_dat.getAddress() << endl;
+		else std::cout << "[" << simTime() << ":peer " << thisAdr << "]: Added peer from super peer: " << peer_dat.getAddress() << endl;
 		RECORD_STATS(numPeerKnownSuccess++);
 	} else {
-		//error("Peer is already in group.");
+
+		if (isSuperPeerLedger())
+			std::cout << "[" << simTime() << ":super peer " << thisAdr << "]: Failed to add peer from super peer (peer already known): " << peer_dat.getAddress() << endl;
+		else std::cout << "[" << simTime() << ":peer " << thisAdr << "]: Failed to add peer from super peer (peer already known): " << peer_dat.getAddress() << endl;
 		RECORD_STATS(numPeerKnownError++);
 	}
 }
@@ -278,7 +288,9 @@ void GroupLedger::removePeer(PeerData peer_dat)
 	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
 	TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
 
-	std::cout << "[" << simTime() << ":" << thisAdr << "]: Peer slated for removal: " << peer_dat.getAddress();
+	if (isSuperPeerLedger())
+		std::cout << "[" << simTime() << ":super peer " << thisAdr << "]: Peer slated for removal: " << peer_dat.getAddress() << endl;
+	else std::cout << "[" << simTime() << ":peer " << thisAdr << "]: Peer slated for removal: " << peer_dat.getAddress() << endl;
 
 	//Find the peer in the peer list
 	for (peer_ledger_it = peer_list.begin() ; peer_ledger_it != peer_list.end() ; peer_ledger_it++)
@@ -323,9 +335,7 @@ void GroupLedger::removePeer(PeerData peer_dat)
 			object_map.erase(object_ledger_it);
 	}
 
-	std::cout << " before erase: " << peer_list.size();
 	peer_list.erase(peer_ledger_it);
-	std::cout << " after erase: " << peer_list.size() << endl;
 }
 
 void GroupLedger::removeObject(OverlayKey key)
@@ -404,7 +414,9 @@ void GroupLedger::addObject(ObjectData objectData, PeerData peer_data_recv)
 		peer_ledger.addObjectRef(object_ledger->objectDataPtr);
 		peer_list.push_back(peer_ledger);
 
-		std::cout << "[" << simTime() << ":" << thisAdr << "]: Added peer because of unknown object: " << peer_ledger.peerDataPtr->getAddress() << endl;
+		if (isSuperPeerLedger())
+			std::cout << "[" << simTime() << ":super peer" << thisAdr << "]: Added peer because of unknown object: " << peer_ledger.peerDataPtr->getAddress() << endl;
+		else std::cout << "[" << simTime() << ":peer " << thisAdr << "]: Added peer because of unknown object: " << peer_ledger.peerDataPtr->getAddress() << endl;
 
 		object_ledger->addPeerRef(peer_ledger.peerDataPtr);	//Add a peer to the ObjectInfo object's peer vector
 
