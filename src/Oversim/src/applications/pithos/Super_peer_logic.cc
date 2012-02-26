@@ -96,8 +96,12 @@ void Super_peer_logic::addObject(cMessage *msg)
 	{
 		peer_data_recv = ((PeerData)plist_p->getPeer_list(i));
 
-		//Both the object and peer data have to be sent, because the two are linked in the ledger
-		group_ledger->addObject(plist_p->getObjectData(), peer_data_recv);
+		//Check whether this peer didn't just leave the group and this message is in fact a delayed out dated message
+		if ((lastPeerLeft.getAddress().isUnspecified()) || (peer_data_recv != lastPeerLeft))
+		{
+			//Both the object and peer data have to be sent, because the two are linked in the ledger
+			group_ledger->addObject(plist_p->getObjectData(), peer_data_recv);
+		}
 	}
 }
 
@@ -155,7 +159,8 @@ void Super_peer_logic::informJoiningPeer(bootstrapPkt *boot_req, TransportAddres
 	list_p->setObjectData(ObjectData::UNSPECIFIED_OBJECT);
 	list_p->setByteLength(2*sizeof(int)+sizeof(ObjectData)+sizeof(int)*(group_ledger->getGroupSize()));	//Value+Type+ObjectData+(IP)*list_length
 
-	//If there are no objects stored in the group, only inform the joining peer of the other peers if any
+	//Again inform the joining peer of all peers in the group, in case there were peers that do not store any objects.
+	//TODO: This should be changed to only inform the joining peer of the peers with no objects.
 	for (unsigned int i = 0 ; i < group_ledger->getGroupSize() ; i++)
 	{
 		list_p->addToPeerList(*(group_ledger->getPeerPtr(i)));	//Send a copy of the object, pointed to by the smart pointer
@@ -166,8 +171,11 @@ void Super_peer_logic::informJoiningPeer(bootstrapPkt *boot_req, TransportAddres
 void Super_peer_logic::handleJoinReq(cMessage *msg)
 {
 	bootstrapPkt *boot_req = check_and_cast<bootstrapPkt *>(msg);
+
 	NodeHandle thisNode = ((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode();
 	TransportAddress sourceAdr(thisNode.getIp(), thisNode.getPort());
+
+	PeerData joining_peer(boot_req->getSourceAddress());
 
 	EV << "Super peer received bootstrap request from " << boot_req->getSourceAddress() << ", sending list and updating group.\n";
 
@@ -181,7 +189,8 @@ void Super_peer_logic::handleJoinReq(cMessage *msg)
 	 * This ensures that the joining peer only ads its own IP after successfully joining a group and only then
 	 * informs the higher layer that it has successfully joined a group.
 	**/
-	group_ledger->addPeer(PeerData(boot_req->getSourceAddress()));
+	group_ledger->addPeer(joining_peer);
+	lastPeerJoined = joining_peer;
 
 	informJoiningPeer(boot_req, sourceAdr);
 
@@ -215,6 +224,25 @@ void Super_peer_logic::addSuperPeer()
 	//TODO: Add resend or timer that checks whether the join request has been handled by the Directory.
 }
 
+void Super_peer_logic::informLastJoinedOfLastLeft()
+{
+	PeerDataPkt *pkt = new PeerDataPkt("peerLeft");
+
+	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
+	TransportAddress sourceAdr(thisNode->getIp(), thisNode->getPort());
+
+	pkt->setSourceAddress(sourceAdr);
+	pkt->setGroupAddress(sourceAdr);
+	pkt->setPayloadType(PEER_LEFT);
+	pkt->setPeerData(lastPeerLeft);
+	pkt->setByteLength(4+4+4+4);	//Source IP + Dest IP + type + left peer IP
+
+	//Dereference it to get PeerDataPtr and use -> operator to get PeerData
+	pkt->setDestinationAddress(lastPeerJoined.getAddress());
+
+	send(pkt, "comms_gate$o");
+}
+
 void Super_peer_logic::handleMessage(cMessage *msg)
 {
 	if (msg == event)
@@ -236,6 +264,11 @@ void Super_peer_logic::handleMessage(cMessage *msg)
 		{
 			PeerDataPkt *peer_data_pkt = check_and_cast<PeerDataPkt *>(packet);
 			group_ledger->removePeer(peer_data_pkt->getPeerData());
+
+			lastPeerLeft = peer_data_pkt->getPeerData();	//Record the data of the last peer that left, in case we get an outdated object add message from that peer
+
+			//Inform the last peer that joined of the last peer that left, in case the peer that left did not know about the peer that joined.
+			informLastJoinedOfLastLeft();
 
 			emit(groupSizeSignal, group_ledger->getGroupSize());
 		} else if (packet->getPayloadType() == JOIN_REQ)

@@ -52,6 +52,9 @@ class Super_peer_logic : public cSimpleModule
 
 		int directory_port; /**< The port of the directory server */
 
+		PeerData lastPeerLeft;		/**< The peer data of the last peer that left the group */
+		PeerData lastPeerJoined;	/**< The peer data of the last peer that joined the group */
+
 		GroupLedger *group_ledger;
 
 		simsignal_t groupSizeSignal; /**< A signal that records the group size over time */
@@ -110,6 +113,8 @@ class Super_peer_logic : public cSimpleModule
 
 		/** Add a new group object to the super peer's object list. */
 		void addObject(cMessage *msg);
+
+		void informLastJoinedOfLastLeft();
 };
 
 Define_Module(Super_peer_logic);
