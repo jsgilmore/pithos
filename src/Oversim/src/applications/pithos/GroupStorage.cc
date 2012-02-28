@@ -194,16 +194,15 @@ void GroupStorage::sendUpperResponse(int responseType, unsigned int rpcid, bool 
 //This is kind of a recursive distributed network function. Keep that in mind when figuring out the code+comments
 void GroupStorage::requestRetrieve(OverlayKeyPkt *retrieve_req)
 {
-	bool group_object;
 	PeerDataPtr container_peer_ptr;
+
+	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
+	TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
 
 	OverlayKey *key = &(retrieve_req->getKey());
 	unsigned int rpcid = retrieve_req->getValue();
 
 	StorageMap::iterator storage_map_it;
-
-	//Check whether this is a group object
-	group_object = group_ledger->isObjectInGroup(*key);
 
 	//This can happen if this peer switched groups, after being selected to retrieve a packet
 	//It should also be noted that this if and the next is required, otherwise an upper response will be sent, instead of a UDP response.
@@ -216,16 +215,6 @@ void GroupStorage::requestRetrieve(OverlayKeyPkt *retrieve_req)
 			delete(retrieve_req);
 			return;
 		}
-	}
-
-	//Is this object actually stored in this group
-	if (!group_object)
-	{
-		RECORD_STATS(numGetError++);
-		//If the object is not stored in the group, send a failure response to the higher layer
-		sendUpperResponse(GROUP_GET, rpcid, false);
-		delete(retrieve_req);
-		return;
 	}
 
 	storage_map_it = storage_map.find(*key);
@@ -245,6 +234,26 @@ void GroupStorage::requestRetrieve(OverlayKeyPkt *retrieve_req)
 		} else {
 			//If the object is stored on this peer, but another peer sent the request, send a UDP response with the object
 			sendUDPResponse(retrieve_req->getDestinationAddress(), retrieve_req->getSourceAddress(), GROUP_GET, rpcid, true, storage_map_it->second);
+
+			delete(retrieve_req);
+			return;
+		}
+	}
+
+	//Is this object actually stored in this group
+	if (!(group_ledger->isObjectInGroup(*key)))
+	{
+		RECORD_STATS(numGetError++);
+
+		if (retrieve_req->getSourceAddress() == retrieve_req->getDestinationAddress())
+		{
+			//If the object is not stored in the group, send a failure response to the higher layer
+			sendUpperResponse(GROUP_GET, rpcid, false);
+			delete(retrieve_req);
+			return;
+		} else {
+			//If the object is not stored in the group, send a failure response to the higher layer
+			sendUDPResponse(retrieve_req->getDestinationAddress(), retrieve_req->getSourceAddress(), GROUP_GET, rpcid, false);
 			delete(retrieve_req);
 			return;
 		}
@@ -265,9 +274,11 @@ void GroupStorage::requestRetrieve(OverlayKeyPkt *retrieve_req)
 
 	retrieve_req->setHops(retrieve_req->getHops()+1);
 
-	//std::cout << "Sending request with " << retrieve_req->getHops() << " hops from "<< retrieve_req->getDestinationAddress() << " to " << retrieve_req->getDestinationAddress() << endl;
-
 	send(retrieve_req, "comms_gate$o");
+
+	//For debugging only
+	/*if (thisAdr == TransportAddress("1.0.0.30", 2000))
+		std::cout << "Req sent onwards from " << retrieve_req->getSourceAddress() << endl;*/
 
 	ResponseTimeoutEvent *timeout = new ResponseTimeoutEvent("timeout");
 	timeout->setRpcid(rpcid);
@@ -279,9 +290,9 @@ void GroupStorage::requestRetrieve(OverlayKeyPkt *retrieve_req)
 	entry.responseType = GROUP_GET;
 	entry.timeouts.push_back(timeout);
 
-	//TODO: For debugging purposes. This situation should never occur.
-	if (pendingRequests.find(rpcid) != pendingRequests.end())
-		error("Inserting known rpcid into pending requests table.");
+	//For debugging purposes. This situation should never occur.
+	/*if (pendingRequests.find(rpcid) != pendingRequests.end())
+		error("Inserting known rpcid into pending requests table.");*/
 
 	pendingRequests.insert(std::make_pair(rpcid, entry));
 }
@@ -552,7 +563,12 @@ void GroupStorage::respond_toUpper(cMessage *msg)
 			pendingRequests.erase(it);
 		} else error("Unknown response type received");
 
-	} //else error("Unknown response received.");
+	} else {
+		const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
+		TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
+
+		std::cout << "[" << simTime() << ":" << thisAdr <<"]: Timeout with unknown RPCID received (" << response->getRpcid() << ")\n";
+	}
 
 	send(msg, "read");
 }
@@ -844,6 +860,15 @@ void GroupStorage::handleTimeout(ResponseTimeoutEvent *timeout)
 	// a failure response to the higher layer for the received timeout
 	sendUpperResponse(it->second.responseType, timeout->getRpcid(), false);
 
+	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
+	TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
+
+	if (it->second.numGetSent > 0)
+		std::cout << "[" << simTime() << ":" << thisAdr <<"]: GET timeout received for peer (" << timeout->getPeerData().getAddress() << " with rpcid " << timeout->getRpcid() << endl;
+	else if (it->second.numPutSent > 0)
+		std::cout << "[" << simTime() << ":" << thisAdr <<"]: PUT timeout received for peer (" << timeout->getPeerData().getAddress() << "with rpcid " << timeout->getRpcid() << endl;
+	else error("Unknown timeout type.");
+
 	//Locate and delete the timeout in the timeout vector in the pending requests list
 	//(This is a small list, no larger than the number of required replicas and gets only have one item)
 	for (timeout_it = it->second.timeouts.begin() ; timeout_it != it->second.timeouts.end() ; timeout_it++)
@@ -862,15 +887,6 @@ void GroupStorage::handleTimeout(ResponseTimeoutEvent *timeout)
 
 	if (!found)
 		error("When a timeout expired, its linked peer data could not be located.");
-
-	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
-	TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
-
-	if (it->second.numGetSent > 0)
-		std::cout << "[" << simTime() << ":" << thisAdr <<"]: GET timeout received for peer (" << peerData.getAddress() << ")\n";
-	else if (it->second.numPutSent > 0)
-		std::cout << "[" << simTime() << ":" << thisAdr <<"]: PUT timeout received for peer (" << peerData.getAddress() << ")\n";
-	else error("Unknown timeout type.");
 
 	//If there are no more timeouts outstanding, remove the pending request item from the requests vector
 	if (it->second.timeouts.size() == 0)
