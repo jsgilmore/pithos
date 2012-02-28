@@ -4,7 +4,7 @@ Upgrade to Omnet++ 4.2
 
 Major:
 Implement time to live for group storage.
-Expand the pithos churn mechanism for group storage to allow for migration between groups and not just leaving and joining of groups.
+Improve statistics collection to better monitor the actual on-peer objects
 Develop grouping algorithm based on player traces
 Have Pithos construct groups based on the grouping algorithm
 Test the system for various levels of churn and various numbers of replicas
