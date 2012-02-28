@@ -46,7 +46,6 @@ void Communicator::initializeApp(int stage)
     bindToPort(2000);
 }
 
-
 // finish is called when the module is being destroyed
 void Communicator::finishApp()
 {
