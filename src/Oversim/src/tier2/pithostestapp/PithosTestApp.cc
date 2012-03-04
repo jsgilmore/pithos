@@ -262,7 +262,7 @@ void PithosTestApp::sendPutRequest()
 	capiPutMsg->setIsModifiable(true);
 
 	RECORD_STATS(numSent++; numPutSent++);
-	sendInternalRpcCall(ROOTOBJECTSTORE_COMP, capiPutMsg, new PithosStatsContext(globalStatistics->isMeasuring(), simTime(), *go));
+	sendInternalRpcCall(ROOTOBJECTSTORE_COMP, capiPutMsg, new PithosStatsContext(globalStatistics->isMeasuring(), go->getCreationTime(), *go));
 }
 
 void PithosTestApp::handleLowerMessage (cMessage *msg)

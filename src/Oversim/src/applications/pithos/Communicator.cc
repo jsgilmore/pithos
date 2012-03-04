@@ -38,10 +38,14 @@ void Communicator::initializeApp(int stage)
     // initialize our statistics variables
     numSent = 0;
     numReceived = 0;
+    bytesSent = 0;
+    bytesReceived = 0;
 
     // tell the GUI to display our variables
     WATCH(numSent);
     WATCH(numReceived);
+    WATCH(bytesSent);
+    WATCH(bytesReceived);
 
     bindToPort(2000);
 }
@@ -49,13 +53,16 @@ void Communicator::initializeApp(int stage)
 // finish is called when the module is being destroyed
 void Communicator::finishApp()
 {
-    // finish() is usually used to save the module's statistics.
-    // We'll use globalStatistics->addStdDev(), which will calculate min, max, mean and deviation values.
-    // The first parameter is a name for the value, you can use any name you like (use a name you can find quickly!).
-    // In the end, the simulator will mix together all values, from all nodes, with the same name.
+	simtime_t time = globalStatistics->calcMeasuredLifetime(creationTime);
 
-    globalStatistics->addStdDev("MyApplication: Sent packets", numSent);
-    globalStatistics->addStdDev("MyApplication: Received packets", numReceived);
+	if (time >= GlobalStatistics::MIN_MEASURED) {
+
+		globalStatistics->addStdDev("MyApplication: Sent packets", numSent);
+		globalStatistics->addStdDev("MyApplication: Received packets", numReceived);
+
+		globalStatistics->addStdDev("Pithos: Sent UDP Bytes/s", bytesSent / time);
+		globalStatistics->addStdDev("Pithos: Received UDP Bytes/s", bytesReceived / time);
+	}
 }
 
 void Communicator::handleTraceMessage(cMessage* msg)
@@ -154,7 +161,9 @@ void Communicator::deliver(OverlayKey& key, cMessage* msg)
 void Communicator::handleUDPMessage(cMessage* msg)
 {
 	Packet *packet = check_and_cast<Packet *>(msg);
-	numReceived++;
+
+	RECORD_STATS(numReceived++);
+	RECORD_STATS(bytesReceived += packet->getByteLength());
 
 	if ((packet->getPayloadType() == WRITE) ||
 			(packet->getPayloadType() == RESPONSE) ||
@@ -225,7 +234,8 @@ void Communicator::sendPacket(cMessage *msg)
 
 	sendMessageToUDP(pkt->getDestinationAddress(), pkt);
 
-	numSent++;
+	RECORD_STATS(numSent++);
+	RECORD_STATS(bytesSent += pkt->getByteLength());
 }
 
 void Communicator::handleSPMsg(cMessage *msg)
