@@ -517,6 +517,8 @@ void GroupStorage::respond_toUpper(cMessage *msg)
 		if (!found)
 			error("No timeout found for response message from peer.");
 
+		//TODO: If a response has been received for a request that has already timed out, that response should not be forwarded to the upper layer.
+
 		/**
 		 * If a response is received from a peer outside the current group, remove that peer from the group ledger
 		 * This can occur when a peer leaves the group, just as this peer joins it. The joining peer is informed of
