@@ -54,6 +54,9 @@ class Communicator : public BaseApp
 		int numSent;              /**< number of packets sent */
 		int numReceived;          /**< number of packets received */
 
+		int bytesSent;
+		int bytesReceived;
+
 	protected:
 		virtual void handleMessage(cMessage *msg);
 
