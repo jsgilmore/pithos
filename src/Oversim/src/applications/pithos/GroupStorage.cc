@@ -78,6 +78,8 @@ void GroupStorage::initialize()
 	cModule *groupLedgerModule = getParentModule()->getSubmodule("group_ledger");
 	group_ledger = check_and_cast<GroupLedger *>(groupLedgerModule);
 
+	event = new cMessage();	//This is the join retry timer.
+
     if (group_ledger == NULL) {
         throw cRuntimeError("GroupStorage::initializeApp(): Group ledger module not found!");
     }
@@ -680,7 +682,7 @@ void GroupStorage::addToGroup(cMessage *msg)
 			const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
 			TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
 
-			//std::cout << "[" << simTime() << ":" << thisAdr <<"]: Unsuccessful add, peer was last peer that left (" << peer_dat.getAddress() << ")\n";
+			std::cout << "[" << simTime() << ":" << thisAdr <<"]: Unsuccessful add, peer was last peer that left (" << peer_dat.getAddress() << ")\n";
 		}
 
 	}
@@ -745,7 +747,7 @@ void GroupStorage::addAndJoinSuperPeer(Packet *packet)
 
 
 	super_peer_address = boot_p->getSuperPeerAdr();
-	//std::cout << "Adding new group address: " << super_peer_address << endl;
+	std::cout << "Adding new group address: " << super_peer_address << endl;
 
 	if (super_peer_address.isUnspecified())
 		error("The address is unspecified.");
@@ -868,11 +870,11 @@ void GroupStorage::handleTimeout(ResponseTimeoutEvent *timeout)
 	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
 	TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
 
-	/*if (it->second.numGetSent > 0)
+	if (it->second.numGetSent > 0)
 		std::cout << "[" << simTime() << ":" << thisAdr <<"]: GET timeout received for peer (" << timeout->getPeerData().getAddress() << " with rpcid " << timeout->getRpcid() << endl;
 	else if (it->second.numPutSent > 0)
 		std::cout << "[" << simTime() << ":" << thisAdr <<"]: PUT timeout received for peer (" << timeout->getPeerData().getAddress() << "with rpcid " << timeout->getRpcid() << endl;
-	else error("Unknown timeout type.");*/
+	else error("Unknown timeout type.");
 
 	//Locate and delete the timeout in the timeout vector in the pending requests list
 	//(This is a small list, no larger than the number of required replicas and gets only have one item)
@@ -929,7 +931,6 @@ void GroupStorage::handleMessage(cMessage *msg)
 		//A request is sent to the well known directory server
 		joinRequest(TransportAddress(IPAddress(directory_ip), directory_port));
 
-		event = new cMessage();	//This is the join retry timer.
 		scheduleAt(simTime()+1, event);		//TODO: make the 1 second wait time a configuration variable that may be set
 
 		delete(msg);
