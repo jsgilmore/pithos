@@ -27,6 +27,7 @@ GroupStorage::~GroupStorage()
 	PendingRequests::iterator requests_it;
 	std::vector<ResponseTimeoutEvent *>::iterator timeout_it;
 
+	cancelAndDelete(event);
 
 	for (requests_it = pendingRequests.begin(); requests_it != pendingRequests.end(); requests_it++)
 	{
@@ -729,7 +730,9 @@ void GroupStorage::addAndJoinSuperPeer(Packet *packet)
 
 	//This event should only repeat while we don't receive responses from the directory server.
 	//This is on account of there not being any super peers known to the server. When we do receive a message, we cancel the event.
-	cancelAndDelete(event);		//We've received the data from the directory server, so we can stop harassing them now
+	cancelEvent(event);		//We've received the data from the directory server, so we can stop harassing them now
+	//This event is only canceled, and not deleted here, because the packet could have been delayed,
+	//which will cause a second "INFORM" packet to arrive. Deleting the already created event will cause a segfault.
 
 	if (!(super_peer_address.isUnspecified()))
 	{
