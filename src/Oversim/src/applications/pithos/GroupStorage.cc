@@ -300,25 +300,6 @@ void GroupStorage::requestRetrieve(OverlayKeyPkt *retrieve_req)
 	pendingRequests.insert(std::make_pair(rpcid, entry));
 }
 
-/*void GroupStorage::addObject(cMessage *msg)
-{
-	PeerListPkt *plist_p = check_and_cast<PeerListPkt *>(msg);
-	PeerData peer_data_recv;
-	ObjectData object_data = plist_p->getObjectData();
-
-	//Iterate through all PeerData objects received in the PeerListPkt
-	for (unsigned int i = 0 ; i < plist_p->getPeer_listArraySize() ; i++)
-	{
-		peer_data_recv = ((PeerData)plist_p->getPeer_list(i));
-
-		//Both the object and peer data have to be sent, because the two are linked in the ledger
-		group_ledger->addObject(object_data, peer_data_recv);
-
-		if (!(group_ledger->isObjectOnPeer(object_data, peer_data_recv)))
-			error("Object unsuccessfully stored.");
-	}
-}*/
-
 void GroupStorage::updatePeerObjects(GameObject go)
 {
 	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
@@ -335,7 +316,7 @@ void GroupStorage::updatePeerObjects(GameObject go)
 		return;
 	}
 
-	objectAddPkt->setObjectData(ObjectData(go.getObjectName(), go.getSize(), go.getHash()));
+	objectAddPkt->setObjectData(ObjectData(go.getObjectName(), go.getSize(), go.getHash(), go.getCreationTime(), go.getTTL()));
 	objectAddPkt->setPayloadType(OBJECT_ADD);
 	objectAddPkt->setSourceAddress(sourceAdr);
 	objectAddPkt->setName("object_add");
@@ -568,12 +549,12 @@ void GroupStorage::respond_toUpper(cMessage *msg)
 			pendingRequests.erase(it);
 		} else error("Unknown response type received");
 
-	} else {
+	} /*else {
 		const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
 		TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
 
 		//std::cout << "[" << simTime() << ":" << thisAdr <<"]: Timeout with unknown RPCID received (" << response->getRpcid() << ")\n";
-	}
+	}*/
 
 	send(msg, "read");
 }
@@ -633,6 +614,11 @@ void GroupStorage::store(cMessage *msg)
 	emit(qsizeSignal, getStorageBytes());
 
 	emit(objectsSignal, 1);
+
+	//Schedule the object to be removed when its TTL expires.
+	ObjectTTLTimer* timer = new ObjectTTLTimer();
+	timer->setKey(go->getHash());
+	scheduleAt(go->getCreationTime() + go->getTTL(), timer);
 
 	sendUDPResponse(value_pkt->getDestinationAddress(), value_pkt->getSourceAddress(), GROUP_PUT, value_pkt->getValue(), true);
 
@@ -906,6 +892,8 @@ void GroupStorage::handleTimeout(ResponseTimeoutEvent *timeout)
 
 void GroupStorage::handleMessage(cMessage *msg)
 {
+	ObjectTTLTimer *ttlTimer = NULL;
+
 	if (msg == event)
 	{
 		//For the first join request, a request is sent to the well known directory server
@@ -921,7 +909,15 @@ void GroupStorage::handleMessage(cMessage *msg)
 
 		handleTimeout(timeout);
 
-	} else if (strcmp(msg->getArrivalGate()->getName(), "from_upperTier") == 0)
+	}
+	else if ((ttlTimer = dynamic_cast<ObjectTTLTimer*>(msg)) != NULL)
+    {
+		//If the object's TTL has expired, remove the object from the ledger.
+		storage_map.erase(ttlTimer->getKey());
+        delete msg;
+
+    }
+	else if (strcmp(msg->getArrivalGate()->getName(), "from_upperTier") == 0)
 	{
 		PositionUpdatePkt *update_pkt = check_and_cast<PositionUpdatePkt *>(msg);
 
@@ -935,7 +931,8 @@ void GroupStorage::handleMessage(cMessage *msg)
 
 		delete(msg);
 
-	} else {
+	}
+	else {
 		Packet *packet = check_and_cast<Packet *>(msg);
 
 		handlePacket(packet);

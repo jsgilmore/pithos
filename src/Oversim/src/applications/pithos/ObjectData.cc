@@ -23,11 +23,13 @@ const ObjectData ObjectData::UNSPECIFIED_OBJECT;
 	key = OverlayKey::UNSPECIFIED_KEY;
 }*/
 
-ObjectData::ObjectData(std::string name, int siz, OverlayKey k)
+ObjectData::ObjectData(std::string name, int siz, OverlayKey k, simtime_t time, int t)
 {
 	object_name = name;
 	size = siz;
 	key = k;
+	creationTime = time;
+	ttl = t;
 }
 
 ObjectData::~ObjectData()
@@ -42,6 +44,8 @@ ObjectData& ObjectData::operator=(const ObjectData& other)
 	object_name = other.object_name;
 	size = other.size;
 	key = other.key;
+	creationTime = other.creationTime;
+	ttl = other.ttl;
 
 	return *this;
 }
@@ -52,10 +56,16 @@ bool operator==(const ObjectData& object1, const ObjectData& object2)
 		return false;
 
 	if (object1.size != object2.size)
-			return false;
+		return false;
 
 	if (object1.key != object2.key)
-			return false;
+		return false;
+
+	if (object1.creationTime != object2.creationTime)
+		return false;
+
+	if (object1.ttl != object2.ttl)
+		return false;
 
 	return true;
 }
@@ -69,7 +79,9 @@ std::ostream& operator<<(std::ostream& stream, const ObjectData object_data)
 {
     return stream << /*This will state the node number and object number: */ object_data.object_name
 					<< " Size: " << object_data.size
-                  << " Key: " << object_data.key;
+                  << " Key: " << object_data.key
+				  << " Creation time: " << object_data.creationTime
+				  << " TTL: " << object_data.ttl;
 }
 
 void ObjectData::setObjectName(const std::string &o_name)
@@ -106,6 +118,26 @@ void ObjectData::setKey(const OverlayKey &k)
 OverlayKey ObjectData::getKey()
 {
 	return key;
+}
+
+void ObjectData::setCreationTime(simtime_t time)
+{
+	creationTime = time;
+}
+
+simtime_t ObjectData::getCreationTime()
+{
+	return creationTime;
+}
+
+void ObjectData::setTTL(int t)
+{
+	ttl = t;
+}
+
+int ObjectData::getTTL()
+{
+	return ttl;
 }
 
 bool ObjectData::isUnspecified()

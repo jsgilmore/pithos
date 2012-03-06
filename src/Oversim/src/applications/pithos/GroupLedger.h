@@ -50,6 +50,8 @@ class GroupLedger : public cSimpleModule
 
 		int numPeerRemoveFail;
 		int numPeerRemoveSuccess;
+		int numObjectRemoveFail;
+		int numObjectRemoveSuccess;
 		int numObjectGetFail;
 		int numObjectGetSuccess;
 		int numPeerKnownError;

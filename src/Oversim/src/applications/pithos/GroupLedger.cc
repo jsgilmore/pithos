@@ -40,6 +40,8 @@ void GroupLedger::initialize()
 	numObjectGetSuccess = 0;
 	numPeerKnownError = 0;
 	numPeerKnownSuccess = 0;
+	numObjectRemoveFail = 0;
+	numObjectRemoveSuccess = 0;
 
 	periodicTimer = new cMessage("PithosTestMapTimer");
 
@@ -57,6 +59,8 @@ void GroupLedger::recordAndClear()
 	numObjectGetSuccess = 0;
 	numPeerKnownError = 0;
 	numPeerKnownSuccess = 0;
+	numObjectRemoveFail = 0;
+	numObjectRemoveSuccess = 0;
 
 	object_map.clear();
 	peer_list.clear();
@@ -64,8 +68,7 @@ void GroupLedger::recordAndClear()
 
 void GroupLedger::handleMessage(cMessage* msg)
 {
-    //cleanupDataMap();
-    //DhtTestEntryTimer *entryTimer = NULL;
+    ObjectTTLTimer *ttlTimer = NULL;
 
     if (msg == periodicTimer)
     {
@@ -92,7 +95,8 @@ void GroupLedger::handleMessage(cMessage* msg)
 			TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
 
 			group_name << "GroupLedger (" << groupStorage->getSuperPeerAddress() << ":" << thisAdr <<"): ";
-		} else {
+		}
+		else {
 			//std::cout << "Unspecified address is: " << groupStorage->getSuperPeerAddress() << endl;
 			return;
 		}
@@ -100,7 +104,14 @@ void GroupLedger::handleMessage(cMessage* msg)
 		RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of known group peers")).c_str(), peer_list.size()));
 		RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of known group objects")).c_str(), object_map.size()));
 
-    } else {
+    }
+    else if ((ttlTimer = dynamic_cast<ObjectTTLTimer*>(msg)) != NULL)
+	{
+		//If the object's TTL has expired, remove the object from the ledger.
+		removeObject(ttlTimer->getKey());
+		delete msg;
+	}
+    else {
         throw cRuntimeError("[GroupLedger::handleMessage()]: Unknown message type!");
     }
 }
@@ -151,6 +162,8 @@ void GroupLedger::finish()
 		globalStatistics->addStdDev((group_name.str() + std::string("GroupLedger: Successful peer gets")).c_str(), numPeerRemoveSuccess);
 		globalStatistics->addStdDev((group_name.str() + std::string("GroupLedger: Number of known peer insertion attempts")).c_str(), numPeerKnownError);
 		globalStatistics->addStdDev((group_name.str() + std::string("GroupLedger: Number of unknown peer insertions")).c_str(), numPeerKnownSuccess);
+		globalStatistics->addStdDev((group_name.str() + std::string("GroupLedger: Failed object removals")).c_str() , numObjectRemoveFail);
+		globalStatistics->addStdDev((group_name.str() + std::string("GroupLedger: Successful object removals")).c_str() , numObjectRemoveSuccess);
     }
 }
 
@@ -346,7 +359,10 @@ void GroupLedger::removeObject(OverlayKey key)
 
 	object_ledger_it = object_map.find(key);
 	if (object_ledger_it == object_map.end())
-			error("Object slated for removal not found in group.");
+	{
+		RECORD_STATS(numObjectRemoveFail++);
+		return;
+	} else { RECORD_STATS(numObjectRemoveSuccess++); }
 
 	//Iterate through all peer references listed for the object
 	for (unsigned int i = 0 ; i < object_ledger_it->second.getPeerListSize() ; i++)
@@ -379,6 +395,9 @@ void GroupLedger::addObject(ObjectData objectData, PeerData peer_data_recv)
 	PeerLedgerList::iterator peer_ledger_it;
 	ObjectLedgerMap::iterator object_map_it;
 	ObjectLedger *object_ledger;
+	std::pair<ObjectLedgerMap::iterator,bool> ret;
+
+	Enter_Method_Silent();
 
 	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
 	TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
@@ -429,9 +448,18 @@ void GroupLedger::addObject(ObjectData objectData, PeerData peer_data_recv)
 
 	if (object_map_it == object_map.end())
 	{
-		object_map.insert(std::make_pair(objectData.getKey(), *object_ledger));
+		ret = object_map.insert(std::make_pair(objectData.getKey(), *object_ledger));
+		//Ensure that a duplicate key wasn't inserted
+		if (ret.second == false)
+			error("[GroupLedger::addObject]: Duplicate key inserted into storage.");
+
 		delete(object_ledger);
 	}
+
+	//Schedule the object to be removed when its TTL expires.
+	ObjectTTLTimer* timer = new ObjectTTLTimer();
+	timer->setKey(objectData.getKey());
+	scheduleAt(objectData.getCreationTime() + objectData.getTTL(), timer);
 }
 
 unsigned int GroupLedger::getGroupSize()
