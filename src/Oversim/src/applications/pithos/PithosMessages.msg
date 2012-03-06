@@ -143,3 +143,8 @@ message ResponseTimeoutEvent
     unsigned int rpcid;
     PeerData peerData;
 }
+
+message ObjectTTLTimer
+{
+	OverlayKey key;
+}

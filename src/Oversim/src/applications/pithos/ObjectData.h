@@ -43,6 +43,9 @@ private:
 
 	OverlayKey key;
 
+	simtime_t creationTime; /**< The time when the object was created */
+	int ttl;				/**< The time-to-live of the object */
+
 	friend std::ostream& operator<<(std::ostream& Stream, const ObjectData object_data);
 
 public:
@@ -50,7 +53,7 @@ public:
 	static const ObjectData UNSPECIFIED_OBJECT;
 
 	//ObjectData();
-	ObjectData(std::string name = "Unspecified" , int siz = 0, OverlayKey k = OverlayKey::ZERO);
+	ObjectData(std::string name = "Unspecified" , int siz = 0, OverlayKey k = OverlayKey::ZERO, simtime_t time = SIMTIME_ZERO, int t = 0);
 	virtual ~ObjectData();
 
 	ObjectData& operator=(const ObjectData& other);
@@ -81,6 +84,11 @@ public:
 	void setKey(const OverlayKey &k);
 
 	OverlayKey getKey();
+
+	void setCreationTime(simtime_t time);
+	simtime_t getCreationTime();
+	void setTTL(int t);
+	int getTTL();
 
 	bool isUnspecified();
 };
