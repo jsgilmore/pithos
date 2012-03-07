@@ -760,7 +760,6 @@ void GroupStorage::handlePacket(Packet *packet)
 		addToGroup(packet);
 		delete(packet);
 	}else if (packet->getPayloadType() == PEER_JOIN)
-
 	{
 		addToGroup(packet);
 		delete(packet);
