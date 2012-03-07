@@ -402,6 +402,10 @@ void GroupLedger::addObject(ObjectData objectData, PeerData peer_data_recv)
 	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
 	TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
 
+	//If the object has expired since it was sent, do not add it to the ledger.
+	if (objectData.getCreationTime() + objectData.getTTL() < simTime())
+		return;
+
 	//Check whether the received object information is already stored in the super peer
 	object_map_it = object_map.find(objectData.getKey());
 
