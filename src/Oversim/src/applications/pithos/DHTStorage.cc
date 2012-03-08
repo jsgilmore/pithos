@@ -305,6 +305,7 @@ void DHTStorage::request_retrieve(Packet *pkt)
 
 	DHTgetCAPICall* dhtGetMsg = new DHTgetCAPICall();
     dhtGetMsg->setKey(destkey);
+    dhtGetMsg->setByteLength(4+4+8); 	//Source address, dest address, key
     RECORD_STATS(numSent++; numGetSent++);
 
 	communicator->externallySendInternalRpcCall(OVERLAYSTORAGE_COMP, dhtGetMsg, new DHTStatsContext(globalStatistics->isMeasuring(), simTime(), destkey, parent_rpcid));
