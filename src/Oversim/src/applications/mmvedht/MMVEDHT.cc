@@ -197,7 +197,8 @@ void MMVEDHT::handleRpcTimeout(BaseCallMessage* msg, const TransportAddress& des
                 getCall->setKind(_DHTGetCall->getKind());
                 getCall->setId(_DHTGetCall->getId());
                 getCall->setIsHash(false);
-                getCall->setBitLength(GETCALL_L(getCall));
+                //getCall->setBitLength(GETCALL_L(getCall));
+                getCall->setByteLength(it->second.getCallMsg->getByteLength());
                 RECORD_STATS(normalMessages++;
                              numBytesNormal += getCall->getByteLength());
 
@@ -223,7 +224,8 @@ void MMVEDHT::handleRpcTimeout(BaseCallMessage* msg, const TransportAddress& des
                 getCall->setKind(_DHTGetCall->getKind());
                 getCall->setId(_DHTGetCall->getId());
                 getCall->setIsHash(true);
-                getCall->setBitLength(GETCALL_L(getCall));
+                //getCall->setBitLength(GETCALL_L(getCall));
+                getCall->setByteLength(it->second.getCallMsg->getByteLength());
 
                 RECORD_STATS(normalMessages++;
                              numBytesNormal += getCall->getByteLength());
@@ -267,7 +269,8 @@ void MMVEDHT::handleRpcTimeout(BaseCallMessage* msg, const TransportAddress& des
                     getCall->setKind(_DHTGetCall->getKind());
                     getCall->setId(_DHTGetCall->getId());
                     getCall->setIsHash(false);
-                    getCall->setBitLength(GETCALL_L(getCall));
+                    //getCall->setBitLength(GETCALL_L(getCall));
+                    getCall->setByteLength(it->second.getCallMsg->getByteLength());
                     RECORD_STATS(normalMessages++;
                                  numBytesNormal += getCall->getByteLength());
                     sendRouteRpcCall(OVERLAYSTORAGE_COMP, it->second.hashVector->back(),
@@ -862,7 +865,8 @@ void MMVEDHT::handleLookupResponse(LookupResponse* lookupMsg, int rpcId)
             dhtMsg->setTtl(it->second.putCallMsg->getTtl());
             dhtMsg->setIsModifiable(it->second.putCallMsg->getIsModifiable());
             dhtMsg->setMaintenance(false);
-            dhtMsg->setBitLength(PUTCALL_L(dhtMsg));
+            //dhtMsg->setBitLength(PUTCALL_L(dhtMsg));
+            dhtMsg->setByteLength(it->second.putCallMsg->getByteLength());
             RECORD_STATS(normalMessages++;
                          numBytesNormal += dhtMsg->getByteLength());
             sendRouteRpcCall(OVERLAYSTORAGE_COMP, lookupMsg->getSiblings(i),
@@ -915,7 +919,8 @@ void MMVEDHT::handleLookupResponse(LookupResponse* lookupMsg, int rpcId)
                 dhtMsg->setKind(it->second.getCallMsg->getKind());
                 dhtMsg->setId(it->second.getCallMsg->getId());
                 dhtMsg->setIsHash(true);
-                dhtMsg->setBitLength(GETCALL_L(dhtMsg));
+                //dhtMsg->setBitLength(GETCALL_L(dhtMsg));
+                dhtMsg->setByteLength(it->second.getCallMsg->getByteLength());
                 RECORD_STATS(normalMessages++;
                              numBytesNormal += dhtMsg->getByteLength());
                 sendRouteRpcCall(OVERLAYSTORAGE_COMP, lookupMsg->getSiblings(i), dhtMsg,
