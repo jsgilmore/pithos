@@ -52,20 +52,20 @@ ObjectData& ObjectData::operator=(const ObjectData& other)
 
 bool operator==(const ObjectData& object1, const ObjectData& object2)
 {
-	if (object1.object_name != object2.object_name)
-		return false;
-
-	if (object1.size != object2.size)
-		return false;
-
 	if (object1.key != object2.key)
 		return false;
+
+	/*if (object1.object_name != object2.object_name)
+			return false;
+
+		if (object1.size != object2.size)
+			return false;
 
 	if (object1.creationTime != object2.creationTime)
 		return false;
 
 	if (object1.ttl != object2.ttl)
-		return false;
+		return false;*/
 
 	return true;
 }

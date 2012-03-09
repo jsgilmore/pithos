@@ -38,15 +38,17 @@ void PeerLedger::addObjectRef(ObjectDataPtr object_data_ptr)
 		std::cout << "Already stored game object: " << **it << endl;
 	}*/
 
-	if (!isObjectPresent(object_data_ptr))
+	//This is a safer but MUCH slower approach. Test have shown that the error never occurs.
+	/*if (!isObjectPresent(object_data_ptr))
 	{
 		ObjectDataPtr ptr(object_data_ptr);
 		objectDataList.push_back(ptr);
-	}
-	//FIXME: Replace this error checking when group sizes bug has been fixed.
-	/* else {
+	} else {
 		opp_error("[PeerLedger]: Object already present in object list.");
 	}*/
+
+	ObjectDataPtr ptr(object_data_ptr);
+	objectDataList.push_back(ptr);
 }
 
 ObjectDataPtr PeerLedger::getObjectRef(const int &i)
