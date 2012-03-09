@@ -45,46 +45,40 @@ GroupStorage::~GroupStorage()
 
 void GroupStorage::initialize()
 {
-	//Register the signal that records the size of the group the peer is currently in
-	groupSizeSignal = registerSignal("GroupSize");
-
-	//Register the signal that records the number of times a put message failed
-	//(This is now mostly handled by failure response messages to the calling module)
-	groupSendFailSignal = registerSignal("GroupSendFail");
-
-	//Register the signal that records the time at which the specific peer joined a group
-	joinTimeSignal = registerSignal("JoinTime");
-
-	//Initialise queue statistics collection
-	qlenSignal = registerSignal("qlen");
-	qsizeSignal = registerSignal("qsize");
-
-	//Register the signals that record the time required for a specific type of object to be stored
-	storeTimeSignal = registerSignal("storeTime");
-
-	//Record the initial zero lengths of the object storage
-	emit(qlenSignal, storage_map.size());
-	emit(qsizeSignal, getStorageBytes());
-
-	//Register the signals that record the number of different types of objects in storage
-	objectsSignal = registerSignal("Object");
-
 	//Read the IP address and port of the directory server from the NED file.
 	strcpy(directory_ip, par("directory_ip"));
 	directory_port = par("directory_port");
 
 	requestTimeout = par("requestTimeout");
 
+	//Link this node's group ledger with this group storage module
 	cModule *groupLedgerModule = getParentModule()->getSubmodule("group_ledger");
 	group_ledger = check_and_cast<GroupLedger *>(groupLedgerModule);
+	if (group_ledger == NULL) {
+		throw cRuntimeError("GroupStorage::initializeApp(): Group ledger module not found!");
+	}
 
 	event = new cMessage();	//This is the join retry timer.
 
-    if (group_ledger == NULL) {
-        throw cRuntimeError("GroupStorage::initializeApp(): Group ledger module not found!");
-    }
-
 	globalStatistics = GlobalStatisticsAccess().get();
+
+	//Register the signal that records the size of the group the peer is currently in
+	groupSizeSignal = registerSignal("GroupSize");
+	//Register the signal that records the number of times a put message failed
+	//(This is now mostly handled by failure response messages to the calling module)
+	groupSendFailSignal = registerSignal("GroupSendFail");
+	//Register the signal that records the time at which the specific peer joined a group
+	joinTimeSignal = registerSignal("JoinTime");
+	//Initialise queue statistics collection
+	qlenSignal = registerSignal("qlen");
+	qsizeSignal = registerSignal("qsize");
+	//Register the signals that record the time required for a specific type of object to be stored
+	storeTimeSignal = registerSignal("storeTime");
+	//Record the initial zero lengths of the object storage
+	emit(qlenSignal, storage_map.size());
+	emit(qsizeSignal, getStorageBytes());
+	//Register the signals that record the number of different types of objects in storage
+	objectsSignal = registerSignal("Object");
 
 	// statistics
 	numSent = 0;
@@ -194,18 +188,102 @@ void GroupStorage::sendUpperResponse(int responseType, unsigned int rpcid, bool 
 	send(response, "read");
 }
 
+void GroupStorage::forwardRequest(OverlayKeyPkt *retrieve_req)
+{
+	PeerDataPtr container_peer_ptr;
+	int rpcid = retrieve_req->getValue();
+
+	//TODO: This check can later be removed if a partially connected group is required with recursive routing within the group.
+	//Such a grouping could have nodes connected to a certain percentage of other nodes, reducing group bandwidth usage and only slightly increasing latency.
+	if (retrieve_req->getHops() > 0)
+		error("[GroupStorage]: Object not found on destination node in group.");
+
+	RECORD_STATS(numSent++; numGetSent++);
+
+	container_peer_ptr = group_ledger->getRandomPeer(retrieve_req->getKey());
+
+	//Send a retrieve request to the group peer storing the object
+	retrieve_req->setDestinationAddress(container_peer_ptr->getAddress());
+	retrieve_req->setGroupAddress(super_peer_address);
+
+	retrieve_req->setHops(retrieve_req->getHops()+1);
+
+	send(retrieve_req, "comms_gate$o");
+
+	//Create and schedule request timeout timer
+	ResponseTimeoutEvent *timeout = new ResponseTimeoutEvent("timeout");
+	timeout->setRpcid(rpcid);
+	timeout->setPeerData(*container_peer_ptr);
+	scheduleAt(simTime()+requestTimeout, timeout);
+
+	//Insert timer into list of pending requests
+	PendingRequestsEntry entry;
+	entry.numGetSent = 1;	//Only one message is sent per get request
+	entry.responseType = GROUP_GET;
+	entry.timeouts.push_back(timeout);
+
+	pendingRequests.insert(std::make_pair(rpcid, entry));
+}
+
+bool GroupStorage::handleMissingObject(OverlayKeyPkt *retrieve_req)
+{
+	OverlayKey key = retrieve_req->getKey();
+	int rpcid = retrieve_req->getValue();
+
+	//Is this object actually stored in this group
+	if (!(group_ledger->isObjectInGroup(key)))
+	{
+		RECORD_STATS(numGetError++);
+
+		if (retrieve_req->getSourceAddress() == retrieve_req->getDestinationAddress())
+		{
+			//If the object is not stored in the group, send a failure response to the higher layer
+			sendUpperResponse(GROUP_GET, rpcid, false);
+			delete(retrieve_req);
+			return true;
+		} else {
+			//If the object is not stored in the group, send a failure response to the higher layer
+			sendUDPResponse(retrieve_req->getDestinationAddress(), retrieve_req->getSourceAddress(), GROUP_GET, rpcid, false);
+			delete(retrieve_req);
+			return true;
+		}
+	}
+	return false;
+}
+
+bool GroupStorage::retrieveLocally(OverlayKeyPkt *retrieve_req)
+{
+	StorageMap::iterator storage_map_it = storage_map.find(retrieve_req->getKey());
+	int rpcid = retrieve_req->getValue();
+
+	if (storage_map_it != storage_map.end())
+	{
+		//If the object is stored in the group, check whether the object is on the same peer that sent the request
+		if (retrieve_req->getSourceAddress() == retrieve_req->getDestinationAddress())
+		{
+			//If the source and destination addresses are the same it means the request comes from the higher layer and not another peer
+			//The object is therefore on the requesting peer itself and we can just reply with the object to the higher layer directly
+			RECORD_STATS(numGetSuccess++);
+			//If the object is stored in local storage, send it to the upper layer without requesting from the group
+			sendUpperResponse(GROUP_GET, rpcid, true, storage_map_it->second);
+			delete(retrieve_req);
+			return true;
+		} else {
+			//If the object is stored on this peer, but another peer sent the request, send a UDP response with the object
+			sendUDPResponse(retrieve_req->getDestinationAddress(), retrieve_req->getSourceAddress(), GROUP_GET, rpcid, true, storage_map_it->second);
+			delete(retrieve_req);
+			return true;
+		}
+	}
+
+	return false;
+}
+
 //This is kind of a recursive distributed network function. Keep that in mind when figuring out the code+comments
 void GroupStorage::requestRetrieve(OverlayKeyPkt *retrieve_req)
 {
-	PeerDataPtr container_peer_ptr;
-
-	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
-	TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
-
-	OverlayKey *key = &(retrieve_req->getKey());
 	unsigned int rpcid = retrieve_req->getValue();
-
-	StorageMap::iterator storage_map_it;
+	bool isSuccess;
 
 	//This can happen if this peer switched groups, after being selected to retrieve a packet
 	//It should also be noted that this if and the next is required, otherwise an upper response will be sent, instead of a UDP response.
@@ -220,91 +298,17 @@ void GroupStorage::requestRetrieve(OverlayKeyPkt *retrieve_req)
 		}
 	}
 
-	storage_map_it = storage_map.find(*key);
+	isSuccess = retrieveLocally(retrieve_req);
+	if (isSuccess) return;
 
-	if (storage_map_it != storage_map.end())
-	{
-		//If the object is stored in the group, check whether the object is on the same peer that sent the request
-		if (retrieve_req->getSourceAddress() == retrieve_req->getDestinationAddress())
-		{
-			//If the source and destination addresses are the same it means the request comes from the higher layer and not another peer
-			//The object is therefore on the requesting peer itself and we can just reply with the object to the higher layer directly
-			RECORD_STATS(numGetSuccess++);
-			//If the object is stored in local storage, send it to the upper layer without requesting from the group
-			sendUpperResponse(GROUP_GET, rpcid, true, storage_map_it->second);
-			delete(retrieve_req);
-			return;
-		} else {
-			//If the object is stored on this peer, but another peer sent the request, send a UDP response with the object
-			sendUDPResponse(retrieve_req->getDestinationAddress(), retrieve_req->getSourceAddress(), GROUP_GET, rpcid, true, storage_map_it->second);
+	isSuccess = handleMissingObject(retrieve_req);
+	if (isSuccess) return;
 
-			delete(retrieve_req);
-			return;
-		}
-	}
-
-	//Is this object actually stored in this group
-	if (!(group_ledger->isObjectInGroup(*key)))
-	{
-		RECORD_STATS(numGetError++);
-
-		if (retrieve_req->getSourceAddress() == retrieve_req->getDestinationAddress())
-		{
-			//If the object is not stored in the group, send a failure response to the higher layer
-			sendUpperResponse(GROUP_GET, rpcid, false);
-			delete(retrieve_req);
-			return;
-		} else {
-			//If the object is not stored in the group, send a failure response to the higher layer
-			sendUDPResponse(retrieve_req->getDestinationAddress(), retrieve_req->getSourceAddress(), GROUP_GET, rpcid, false);
-			delete(retrieve_req);
-			return;
-		}
-	}
-
-	//TODO: This check can later be removed if a partially connected group is required with recursive routing within the group.
-	//Such a grouping could have nodes connected to a certain percentage of other nodes, reducing group bandwidth usage and only slightly increasing latency.
-	if (retrieve_req->getHops() > 0)
-		error("[GroupStorage]: Object not found on destination node in group.");
-
-	RECORD_STATS(numSent++; numGetSent++);
-
-	container_peer_ptr = group_ledger->getRandomPeer(*key);
-
-	//Send a retrieve request to the group peer storing the object
-	retrieve_req->setDestinationAddress(container_peer_ptr->getAddress());
-	retrieve_req->setGroupAddress(super_peer_address);
-
-	retrieve_req->setHops(retrieve_req->getHops()+1);
-
-	send(retrieve_req, "comms_gate$o");
-
-	//For debugging only
-	/*if (thisAdr == TransportAddress("1.0.0.30", 2000))
-		std::cout << "Req sent onwards from " << retrieve_req->getSourceAddress() << endl;*/
-
-	ResponseTimeoutEvent *timeout = new ResponseTimeoutEvent("timeout");
-	timeout->setRpcid(rpcid);
-	timeout->setPeerData(*container_peer_ptr);
-	scheduleAt(simTime()+requestTimeout, timeout);
-
-	PendingRequestsEntry entry;
-	entry.numGetSent = 1; //TODO:This numSent should be calculated from the required group and overlay writes
-	entry.responseType = GROUP_GET;
-	entry.timeouts.push_back(timeout);
-
-	//For debugging purposes. This situation should never occur.
-	/*if (pendingRequests.find(rpcid) != pendingRequests.end())
-		error("Inserting known rpcid into pending requests table.");*/
-
-	pendingRequests.insert(std::make_pair(rpcid, entry));
+	forwardRequest(retrieve_req);
 }
 
 void GroupStorage::updatePeerObjects(GameObject go)
 {
-	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
-	TransportAddress sourceAdr(thisNode->getIp(), thisNode->getPort());
-
 	PeerListPkt *objectAddPkt = new PeerListPkt();
 	objectAddPkt->setByteLength(4+4+4+8+4);	//Source address, dest address, type, object name ID, storage peer address
 
@@ -318,11 +322,11 @@ void GroupStorage::updatePeerObjects(GameObject go)
 
 	objectAddPkt->setObjectData(ObjectData(go.getObjectName(), go.getSize(), go.getHash(), go.getCreationTime(), go.getTTL()));
 	objectAddPkt->setPayloadType(OBJECT_ADD);
-	objectAddPkt->setSourceAddress(sourceAdr);
+	objectAddPkt->setSourceAddress(this_address);
 	objectAddPkt->setName("object_add");
 	objectAddPkt->setGroupAddress(super_peer_address);
 
-	objectAddPkt->addToPeerList(PeerData(sourceAdr));
+	objectAddPkt->addToPeerList(PeerData(this_address));
 
 	//Inform all group peers about the new object and where it is stored
 	for (unsigned int i = 0 ; i < group_ledger->getGroupSize() ; i++)
@@ -364,15 +368,12 @@ PeerDataPtr GroupStorage::selectDestination(std::vector<TransportAddress> send_l
 
 void GroupStorage::createWritePkt(ValuePkt **write, unsigned int rpcid)
 {
-	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
-	TransportAddress sourceAdr(thisNode->getIp(), thisNode->getPort());
-
 	//Create the packet that will house the game object
 	(*write) = new ValuePkt("write");
 	(*write)->setByteLength(4+4+4+8);	//Source address, dest address, object name ID and object size
 	(*write)->setPayloadType(WRITE);
 	(*write)->setValue(rpcid);
-	(*write)->setSourceAddress(sourceAdr);
+	(*write)->setSourceAddress(this_address);
 	(*write)->setGroupAddress(super_peer_address);
 }
 
@@ -405,7 +406,7 @@ int GroupStorage::getReplicaNr(unsigned int rpcid)
 	return replicas;
 }
 
-void GroupStorage::send_forstore(GameObject *go, unsigned int rpcid)
+void GroupStorage::send_forstore(ValuePkt *store_req)
 {
 	unsigned int i;
 	simtime_t sendDelay;
@@ -420,9 +421,14 @@ void GroupStorage::send_forstore(GameObject *go, unsigned int rpcid)
 	ResponseTimeoutEvent *timeout;
 	PeerDataPtr destAdrPtr;
 
+	int rpcid = store_req->getValue();
 	replicas = getReplicaNr(rpcid);
 
 	createWritePkt(&write, rpcid);
+
+	GameObject *go = (GameObject *)store_req->removeObject("GameObject");
+	if (go == NULL)
+		error("No object was attached to be stored in group storage");
 
 	//Add a new request for which at least one response is required
 	//std::cout << "Inserting pending put request with rpcid: " << rpcid << endl;
@@ -455,51 +461,93 @@ void GroupStorage::send_forstore(GameObject *go, unsigned int rpcid)
 
 	pendingRequests.insert(std::make_pair(rpcid, entry));
 
+	delete(go);		//Only duplicates of the game object are stored, so the original must be deleted
 	delete(write);
+}
+
+void GroupStorage::handleResponse(PendingRequests::iterator it, ResponsePkt *response)
+{
+	if (response->getResponseType() == GROUP_PUT)
+	{
+		if (response->getIsSuccess())
+		{
+			it->second.numGroupPutSucceeded++;
+			RECORD_STATS(numPutSuccess++);
+		}
+		else {
+			it->second.numGroupPutFailed++;
+			RECORD_STATS(numPutError++);		//These errors are currently all caused by an insufficient number of group peers to store all replicas.
+		}
+
+		if (it->second.numGroupPutSucceeded + it->second.numGroupPutFailed == it->second.numPutSent)
+		{
+			pendingRequests.erase(it);
+		}
+	} else if (response->getResponseType() == GROUP_GET)
+	{
+		if (response->getIsSuccess())
+		{
+			it->second.numGroupGetSucceeded++;
+			RECORD_STATS(numGetSuccess++);
+		}
+		else {
+			it->second.numGroupGetFailed++;
+			RECORD_STATS(numGetError++);
+		}
+
+		pendingRequests.erase(it);
+	} else error("Unknown response type received");
+}
+
+PeerData GroupStorage::cancelRequestTimer(PendingRequests::iterator it, TransportAddress source_address)
+{
+	bool found = false;
+	ResponseTimeoutEvent * timeout;
+	std::vector<ResponseTimeoutEvent *>::iterator timeout_it;
+	PeerData peerData;
+
+	//std::cout << "Received response timeout address: " << response->getSourceAddress() << endl;
+	//For debugging purposes only
+	/*if (it->second.numPutSent > 0)
+		std::cout << "\nResponse address in received PUT message: " << response->getSourceAddress() << endl;
+	else if (it->second.numGetSent > 0)
+		std::cout << "\nResponse address in received GET message: " << response->getSourceAddress() << endl;
+	else	error("No puts or gets registered in pending requests record.");*/
+
+	//Cancel the timeout for the responding peer
+	for (timeout_it = it->second.timeouts.begin() ; timeout_it != it->second.timeouts.end() ; timeout_it++)
+	{
+		timeout = *timeout_it;
+		peerData = timeout->getPeerData();
+
+		//std::cout << "Response address in timeout vector: " << address << endl;
+
+		//timeout_it is an iterator to a pointer, so it has to be dereferenced once to get to the ResponseTimeoutEvent pointer
+		if (peerData.getAddress() == source_address)
+		{
+			cancelAndDelete(timeout);
+			it->second.timeouts.erase(timeout_it);
+			found = true;
+			break;
+		}
+	}
+
+	if (!found)
+		error("No timeout found for response message from peer.");
+
+	return peerData;
 }
 
 void GroupStorage::respond_toUpper(cMessage *msg)
 {
-	bool found = false;
 	ResponsePkt *response = check_and_cast<ResponsePkt *>(msg);
 	PeerData peerData;
-	ResponseTimeoutEvent * timeout;
 
-	std::vector<ResponseTimeoutEvent *>::iterator timeout_it;
 	PendingRequests::iterator it = pendingRequests.find(response->getRpcid());
 
 	if (it != pendingRequests.end()) // unknown request or request for already erased call
 	{
-
-		//std::cout << "Received response timeout address: " << response->getSourceAddress() << endl;
-
-		//For debugging purposes only
-		/*if (it->second.numPutSent > 0)
-			std::cout << "\nResponse address in received PUT message: " << response->getSourceAddress() << endl;
-		else if (it->second.numGetSent > 0)
-			std::cout << "\nResponse address in received GET message: " << response->getSourceAddress() << endl;
-		else	error("No puts or gets registered in pending requests record.");*/
-
-		//Cancel the timeout for the responding peer
-		for (timeout_it = it->second.timeouts.begin() ; timeout_it != it->second.timeouts.end() ; timeout_it++)
-		{
-			timeout = *timeout_it;
-			peerData = timeout->getPeerData();
-
-			//std::cout << "Response address in timeout vector: " << address << endl;
-
-			//timeout_it is an iterator to a pointer, so it has to be dereferenced once to get to the ResponseTimeoutEvent pointer
-			if (peerData.getAddress() == response->getSourceAddress())
-			{
-				cancelAndDelete(timeout);
-				it->second.timeouts.erase(timeout_it);
-				found = true;
-				break;
-			}
-		}
-
-		if (!found)
-			error("No timeout found for response message from peer.");
+		peerData = cancelRequestTimer(it, response->getSourceAddress());
 
 		//TODO: If a response has been received for a request that has already timed out, that response should not be forwarded to the upper layer.
 
@@ -518,42 +566,10 @@ void GroupStorage::respond_toUpper(cMessage *msg)
 
 		//TODO: Record the group put latency (This will merely require that the response packet be expanded with the initiation time of the request)
 
-		if (response->getResponseType() == GROUP_PUT)
-		{
-			if (response->getIsSuccess())
-			{
-				it->second.numGroupPutSucceeded++;
-				RECORD_STATS(numPutSuccess++);
-			}
-			else {
-				it->second.numGroupPutFailed++;
-				RECORD_STATS(numPutError++);		//These errors are currently all caused by an insufficient number of group peers to store all replicas.
-			}
-
-			if (it->second.numGroupPutSucceeded + it->second.numGroupPutFailed == it->second.numPutSent)
-			{
-				pendingRequests.erase(it);
-			}
-		} else if (response->getResponseType() == GROUP_GET)
-		{
-			if (response->getIsSuccess())
-			{
-				it->second.numGroupGetSucceeded++;
-				RECORD_STATS(numGetSuccess++);
-			}
-			else {
-				it->second.numGroupGetFailed++;
-				RECORD_STATS(numGetError++);
-			}
-
-			pendingRequests.erase(it);
-		} else error("Unknown response type received");
+		handleResponse(it, response);
 
 	} /*else {
-		const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
-		TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
-
-		//std::cout << "[" << simTime() << ":" << thisAdr <<"]: Timeout with unknown RPCID received (" << response->getRpcid() << ")\n";
+		//std::cout << "[" << simTime() << ":" << this_address <<"]: Timeout with unknown RPCID received (" << response->getRpcid() << ")\n";
 	}*/
 
 	send(msg, "read");
@@ -590,29 +606,23 @@ void GroupStorage::store(cMessage *msg)
 	if (!(msg->hasObject("GameObject")))
 		error("[GroupStorage::store]: Storage received a message with no game object attached");
 
-	GameObject *go = (GameObject *)msg->getObject("GameObject");		//We're not removing the object here, because we're only using the value and then the object is deleted with the message.
-
+	//We're not removing the object here, because we're only using the value and then the object is deleted with the message.
+	GameObject *go = (GameObject *)msg->getObject("GameObject");
 	go->setGroupAddress(super_peer_address);
-
-	EV << getName() << " " << getIndex() << " received Game Object of size " << go->getSize() << "\n";
-
 	delay = simTime() - go->getCreationTime();
 
+	//std::cout << "[GroupStorageTarget] Stored object with key " << go->getHash() << endl;
+	EV << getName() << " " << getIndex() << " received Game Object of size " << go->getSize() << "\n";
 	EV << getName() << " " << getIndex() << " received write command of size " << go->getSize() << " with delay " << go->getCreationTime() << "\n";
 
-	//std::cout << "[GroupStorageTarget] Stored object with key " << go->getHash() << endl;
-
 	ret = storage_map.insert(std::make_pair(go->getHash(), *go));
-
 	//Ensure that a duplicate key wasn't inserted
 	if (ret.second == false)
 		error("[GroupStorage::store]: Duplicate key inserted into storage.");
 
 	emit(storeTimeSignal, delay);
-
 	emit(qlenSignal, storage_map.size());
 	emit(qsizeSignal, getStorageBytes());
-
 	emit(objectsSignal, 1);
 
 	//Schedule the object to be removed when its TTL expires.
@@ -665,10 +675,7 @@ void GroupStorage::addToGroup(cMessage *msg)
 					group_ledger->addObject(object_dat, peer_dat);
 			}
 		} else {
-			const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
-			TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
-
-			//std::cout << "[" << simTime() << ":" << thisAdr <<"]: Unsuccessful add, peer was last peer that left (" << peer_dat.getAddress() << ")\n";
+			//std::cout << "[" << simTime() << ":" << this_address <<"]: Unsuccessful add, peer was last peer that left (" << peer_dat.getAddress() << ")\n";
 		}
 
 	}
@@ -684,10 +691,7 @@ void GroupStorage::joinRequest(const TransportAddress &dest_adr)
 		error("Destination address is unspecified when requesting a join.\n");
 
 	bootstrapPkt *boot_p = new bootstrapPkt();
-	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
-	TransportAddress sourceAdr(thisNode->getIp(), thisNode->getPort());
-
-	boot_p->setSourceAddress(sourceAdr);
+	boot_p->setSourceAddress(this_address);
 	boot_p->setDestinationAddress(dest_adr);
 	boot_p->setPayloadType(JOIN_REQ);
 	boot_p->setName("join_req");
@@ -700,12 +704,9 @@ void GroupStorage::joinRequest(const TransportAddress &dest_adr)
 
 void GroupStorage::leaveGroup()
 {
-	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
-	TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
+	group_ledger->removePeer(PeerData(this_address));
 
-	group_ledger->removePeer(PeerData(thisAdr));
-
-	peerLeftInform(PeerData(thisAdr));
+	peerLeftInform(PeerData(this_address));
 
 	group_ledger->recordAndClear();
 
@@ -743,6 +744,23 @@ void GroupStorage::addAndJoinSuperPeer(Packet *packet)
 	joinRequest(super_peer_address);
 }
 
+void GroupStorage::handleLeftPeer(PeerDataPkt *peer_data_pkt)
+{
+	//If a packet was received from another group, ignore it.
+	if (peer_data_pkt->getGroupAddress() != super_peer_address)
+	{
+		return;
+	}
+
+	group_ledger->removePeer(peer_data_pkt->getPeerData());
+
+	//The peer's perceived group size is one larger, because itself is part of the group it is in
+	emit(groupSizeSignal, group_ledger->getGroupSize() + 1);
+
+	//Record the data of the last peer that left, in case we get an outdated object add message from that peer
+	lastPeerLeft = peer_data_pkt->getPeerData();
+}
+
 void GroupStorage::handlePacket(Packet *packet)
 {
 
@@ -774,13 +792,7 @@ void GroupStorage::handlePacket(Packet *packet)
 	{
 		ValuePkt *store_req = check_and_cast<ValuePkt *>(packet);
 
-		GameObject *go = (GameObject *)packet->removeObject("GameObject");
-		if (go == NULL)
-			error("No object was attached to be stored in group storage");
-
-		send_forstore(go, store_req->getValue());
-
-		delete(go);		//Only duplicates of the game object are stored, so the original must be deleted
+		send_forstore(store_req);
 		delete(packet);
 	} else if (packet->getPayloadType() == RETRIEVE_REQ)
 	{
@@ -789,18 +801,9 @@ void GroupStorage::handlePacket(Packet *packet)
 		requestRetrieve(retrieve_req);
 	} else if (packet->getPayloadType() == PEER_LEFT)
 	{
-		//If a packet was received from another group, ignore it.
-		if (packet->getGroupAddress() != super_peer_address)
-		{
-			delete(packet);
-			return;
-		}
-
 		PeerDataPkt *peer_data_pkt = check_and_cast<PeerDataPkt *>(packet);
-		group_ledger->removePeer(peer_data_pkt->getPeerData());
-		emit(groupSizeSignal, group_ledger->getGroupSize() + 1);	//The peer's perceived group size is one larger, because itself is part of the group it is in
 
-		lastPeerLeft = peer_data_pkt->getPeerData();	//Record the data of the last peer that left, in case we get an outdated object add message from that peer
+		handleLeftPeer(peer_data_pkt);
 		delete(packet);
 	}
 	else error("Group storage received an unknown packet");
@@ -811,17 +814,14 @@ void GroupStorage::peerLeftInform(PeerData peerData)
 	std::vector<PeerDataPtr>::iterator it;
 	PeerDataPkt *pkt = new PeerDataPkt("peerLeft");
 
-	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
-	TransportAddress sourceAdr(thisNode->getIp(), thisNode->getPort());
-
-	pkt->setSourceAddress(sourceAdr);
+	pkt->setSourceAddress(this_address);
 	pkt->setGroupAddress(super_peer_address);
 	pkt->setPayloadType(PEER_LEFT);
 	pkt->setPeerData(peerData);
 	pkt->setByteLength(4+4+4+4);	//Source IP + Dest IP + type + left peer IP
 
 	std::ostringstream msg;
-	msg << "[" << sourceAdr << "]: Leaving peer group size\n";
+	msg << "[" << this_address << "]: Leaving peer group size\n";
 
 	RECORD_STATS(globalStatistics->recordOutVector(msg.str().c_str(), group_ledger->getGroupSize()));
 
@@ -852,13 +852,10 @@ void GroupStorage::handleTimeout(ResponseTimeoutEvent *timeout)
 	// a failure response to the higher layer for the received timeout
 	sendUpperResponse(it->second.responseType, timeout->getRpcid(), false);
 
-	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
-	TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
-
 	/*if (it->second.numGetSent > 0)
-		std::cout << "[" << simTime() << ":" << thisAdr <<"]: GET timeout received for peer (" << timeout->getPeerData().getAddress() << " with rpcid " << timeout->getRpcid() << endl;
+		std::cout << "[" << simTime() << ":" << this_address <<"]: GET timeout received for peer (" << timeout->getPeerData().getAddress() << " with rpcid " << timeout->getRpcid() << endl;
 	else if (it->second.numPutSent > 0)
-		std::cout << "[" << simTime() << ":" << thisAdr <<"]: PUT timeout received for peer (" << timeout->getPeerData().getAddress() << "with rpcid " << timeout->getRpcid() << endl;
+		std::cout << "[" << simTime() << ":" << this_address <<"]: PUT timeout received for peer (" << timeout->getPeerData().getAddress() << "with rpcid " << timeout->getRpcid() << endl;
 	else error("Unknown timeout type.");*/
 
 	//Locate and delete the timeout in the timeout vector in the pending requests list
@@ -928,8 +925,11 @@ void GroupStorage::handleMessage(cMessage *msg)
 
 		scheduleAt(simTime()+1, event);		//TODO: make the 1 second wait time a configuration variable that may be set
 
-		delete(msg);
+		//Obtain this node's transport address from the communicator module
+		const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
+		this_address = TransportAddress(thisNode->getIp(), thisNode->getPort());
 
+		delete(msg);
 	}
 	else {
 		Packet *packet = check_and_cast<Packet *>(msg);

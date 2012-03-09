@@ -103,6 +103,7 @@ class GroupStorage : public cSimpleModule
 		StorageMap storage_map;
 
 		TransportAddress super_peer_address; /**< The TransPort address of the group super peer (this address is set, after the peer has joined a group) */
+		TransportAddress this_address;		 /**< The TransPort address of the peer that houses the group storage module*/
 
 		cMessage *event;	//This event is required
 
@@ -153,6 +154,13 @@ class GroupStorage : public cSimpleModule
 		 */
 		PeerDataPtr selectDestination(std::vector<TransportAddress> send_list);
 
+		void handleResponse(PendingRequests::iterator it, ResponsePkt *response);
+		/**
+		 * Cancel the pending request timeout
+		 * @returns the peer data related to the request
+		 */
+		PeerData cancelRequestTimer(PendingRequests::iterator it, TransportAddress source_address);
+
 		void respond_toUpper(cMessage *msg);
 
 		void createResponseMsg(ResponsePkt **response, int responseType, unsigned int rpcid, bool isSuccess, GameObject object);
@@ -179,14 +187,17 @@ class GroupStorage : public cSimpleModule
 
 		void store(cMessage *msg);
 
+		void handleLeftPeer(PeerDataPkt *peer_data_pkt);
 		/**
 		 * Function to store files in the group. This function replicates game objects and sends them to different group nodes.
 		 *
-		 * @param go The GameObject to be stored
-		 * @param rpcid The RPC ID of the original request from the higher layer
+		 * @param store_req The received storage request message
 		 */
-		void send_forstore(GameObject *go, unsigned int rpcid);
+		void send_forstore(ValuePkt *store_req);
 
+		void forwardRequest(OverlayKeyPkt *retrieve_req);
+		bool handleMissingObject(OverlayKeyPkt *retrieve_req);
+		bool retrieveLocally(OverlayKeyPkt *retrieve_req);
 		void requestRetrieve(OverlayKeyPkt *retrieve_req);
 
 		/**
