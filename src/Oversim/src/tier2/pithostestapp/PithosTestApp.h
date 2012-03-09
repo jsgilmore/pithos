@@ -143,6 +143,8 @@ private:
 	simtime_t generationTime;
 	double objectSize_av;
 
+	bool groupMigration;
+
     // statistics
     int numSent; /**< number of sent packets*/
     int numGetSent; /**< number of get sent*/
