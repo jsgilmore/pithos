@@ -140,6 +140,8 @@ simple Peer_logic
     parameters:
         @class(Peer_logic);
         @display("i=block/cogwheel");
+        
+        int replicas;
     gates:
         inout comms_gate;
         

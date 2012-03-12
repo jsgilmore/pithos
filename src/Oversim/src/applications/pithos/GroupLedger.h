@@ -48,6 +48,9 @@ class GroupLedger : public cSimpleModule
 
 		cMessage *periodicTimer; /**< timer self-message for writing periodic statistical information */
 
+		int objects_total;	//The number of objects including replicas
+		int data_size;			//The total size in bytes stored in the ledger
+
 		int numPeerRemoveFail;
 		int numPeerRemoveSuccess;
 		int numObjectRemoveFail;
@@ -175,6 +178,8 @@ class GroupLedger : public cSimpleModule
 		 * Clear all recorded statistics and remove all peer and object data from the ledger.
 		 */
 		void recordAndClear();
+
+		int countTotalObjects();
 };
 
 #endif /* GROUPLEDGER_H_ */
