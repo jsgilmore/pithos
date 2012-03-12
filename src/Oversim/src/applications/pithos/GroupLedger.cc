@@ -43,6 +43,9 @@ void GroupLedger::initialize()
 	numObjectRemoveFail = 0;
 	numObjectRemoveSuccess = 0;
 
+	data_size = 0;
+	objects_total = 0;
+
 	periodicTimer = new cMessage("PithosTestMapTimer");
 
 	scheduleAt(simTime(), periodicTimer);
@@ -62,8 +65,28 @@ void GroupLedger::recordAndClear()
 	numObjectRemoveFail = 0;
 	numObjectRemoveSuccess = 0;
 
+	data_size = 0;
+	objects_total = 0;
+
 	object_map.clear();
 	peer_list.clear();
+}
+
+/**
+ * For validation only.
+ * This function was used to verify the statistics collected throughout the simulation of the total number of objects in a group.
+ * Continuous collection is preferred above this function, because data is then collected when it's being processed and therefore available by default.
+ */
+int GroupLedger::countTotalObjects()
+{
+	int count = 0;
+
+	for (unsigned int i = 0 ; i < peer_list.size() ; i++)
+	{
+		count += peer_list.at(i).getObjectListSize();
+	}
+
+	return count;
 }
 
 void GroupLedger::handleMessage(cMessage* msg)
@@ -102,8 +125,12 @@ void GroupLedger::handleMessage(cMessage* msg)
 		}
 
 		RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of known group peers")).c_str(), peer_list.size()));
-		RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of known group objects")).c_str(), object_map.size()));
+		RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of unique group objects")).c_str(), object_map.size()));
+		RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Data stored for known group objects")).c_str(), data_size));
+		RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of total group objects")).c_str(), objects_total));
 
+		if (object_map.size() > 0)
+			RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Average number of replicas per object")).c_str(), double(objects_total)/object_map.size()));
     }
     else if ((ttlTimer = dynamic_cast<ObjectTTLTimer*>(msg)) != NULL)
 	{
@@ -122,6 +149,7 @@ bool GroupLedger::isSuperPeerLedger()
 		return true;
 	else if  (strcmp(getName(), "group_ledger") == 0)
 		return false;
+	else
 
 
 	error("Group ledger named incorrectly, expecting 'group_ledger' or 'sp_group_ledger'.");
@@ -343,7 +371,12 @@ void GroupLedger::removePeer(PeerData peer_dat)
 
 		//Remove the specific peer reference from the object ledger
 		object_ledger_it->second.erasePeerRef(peer_ledger_it->peerDataPtr);
+
+		data_size -= object_ledger_it->second.objectDataPtr->getSize();
+		objects_total--;
+
 		//If the peer is removed and there are now no peers on which the object is stored, remove the object ledger entry
+		//TODO: Uncommenting this says that objects may exist, without being stored on any peer. This helps to tracks objects that have starved.
 		if (object_ledger_it->second.getPeerListSize() == 0)
 			object_map.erase(object_ledger_it);
 	}
@@ -384,9 +417,14 @@ void GroupLedger::removeObject(OverlayKey key)
 		//Remove the specific peer reference from the object ledger
 		peer_ledger_it->eraseObjectRef(object_ledger_it->second.objectDataPtr);
 
+		//Records the total size in object bytes that's stored in this ledger.
+		data_size -= object_ledger_it->second.objectDataPtr->getSize();
+		objects_total--;
+
 		//Peers do not have to house objects to exist. A peer can exist, even if it stores no objects.
 	}
 
+	//TODO: Uncommenting this says that objects may exist, without being stored on any peer. This helps to tracks objects that have starved.
 	object_map.erase(object_ledger_it);
 }
 
@@ -459,6 +497,9 @@ void GroupLedger::addObject(ObjectData objectData, PeerData peer_data_recv)
 
 		delete(object_ledger);
 	}
+
+	data_size += objectData.getSize();
+	objects_total++;
 
 	//Schedule the object to be removed when its TTL expires.
 	ObjectTTLTimer* timer = new ObjectTTLTimer();
