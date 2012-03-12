@@ -105,6 +105,8 @@ class Peer_logic: public cSimpleModule
 		typedef std::map<uint32_t, PendingRpcsEntry> PendingRpcs;
 		PendingRpcs pendingRpcs; /**< a map of all pending RPC operations */
 
+		int replicas;	//The number of replicas group storage is set to.
+
 	public:
 		Peer_logic();
 		virtual ~Peer_logic();

@@ -38,7 +38,7 @@ Peer_logic::~Peer_logic()
 
 void Peer_logic::initialize()
 {
-
+	replicas = par("replicas");
 }
 
 void Peer_logic::finalize()
@@ -83,7 +83,7 @@ void Peer_logic::handleGetCAPIRequest(RootObjectGetCAPICall* capiGetMsg)
 
     PendingRpcsEntry entry;
     entry.getCallMsg = capiGetMsg;
-    entry.numSent = 1;		//TODO:This numSent should be calculated from the required group and overlay writes
+    entry.numSent = 1;		//Only one of the responses from either DHT storage or group storage is required
     pendingRpcs.insert(std::make_pair(capiGetMsg->getNonce(), entry));
 }
 
@@ -120,7 +120,7 @@ void Peer_logic::handlePutCAPIRequest(RootObjectPutCAPICall* capiPutMsg)
 
 	//Add the received RPC to the list of RPC for which responses are still outstanding
 	PendingRpcsEntry entry;
-	entry.numSent = 4;		//TODO:This numSent should be calculated from the required group and overlay writes
+	entry.numSent = replicas + 1;		//Number of replicas required for group storage plus the ons DHT storage request
 	entry.putCallMsg = capiPutMsg;
 	pendingRpcs.insert(std::make_pair(capiPutMsg->getNonce(), entry));
 }
