@@ -58,6 +58,7 @@ enum PacketTypes
     SP_PEER_LEFT = 14;
     POSITION_UPDATE = 15;
     REPLICATION_REQ = 16;
+    REPLICATE = 17;
 };
 
 enum OverlayTypes 

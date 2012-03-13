@@ -71,7 +71,7 @@ class ObjectLedger
 
 		unsigned int getPeerListSize();
 
-		bool isPeerPresent(PeerDataPtr peer_ptr);
+		bool isPeerPresent(PeerData peer_data);
 
 		void erasePeerRef(const int &i);
 
