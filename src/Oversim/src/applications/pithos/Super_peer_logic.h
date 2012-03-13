@@ -52,6 +52,8 @@ class Super_peer_logic : public cSimpleModule
 
 		int directory_port; /**< The port of the directory server */
 
+		bool objectReplication;
+
 		PeerData lastPeerLeft;		/**< The peer data of the last peer that left the group */
 		PeerData lastPeerJoined;	/**< The peer data of the last peer that joined the group */
 
@@ -115,6 +117,8 @@ class Super_peer_logic : public cSimpleModule
 		void addObject(cMessage *msg);
 
 		void informLastJoinedOfLastLeft();
+
+		void replicateObjects(PeerDataPkt *peer_data_pkt);
 };
 
 Define_Module(Super_peer_logic);

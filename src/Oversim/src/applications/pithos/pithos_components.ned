@@ -164,6 +164,8 @@ simple Super_peer_logic
 
         string directory_ip;
         int directory_port;
+        
+        bool objectReplication;
 
         @signal[OverlayWrite](type="int");
         @signal[GroupSize](type="int");

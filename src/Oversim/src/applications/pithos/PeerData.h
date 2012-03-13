@@ -22,6 +22,8 @@
 #include <TransportAddress.h>
 #include <tr1/memory>
 
+#define PEERDATA_SIZE 8	//IP address + port
+
 class PeerData;
 
 /**
