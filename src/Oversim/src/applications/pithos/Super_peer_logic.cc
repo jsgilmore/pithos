@@ -247,12 +247,28 @@ void Super_peer_logic::informLastJoinedOfLastLeft()
 
 void Super_peer_logic::replicateObjects(PeerDataPkt *peer_data_pkt)
 {
+	ObjectData object_data;
+	PeerData peer_data;
+
 	ObjectDataPkt *replication_req = new ObjectDataPkt();
 	replication_req->setSourceAddress(peer_data_pkt->getDestinationAddress());
 	replication_req->setPayloadType(REPLICATION_REQ);
 	replication_req->setGroupAddress(peer_data_pkt->getDestinationAddress());
 	replication_req->setByteLength(OBJECTDATA_PKT_SIZE);
 
+	for (int i = 0 ; i < group_ledger->getObjectLedgerSize(peer_data_pkt->getPeerData()) ; i++)
+	{
+		object_data = group_ledger->getObjectFromPeer(peer_data_pkt->getPeerData(), i);
+
+		peer_data = group_ledger->getRandomPeer(object_data.getKey());
+
+		replication_req->setObjectData(object_data);
+		replication_req->setDestinationAddress(peer_data.getAddress());
+
+		send(replication_req->dup(), "comms_gate$o");
+	}
+
+	delete(replication_req);
 }
 
 void Super_peer_logic::handleMessage(cMessage *msg)

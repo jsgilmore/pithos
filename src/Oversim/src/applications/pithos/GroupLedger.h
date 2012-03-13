@@ -74,6 +74,14 @@ class GroupLedger : public cSimpleModule
 		bool isObjectInGroup(OverlayKey key);
 
 		/**
+		 * Checks whether a given object key exists in the ledger.
+		 *
+		 * @param key The hash value of the object in question
+		 *
+		 */
+		bool isObjectOnPeer(ObjectData object_data, PeerData peer_data);
+
+		/**
 		 * Checks whether a given peer exists in the ledger.
 		 *
 		 * @param peerData The peer data of the peer in question (containing its transport address)
@@ -88,14 +96,14 @@ class GroupLedger : public cSimpleModule
 		 * @param object_data The object data to be checked
 		 * @param peer_data The peer data containing the peer's transport address
 		 */
-		bool isObjectOnPeer(ObjectData object_data, PeerData peer_data);
+		bool verifyObjectOnPeer(ObjectData object_data, PeerData peer_data);
 
 		/**
 		 * The functions returns a random peer in the ledger
 		 *
 		 * @return A smart pointer to a random peer in the ledger
 		 */
-		PeerDataPtr getRandomPeer();
+		PeerData getRandomPeer();
 
 		/**
 		 *	This functions returns a random peer that hosts the specified object.
@@ -104,7 +112,7 @@ class GroupLedger : public cSimpleModule
 		 *
 		 *	@return A smart pointer to a peer containing the specified object
 		 */
-		PeerDataPtr getRandomPeer(OverlayKey key);
+		PeerData getRandomPeer(OverlayKey key);
 
 		/**
 		 * Add a peer to the ledger
@@ -140,6 +148,10 @@ class GroupLedger : public cSimpleModule
 		 * @return A smart pointer to the peer at the specified index.
 		 */
 		PeerDataPtr getPeerPtr(const int &i);
+
+		ObjectData getObjectFromPeer(PeerData peer_data, const int &i);
+		int getObjectLedgerSize(PeerData peer_data);
+		int getPeerLedgerSize(ObjectData object_data);
 
 		/**
 		 * Remove a peer from the ledger.

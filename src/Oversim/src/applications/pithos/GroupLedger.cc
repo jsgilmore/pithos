@@ -148,6 +148,45 @@ void GroupLedger::handleMessage(cMessage* msg)
     }
 }
 
+ObjectData GroupLedger::getObjectFromPeer(PeerData peer_data, const int &i)
+{
+	PeerLedgerList::iterator peer_ledger_it;
+
+	for (peer_ledger_it = peer_list.begin() ; peer_ledger_it != peer_list.end() ; peer_ledger_it++)
+	{
+		if (*(peer_ledger_it->peerDataPtr) == peer_data)
+		{
+			return *(peer_ledger_it->getObjectRef(i));
+		}
+	}
+
+	error("Peer not found in group ledger,");
+	return ObjectData();
+}
+
+int GroupLedger::getObjectLedgerSize(PeerData peer_data)
+{
+	PeerLedgerList::iterator peer_ledger_it;
+
+	for (peer_ledger_it = peer_list.begin() ; peer_ledger_it != peer_list.end() ; peer_ledger_it++)
+	{
+		if (*(peer_ledger_it->peerDataPtr) == peer_data)
+			return peer_ledger_it->getObjectListSize();
+	}
+
+	error("Object not found when querying ledger size.");
+	return 0;
+}
+
+int GroupLedger::getPeerLedgerSize(ObjectData object_data)
+{
+	ObjectLedgerMap::iterator object_map_it = object_map.find(object_data.getKey());
+	if (object_map_it == object_map.end())
+		error("[getPeerLedgerSize]: Object could not be found in group.");
+
+	return object_map_it->second.getPeerListSize();
+}
+
 bool GroupLedger::isSuperPeerLedger()
 {
 	if (strcmp(getName(), "sp_group_ledger") == 0)
@@ -219,7 +258,7 @@ bool GroupLedger::isPeerInGroup(PeerData peerData)
 }
 
 //****Careful, this is a very expensive function and should only be used for debugging purposes****
-bool GroupLedger::isObjectOnPeer(ObjectData object_data, PeerData peer_data)
+bool GroupLedger::verifyObjectOnPeer(ObjectData object_data, PeerData peer_data)
 {
 	unsigned int i;
 	ObjectLedgerMap::iterator object_map_it;
@@ -274,7 +313,16 @@ bool GroupLedger::isObjectOnPeer(ObjectData object_data, PeerData peer_data)
 	return found;
 }
 
-PeerDataPtr GroupLedger::getRandomPeer(OverlayKey key)
+bool GroupLedger::isObjectOnPeer(ObjectData object_data, PeerData peer_data)
+{
+	ObjectLedgerMap::iterator object_map_it = object_map.find(object_data.getKey());
+	if (object_map_it == object_map.end())
+		error("[isObjectOnPeer]: Object could not be found in group.");
+
+	return object_map_it->second.isPeerPresent(peer_data);
+}
+
+PeerData GroupLedger::getRandomPeer(OverlayKey key)
 {
 	ObjectLedgerMap::iterator object_map_it;
 	ObjectLedger object_ledger_entry;
@@ -288,15 +336,15 @@ PeerDataPtr GroupLedger::getRandomPeer(OverlayKey key)
 
 	peer_ptr = object_ledger_entry.getRandPeerRef();
 
-	return peer_ptr;
+	return *peer_ptr;
 }
 
-PeerDataPtr GroupLedger::getRandomPeer()
+PeerData GroupLedger::getRandomPeer()
 {
     if (peer_list.size() == 0)
         error("No peers in group.");
 
-    return (peer_list.at(intuniform(0, peer_list.size()-1))).peerDataPtr;
+    return *((peer_list.at(intuniform(0, peer_list.size()-1))).peerDataPtr);
 }
 
 void GroupLedger::addPeer(PeerData peer_dat)
