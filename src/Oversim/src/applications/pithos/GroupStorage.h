@@ -152,7 +152,7 @@ class GroupStorage : public cSimpleModule
 		 * @param dest_adr The selected destination address to which an object should be written.
 		 * @param send_list A history of peers selected to store the particular GameObject.
 		 */
-		PeerDataPtr selectDestination(std::vector<TransportAddress> send_list);
+		PeerData selectDestination(std::vector<TransportAddress> send_list);
 
 		void handleResponse(PendingRequests::iterator it, ResponsePkt *response);
 		/**
@@ -199,6 +199,8 @@ class GroupStorage : public cSimpleModule
 		bool handleMissingObject(OverlayKeyPkt *retrieve_req);
 		bool retrieveLocally(OverlayKeyPkt *retrieve_req);
 		void requestRetrieve(OverlayKeyPkt *retrieve_req);
+
+		void replicate(ObjectDataPkt *replicate_pkt);
 
 		/**
 		 * Function is called when the peer is informed by the group super peer that new peers have joined the group.

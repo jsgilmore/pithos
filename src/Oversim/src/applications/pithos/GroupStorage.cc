@@ -190,7 +190,7 @@ void GroupStorage::sendUpperResponse(int responseType, unsigned int rpcid, bool 
 
 void GroupStorage::forwardRequest(OverlayKeyPkt *retrieve_req)
 {
-	PeerDataPtr container_peer_ptr;
+	PeerData container_peer;
 	int rpcid = retrieve_req->getValue();
 
 	//TODO: This check can later be removed if a partially connected group is required with recursive routing within the group.
@@ -200,10 +200,10 @@ void GroupStorage::forwardRequest(OverlayKeyPkt *retrieve_req)
 
 	RECORD_STATS(numSent++; numGetSent++);
 
-	container_peer_ptr = group_ledger->getRandomPeer(retrieve_req->getKey());
+	container_peer = group_ledger->getRandomPeer(retrieve_req->getKey());
 
 	//Send a retrieve request to the group peer storing the object
-	retrieve_req->setDestinationAddress(container_peer_ptr->getAddress());
+	retrieve_req->setDestinationAddress(container_peer.getAddress());
 	retrieve_req->setGroupAddress(super_peer_address);
 
 	retrieve_req->setHops(retrieve_req->getHops()+1);
@@ -213,7 +213,7 @@ void GroupStorage::forwardRequest(OverlayKeyPkt *retrieve_req)
 	//Create and schedule request timeout timer
 	ResponseTimeoutEvent *timeout = new ResponseTimeoutEvent("timeout");
 	timeout->setRpcid(rpcid);
-	timeout->setPeerData(*container_peer_ptr);
+	timeout->setPeerData(container_peer);
 	scheduleAt(simTime()+requestTimeout, timeout);
 
 	//Insert timer into list of pending requests
@@ -343,27 +343,27 @@ void GroupStorage::updatePeerObjects(GameObject go)
 	send(objectAddPkt, "comms_gate$o");		//Set address
 }
 
-PeerDataPtr GroupStorage::selectDestination(std::vector<TransportAddress> send_list)
+PeerData GroupStorage::selectDestination(std::vector<TransportAddress> send_list)
 {
 	unsigned int j;
 	bool original_address = false;
-	PeerDataPtr peerDataPtr;
+	PeerData peerData;
 
 	while(!original_address)
 	{
-		peerDataPtr = group_ledger->getRandomPeer();		//Choose a uniform random peer in the group for the destination
+		peerData = group_ledger->getRandomPeer();		//Choose a uniform random peer in the group for the destination
 
 		//Check all previous chosen addresses to determine whether this address is unique
 		original_address = true;
 
 		for (j = 0 ; j < send_list.size() ; j++)
 		{
-			if (send_list.at(j) == peerDataPtr->getAddress())
+			if (send_list.at(j) == peerData.getAddress())
 				original_address = false;
 		}
 	}
 
-	return peerDataPtr;
+	return peerData;
 }
 
 void GroupStorage::createWritePkt(ValuePkt **write, unsigned int rpcid)
@@ -419,7 +419,7 @@ void GroupStorage::send_forstore(ValuePkt *store_req)
 
 	PendingRequestsEntry entry;
 	ResponseTimeoutEvent *timeout;
-	PeerDataPtr destAdrPtr;
+	PeerData destAdr;
 
 	int rpcid = store_req->getValue();
 	replicas = getReplicaNr(rpcid);
@@ -443,17 +443,17 @@ void GroupStorage::send_forstore(ValuePkt *store_req)
 
 		write_dup->addObject(go_dup);
 
-		destAdrPtr = selectDestination(send_list);
-		write_dup->setDestinationAddress(destAdrPtr->getAddress());
+		destAdr = selectDestination(send_list);
+		write_dup->setDestinationAddress(destAdr.getAddress());
 
-		send_list.push_back(destAdrPtr->getAddress());
+		send_list.push_back(destAdr.getAddress());
 
 		RECORD_STATS(numSent++; numPutSent++);
 		send(write_dup, "comms_gate$o");
 
 		timeout = new ResponseTimeoutEvent("timeout");
 		timeout->setRpcid(rpcid);
-		timeout->setPeerData(*destAdrPtr);
+		timeout->setPeerData(destAdr);
 		scheduleAt(simTime()+requestTimeout, timeout);
 
 		entry.timeouts.push_back(timeout);
@@ -761,6 +761,41 @@ void GroupStorage::handleLeftPeer(PeerDataPkt *peer_data_pkt)
 	lastPeerLeft = peer_data_pkt->getPeerData();
 }
 
+void GroupStorage::replicate(ObjectDataPkt *replicate_pkt)
+{
+	bool objectIsOnPeer = true;
+	int retries = 0;
+	PeerData peer_data;
+
+	int replicas = par("replicas");
+
+	ObjectData object_data = replicate_pkt->getObjectData();
+
+	while(objectIsOnPeer)
+	{
+		peer_data = group_ledger->getRandomPeer(object_data.getKey());
+		if (!(group_ledger->isObjectOnPeer(object_data, peer_data)))
+		{
+			objectIsOnPeer = false;
+		} else retries++;
+
+		//If we've retried for more times than there are replicas, we give up (because our choices are random, there might still be a unique peer).
+		//TODO: The number of time should be matched against the actual number of peers present.
+		if (retries == replicas)
+			return;
+	}
+
+	//TODO: Initiate a storage request to the destination peer
+	//Create the packet that will house the game object
+	/*ValuePkt *write = new ValuePkt("replicate");
+	write->setByteLength(VALUE_PKT_SIZE);
+	write->setPayloadType(REPLICATE);
+	write->setValue(rpcid);
+	write->setSourceAddress(this_address);
+	write->setGroupAddress(super_peer_address);*/
+
+}
+
 void GroupStorage::handlePacket(Packet *packet)
 {
 
@@ -799,6 +834,11 @@ void GroupStorage::handlePacket(Packet *packet)
 		OverlayKeyPkt *retrieve_req = check_and_cast<OverlayKeyPkt *>(packet);
 
 		requestRetrieve(retrieve_req);
+	} else if (packet->getPayloadType() == REPLICATION_REQ)
+	{
+		ObjectDataPkt *replicate_pkt = check_and_cast<ObjectDataPkt *>(packet);
+
+		replicate(replicate_pkt);
 	} else if (packet->getPayloadType() == PEER_LEFT)
 	{
 		PeerDataPkt *peer_data_pkt = check_and_cast<PeerDataPkt *>(packet);

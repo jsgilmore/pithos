@@ -24,7 +24,7 @@ ObjectLedger::~ObjectLedger() {
 
 void ObjectLedger::addPeerRef(PeerDataPtr peer_data_ptr)
 {
-	if (!isPeerPresent(peer_data_ptr))
+	if (!isPeerPresent(*peer_data_ptr))
 	{
 		PeerDataPtr ptr(peer_data_ptr);
 		location_list.push_back(ptr);
@@ -52,14 +52,14 @@ PeerDataPtr ObjectLedger::getRandPeerRef()
 	return location_list.at(index);
 }
 
-bool ObjectLedger::isPeerPresent(PeerDataPtr peer_ptr)
+bool ObjectLedger::isPeerPresent(PeerData peer_data)
 {
 	std::vector<PeerDataPtr>::iterator list_ptr;
 
 	for (list_ptr = location_list.begin() ; list_ptr != location_list.end() ; list_ptr++)
 	{
 		//This checks whether the PeerData object have the same values
-		if (**list_ptr == *peer_ptr)
+		if (**list_ptr == peer_data)
 			return true;
 	}
 
