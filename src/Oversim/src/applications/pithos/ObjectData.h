@@ -32,6 +32,8 @@ class ObjectData;
  */
 typedef std::tr1::shared_ptr <ObjectData> ObjectDataPtr;
 
+#define OBJECTDATA_SIZE 8+4+sizeof(OverlayKey)+sizeof(simtime_t)+4	//Object name ID (8B), size (4B), key, creation time (4B), ttl (4B)
+
 class ObjectData
 {
 private:

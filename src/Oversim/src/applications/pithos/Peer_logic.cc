@@ -60,7 +60,7 @@ void Peer_logic::handleGetCAPIRequest(RootObjectGetCAPICall* capiGetMsg)
 	read_pkt = new OverlayKeyPkt();
 	read_pkt->setName(capiGetMsg->getName());
 	read_pkt->setPayloadType(RETRIEVE_REQ);
-	read_pkt->setByteLength(4 + 4 + 4 + 4 + 4);		//payload type + source address + destination address + rpcid + key
+	read_pkt->setByteLength(OVERLAYKEY_PKT_SIZE);
 
 	//These duplicate addresses of the current node are used by group storage to determine whether the higher layer has requested an object, or another peer
 	read_pkt->setSourceAddress(address);

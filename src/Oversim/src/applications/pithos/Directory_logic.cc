@@ -109,7 +109,7 @@ void Directory_logic::handleJoinReq(bootstrapPkt *boot_req)
 	boot_ans->setPayloadType(INFORM);
 	boot_ans->setName("inform");
 	boot_ans->setSourceAddress(boot_req->getDestinationAddress());
-	boot_ans->setByteLength(4+4+4);	//Type, Src IP as # and Dest IP as #
+	boot_ans->setByteLength(BOOTSTRAP_PKT_SIZE);
 	boot_ans->setDestinationAddress(boot_req->getSourceAddress());
 
 	boot_ans->setSuperPeerAdr(findAddress(boot_req->getLatitude(), boot_req->getLongitude()));

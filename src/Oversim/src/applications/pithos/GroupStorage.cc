@@ -159,11 +159,11 @@ void GroupStorage::createResponseMsg(ResponsePkt **response, int responseType, u
 		GameObject *object_ptr =  new GameObject(object);
 		(*response)->addObject(object_ptr);
 
-		//SourceAddress + DestinationAddress + ResponseType + PayloadType + isSuccess + RPCID
-		(*response)->setByteLength(4 + 4 + 4 + 4 + 4 + 4 + object.getSize());
+		//Response packet + object size
+		(*response)->setByteLength(RESPONSE_PKT_SIZE + object.getSize());
 	} else {
-		//SourceAddress + DestinationAddress + ResponseType + PayloadType + isSuccess + RPCID
-		(*response)->setByteLength(4 + 4 + 4 + 4 + 4 + 4);
+		//Packet + ResponseType + isSuccess + RPCID
+		(*response)->setByteLength(RESPONSE_PKT_SIZE);
 	}
 }
 
@@ -310,7 +310,7 @@ void GroupStorage::requestRetrieve(OverlayKeyPkt *retrieve_req)
 void GroupStorage::updatePeerObjects(GameObject go)
 {
 	PeerListPkt *objectAddPkt = new PeerListPkt();
-	objectAddPkt->setByteLength(4+4+4+8+4);	//Source address, dest address, type, object name ID, storage peer address
+	objectAddPkt->setByteLength(PEERLIST_PKT_SIZE(PEERDATA_SIZE));
 
 	if (super_peer_address.isUnspecified())
 	{
@@ -370,7 +370,7 @@ void GroupStorage::createWritePkt(ValuePkt **write, unsigned int rpcid)
 {
 	//Create the packet that will house the game object
 	(*write) = new ValuePkt("write");
-	(*write)->setByteLength(4+4+4+8);	//Source address, dest address, object name ID and object size
+	(*write)->setByteLength(VALUE_PKT_SIZE);
 	(*write)->setPayloadType(WRITE);
 	(*write)->setValue(rpcid);
 	(*write)->setSourceAddress(this_address);
@@ -652,7 +652,7 @@ void GroupStorage::addToGroup(cMessage *msg)
 	{
 		AddressPkt *request_start = new AddressPkt("request_start");
 		request_start->setAddress(super_peer_address);
-		request_start->setByteLength(4);	//The super peer IP
+		request_start->setByteLength(ADDRESS_SIZE);	//The super peer IP
 		send(request_start, "to_upperTier");
 
 		emit(joinTimeSignal, joinTime);
@@ -697,7 +697,7 @@ void GroupStorage::joinRequest(const TransportAddress &dest_adr)
 	boot_p->setName("join_req");
 	boot_p->setLatitude(latitude);
 	boot_p->setLongitude(longitude);
-	boot_p->setByteLength(4+4+4+8+8);	//Src IP as #, Dest IP as #, Type, Lat, Long
+	boot_p->setByteLength(BOOTSTRAP_PKT_SIZE);	//Src IP as #, Dest IP as #, Type, Lat, Long
 
 	send(boot_p, "comms_gate$o");
 }
@@ -818,7 +818,7 @@ void GroupStorage::peerLeftInform(PeerData peerData)
 	pkt->setGroupAddress(super_peer_address);
 	pkt->setPayloadType(PEER_LEFT);
 	pkt->setPeerData(peerData);
-	pkt->setByteLength(4+4+4+4);	//Source IP + Dest IP + type + left peer IP
+	pkt->setByteLength(PEERDATA_PKT_SIZE);
 
 	std::ostringstream msg;
 	msg << "[" << this_address << "]: Leaving peer group size\n";

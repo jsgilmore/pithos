@@ -305,7 +305,7 @@ void DHTStorage::request_retrieve(Packet *pkt)
 
 	DHTgetCAPICall* dhtGetMsg = new DHTgetCAPICall();
     dhtGetMsg->setKey(destkey);
-    dhtGetMsg->setByteLength(4+4+8); 	//Source address, dest address, key
+    dhtGetMsg->setByteLength(8+8+8); 	//Source address, dest address, key
     RECORD_STATS(numSent++; numGetSent++);
 
 	communicator->externallySendInternalRpcCall(OVERLAYSTORAGE_COMP, dhtGetMsg, new DHTStatsContext(globalStatistics->isMeasuring(), simTime(), destkey, parent_rpcid));
@@ -335,7 +335,7 @@ void DHTStorage::send_forstore(Packet *pkt)
 	dhtPutMsg->setValue(go->getBinaryValue());
 	dhtPutMsg->setTtl(go->getTTL());
 	dhtPutMsg->setIsModifiable(true);
-	dhtPutMsg->setByteLength(4+4+4+4+8+go->getSize()); 	//Source address, dest address, type, value, object name ID, object size
+	dhtPutMsg->setByteLength(8+8+4+4+8+go->getSize()); 	//Source address, dest address, type, value, object name ID, object size
 
 	RECORD_STATS(numSent++; numPutSent++);
 
