@@ -48,7 +48,8 @@ class GroupLedger : public cSimpleModule
 
 		cMessage *periodicTimer; /**< timer self-message for writing periodic statistical information */
 
-		int objects_total;	//The number of objects including replicas
+		int objects_total;		//The number of objects including replicas
+		int objects_starved;	//The number of objects that have been lost due to peers leaving
 		int data_size;			//The total size in bytes stored in the ledger
 
 		int numPeerRemoveFail;

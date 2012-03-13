@@ -45,6 +45,7 @@ void GroupLedger::initialize()
 
 	data_size = 0;
 	objects_total = 0;
+	objects_starved = 0;
 
 	periodicTimer = new cMessage("PithosTestMapTimer");
 
@@ -67,6 +68,7 @@ void GroupLedger::recordAndClear()
 
 	data_size = 0;
 	objects_total = 0;
+	objects_starved = 0;
 
 	object_map.clear();
 	peer_list.clear();
@@ -110,6 +112,13 @@ void GroupLedger::handleMessage(cMessage* msg)
 			TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
 
 			group_name << "GroupLedger (" << thisAdr << ":" << thisAdr <<"): ";
+
+			RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Data stored for known group objects")).c_str(), data_size));
+			RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of total group objects")).c_str(), objects_total));
+			RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of starved group objects")).c_str(), objects_starved));
+
+			if (object_map.size() > 0)
+				RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Average number of replicas per object")).c_str(), double(objects_total)/(object_map.size() + objects_starved)));
 		}
 		else if (!(groupStorage->getSuperPeerAddress().isUnspecified()))
 		{
@@ -124,13 +133,9 @@ void GroupLedger::handleMessage(cMessage* msg)
 			return;
 		}
 
+		//Collect stats for both super peers and peers
 		RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of known group peers")).c_str(), peer_list.size()));
 		RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of unique group objects")).c_str(), object_map.size()));
-		RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Data stored for known group objects")).c_str(), data_size));
-		RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of total group objects")).c_str(), objects_total));
-
-		if (object_map.size() > 0)
-			RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Average number of replicas per object")).c_str(), double(objects_total)/object_map.size()));
     }
     else if ((ttlTimer = dynamic_cast<ObjectTTLTimer*>(msg)) != NULL)
 	{
@@ -378,7 +383,10 @@ void GroupLedger::removePeer(PeerData peer_dat)
 		//If the peer is removed and there are now no peers on which the object is stored, remove the object ledger entry
 		//TODO: Uncommenting this says that objects may exist, without being stored on any peer. This helps to tracks objects that have starved.
 		if (object_ledger_it->second.getPeerListSize() == 0)
+		{
 			object_map.erase(object_ledger_it);
+			objects_starved++;
+		}
 	}
 
 	peer_list.erase(peer_ledger_it);

@@ -48,6 +48,8 @@ void Super_peer_logic::initialize()
 	latitude = uniform(0,100);		//Make this range changeable
 	longitude = uniform(0,100);		//Make this range changeable
 
+	objectReplication = par("objectReplication");
+
 	event = new cMessage("event");
 	scheduleAt(simTime()+par("wait_time"), event);
 }
@@ -116,7 +118,7 @@ void Super_peer_logic::informGroupPeers(bootstrapPkt *boot_req, TransportAddress
 	list_p->setGroupAddress(sourceAdr);
 	list_p->setObjectData(ObjectData::UNSPECIFIED_OBJECT);
 	list_p->addToPeerList(peer_data);
-	list_p->setByteLength(4 + 4 + 4);	//Value+Type+IP
+	list_p->setByteLength(PEERLIST_PKT_SIZE(PEERDATA_SIZE));
 
 	for (unsigned int i = 0 ; i < group_ledger->getGroupSize() ; i++)
 	{
@@ -150,14 +152,14 @@ void Super_peer_logic::informJoiningPeer(bootstrapPkt *boot_req, TransportAddres
 			list_p->addToPeerList(*(object_map_it->second.getPeerRef(j)));	//Send a copy of the object, pointed to by the smart pointer
 		}
 
-		list_p->setByteLength(2*sizeof(int)+sizeof(ObjectData)+sizeof(int)*(object_map_it->second.getPeerListSize()));	//Value+Type+ObjectData+(IP)*list_length
+		list_p->setByteLength(PEERLIST_PKT_SIZE (PEERDATA_SIZE*(object_map_it->second.getPeerListSize())));		//Peerlist packet size + peerdata inserted
 
 		send(list_p->dup(), "comms_gate$o");	//Send a copy of the peer list, so the original packet may be reused to inform the other nodes
 		list_p->clearPeerList();
 	}
 
 	list_p->setObjectData(ObjectData::UNSPECIFIED_OBJECT);
-	list_p->setByteLength(2*sizeof(int)+sizeof(ObjectData)+sizeof(int)*(group_ledger->getGroupSize()));	//Value+Type+ObjectData+(IP)*list_length
+	list_p->setByteLength(PEERLIST_PKT_SIZE (PEERDATA_SIZE*(group_ledger->getGroupSize())));	//Peerlist packet size + peerdata inserted
 
 	//Again inform the joining peer of all peers in the group, in case there were peers that do not store any objects.
 	//TODO: This should be changed to only inform the joining peer of the peers with no objects.
@@ -215,7 +217,7 @@ void Super_peer_logic::addSuperPeer()
 	boot_p->setName("super_peer_add");
 	boot_p->setLatitude(latitude);
 	boot_p->setLongitude(longitude);
-	boot_p->setByteLength(4+4+4+8+8);	//Src IP as #, Dest IP as #, Type, Lat, Long
+	boot_p->setByteLength(BOOTSTRAP_PKT_SIZE);
 
 	send(boot_p, "comms_gate$o");
 
@@ -235,12 +237,22 @@ void Super_peer_logic::informLastJoinedOfLastLeft()
 	pkt->setGroupAddress(sourceAdr);
 	pkt->setPayloadType(PEER_LEFT);
 	pkt->setPeerData(lastPeerLeft);
-	pkt->setByteLength(4+4+4+4);	//Source IP + Dest IP + type + left peer IP
+	pkt->setByteLength(PEERDATA_PKT_SIZE);	//Source IP + Dest IP + type + left peer IP
 
 	//Dereference it to get PeerDataPtr and use -> operator to get PeerData
 	pkt->setDestinationAddress(lastPeerJoined.getAddress());
 
 	send(pkt, "comms_gate$o");
+}
+
+void Super_peer_logic::replicateObjects(PeerDataPkt *peer_data_pkt)
+{
+	ObjectDataPkt *replication_req = new ObjectDataPkt();
+	replication_req->setSourceAddress(peer_data_pkt->getDestinationAddress());
+	replication_req->setPayloadType(REPLICATION_REQ);
+	replication_req->setGroupAddress(peer_data_pkt->getDestinationAddress());
+	replication_req->setByteLength(OBJECTDATA_PKT_SIZE);
+
 }
 
 void Super_peer_logic::handleMessage(cMessage *msg)
@@ -263,6 +275,12 @@ void Super_peer_logic::handleMessage(cMessage *msg)
 		} else if (packet->getPayloadType() == SP_PEER_LEFT)
 		{
 			PeerDataPkt *peer_data_pkt = check_and_cast<PeerDataPkt *>(packet);
+
+			if (objectReplication)
+			{
+				replicateObjects(peer_data_pkt);
+			}
+
 			group_ledger->removePeer(peer_data_pkt->getPeerData());
 
 			lastPeerLeft = peer_data_pkt->getPeerData();	//Record the data of the last peer that left, in case we get an outdated object add message from that peer

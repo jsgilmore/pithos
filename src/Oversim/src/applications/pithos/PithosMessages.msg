@@ -18,6 +18,19 @@ cplusplus {{
 #include "PeerData.h"
 #include "ObjectData.h"
 #include "OverlayKey.h"
+
+//Packet size definiations
+#define ADDRESS_SIZE 			8								//Transport address
+#define PKT_SIZE 				8+8+8+4							//Source address, destination address, group_address, payload type
+#define VALUE_PKT_SIZE 			PKT_SIZE+4						//Packet + int value
+#define OVERLAYKEY_PKT_SIZE		PKT_SIZE+4+4+sizeof(OverlayKey)
+#define RESPONSE_PKT_SIZE		PKT_SIZE+4+4+4 					//Packet +  rpcid + isSuccess + responseType
+#define BOOTSTRAP_PKT_SIZE		PKT_SIZE+8+8+8					//Packet + super peer address + latitude + longitude
+#define POSITION_UP_PKT_SIZE	PKT_SIZE+8+8					//Packet + latitude + longitude
+#define PEERLIST_PKT_SIZE		PKT_SIZE+OBJECTDATA_SIZE+ 		//Packet + object data + the size of the peer data objects added (to be added at declaration)
+#define PEERDATA_PKT_SIZE		PKT_SIZE+PEERDATA_SIZE
+#define OBJECTDATA_PKT_SIZE		PKT_SIZE+OBJECTDATA_SIZE
+
 }}
 
 // import the IP Address class
@@ -44,6 +57,7 @@ enum PacketTypes
     PEER_LEFT = 13;
     SP_PEER_LEFT = 14;
     POSITION_UPDATE = 15;
+    REPLICATION_REQ = 16;
 };
 
 enum OverlayTypes 
