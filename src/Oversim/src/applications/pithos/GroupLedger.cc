@@ -168,13 +168,16 @@ int GroupLedger::getObjectLedgerSize(PeerData peer_data)
 {
 	PeerLedgerList::iterator peer_ledger_it;
 
+	//std::cout << "\nPeer data to match for size: " << peer_data.getAddress() << endl;
+
 	for (peer_ledger_it = peer_list.begin() ; peer_ledger_it != peer_list.end() ; peer_ledger_it++)
 	{
+		//std::cout << "Currently comparing peer: " << peer_ledger_it->peerDataPtr->getAddress() << endl;
+
 		if (*(peer_ledger_it->peerDataPtr) == peer_data)
 			return peer_ledger_it->getObjectListSize();
 	}
 
-	error("Object not found when querying ledger size.");
 	return 0;
 }
 
@@ -378,6 +381,7 @@ void GroupLedger::removePeer(PeerData peer_dat)
 	PeerLedgerList::iterator peer_ledger_it;
 	ObjectDataPtr object_data_ptr;
 	ObjectLedgerMap::iterator object_ledger_it;
+	unsigned int objectListSize;
 
 	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
 	TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
@@ -409,8 +413,10 @@ void GroupLedger::removePeer(PeerData peer_dat)
 		RECORD_STATS(globalStatistics->recordOutVector(msg.str().c_str(), 0));
 	}
 
+	objectListSize = peer_ledger_it->getObjectListSize();
+
 	//Iterate through all object references listed for the peer
-	for (unsigned int i = 0 ; i < peer_ledger_it->getObjectListSize() ; i++)
+	for (unsigned int i = 0 ; i < objectListSize ; i++)
 	{
 		object_data_ptr = peer_ledger_it->getObjectRef(i);
 

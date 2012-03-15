@@ -185,7 +185,7 @@ class GroupStorage : public cSimpleModule
 		 */
 		void addAndJoinSuperPeer(Packet *packet);
 
-		void store(cMessage *msg);
+		void store(Packet *pkt);
 
 		void handleLeftPeer(PeerDataPkt *peer_data_pkt);
 		/**

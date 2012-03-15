@@ -589,27 +589,25 @@ int GroupStorage::getStorageBytes()
 	return total_size;
 }
 
-void GroupStorage::store(cMessage *msg)
+void GroupStorage::store(Packet *pkt)
 {
-	simtime_t delay;
-	ValuePkt *value_pkt = check_and_cast<ValuePkt *>(msg);
 	std::pair<StorageMap::iterator,bool> ret;
 
 	//This happens when a group peer changes groups, after being selected to store a file
-	if (value_pkt->getGroupAddress() != super_peer_address)
+	if ((pkt->getGroupAddress() != super_peer_address) && (pkt->getPayloadType() == WRITE))
 	{
-		//error("[GroupStorage::store]: Received packet from a different group.");
+		//We can also receive a replicate packet, which does not expect a response
+		ValuePkt *value_pkt = check_and_cast<ValuePkt *>(pkt);
 		sendUDPResponse(value_pkt->getDestinationAddress(), value_pkt->getSourceAddress(), GROUP_PUT, value_pkt->getValue(), false);
 		return;
 	}
 
-	if (!(msg->hasObject("GameObject")))
+	if (!(pkt->hasObject("GameObject")))
 		error("[GroupStorage::store]: Storage received a message with no game object attached");
 
 	//We're not removing the object here, because we're only using the value and then the object is deleted with the message.
-	GameObject *go = (GameObject *)msg->getObject("GameObject");
+	GameObject *go = (GameObject *)pkt->getObject("GameObject");
 	go->setGroupAddress(super_peer_address);
-	delay = simTime() - go->getCreationTime();
 
 	//std::cout << "[GroupStorageTarget] Stored object with key " << go->getHash() << endl;
 	EV << getName() << " " << getIndex() << " received Game Object of size " << go->getSize() << "\n";
@@ -617,10 +615,9 @@ void GroupStorage::store(cMessage *msg)
 
 	ret = storage_map.insert(std::make_pair(go->getHash(), *go));
 	//Ensure that a duplicate key wasn't inserted
-	if (ret.second == false)
-		error("[GroupStorage::store]: Duplicate key inserted into storage.");
+	//if (ret.second == false)
+		//error("[GroupStorage::store]: Duplicate key inserted into storage.");
 
-	emit(storeTimeSignal, delay);
 	emit(qlenSignal, storage_map.size());
 	emit(qsizeSignal, getStorageBytes());
 	emit(objectsSignal, 1);
@@ -630,7 +627,12 @@ void GroupStorage::store(cMessage *msg)
 	timer->setKey(go->getHash());
 	scheduleAt(go->getCreationTime() + go->getTTL(), timer);
 
-	sendUDPResponse(value_pkt->getDestinationAddress(), value_pkt->getSourceAddress(), GROUP_PUT, value_pkt->getValue(), true);
+	if (pkt->getPayloadType() == WRITE)
+	{
+		//We can also receive a replicate packet, which does not expect a response
+		ValuePkt *value_pkt = check_and_cast<ValuePkt *>(pkt);
+		sendUDPResponse(value_pkt->getDestinationAddress(), value_pkt->getSourceAddress(), GROUP_PUT, value_pkt->getValue(), true);
+	}
 
 	updatePeerObjects(*go);
 }
@@ -709,8 +711,9 @@ void GroupStorage::leaveGroup()
 	peerLeftInform(PeerData(this_address));
 
 	group_ledger->recordAndClear();
+	storage_map.clear();
 
-	lastPeerLeft = PeerData();	//Sets the transport address to unspecified
+	lastPeerLeft = PeerData();	//Sets the transport address to unspecified for the new group
 }
 
 void GroupStorage::addAndJoinSuperPeer(Packet *packet)
@@ -763,37 +766,67 @@ void GroupStorage::handleLeftPeer(PeerDataPkt *peer_data_pkt)
 
 void GroupStorage::replicate(ObjectDataPkt *replicate_pkt)
 {
-	bool objectIsOnPeer = true;
-	int retries = 0;
+
 	PeerData peer_data;
+	StorageMap::iterator storage_it;
+	GameObject *go;
+	std::set<TransportAddress> selected_peers;
+	std::set<TransportAddress>::iterator selected_it;
+
+	if (replicate_pkt->getGroupAddress() != super_peer_address)
+	{
+		delete(replicate_pkt);
+		return;
+	}
 
 	int replicas = par("replicas");
 
 	ObjectData object_data = replicate_pkt->getObjectData();
 
-	while(objectIsOnPeer)
+	for (int i = 0 ; i < 1 ; i++)
 	{
-		peer_data = group_ledger->getRandomPeer(object_data.getKey());
-		if (!(group_ledger->isObjectOnPeer(object_data, peer_data)))
+		bool objectIsOnPeer = true;
+		int retries = 0;
+
+		selected_it = selected_peers.find(peer_data.getAddress());
+
+		//Find a group peer that does not already contain the object
+		while(objectIsOnPeer)
 		{
-			objectIsOnPeer = false;
-		} else retries++;
+			peer_data = group_ledger->getRandomPeer();
 
-		//If we've retried for more times than there are replicas, we give up (because our choices are random, there might still be a unique peer).
-		//TODO: The number of time should be matched against the actual number of peers present.
-		if (retries == replicas)
-			return;
+			if (!(group_ledger->isObjectOnPeer(object_data, peer_data)) || (selected_it == selected_peers.end()))
+			{
+				objectIsOnPeer = false;
+			} else retries++;
+
+			//If we've retried for more times than there are replicas, we give up (because our choices are random, there might still be a unique peer).
+			//TODO: The number of time should be matched against the actual number of peers present.
+			if (retries == replicas*2)
+				return;
+		}
+		selected_peers.insert(peer_data.getAddress());
+
+		//Retrieve the object from local storage
+		storage_it = storage_map.find(object_data.getKey());
+		if (storage_it == storage_map.end())
+				error("[replicate]: Object could not be found in local storage.");
+
+		go = new GameObject(storage_it->second);	//A dynamic game object is required to add to an Omnet message
+
+		std::cout << "Replicating object (" << go->getObjectName()  << ") from " << this_address << " on " << peer_data.getAddress() << endl;
+
+		//Create the packet that will house the game object
+		Packet *write = new Packet("replicate");
+		write->setByteLength(PKT_SIZE + go->getSize());
+		write->setPayloadType(REPLICATE);
+		write->setSourceAddress(this_address);
+		write->setDestinationAddress(peer_data.getAddress());
+		write->setGroupAddress(super_peer_address);
+		write->addObject(go);
+
+		send(write, "comms_gate$o");
 	}
-
-	//TODO: Initiate a storage request to the destination peer
-	//Create the packet that will house the game object
-	/*ValuePkt *write = new ValuePkt("replicate");
-	write->setByteLength(VALUE_PKT_SIZE);
-	write->setPayloadType(REPLICATE);
-	write->setValue(rpcid);
-	write->setSourceAddress(this_address);
-	write->setGroupAddress(super_peer_address);*/
-
 }
 
 void GroupStorage::handlePacket(Packet *packet)
@@ -820,6 +853,10 @@ void GroupStorage::handlePacket(Packet *packet)
 	{
 		store(packet);
 		delete(packet);
+	} else if (packet->getPayloadType() == REPLICATE)
+	{
+		store(packet);
+		delete(packet);
 	} else if (packet->getPayloadType() == RESPONSE)
 	{
 		respond_toUpper(packet);
@@ -839,6 +876,7 @@ void GroupStorage::handlePacket(Packet *packet)
 		ObjectDataPkt *replicate_pkt = check_and_cast<ObjectDataPkt *>(packet);
 
 		replicate(replicate_pkt);
+		delete(packet);
 	} else if (packet->getPayloadType() == PEER_LEFT)
 	{
 		PeerDataPkt *peer_data_pkt = check_and_cast<PeerDataPkt *>(packet);

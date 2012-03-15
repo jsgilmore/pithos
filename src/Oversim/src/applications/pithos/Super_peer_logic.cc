@@ -88,9 +88,8 @@ void Super_peer_logic::handleOverlayWrite(cMessage *msg)
 	EV << "Packet sent for storage in the overlay\n";
 }
 
-void Super_peer_logic::addObject(cMessage *msg)
+void Super_peer_logic::addObject(PeerListPkt *plist_p)
 {
-	PeerListPkt *plist_p = check_and_cast<PeerListPkt *>(msg);
 	PeerData peer_data_recv;
 
 	//Iterate through all PeerData objects received in the PeerListPkt
@@ -249,6 +248,11 @@ void Super_peer_logic::replicateObjects(PeerDataPkt *peer_data_pkt)
 {
 	ObjectData object_data;
 	PeerData peer_data;
+	int objectLedgerSize = group_ledger->getObjectLedgerSize(peer_data_pkt->getPeerData());
+
+	//If the peer was not found, it means it has already been removed.
+	if (objectLedgerSize == 0)
+		return;
 
 	ObjectDataPkt *replication_req = new ObjectDataPkt();
 	replication_req->setSourceAddress(peer_data_pkt->getDestinationAddress());
@@ -256,7 +260,9 @@ void Super_peer_logic::replicateObjects(PeerDataPkt *peer_data_pkt)
 	replication_req->setGroupAddress(peer_data_pkt->getDestinationAddress());
 	replication_req->setByteLength(OBJECTDATA_PKT_SIZE);
 
-	for (int i = 0 ; i < group_ledger->getObjectLedgerSize(peer_data_pkt->getPeerData()) ; i++)
+	std::cout << "Super peer replicating objects on peer: " << peer_data_pkt->getPeerData().getAddress() << endl;
+
+	for (int i = 0 ; i < objectLedgerSize ; i++)
 	{
 		object_data = group_ledger->getObjectFromPeer(peer_data_pkt->getPeerData(), i);
 
@@ -287,10 +293,17 @@ void Super_peer_logic::handleMessage(cMessage *msg)
 			handleOverlayWrite(msg);
 		} else if (packet->getPayloadType() == SP_OBJECT_ADD)
 		{
-			addObject(msg);
+			PeerListPkt *plist_p = check_and_cast<PeerListPkt *>(msg);
+
+			addObject(plist_p);
 		} else if (packet->getPayloadType() == SP_PEER_LEFT)
 		{
 			PeerDataPkt *peer_data_pkt = check_and_cast<PeerDataPkt *>(packet);
+
+			const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
+			TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
+
+			std::cout << "[SP: " << thisAdr << "] Received peer left from " << peer_data_pkt->getSourceAddress() << " for " << peer_data_pkt->getPeerData().getAddress() << " in group " << peer_data_pkt->getGroupAddress() << endl;
 
 			if (objectReplication)
 			{

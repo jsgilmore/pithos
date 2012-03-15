@@ -173,6 +173,7 @@ void Communicator::handleUDPMessage(cMessage* msg)
 			(packet->getPayloadType() == PEER_LEFT) ||
 			(packet->getPayloadType() == PEER_JOIN) ||
 			(packet->getPayloadType() == REPLICATION_REQ) ||
+			(packet->getPayloadType() == REPLICATE) ||
 			(packet->getPayloadType() == OBJECT_ADD))
 	{
 		send(msg, "gs_gate$o");
