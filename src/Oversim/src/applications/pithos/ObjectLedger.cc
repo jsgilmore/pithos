@@ -78,17 +78,14 @@ void ObjectLedger::erasePeerRef(const int &i)
 
 void ObjectLedger::erasePeerRef(PeerDataPtr peer_data_ptr)
 {
-	bool found = false;
 	for (unsigned int i = 0 ; i < location_list.size() ; i++)
 	{
 		if (peer_data_ptr == location_list.at(i))
 		{
-			found = true;
 			location_list.erase(location_list.begin()+i);
-			break;
+			return;
 		}
 	}
 
-	if (!found)
-		opp_error("Peer pointer not found when erasing.");
+	opp_error("Peer pointer not found when erasing.");
 }
