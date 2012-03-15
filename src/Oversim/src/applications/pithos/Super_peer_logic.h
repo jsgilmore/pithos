@@ -114,7 +114,7 @@ class Super_peer_logic : public cSimpleModule
 		void addSuperPeer();
 
 		/** Add a new group object to the super peer's object list. */
-		void addObject(cMessage *msg);
+		void addObject(PeerListPkt *plist_p);
 
 		void informLastJoinedOfLastLeft();
 
