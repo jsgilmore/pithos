@@ -248,30 +248,61 @@ void Super_peer_logic::replicateObjects(PeerDataPkt *peer_data_pkt)
 {
 	ObjectData object_data;
 	PeerData peer_data;
+	int known_replicas;
+	int expected_replicas = par("replicas");
 	int objectLedgerSize = group_ledger->getObjectLedgerSize(peer_data_pkt->getPeerData());
+
+	int peer_selection_tries;
 
 	//If the peer was not found, it means it has already been removed.
 	if (objectLedgerSize == 0)
 		return;
 
-	ObjectDataPkt *replication_req = new ObjectDataPkt();
+	ReplicationReqPkt *replication_req = new ReplicationReqPkt();
 	replication_req->setSourceAddress(peer_data_pkt->getDestinationAddress());
 	replication_req->setPayloadType(REPLICATION_REQ);
 	replication_req->setGroupAddress(peer_data_pkt->getDestinationAddress());
 	replication_req->setByteLength(OBJECTDATA_PKT_SIZE);
 
-	std::cout << "Super peer replicating objects on peer: " << peer_data_pkt->getPeerData().getAddress() << endl;
+	//std::cout << "Super peer replicating objects on peer: " << peer_data_pkt->getPeerData().getAddress() << endl;
 
+	//Every object housed on the leaving peer must be replicated
 	for (int i = 0 ; i < objectLedgerSize ; i++)
 	{
+		//Find the ith object housed on the leaving peer
 		object_data = group_ledger->getObjectFromPeer(peer_data_pkt->getPeerData(), i);
-
-		peer_data = group_ledger->getRandomPeer(object_data.getKey());
-
 		replication_req->setObjectData(object_data);
-		replication_req->setDestinationAddress(peer_data.getAddress());
 
-		send(replication_req->dup(), "comms_gate$o");
+		//Determine how many replications have to be made, by examining the current number of replicas.
+		known_replicas = group_ledger->getReplicaNum(object_data);
+
+		//The leaving peer hasn't been removed yet, so equality has to be included
+		if (known_replicas <= expected_replicas)
+		{
+			replication_req->setReplicaDiff(expected_replicas-known_replicas+1);	//+1 for the leaving peer
+			peer_selection_tries = 0;
+
+			//Make sure the leaving peer isn't selected as the replicating peer
+			while (1)
+			{
+				peer_data = group_ledger->getRandomPeer(object_data.getKey());
+				if (peer_data != peer_data_pkt->getPeerData())
+				{
+					const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
+					TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
+
+					replication_req->setDestinationAddress(peer_data.getAddress());
+					send(replication_req->dup(), "comms_gate$o");
+
+					std::cout << "[" << thisAdr << "]: Requesting replication of object (" << object_data.getObjectName() << ") with " << known_replicas << " known replicas on peer " << peer_data.getAddress() << endl;
+					break;
+				} else peer_selection_tries++;
+
+				//This just prevents infinite loops when our replica numbers are too low
+				if (peer_selection_tries > 2*expected_replicas)
+					break;
+			}
+		}
 	}
 
 	delete(replication_req);
@@ -303,7 +334,7 @@ void Super_peer_logic::handleMessage(cMessage *msg)
 			const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
 			TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
 
-			std::cout << "[SP: " << thisAdr << "] Received peer left from " << peer_data_pkt->getSourceAddress() << " for " << peer_data_pkt->getPeerData().getAddress() << " in group " << peer_data_pkt->getGroupAddress() << endl;
+			//std::cout << "[SP: " << thisAdr << "] Received peer left from " << peer_data_pkt->getSourceAddress() << " for " << peer_data_pkt->getPeerData().getAddress() << " in group " << peer_data_pkt->getGroupAddress() << endl;
 
 			if (objectReplication)
 			{
