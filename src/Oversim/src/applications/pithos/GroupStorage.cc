@@ -594,12 +594,15 @@ void GroupStorage::store(Packet *pkt)
 	std::pair<StorageMap::iterator,bool> ret;
 
 	//This happens when a group peer changes groups, after being selected to store a file
-	if ((pkt->getGroupAddress() != super_peer_address) && (pkt->getPayloadType() == WRITE))
+	if (pkt->getGroupAddress() != super_peer_address)
 	{
-		//We can also receive a replicate packet, which does not expect a response
-		ValuePkt *value_pkt = check_and_cast<ValuePkt *>(pkt);
-		sendUDPResponse(value_pkt->getDestinationAddress(), value_pkt->getSourceAddress(), GROUP_PUT, value_pkt->getValue(), false);
-		return;
+		if (pkt->getPayloadType() == WRITE)
+		{
+			//We can also receive a replicate packet, which does not expect a response
+			ValuePkt *value_pkt = check_and_cast<ValuePkt *>(pkt);
+			sendUDPResponse(value_pkt->getDestinationAddress(), value_pkt->getSourceAddress(), GROUP_PUT, value_pkt->getValue(), false);
+			return;
+		} else return;
 	}
 
 	if (!(pkt->hasObject("GameObject")))
@@ -615,7 +618,8 @@ void GroupStorage::store(Packet *pkt)
 
 	ret = storage_map.insert(std::make_pair(go->getHash(), *go));
 	//Ensure that a duplicate key wasn't inserted
-	//if (ret.second == false)
+	if (ret.second == false)
+		return;
 		//error("[GroupStorage::store]: Duplicate key inserted into storage.");
 
 	emit(qlenSignal, storage_map.size());
@@ -764,7 +768,7 @@ void GroupStorage::handleLeftPeer(PeerDataPkt *peer_data_pkt)
 	lastPeerLeft = peer_data_pkt->getPeerData();
 }
 
-void GroupStorage::replicate(ObjectDataPkt *replicate_pkt)
+void GroupStorage::replicate(ReplicationReqPkt *replicate_pkt)
 {
 
 	PeerData peer_data;
@@ -783,17 +787,18 @@ void GroupStorage::replicate(ObjectDataPkt *replicate_pkt)
 
 	ObjectData object_data = replicate_pkt->getObjectData();
 
-	for (int i = 0 ; i < 1 ; i++)
+	std::cout << "[" << this_address << "]: Replicating object: " << object_data.getObjectName() << endl;
+
+	for (int i = 0 ; i < replicate_pkt->getReplicaDiff() ; i++)
 	{
 		bool objectIsOnPeer = true;
 		int retries = 0;
-
-		selected_it = selected_peers.find(peer_data.getAddress());
 
 		//Find a group peer that does not already contain the object
 		while(objectIsOnPeer)
 		{
 			peer_data = group_ledger->getRandomPeer();
+			selected_it = selected_peers.find(peer_data.getAddress());
 
 			if (!(group_ledger->isObjectOnPeer(object_data, peer_data)) || (selected_it == selected_peers.end()))
 			{
@@ -802,7 +807,7 @@ void GroupStorage::replicate(ObjectDataPkt *replicate_pkt)
 
 			//If we've retried for more times than there are replicas, we give up (because our choices are random, there might still be a unique peer).
 			//TODO: The number of time should be matched against the actual number of peers present.
-			if (retries == replicas*2)
+			if (retries == replicas)
 				return;
 		}
 		selected_peers.insert(peer_data.getAddress());
@@ -814,7 +819,7 @@ void GroupStorage::replicate(ObjectDataPkt *replicate_pkt)
 
 		go = new GameObject(storage_it->second);	//A dynamic game object is required to add to an Omnet message
 
-		std::cout << "Replicating object (" << go->getObjectName()  << ") from " << this_address << " on " << peer_data.getAddress() << endl;
+		//std::cout << "Replicating object (" << go->getObjectName()  << ") from " << this_address << " on " << peer_data.getAddress() << endl;
 
 		//Create the packet that will house the game object
 		Packet *write = new Packet("replicate");
@@ -873,7 +878,7 @@ void GroupStorage::handlePacket(Packet *packet)
 		requestRetrieve(retrieve_req);
 	} else if (packet->getPayloadType() == REPLICATION_REQ)
 	{
-		ObjectDataPkt *replicate_pkt = check_and_cast<ObjectDataPkt *>(packet);
+		ReplicationReqPkt *replicate_pkt = check_and_cast<ReplicationReqPkt *>(packet);
 
 		replicate(replicate_pkt);
 		delete(packet);

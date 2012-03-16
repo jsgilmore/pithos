@@ -193,6 +193,8 @@ class GroupLedger : public cSimpleModule
 		void recordAndClear();
 
 		int countTotalObjects();
+
+		int getReplicaNum(ObjectData object_data);
 };
 
 #endif /* GROUPLEDGER_H_ */
