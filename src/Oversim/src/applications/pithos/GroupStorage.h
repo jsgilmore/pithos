@@ -200,7 +200,7 @@ class GroupStorage : public cSimpleModule
 		bool retrieveLocally(OverlayKeyPkt *retrieve_req);
 		void requestRetrieve(OverlayKeyPkt *retrieve_req);
 
-		void replicate(ObjectDataPkt *replicate_pkt);
+		void replicate(ReplicationReqPkt *replicate_pkt);
 
 		/**
 		 * Function is called when the peer is informed by the group super peer that new peers have joined the group.

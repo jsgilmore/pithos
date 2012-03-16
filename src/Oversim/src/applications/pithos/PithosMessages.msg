@@ -153,6 +153,12 @@ packet ObjectDataPkt extends Packet
     ObjectData objectData;
 }
 
+packet ReplicationReqPkt extends Packet
+{
+    ObjectData objectData;
+    int replicaDiff;
+}
+
 message ResponseTimeoutEvent
 {
     unsigned int rpcid;

@@ -320,9 +320,19 @@ bool GroupLedger::isObjectOnPeer(ObjectData object_data, PeerData peer_data)
 {
 	ObjectLedgerMap::iterator object_map_it = object_map.find(object_data.getKey());
 	if (object_map_it == object_map.end())
+		//return false;
 		error("[isObjectOnPeer]: Object could not be found in group.");
 
 	return object_map_it->second.isPeerPresent(peer_data);
+}
+
+int GroupLedger::getReplicaNum(ObjectData object_data)
+{
+	ObjectLedgerMap::iterator object_map_it = object_map.find(object_data.getKey());
+	if (object_map_it == object_map.end())
+		error("[getReplicaNum]: Object could not be found in group.");
+
+	return object_map_it->second.getPeerListSize();
 }
 
 PeerData GroupLedger::getRandomPeer(OverlayKey key)

@@ -165,6 +165,7 @@ simple Super_peer_logic
         string directory_ip;
         int directory_port;
         
+        int replicas;
         bool objectReplication;
 
         @signal[OverlayWrite](type="int");
