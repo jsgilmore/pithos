@@ -787,7 +787,7 @@ void GroupStorage::replicate(ReplicationReqPkt *replicate_pkt)
 
 	ObjectData object_data = replicate_pkt->getObjectData();
 
-	std::cout << "[" << this_address << "]: Replicating object: " << object_data.getObjectName() << endl;
+	//std::cout << "[" << this_address << "]: Replicating object: " << object_data.getObjectName() << endl;
 
 	for (int i = 0 ; i < replicate_pkt->getReplicaDiff() ; i++)
 	{

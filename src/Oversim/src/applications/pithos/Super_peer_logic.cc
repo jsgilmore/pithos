@@ -294,7 +294,7 @@ void Super_peer_logic::replicateObjects(PeerDataPkt *peer_data_pkt)
 					replication_req->setDestinationAddress(peer_data.getAddress());
 					send(replication_req->dup(), "comms_gate$o");
 
-					std::cout << "[" << thisAdr << "]: Requesting replication of object (" << object_data.getObjectName() << ") with " << known_replicas << " known replicas on peer " << peer_data.getAddress() << endl;
+					//std::cout << "[" << thisAdr << "]: Requesting replication of object (" << object_data.getObjectName() << ") with " << known_replicas << " known replicas on peer " << peer_data.getAddress() << endl;
 					break;
 				} else peer_selection_tries++;
 
