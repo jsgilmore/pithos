@@ -1,22 +1,17 @@
 PhD TODO list:
 
-Upgrade to Omnet++ 4.2
-
 Major:
-Implement time to live for group storage.
-Improve statistics collection to better monitor the actual on-peer objects
+Improve replication mechanism to avoid object starvation under any level of churn for a given number of replicas
+Implement a get retry mechanisms (multiple get requests) to improve group get reliabiltiy at the cost of latency (if done sequentially) or bandwidth (if done in parallel).
+Define a set of metrics that can be recorded in simulation, which can be used to evaluate the performance of Pithos and allow it to be compared with other implementations
+Implment Pithos as a real world application
 Develop grouping algorithm based on player traces
 Have Pithos construct groups based on the grouping algorithm
-Test the system for various levels of churn and various numbers of replicas
 Write-up PhD
 
-Change the numSent variables to be the actual recorded numbers and not magic numbers of the known variables.
-
 Minor:
-The correct packet sizes for DHT storage still have to be implemented. The current implementation uses the data in the packet and not the specified size of the packet.
 Implement object update for group storage.
 Extend the pithos test application to add modify testing.
-Reduce the number of overlay get failures under no churn
 Test the system for various numbers of malicious peers
 
 Make the latitude and longitude ranges for peers and super peers a changeable paramter instead of 100
@@ -24,8 +19,6 @@ Support can be added for partially connected groups that will reduce network ban
 Add a debug mode to the code, which ads the debugging code currently present in Pithos as an option and not always.
 The error condition of an unspecified peer should be logged.
 Group storage should record its own successes, failures and latencies and not depend on PithosTestApp from recording them indirectly.
-Get retry mechanisms can be added to improve group get reliabiltiy at the cost of latency (if done sequentially) or bandwidth (if done in parallel).
 The DHT module can be changed so as to store and retrieve GameObjects instead of BinaryValues
 A maximum distance needs to be defined for the directory server
-Ensure correctness for pithos under 32bit systems. This includes testing long variable sizes and making then 32bit safe.
- 
+Ensure correctness for pithos under 32bit systems. This includes testing long variable sizes and making them 32bit safe.
