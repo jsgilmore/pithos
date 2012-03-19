@@ -128,6 +128,8 @@ class GroupStorage : public cSimpleModule
 
 		simtime_t requestTimeout;	/**< The amount of time to wait for a response to a request, before a node is removed from the group*/
 
+		bool gracefulMigration;
+
 		/**
 		 * The function creates a write packet and fills it with address information, payload type and byte length.
 		 *
@@ -176,6 +178,8 @@ class GroupStorage : public cSimpleModule
 		 */
 		void joinRequest(const TransportAddress &dest_adr);
 
+		void replicateLocalObjects();
+
 		void leaveGroup();
 
 		/**
@@ -200,7 +204,7 @@ class GroupStorage : public cSimpleModule
 		bool retrieveLocally(OverlayKeyPkt *retrieve_req);
 		void requestRetrieve(OverlayKeyPkt *retrieve_req);
 
-		void replicate(ReplicationReqPkt *replicate_pkt);
+		void replicate(ObjectData object_data, int repplica_diff);
 
 		/**
 		 * Function is called when the peer is informed by the group super peer that new peers have joined the group.
@@ -211,7 +215,7 @@ class GroupStorage : public cSimpleModule
 
 		void removePeer(PeerDataPtr peerDataPtr);
 
-		void peerLeftInform(PeerData peerData);
+		void peerLeftInform(PeerData peerData, int sp_way_left);
 
 		/**
 		 * @returns the number of required replicas or the number of group peers, if this number is less than the required replicas (this case is also logged).

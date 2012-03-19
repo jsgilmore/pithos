@@ -180,6 +180,7 @@ void Communicator::handleUDPMessage(cMessage* msg)
 	} else if ((packet->getPayloadType() == JOIN_REQ) ||
 			(packet->getPayloadType() == SP_OBJECT_ADD) ||
 			(packet->getPayloadType() == SP_PEER_LEFT) ||
+			(packet->getPayloadType() == SP_PEER_MIGRATED) ||
 			(packet->getPayloadType() == OVERLAY_WRITE_REQ))
 	{
 		send(msg, "sp_group_gate$o");
