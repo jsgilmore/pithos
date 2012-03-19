@@ -320,8 +320,8 @@ bool GroupLedger::isObjectOnPeer(ObjectData object_data, PeerData peer_data)
 {
 	ObjectLedgerMap::iterator object_map_it = object_map.find(object_data.getKey());
 	if (object_map_it == object_map.end())
-		//return false;
-		error("[isObjectOnPeer]: Object could not be found in group.");
+		return false;
+		//error("[isObjectOnPeer]: Object could not be found in group.");
 
 	return object_map_it->second.isPeerPresent(peer_data);
 }
@@ -448,6 +448,10 @@ void GroupLedger::removePeer(PeerData peer_dat)
 		//TODO: Uncommenting this says that objects may exist, without being stored on any peer. This helps to tracks objects that have starved.
 		if (object_ledger_it->second.getPeerListSize() == 0)
 		{
+			const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
+			TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
+
+			//std::cout << "[" << simTime() << ":" << thisAdr << "]: Starved object: " << object_ledger_it->second.objectDataPtr->getObjectName() << endl;
 			object_map.erase(object_ledger_it);
 			objects_starved++;
 		}
