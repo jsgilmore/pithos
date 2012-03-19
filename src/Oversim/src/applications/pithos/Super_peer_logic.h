@@ -83,6 +83,8 @@ class Super_peer_logic : public cSimpleModule
 		/** Called when the module is about to be destroyed */
 		void finish();
 
+		void handlePeerLeaving(PeerData peer_data);
+
 		virtual void handleMessage(cMessage *msg);
 
 		/**

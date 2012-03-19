@@ -51,6 +51,8 @@ void GroupStorage::initialize()
 
 	requestTimeout = par("requestTimeout");
 
+	gracefulMigration = par("gracefulMigration");
+
 	//Link this node's group ledger with this group storage module
 	cModule *groupLedgerModule = getParentModule()->getSubmodule("group_ledger");
 	group_ledger = check_and_cast<GroupLedger *>(groupLedgerModule);
@@ -722,11 +724,49 @@ void GroupStorage::joinRequest(const TransportAddress &dest_adr)
 	send(boot_p, "comms_gate$o");
 }
 
+void GroupStorage::replicateLocalObjects()
+{
+	ObjectData object_data;
+	int known_replicas, replica_diff;
+	int expected_replicas = par("replicas");
+	int objectLedgerSize = group_ledger->getObjectLedgerSize(PeerData(this_address));
+
+	//If no objects are contained on this peer, don't bother trying to replicate anything
+	if (objectLedgerSize == 0)
+		return;
+
+	//std::cout << "Super peer replicating objects on peer: " << peer_data_pkt->getPeerData().getAddress() << endl;
+
+	//Every object housed on the leaving peer must be replicated
+	for (int i = 0 ; i < objectLedgerSize ; i++)
+	{
+		//Find the ith object housed on the leaving peer
+		object_data = group_ledger->getObjectFromPeer(PeerData(this_address), i);
+
+		//Determine how many replications have to be made, by examining the current number of replicas.
+		known_replicas = group_ledger->getReplicaNum(object_data);
+
+		//The leaving peer hasn't been removed yet, so equality has to be included
+		if (known_replicas <= expected_replicas)
+		{
+			replica_diff = expected_replicas - known_replicas + 1;	//+1 for the leaving peer
+
+			replicate(object_data, replica_diff);	//Choose group peers to replicate this object on
+		}
+	}
+}
+
 void GroupStorage::leaveGroup()
 {
 	group_ledger->removePeer(PeerData(this_address));
 
-	peerLeftInform(PeerData(this_address));
+	if (gracefulMigration)
+	{
+		peerLeftInform(PeerData(this_address), SP_PEER_MIGRATED);
+
+		replicateLocalObjects();
+	}
+	else peerLeftInform(PeerData(this_address), SP_PEER_LEFT);
 
 	group_ledger->recordAndClear();
 	storage_map.clear();
@@ -782,28 +822,19 @@ void GroupStorage::handleLeftPeer(PeerDataPkt *peer_data_pkt)
 	lastPeerLeft = peer_data_pkt->getPeerData();
 }
 
-void GroupStorage::replicate(ReplicationReqPkt *replicate_pkt)
+void GroupStorage::replicate(ObjectData object_data, int repplica_diff)
 {
-
 	PeerData peer_data;
 	StorageMap::iterator storage_it;
 	GameObject *go;
 	std::set<TransportAddress> selected_peers;
 	std::set<TransportAddress>::iterator selected_it;
 
-	if (replicate_pkt->getGroupAddress() != super_peer_address)
-	{
-		delete(replicate_pkt);
-		return;
-	}
-
 	int replicas = par("replicas");
-
-	ObjectData object_data = replicate_pkt->getObjectData();
 
 	//std::cout << "[" << simTime() << ":" << this_address << "]: Replicating object: " << object_data.getObjectName() << endl;
 
-	for (int i = 0 ; i < replicate_pkt->getReplicaDiff() ; i++)
+	for (int i = 0 ; i < repplica_diff ; i++)
 	{
 		bool objectIsOnPeer = true;
 		int retries = 0;
@@ -894,7 +925,13 @@ void GroupStorage::handlePacket(Packet *packet)
 	{
 		ReplicationReqPkt *replicate_pkt = check_and_cast<ReplicationReqPkt *>(packet);
 
-		replicate(replicate_pkt);
+		if (replicate_pkt->getGroupAddress() != super_peer_address)
+		{
+			delete(replicate_pkt);
+			return;
+		}
+
+		replicate(replicate_pkt->getObjectData(), replicate_pkt->getReplicaDiff());
 		delete(packet);
 	} else if (packet->getPayloadType() == PEER_LEFT)
 	{
@@ -906,7 +943,7 @@ void GroupStorage::handlePacket(Packet *packet)
 	else error("Group storage received an unknown packet");
 }
 
-void GroupStorage::peerLeftInform(PeerData peerData)
+void GroupStorage::peerLeftInform(PeerData peerData, int sp_way_left)
 {
 	std::vector<PeerDataPtr>::iterator it;
 	PeerDataPkt *pkt = new PeerDataPkt("peerLeft");
@@ -930,8 +967,9 @@ void GroupStorage::peerLeftInform(PeerData peerData)
 		send(pkt->dup(), "comms_gate$o");
 	}
 
+	//Can be either SP_PEER_LEFT or SP_PEER_MIGRATED (only the super peer's is different, since the super peer decides to replicate or note based on this info
+	pkt->setPayloadType(sp_way_left);
 	pkt->setDestinationAddress(super_peer_address);
-	pkt->setPayloadType(SP_PEER_LEFT);
 	send(pkt, "comms_gate$o");
 }
 
@@ -980,7 +1018,7 @@ void GroupStorage::handleTimeout(ResponseTimeoutEvent *timeout)
 
 	//The peer is not removed from the group ledger here. Since the peer itself is contained in its own group ledger, a message is just sent to itself to remove the peer.
 
-	peerLeftInform(peerData);
+	peerLeftInform(peerData, SP_PEER_LEFT);
 }
 
 void GroupStorage::handleMessage(cMessage *msg)

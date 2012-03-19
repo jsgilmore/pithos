@@ -56,9 +56,10 @@ enum PacketTypes
     RESPONSE = 12;
     PEER_LEFT = 13;
     SP_PEER_LEFT = 14;
-    POSITION_UPDATE = 15;
-    REPLICATION_REQ = 16;
-    REPLICATE = 17;
+    SP_PEER_MIGRATED = 15;
+    POSITION_UPDATE = 16;
+    REPLICATION_REQ = 17;
+    REPLICATE = 18;
 };
 
 enum OverlayTypes 
