@@ -288,8 +288,8 @@ void Super_peer_logic::replicateObjects(PeerDataPkt *peer_data_pkt)
 				peer_data = group_ledger->getRandomPeer(object_data.getKey());
 				if (peer_data != peer_data_pkt->getPeerData())
 				{
-					const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
-					TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
+					//const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
+					//TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
 
 					replication_req->setDestinationAddress(peer_data.getAddress());
 					send(replication_req->dup(), "comms_gate$o");
@@ -306,6 +306,18 @@ void Super_peer_logic::replicateObjects(PeerDataPkt *peer_data_pkt)
 	}
 
 	delete(replication_req);
+}
+
+void Super_peer_logic::handlePeerLeaving(PeerData peer_data)
+{
+	group_ledger->removePeer(peer_data);
+
+	lastPeerLeft = peer_data;	//Record the data of the last peer that left, in case we get an outdated object add message from that peer
+
+	//Inform the last peer that joined of the last peer that left, in case the peer that left did not know about the peer that joined.
+	informLastJoinedOfLastLeft();
+
+	emit(groupSizeSignal, group_ledger->getGroupSize());
 }
 
 void Super_peer_logic::handleMessage(cMessage *msg)
@@ -331,24 +343,19 @@ void Super_peer_logic::handleMessage(cMessage *msg)
 		{
 			PeerDataPkt *peer_data_pkt = check_and_cast<PeerDataPkt *>(packet);
 
-			const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
-			TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
-
-			//std::cout << "[SP: " << thisAdr << "] Received peer left from " << peer_data_pkt->getSourceAddress() << " for " << peer_data_pkt->getPeerData().getAddress() << " in group " << peer_data_pkt->getGroupAddress() << endl;
-
 			if (objectReplication)
 			{
 				replicateObjects(peer_data_pkt);
 			}
 
-			group_ledger->removePeer(peer_data_pkt->getPeerData());
+			handlePeerLeaving(peer_data_pkt->getPeerData());
 
-			lastPeerLeft = peer_data_pkt->getPeerData();	//Record the data of the last peer that left, in case we get an outdated object add message from that peer
+		} else if (packet->getPayloadType() == SP_PEER_MIGRATED)
+		{
+			PeerDataPkt *peer_data_pkt = check_and_cast<PeerDataPkt *>(packet);
 
-			//Inform the last peer that joined of the last peer that left, in case the peer that left did not know about the peer that joined.
-			informLastJoinedOfLastLeft();
+			handlePeerLeaving(peer_data_pkt->getPeerData());
 
-			emit(groupSizeSignal, group_ledger->getGroupSize());
 		} else if (packet->getPayloadType() == JOIN_REQ)
 		{
 			handleJoinReq(msg);
