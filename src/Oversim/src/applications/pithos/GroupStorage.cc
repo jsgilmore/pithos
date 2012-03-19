@@ -394,13 +394,22 @@ int GroupStorage::getReplicaNr(unsigned int rpcid)
 		//This packet is sent internally, so no size is required
 
 		//Send one failure response packet for each replica that cannot be stored
-		for (i = 0 ; i < replicas - group_ledger->getGroupSize() - 1 ; i++)
+		for (i = 0 ; i < replicas - group_ledger->getGroupSize() ; i++)
 			send(response->dup(), "read");
-		send(response, "read");
 
 		emit(groupSendFailSignal, replicas - group_ledger->getGroupSize());
 		RECORD_STATS(numPutError++);
 		replicas = group_ledger->getGroupSize();
+
+		//If there is only one peer available, the object will be lost as soon as that peer leaves the group,
+		//since there will be no other peers that can be used for replication. We therefore report put failure if no replication can be done.
+		//This only happens with new groups, where there are few peers in the group
+		if (replicas == 1)
+		{
+			send(response, "read");
+			return 0;
+		}
+		else delete(response);
 	}
 
 	return replicas;
@@ -422,7 +431,10 @@ void GroupStorage::send_forstore(ValuePkt *store_req)
 	PeerData destAdr;
 
 	int rpcid = store_req->getValue();
+
 	replicas = getReplicaNr(rpcid);
+	if (replicas == 0)
+		return;
 
 	createWritePkt(&write, rpcid);
 
@@ -430,8 +442,10 @@ void GroupStorage::send_forstore(ValuePkt *store_req)
 	if (go == NULL)
 		error("No object was attached to be stored in group storage");
 
-	//Add a new request for which at least one response is required
 	//std::cout << "Inserting pending put request with rpcid: " << rpcid << endl;
+	//std::cout << simTime() << ": Inserting object (" << go->getObjectName() << ") with " << replicas << " replicas.\n";
+
+	//Add a new request for which at least one response is required
 	entry.numPutSent = replicas;
 	entry.responseType = GROUP_PUT;
 
@@ -787,7 +801,7 @@ void GroupStorage::replicate(ReplicationReqPkt *replicate_pkt)
 
 	ObjectData object_data = replicate_pkt->getObjectData();
 
-	//std::cout << "[" << this_address << "]: Replicating object: " << object_data.getObjectName() << endl;
+	//std::cout << "[" << simTime() << ":" << this_address << "]: Replicating object: " << object_data.getObjectName() << endl;
 
 	for (int i = 0 ; i < replicate_pkt->getReplicaDiff() ; i++)
 	{
