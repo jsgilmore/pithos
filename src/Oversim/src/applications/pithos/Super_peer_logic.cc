@@ -141,6 +141,18 @@ void Super_peer_logic::informJoiningPeer(bootstrapPkt *boot_req, TransportAddres
 	list_p->setGroupAddress(sourceAdr);
 	list_p->setDestinationAddress(boot_req->getSourceAddress());
 
+	//Inform the joining peer of all peers in the group, in case there are peers that do not store any objects.
+	//TODO: This should be changed to only inform the joining peer of the peers with no objects.
+	list_p->setObjectData(ObjectData::UNSPECIFIED_OBJECT);
+	list_p->setByteLength(PEERLIST_PKT_SIZE (PEERDATA_SIZE*(group_ledger->getGroupSize())));	//Peerlist packet size + peerdata inserted
+
+	for (unsigned int i = 0 ; i < group_ledger->getGroupSize() ; i++)
+	{
+		list_p->addToPeerList(*(group_ledger->getPeerPtr(i)));	//Send a copy of the object, pointed to by the smart pointer
+	}
+	send(list_p->dup(), "comms_gate$o");	//Send a copy of the peer list, so the original packet may be reused to inform the other nodes
+	list_p->clearPeerList();
+
 	//If there are already objects stored in the group, inform the joining peer of all objects and of the peers they are stored on
 	for (object_map_it = group_ledger->getObjectMapBegin() ; object_map_it != group_ledger->getObjectMapEnd() ; object_map_it++)
 	{
@@ -157,16 +169,7 @@ void Super_peer_logic::informJoiningPeer(bootstrapPkt *boot_req, TransportAddres
 		list_p->clearPeerList();
 	}
 
-	list_p->setObjectData(ObjectData::UNSPECIFIED_OBJECT);
-	list_p->setByteLength(PEERLIST_PKT_SIZE (PEERDATA_SIZE*(group_ledger->getGroupSize())));	//Peerlist packet size + peerdata inserted
-
-	//Again inform the joining peer of all peers in the group, in case there were peers that do not store any objects.
-	//TODO: This should be changed to only inform the joining peer of the peers with no objects.
-	for (unsigned int i = 0 ; i < group_ledger->getGroupSize() ; i++)
-	{
-		list_p->addToPeerList(*(group_ledger->getPeerPtr(i)));	//Send a copy of the object, pointed to by the smart pointer
-	}
-	send(list_p, "comms_gate$o");	//Send a copy of the peer list, so the original packet may be reused to inform the other nodes
+	delete(list_p);
 }
 
 void Super_peer_logic::handleJoinReq(cMessage *msg)
@@ -178,7 +181,10 @@ void Super_peer_logic::handleJoinReq(cMessage *msg)
 
 	PeerData joining_peer(boot_req->getSourceAddress());
 
-	EV << "Super peer received bootstrap request from " << boot_req->getSourceAddress() << ", sending list and updating group.\n";
+	if (group_ledger->isPeerInGroup(joining_peer))
+		return;
+
+	std::cout << "Super peer received bootstrap request from " << boot_req->getSourceAddress() << endl;
 
 	//Inform all other nodes in the group of the joining node
 	informGroupPeers(boot_req, sourceAdr);
@@ -254,8 +260,8 @@ void Super_peer_logic::replicateObjects(PeerDataPkt *peer_data_pkt)
 
 	int peer_selection_tries;
 
-	//If the peer was not found, it means it has already been removed.
-	if (objectLedgerSize == 0)
+	//If the peer did not contain any objects or the peer was not found (has already been removed) there is nothing to be done
+	if (objectLedgerSize == 0 || objectLedgerSize == -1)
 		return;
 
 	ReplicationReqPkt *replication_req = new ReplicationReqPkt();
