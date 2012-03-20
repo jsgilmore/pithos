@@ -184,7 +184,7 @@ void Super_peer_logic::handleJoinReq(cMessage *msg)
 	if (group_ledger->isPeerInGroup(joining_peer))
 		return;
 
-	std::cout << "Super peer received bootstrap request from " << boot_req->getSourceAddress() << endl;
+	//std::cout << "Super peer received bootstrap request from " << boot_req->getSourceAddress() << endl;
 
 	//Inform all other nodes in the group of the joining node
 	informGroupPeers(boot_req, sourceAdr);
