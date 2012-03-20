@@ -119,6 +119,7 @@ void GroupLedger::handleMessage(cMessage* msg)
 
 			if (object_map.size() > 0)
 				RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Average number of replicas per object")).c_str(), double(objects_total)/(object_map.size() + objects_starved)));
+			else RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Average number of replicas per object")).c_str(), 0));
 		}
 		else if (!(groupStorage->getSuperPeerAddress().isUnspecified()))
 		{
@@ -178,7 +179,7 @@ int GroupLedger::getObjectLedgerSize(PeerData peer_data)
 			return peer_ledger_it->getObjectListSize();
 	}
 
-	return 0;
+	return -1;
 }
 
 int GroupLedger::getPeerLedgerSize(ObjectData object_data)

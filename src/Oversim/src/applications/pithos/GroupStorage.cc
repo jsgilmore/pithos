@@ -692,9 +692,12 @@ void GroupStorage::addToGroup(cMessage *msg)
 		if ((lastPeerLeft.getAddress().isUnspecified()) || (peer_dat != lastPeerLeft))
 		{
 			if ((list_p->getObjectData()).isUnspecified())
+			{
 				group_ledger->addPeer(peer_dat);
+				std::cout << simTime() << ": " << this_address << " was informed of peer: " << peer_dat.getAddress() << endl;
+			}
 			else {
-					group_ledger->addObject(object_dat, peer_dat);
+				group_ledger->addObject(object_dat, peer_dat);
 			}
 		} else {
 			//std::cout << "[" << simTime() << ":" << this_address <<"]: Unsuccessful add, peer was last peer that left (" << peer_dat.getAddress() << ")\n";
@@ -721,6 +724,8 @@ void GroupStorage::joinRequest(const TransportAddress &dest_adr)
 	boot_p->setLongitude(longitude);
 	boot_p->setByteLength(BOOTSTRAP_PKT_SIZE);	//Src IP as #, Dest IP as #, Type, Lat, Long
 
+	std::cout << "Join request sent to communicator from " << this_address << endl;
+
 	send(boot_p, "comms_gate$o");
 }
 
@@ -729,7 +734,14 @@ void GroupStorage::replicateLocalObjects()
 	ObjectData object_data;
 	int known_replicas, replica_diff;
 	int expected_replicas = par("replicas");
+
 	int objectLedgerSize = group_ledger->getObjectLedgerSize(PeerData(this_address));
+
+	std::cout << simTime() << ": Trying to replicate the local objects of peer " << this_address << endl;
+
+	//If the peer does not exist in its own group ledger, there's something wrong
+	if (objectLedgerSize == -1)
+		error("No objects for replication.");
 
 	//If no objects are contained on this peer, don't bother trying to replicate anything
 	if (objectLedgerSize == 0)
@@ -758,15 +770,17 @@ void GroupStorage::replicateLocalObjects()
 
 void GroupStorage::leaveGroup()
 {
-	group_ledger->removePeer(PeerData(this_address));
-
 	if (gracefulMigration)
 	{
-		peerLeftInform(PeerData(this_address), SP_PEER_MIGRATED);
-
 		replicateLocalObjects();
+
+		group_ledger->removePeer(PeerData(this_address));
+		peerLeftInform(PeerData(this_address), SP_PEER_MIGRATED);
 	}
-	else peerLeftInform(PeerData(this_address), SP_PEER_LEFT);
+	else {
+		group_ledger->removePeer(PeerData(this_address));
+		peerLeftInform(PeerData(this_address), SP_PEER_LEFT);
+	}
 
 	group_ledger->recordAndClear();
 	storage_map.clear();
@@ -795,7 +809,7 @@ void GroupStorage::addAndJoinSuperPeer(Packet *packet)
 
 
 	super_peer_address = boot_p->getSuperPeerAdr();
-	//std::cout << "Adding new group address: " << super_peer_address << endl;
+	std::cout << "[" << simTime() << ":" << this_address << "]: Adding new group address: " << super_peer_address << endl;
 
 	if (super_peer_address.isUnspecified())
 		error("The address is unspecified.");
