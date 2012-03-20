@@ -252,11 +252,6 @@ void Communicator::handleSPMsg(cMessage *msg)
 
 void Communicator::handlePeerMsg(cMessage *msg)
 {
-	Packet *packet = check_and_cast<Packet *>(msg);
-
-	if (packet->getPayloadType() == JOIN_REQ)
-		std::cout << simTime() << ": Join request sent from communicator over UDP from " << TransportAddress(thisNode.getIp(), thisNode.getPort()) << endl;
-
 	sendPacket(msg);
 
 }
