@@ -50,6 +50,7 @@ class GroupLedger : public cSimpleModule
 
 		int objects_total;		//The number of objects including replicas
 		int objects_starved;	//The number of objects that have been lost due to peers leaving
+		double object_lifetime;
 		int data_size;			//The total size in bytes stored in the ledger
 
 		int numPeerRemoveFail;

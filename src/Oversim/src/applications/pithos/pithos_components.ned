@@ -105,6 +105,7 @@ simple GroupStorage
         int directory_port;
         double requestTimeout @unit(s);
         int replicas;
+        int numGetRequests;
         
         bool gracefulMigration;
     gates:

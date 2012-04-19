@@ -125,10 +125,18 @@ class GroupStorage : public cSimpleModule
 		int numGetSuccess; /**< number of success in put responses*/
 		int numPutError; /**< number of error in put responses*/
 		int numPutSuccess; /**< number of success in put responses*/
+		int numGetSecondGood;
+		int	numGetSecondBad;
+
+		//Get and Put error reasons
+		int getErrMissingObjectSamePeer;
+		int getErrMissingObjectOtherPeer;
+		int getErrRequestOOG;
+		int putErrStoreOOG;
 
 		simtime_t requestTimeout;	/**< The amount of time to wait for a response to a request, before a node is removed from the group*/
-
 		bool gracefulMigration;
+		int numGetRequests;
 
 		/**
 		 * The function creates a write packet and fills it with address information, payload type and byte length.

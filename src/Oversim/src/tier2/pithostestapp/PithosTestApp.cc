@@ -316,9 +316,16 @@ void PithosTestApp::handleTimerEvent(cMessage* msg)
 {
 	if (msg->isName("position_update_timer"))
 	{
-		//TODO: Uncomment this to simulate group migration again.
 		if (groupMigration)
-			scheduleAt(simTime()+uniform(250, 750), position_update_timer);		//TODO: These parameters should be made configurable
+		{
+			//The minimum group time value is to ensure that the underlying layer has sufficient time to join a group.
+			double group_time = 0.0;
+			while(group_time < 1.5)
+			{
+				group_time = exponential(400);
+			}
+			scheduleAt(simTime()+group_time, position_update_timer);		//TODO: These parameters should be made configurable
+		}
 
 		PositionUpdatePkt *update_pkt = new PositionUpdatePkt();
 		update_pkt->setLatitude(uniform(0,100));	//TODO: These parameters should be made configurable
