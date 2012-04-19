@@ -47,6 +47,8 @@ void GroupLedger::initialize()
 	objects_total = 0;
 	objects_starved = 0;
 
+	object_lifetime = 0.0;
+
 	periodicTimer = new cMessage("PithosTestMapTimer");
 
 	scheduleAt(simTime(), periodicTimer);
@@ -69,6 +71,8 @@ void GroupLedger::recordAndClear()
 	data_size = 0;
 	objects_total = 0;
 	objects_starved = 0;
+
+	object_lifetime = 0;
 
 	object_map.clear();
 	peer_list.clear();
@@ -230,7 +234,7 @@ void GroupLedger::finish()
     	} else {
 
         	group_name << "GroupLedger (" << groupStorage->getSuperPeerAddress() << "): ";
-    	} return;
+    	}
 
     	globalStatistics->addStdDev((group_name.str() + std::string("GroupLedger: Failed object gets")).c_str() , numObjectGetFail);
     	globalStatistics->addStdDev((group_name.str() + std::string("GroupLedger: Successful object gets")).c_str() , numObjectGetSuccess);
@@ -446,13 +450,20 @@ void GroupLedger::removePeer(PeerData peer_dat)
 		objects_total--;
 
 		//If the peer is removed and there are now no peers on which the object is stored, remove the object ledger entry
-		//TODO: Uncommenting this says that objects may exist, without being stored on any peer. This helps to tracks objects that have starved.
 		if (object_ledger_it->second.getPeerListSize() == 0)
 		{
-			const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
-			TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
+			std::ostringstream group_name;
 
-			//std::cout << "[" << simTime() << ":" << thisAdr << "]: Starved object: " << object_ledger_it->second.objectDataPtr->getObjectName() << endl;
+			if (isSuperPeerLedger())
+			{
+				const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
+				TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
+
+				group_name << "GroupLedger (" << thisAdr << "): ";
+				object_lifetime = (simTime() - object_ledger_it->second.objectDataPtr->getCreationTime()).dbl();
+				globalStatistics->addStdDev((group_name.str() + std::string("GroupLedger: Object lifetime")).c_str() , object_lifetime);
+			}
+
 			object_map.erase(object_ledger_it);
 			objects_starved++;
 		}

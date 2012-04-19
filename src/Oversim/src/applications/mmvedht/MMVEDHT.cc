@@ -618,8 +618,7 @@ void MMVEDHT::handleGetResponse(DHTGetResponse* dhtMsg, int rpcId)
             }
         }
 
-        if ((double) maxCount / (double) it->second.numAvailableReplica
-                >= ratioIdentical) {
+        if ((double) maxCount / (double) it->second.numAvailableReplica >= ratioIdentical) {
             it->second.hashVector = hashVector;
         } else if (it->second.numResponses >= numGetRequests) {
             // we'll try to ask some other nodes
