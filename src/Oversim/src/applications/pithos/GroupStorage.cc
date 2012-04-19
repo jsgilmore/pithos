@@ -53,6 +53,8 @@ void GroupStorage::initialize()
 
 	gracefulMigration = par("gracefulMigration");
 
+	numGetRequests = par("numGetRequests");
+
 	//Link this node's group ledger with this group storage module
 	cModule *groupLedgerModule = getParentModule()->getSubmodule("group_ledger");
 	group_ledger = check_and_cast<GroupLedger *>(groupLedgerModule);
@@ -90,6 +92,14 @@ void GroupStorage::initialize()
 	numGetSent = 0;
 	numGetError = 0;
 	numGetSuccess = 0;
+	numGetSecondGood = 0;
+	numGetSecondBad = 0;
+
+	//Get error reasons
+	getErrMissingObjectOtherPeer = 0;
+	getErrMissingObjectSamePeer = 0;
+	getErrRequestOOG = 0;
+	putErrStoreOOG = 0;
 
 	//initRpcs();
 	WATCH(numSent);
@@ -99,6 +109,13 @@ void GroupStorage::initialize()
 	WATCH(numGetSent);
 	WATCH(numGetError);
 	WATCH(numGetSuccess);
+	WATCH(numGetSecondGood);
+	WATCH(numGetSecondBad);
+
+	WATCH(getErrMissingObjectOtherPeer);
+	WATCH(getErrMissingObjectSamePeer);
+	WATCH(getErrRequestOOG);
+	WATCH(putErrStoreOOG);
 
 	WATCH_MAP(storage_map);
 }
@@ -121,6 +138,16 @@ void GroupStorage::finish()
         globalStatistics->addStdDev("GroupStorage: Sent GET Messages", numGetSent);
 		globalStatistics->addStdDev("GroupStorage: Failed GET Requests", numGetError);
 		globalStatistics->addStdDev("GroupStorage: Successful GET Requests", numGetSuccess);
+
+		globalStatistics->addStdDev("GroupStorage: GET assisted by second request", numGetSecondGood);
+		globalStatistics->addStdDev("GroupStorage: GET not assisted by second request", numGetSecondBad);
+
+		globalStatistics->addStdDev("GroupStorage: GET error: Missing objects on requesting peer", getErrMissingObjectSamePeer);
+		globalStatistics->addStdDev("GroupStorage: GET error: Missing objects on target peer", getErrMissingObjectOtherPeer);
+		globalStatistics->addStdDev("GroupStorage: GET error: Target of request out of group", getErrRequestOOG);
+		globalStatistics->addStdDev("GroupStorage: PUT error: Target of store out of group", putErrStoreOOG);
+
+		globalStatistics->addStdDev("GroupStorage: Measured Lifetime", time.dbl());
 
         if ((numGetSuccess + numGetError) > 0) {
             globalStatistics->addStdDev("GroupStorage: GET Success Ratio", (double) numGetSuccess / (double) (numGetSuccess + numGetError));
@@ -192,7 +219,14 @@ void GroupStorage::sendUpperResponse(int responseType, unsigned int rpcid, bool 
 
 void GroupStorage::forwardRequest(OverlayKeyPkt *retrieve_req)
 {
+	std::set<TransportAddress> chosen_peers;
+	std::set<TransportAddress>::iterator chosen_peers_it;
+	int choose_tries;
+	int group_size = group_ledger->getGroupSize();
+	OverlayKeyPkt *retrieve_dup;
+
 	PeerData container_peer;
+	PendingRequestsEntry entry;
 	int rpcid = retrieve_req->getValue();
 
 	//TODO: This check can later be removed if a partially connected group is required with recursive routing within the group.
@@ -200,31 +234,51 @@ void GroupStorage::forwardRequest(OverlayKeyPkt *retrieve_req)
 	if (retrieve_req->getHops() > 0)
 		error("[GroupStorage]: Object not found on destination node in group.");
 
-	RECORD_STATS(numSent++; numGetSent++);
-
-	container_peer = group_ledger->getRandomPeer(retrieve_req->getKey());
-
-	//Send a retrieve request to the group peer storing the object
-	retrieve_req->setDestinationAddress(container_peer.getAddress());
-	retrieve_req->setGroupAddress(super_peer_address);
-
-	retrieve_req->setHops(retrieve_req->getHops()+1);
-
-	send(retrieve_req, "comms_gate$o");
-
-	//Create and schedule request timeout timer
-	ResponseTimeoutEvent *timeout = new ResponseTimeoutEvent("timeout");
-	timeout->setRpcid(rpcid);
-	timeout->setPeerData(container_peer);
-	scheduleAt(simTime()+requestTimeout, timeout);
-
-	//Insert timer into list of pending requests
-	PendingRequestsEntry entry;
-	entry.numGetSent = 1;	//Only one message is sent per get request
+	entry.numGetSent = numGetRequests;
 	entry.responseType = GROUP_GET;
-	entry.timeouts.push_back(timeout);
+
+	for (int i = 0 ; i < numGetRequests ; i++)
+	{
+		retrieve_dup = retrieve_req->dup();
+		choose_tries = 0;
+		while(choose_tries < 2*group_size)
+		{
+			container_peer = group_ledger->getRandomPeer(retrieve_req->getKey());
+			chosen_peers_it = chosen_peers.find(container_peer.getAddress());
+			if (chosen_peers_it == chosen_peers.end())
+			{
+				chosen_peers.insert(container_peer.getAddress());
+				break;
+			}
+			else choose_tries++;
+		}
+		if (choose_tries >= 2*group_size)
+		{
+			delete(retrieve_dup);
+			continue;
+		}
+
+		//Send a retrieve request to the group peer storing the object
+		retrieve_dup->setDestinationAddress(container_peer.getAddress());
+		retrieve_dup->setGroupAddress(super_peer_address);
+
+		retrieve_dup->setHops(retrieve_req->getHops()+1);
+
+		send(retrieve_dup, "comms_gate$o");
+		RECORD_STATS(numSent++; numGetSent++);
+
+		//Create and schedule request timeout timer
+		ResponseTimeoutEvent *timeout = new ResponseTimeoutEvent("timeout");
+		timeout->setRpcid(rpcid);
+		timeout->setPeerData(container_peer);
+		scheduleAt(simTime()+requestTimeout, timeout);
+
+		//Insert timer into list of pending requests
+		entry.timeouts.push_back(timeout);
+	}
 
 	pendingRequests.insert(std::make_pair(rpcid, entry));
+	delete(retrieve_req);
 }
 
 bool GroupStorage::handleMissingObject(OverlayKeyPkt *retrieve_req)
@@ -241,11 +295,14 @@ bool GroupStorage::handleMissingObject(OverlayKeyPkt *retrieve_req)
 		{
 			//If the object is not stored in the group, send a failure response to the higher layer
 			sendUpperResponse(GROUP_GET, rpcid, false);
+			RECORD_STATS(getErrMissingObjectSamePeer++);
 			delete(retrieve_req);
 			return true;
 		} else {
 			//If the object is not stored in the group, send a failure response to the higher layer
+			//This situation shouldn't really occur. Make sure there are no packets dropped by the underlay, since it can cause this situation.
 			sendUDPResponse(retrieve_req->getDestinationAddress(), retrieve_req->getSourceAddress(), GROUP_GET, rpcid, false);
+			RECORD_STATS(getErrMissingObjectOtherPeer++);
 			delete(retrieve_req);
 			return true;
 		}
@@ -287,21 +344,28 @@ void GroupStorage::requestRetrieve(OverlayKeyPkt *retrieve_req)
 	unsigned int rpcid = retrieve_req->getValue();
 	bool isSuccess;
 
-	//This can happen if this peer switched groups, after being selected to retrieve a packet
-	//It should also be noted that this if and the next is required, otherwise an upper response will be sent, instead of a UDP response.
-	//The first request to come from the upper layer will have an unspecified group address and has to be ignored. An illegal compare eror wil be generated if it's not the first hop
+	isSuccess = retrieveLocally(retrieve_req);
+	if (isSuccess) return;
+
+	/**
+	 * Check whether the message was sent from another group.
+	 * Note that this is done after checking whether the object is locally available. This means that if the object is locally available, it will be sent to the requesting peer.
+	 * The requesting peer will still, however, remove the target peer from its group ledger.
+	 *
+	 * The out of group error can happen if this peer switched groups, after being selected to retrieve a packet
+	 * It should also be noted that this if and the next is required, otherwise an upper response will be sent, instead of a UDP response.
+	 * The first request to come from the upper layer will have an unspecified group address and has to be ignored. An illegal compare error will be generated if it's not the first hop
+	 */
 	if (!(retrieve_req->getGroupAddress().isUnspecified()) || (retrieve_req->getHops() != 0))
 	{
 		if (retrieve_req->getGroupAddress() != super_peer_address)
 		{
 			sendUDPResponse(retrieve_req->getDestinationAddress(), retrieve_req->getSourceAddress(), GROUP_GET, rpcid, false);
+			RECORD_STATS(getErrRequestOOG++);
 			delete(retrieve_req);
 			return;
 		}
 	}
-
-	isSuccess = retrieveLocally(retrieve_req);
-	if (isSuccess) return;
 
 	isSuccess = handleMissingObject(retrieve_req);
 	if (isSuccess) return;
@@ -511,7 +575,17 @@ void GroupStorage::handleResponse(PendingRequests::iterator it, ResponsePkt *res
 			RECORD_STATS(numGetError++);
 		}
 
-		pendingRequests.erase(it);
+		if (it->second.numGroupGetSucceeded + it->second.numGroupGetFailed == it->second.numGetSent)
+		{
+			//Measure whether the second message was useful. If we had one success and one failure, the second message might have been useful.
+			//If we had no successes or no failures, the second message did not help. (In fact, it had a negative impact, because of extra bandwidth.)
+			if (it->second.numGroupGetFailed > 0 && it->second.numGroupGetSucceeded > 0)
+				RECORD_STATS(numGetSecondGood++);
+			else RECORD_STATS(numGetSecondBad++);
+
+			pendingRequests.erase(it);
+		}
+
 	} else error("Unknown response type received");
 }
 
@@ -575,7 +649,7 @@ void GroupStorage::respond_toUpper(cMessage *msg)
 		 */
 		if (response->getGroupAddress() != super_peer_address)
 		{
-			//PeerData wil here be equal to the peer data found in the appropriate timeout
+			//PeerData will here be equal to the peer data found in the appropriate timeout
 			group_ledger->removePeer(peerData);
 			//LastPeerLeft should not be updated here, since it might have been this peer that left
 		}
@@ -584,9 +658,7 @@ void GroupStorage::respond_toUpper(cMessage *msg)
 
 		handleResponse(it, response);
 
-	} /*else {
-		//std::cout << "[" << simTime() << ":" << this_address <<"]: Timeout with unknown RPCID received (" << response->getRpcid() << ")\n";
-	}*/
+	}
 
 	send(msg, "read");
 }
@@ -617,6 +689,7 @@ void GroupStorage::store(Packet *pkt)
 			//We can also receive a replicate packet, which does not expect a response
 			ValuePkt *value_pkt = check_and_cast<ValuePkt *>(pkt);
 			sendUDPResponse(value_pkt->getDestinationAddress(), value_pkt->getSourceAddress(), GROUP_PUT, value_pkt->getValue(), false);
+			RECORD_STATS(putErrStoreOOG++);
 			return;
 		} else return;
 	}
@@ -627,6 +700,10 @@ void GroupStorage::store(Packet *pkt)
 	//We're not removing the object here, because we're only using the value and then the object is deleted with the message.
 	GameObject *go = (GameObject *)pkt->getObject("GameObject");
 	go->setGroupAddress(super_peer_address);
+
+	//A peer migrated. When the packets that it replicated arrived here, they had already expired.
+	if (simTime() > (go->getCreationTime() + go->getTTL()))
+		return;
 
 	//std::cout << "[GroupStorageTarget] Stored object with key " << go->getHash() << endl;
 	EV << getName() << " " << getIndex() << " received Game Object of size " << go->getSize() << "\n";
@@ -783,7 +860,6 @@ void GroupStorage::leaveGroup()
 	}
 
 	group_ledger->recordAndClear();
-	storage_map.clear();
 
 	lastPeerLeft = PeerData();	//Sets the transport address to unspecified for the new group
 }
@@ -873,8 +949,9 @@ void GroupStorage::replicate(ObjectData object_data, int repplica_diff)
 
 		//Retrieve the object from local storage
 		storage_it = storage_map.find(object_data.getKey());
+		//This can occur if a replication request was sent for an object and when the request arrived, that object had already expired.
 		if (storage_it == storage_map.end())
-				error("[replicate]: Object could not be found in local storage.");
+			return;
 
 		go = new GameObject(storage_it->second);	//A dynamic game object is required to add to an Omnet message
 
@@ -1071,6 +1148,9 @@ void GroupStorage::handleMessage(cMessage *msg)
 
 		//A request is sent to the well known directory server
 		joinRequest(TransportAddress(IPAddress(directory_ip), directory_port));
+
+		if (event->isScheduled())
+			error("The upper layer is generating group join requests faster than the time it takes to join a group.");
 
 		scheduleAt(simTime()+1, event);		//TODO: make the 1 second wait time a configuration variable that may be set
 
