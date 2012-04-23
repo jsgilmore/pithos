@@ -456,12 +456,10 @@ void GroupLedger::removePeer(PeerData peer_dat)
 
 			if (isSuperPeerLedger())
 			{
-				const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
-				TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
-
-				group_name << "GroupLedger (" << thisAdr << "): ";
 				object_lifetime = (simTime() - object_ledger_it->second.objectDataPtr->getCreationTime()).dbl();
-				globalStatistics->addStdDev((group_name.str() + std::string("GroupLedger: Object lifetime")).c_str() , object_lifetime);
+				std::cout << "Object lifetime: " << object_lifetime << endl;
+				RECORD_STATS(globalStatistics->recordOutVector("GroupLedger: Object lifetime", object_lifetime));
+				RECORD_STATS(globalStatistics->recordOutVector("GroupLedger: Object initial group size", object_ledger_it->second.objectDataPtr->getInitGroupSize()));
 			}
 
 			object_map.erase(object_ledger_it);

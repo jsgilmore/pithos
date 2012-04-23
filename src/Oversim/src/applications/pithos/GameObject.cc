@@ -26,9 +26,9 @@ GameObject::~GameObject()
 
 }
 
-GameObject::GameObject(const char *name, int64_t o_size, simtime_t o_creationTime, int o_ttl) : cOwnedObject(name)
+GameObject::GameObject(const std::string o_name, int64_t o_size, simtime_t o_creationTime, int o_ttl) : cOwnedObject(o_name.c_str())
 {
-	strcpy(objectName, "Unspecified");
+	objectName = "Unspecified";
 	size = o_size;
 	creationTime = o_creationTime;
 	ttl = o_ttl;
@@ -47,7 +47,7 @@ GameObject& GameObject::operator=(const GameObject& other)
 
 	size = other.size;
 	ttl = other.ttl;
-	strcpy(objectName, other.objectName);
+	objectName = other.objectName;
 	creationTime = other.creationTime;
 	group_address = other.group_address;
 
@@ -62,7 +62,7 @@ bool operator==(const GameObject& object1, const GameObject& object2)
 	if (object1.ttl != object2.ttl)
 		return false;
 
-	if (strcmp(object1.objectName, object2.objectName) != 0)
+	if (object1.objectName != object2.objectName)
 		return false;
 
 	//A creation time difference of no more than one is used to account for inaccuracies when converting from the float string of the BinaryValue to a float variable
@@ -89,7 +89,7 @@ GameObject& GameObject::operator=(const BinaryValue& binval)
 	//If an unspecified BinaryValue was received, return an unspecified GameObject
 	if (binval == BinaryValue::UNSPECIFIED_VALUE)
 	{
-		strcpy(objectName, "Unspecified");
+		objectName = "Unspecified";
 		size = 0;
 		creationTime = SIMTIME_ZERO;
 		ttl = 0;
@@ -108,7 +108,7 @@ GameObject& GameObject::operator=(const BinaryValue& binval)
 		tokens.push_back(buf);
 
 	//After the string has been tokenised, we have to use the tokens to populate the variables
-	strcpy(objectName, (tokens[0]).c_str());
+	objectName = tokens[0];
 	size = atol((tokens[1]).c_str());		//TODO: I'm quite sure this long will be 64 bits in a 64 bit system, but unsure about 32 bit systems
 	creationTime = atof((tokens[2]).c_str());
 	ttl = atoi((tokens[3]).c_str());
@@ -122,6 +122,7 @@ std::string GameObject::info()
 	/**
 	 * It's important that this function is kept up to date,
 	 * since the BinaryValue and hash of the object is generated using it.
+	 * Also keep the const function up to date with this one.
 	 *
 	 * Space delimiting is used by the C++ string streams to tokenise the input for reconstruction
 	 *
@@ -129,6 +130,13 @@ std::string GameObject::info()
 	 * since the hash of an object should not depend on whether it's a root, replica or overlay object
 	 */
 
+	std::stringstream out;
+	out << objectName << " " << size << " " << creationTime << " " << ttl;
+	return out.str();
+}
+
+std::string GameObject::info() const
+{
 	std::stringstream out;
 	out << objectName << " " << size << " " << creationTime << " " << ttl;
 	return out.str();
@@ -161,6 +169,11 @@ OverlayKey GameObject::getHash()
 	return OverlayKey::sha1(getBinaryValue());
 }
 
+OverlayKey GameObject::getHash() const
+{
+	return OverlayKey::sha1(getBinaryValue());
+}
+
 GameObject *GameObject::dup() const
 {
 	return new GameObject(*this);
@@ -168,6 +181,11 @@ GameObject *GameObject::dup() const
 
 //This is the real meat of the packet. The getter and setter methods for the different attributes.
 int64_t GameObject::getSize()
+{
+	return size;
+}
+
+int64_t GameObject::getSize() const
 {
 	return size;
 }
@@ -192,12 +210,17 @@ void GameObject::setTTL(const int &o_ttl)
 	ttl = o_ttl;
 }
 
-void GameObject::setObjectName(const char *o_Name)
+void GameObject::setObjectName(const std::string& o_Name)
 {
-	strcpy(objectName, o_Name);
+	objectName = o_Name;
 }
 
-char * GameObject::getObjectName()
+std::string GameObject::getObjectName()
+{
+	return objectName;
+}
+
+std::string GameObject::getObjectName() const
 {
 	return objectName;
 }
@@ -218,6 +241,13 @@ simtime_t GameObject::getCreationTime() const
 }
 
 BinaryValue GameObject::getBinaryValue()
+{
+	BinaryValue binval(info());
+
+	return binval;
+}
+
+BinaryValue GameObject::getBinaryValue() const
 {
 	BinaryValue binval(info());
 
