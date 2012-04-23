@@ -23,13 +23,24 @@ const ObjectData ObjectData::UNSPECIFIED_OBJECT;
 	key = OverlayKey::UNSPECIFIED_KEY;
 }*/
 
-ObjectData::ObjectData(std::string name, int siz, OverlayKey k, simtime_t time, int t)
+ObjectData::ObjectData(std::string name, int siz, OverlayKey k, simtime_t time, int t, int group_size)
 {
 	object_name = name;
 	size = siz;
 	key = k;
 	creationTime = time;
 	ttl = t;
+	init_group_size = group_size;
+}
+
+ObjectData::ObjectData(const GameObject& go, int group_size)
+{
+	object_name = go.getObjectName();
+	size = go.getSize();
+	key = go.getHash();
+	creationTime = go.getCreationTime();
+	ttl = go.getTTL();
+	init_group_size = group_size;
 }
 
 ObjectData::~ObjectData()
@@ -46,6 +57,7 @@ ObjectData& ObjectData::operator=(const ObjectData& other)
 	key = other.key;
 	creationTime = other.creationTime;
 	ttl = other.ttl;
+	init_group_size = other.init_group_size;
 
 	return *this;
 }
@@ -55,6 +67,7 @@ bool operator==(const ObjectData& object1, const ObjectData& object2)
 	if (object1.key != object2.key)
 		return false;
 
+	//Other comparisons significantly slow down computation and keys already define a unique object
 	/*if (object1.object_name != object2.object_name)
 			return false;
 
@@ -113,6 +126,16 @@ int ObjectData::getSize()
 void ObjectData::setKey(const OverlayKey &k)
 {
 	key = k;
+}
+
+void ObjectData::setInitGroupSize(const int &siz)
+{
+	init_group_size = siz;
+}
+
+int ObjectData::getInitGroupSize()
+{
+	return init_group_size;
 }
 
 OverlayKey ObjectData::getKey()

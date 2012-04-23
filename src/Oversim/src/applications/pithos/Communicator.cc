@@ -188,37 +188,6 @@ void Communicator::handleUDPMessage(cMessage* msg)
 	else error("Communicator received unknown message from UDP");
 }
 
-void Communicator::overlayStore(cMessage *msg)
-{
-	CSHA1 hash;
-	char hash_str[41];		//SHA-1 produces a 160 bit/20 byte hash
-
-	if (underlayConfigurator->isInInitPhase())
-	{
-		delete(msg);
-		error("Underlay configurator is still in init phase, extend wait time.\n");
-	}
-
-	for (int i = 0 ; i < 41 ; i++)	//The string has to be cleared for the OverlayKey constructor to correctly handle it.
-		hash_str[i] = 0;
-
-	GameObject *go = (GameObject *)msg->getObject("GameObject");
-	cPacket *pkt = check_and_cast<cPacket *>(msg);
-
-	EV << "[Communicator]: Sending object with name: " << go->getObjectName() << endl;
-
-	//Create a hash of the game object's name
-	hash.Update((unsigned char *)go->getObjectName(), strlen(go->getObjectName()));
-	hash.Final();
-	hash.ReportHash(hash_str, CSHA1::REPORT_HEX);
-
-	OverlayKey nameKey(hash_str, 16);
-
-	EV << "[Communicator]: " << thisNode.getIp() << " sending packet to " << nameKey << endl;
-
-	callRoute(nameKey, pkt);
-}
-
 void Communicator::sendPacket(cMessage *msg)
 {
 	Packet *pkt = check_and_cast<Packet *>(msg);
@@ -243,17 +212,12 @@ void Communicator::sendPacket(cMessage *msg)
 
 void Communicator::handleSPMsg(cMessage *msg)
 {
-	if (strcmp(msg->getName(), "overlay_write") == 0)
-	{
-		overlayStore(msg);
-	}
-	else sendPacket(msg);
+	sendPacket(msg);
 }
 
 void Communicator::handlePeerMsg(cMessage *msg)
 {
 	sendPacket(msg);
-
 }
 
 void Communicator::handleMessage(cMessage *msg)

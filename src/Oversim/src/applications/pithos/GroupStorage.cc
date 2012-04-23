@@ -172,7 +172,7 @@ int GroupStorage::getStorageFiles()
 	return storage_map.size();
 }
 
-void GroupStorage::createResponseMsg(ResponsePkt **response, int responseType, unsigned int rpcid, bool isSuccess, GameObject object)
+void GroupStorage::createResponseMsg(ResponsePkt **response, int responseType, unsigned int rpcid, bool isSuccess, const GameObject& object)
 {
 	//Create the packet that will house the game object
 	(*response) = new ResponsePkt();
@@ -196,7 +196,7 @@ void GroupStorage::createResponseMsg(ResponsePkt **response, int responseType, u
 	}
 }
 
-void GroupStorage::sendUDPResponse(TransportAddress src_adr, TransportAddress dest_adr, int responseType, unsigned int rpcid, bool isSuccess, GameObject object)
+void GroupStorage::sendUDPResponse(TransportAddress src_adr, TransportAddress dest_adr, int responseType, unsigned int rpcid, bool isSuccess, const GameObject& object)
 {
 	ResponsePkt *response;
 
@@ -208,7 +208,7 @@ void GroupStorage::sendUDPResponse(TransportAddress src_adr, TransportAddress de
 	send(response, "comms_gate$o");
 }
 
-void GroupStorage::sendUpperResponse(int responseType, unsigned int rpcid, bool isSuccess, GameObject object)
+void GroupStorage::sendUpperResponse(int responseType, unsigned int rpcid, bool isSuccess, const GameObject& object)
 {
 	ResponsePkt *response;
 
@@ -373,7 +373,7 @@ void GroupStorage::requestRetrieve(OverlayKeyPkt *retrieve_req)
 	forwardRequest(retrieve_req);
 }
 
-void GroupStorage::updatePeerObjects(GameObject go)
+void GroupStorage::updatePeerObjects(const GameObject& go)
 {
 	PeerListPkt *objectAddPkt = new PeerListPkt();
 	objectAddPkt->setByteLength(PEERLIST_PKT_SIZE(PEERDATA_SIZE));
@@ -386,7 +386,7 @@ void GroupStorage::updatePeerObjects(GameObject go)
 		return;
 	}
 
-	objectAddPkt->setObjectData(ObjectData(go.getObjectName(), go.getSize(), go.getHash(), go.getCreationTime(), go.getTTL()));
+	objectAddPkt->setObjectData(ObjectData(go, group_ledger->getGroupSize()));
 	objectAddPkt->setPayloadType(OBJECT_ADD);
 	objectAddPkt->setSourceAddress(this_address);
 	objectAddPkt->setName("object_add");
@@ -776,10 +776,9 @@ void GroupStorage::addToGroup(cMessage *msg)
 			else {
 				group_ledger->addObject(object_dat, peer_dat);
 			}
-		} else {
-			//std::cout << "[" << simTime() << ":" << this_address <<"]: Unsuccessful add, peer was last peer that left (" << peer_dat.getAddress() << ")\n";
-		}
-
+		} /*else {
+			std::cout << "[" << simTime() << ":" << this_address <<"]: Unsuccessful add, peer was last peer that left (" << peer_dat.getAddress() << ")\n";
+		}*/
 	}
 
 	emit(groupSizeSignal, group_ledger->getGroupSize() + 1);	//The peer's group size is one peer larger than its perceived group size, because itself is part of the group it is in

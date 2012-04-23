@@ -20,6 +20,7 @@
 #include <tr1/memory>
 
 #include "OverlayKey.h"
+#include "GameObject.h"
 
 class ObjectData;
 
@@ -32,7 +33,7 @@ class ObjectData;
  */
 typedef std::tr1::shared_ptr <ObjectData> ObjectDataPtr;
 
-#define OBJECTDATA_SIZE 8+4+sizeof(OverlayKey)+sizeof(simtime_t)+4	//Object name ID (8B), size (4B), key, creation time (4B), ttl (4B)
+#define OBJECTDATA_SIZE 8+4+sizeof(OverlayKey)+sizeof(simtime_t)+4+4	//Object name ID (8B), size (4B), key, creation time (4B), ttl (4B), init group size (4B)
 
 class ObjectData
 {
@@ -46,6 +47,8 @@ private:
 	OverlayKey key;
 
 	simtime_t creationTime; /**< The time when the object was created */
+	int init_group_size;	/**< The initial group size, when the object was inserted */
+
 	int ttl;				/**< The time-to-live of the object */
 
 	friend std::ostream& operator<<(std::ostream& Stream, const ObjectData object_data);
@@ -55,7 +58,8 @@ public:
 	static const ObjectData UNSPECIFIED_OBJECT;
 
 	//ObjectData();
-	ObjectData(std::string name = "Unspecified" , int siz = 0, OverlayKey k = OverlayKey::ZERO, simtime_t time = SIMTIME_ZERO, int t = 0);
+	ObjectData(std::string name = "Unspecified" , int siz = 0, OverlayKey k = OverlayKey::ZERO, simtime_t time = SIMTIME_ZERO, int t = 0, int group_size = 0);
+	ObjectData(const GameObject& go, int group_size);
 	virtual ~ObjectData();
 
 	ObjectData& operator=(const ObjectData& other);
@@ -82,6 +86,10 @@ public:
 	void setSize(const int &siz);
 
 	int getSize();
+
+	void setInitGroupSize(const int &siz);
+
+	int getInitGroupSize();
 
 	void setKey(const OverlayKey &k);
 

@@ -36,7 +36,8 @@ class GameObject : public cOwnedObject
 {
 	private:
 
-		char objectName[41]; 	/**< The name of the game object, which is different from the name of the object itself, which is usually "GameObject" */
+		//char objectName[41];
+		std::string objectName; /**< The name of the game object, which is different from the name of the object itself, which is usually "GameObject" */
 
 		int64_t size; 			/**< The size in bytes of the object */
 
@@ -52,7 +53,7 @@ class GameObject : public cOwnedObject
 
 		//If no ttl is given and the object is stored, it will not be able to exist in storage
 		//creationTime is initialised to an empty simtime_t object. Values such as zero do not work, since the scale exponent for simtime_t might not have been defined.
-		GameObject(const char *name="GameObject", int64_t o_size=0, simtime_t o_creationTime=SIMTIME_ZERO, int o_ttl=0);
+		GameObject(const std::string objectName = "GameObject", int64_t o_size=0, simtime_t o_creationTime=SIMTIME_ZERO, int o_ttl=0);
 		GameObject(const GameObject& other);
 		GameObject(const BinaryValue& binval);
 		virtual ~GameObject();
@@ -61,15 +62,18 @@ class GameObject : public cOwnedObject
 		friend bool operator==(const GameObject& object1, const GameObject& object2);
 		friend bool operator!=(const GameObject& object1, const GameObject& object2);
 		virtual std::string info();
+		virtual std::string info() const;
 
 		void getHash(char hash_str[41]);
 		OverlayKey getHash();
+		OverlayKey getHash() const;
 
 		/** @returns Duplicate of the game object */
 		virtual GameObject *dup() const;
 
 		/** @returns the size of the object in bytes */
 		int64_t getSize();
+		int64_t getSize() const;
 
 		/** @param o_size The size of the object in bytes */
 		void setSize(const int64_t &o_size);
@@ -78,9 +82,10 @@ class GameObject : public cOwnedObject
 		int getTTL();
 		void setTTL(const int &o_ttl);
 
-		void setObjectName(const char *o_Name);
+		void setObjectName(const std::string& o_Name);
 
-		char *getObjectName();
+		std::string getObjectName();
+		std::string getObjectName() const;
 
 		void setCreationTime(const simtime_t &time);
 
@@ -88,6 +93,7 @@ class GameObject : public cOwnedObject
 		simtime_t getCreationTime() const;
 
 		BinaryValue getBinaryValue();
+		BinaryValue getBinaryValue() const;
 
 		TransportAddress getGroupAddress();
 		TransportAddress getGroupAddress() const;
