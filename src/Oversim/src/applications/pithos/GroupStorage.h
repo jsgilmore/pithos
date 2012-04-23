@@ -154,7 +154,7 @@ class GroupStorage : public cSimpleModule
 		 * @param go The GameObject stored, of which the size and name are used.
 		 * @param send_list A history of all peers selected to store the new object.
 		 */
-		void updatePeerObjects(GameObject go);
+		void updatePeerObjects(const GameObject& go);
 
 		/**
 		 * Select a random TransportAddress within the group that has not be chosen for a replica during the current selection process.
@@ -173,11 +173,11 @@ class GroupStorage : public cSimpleModule
 
 		void respond_toUpper(cMessage *msg);
 
-		void createResponseMsg(ResponsePkt **response, int responseType, unsigned int rpcid, bool isSuccess, GameObject object);
+		void createResponseMsg(ResponsePkt **response, int responseType, unsigned int rpcid, bool isSuccess, const GameObject& object);
 
-		void sendUDPResponse(TransportAddress src_adr, TransportAddress dest_adr, int responseType, unsigned int rpcid, bool isSuccess, GameObject object = GameObject::UNSPECIFIED_OBJECT);
+		void sendUDPResponse(TransportAddress src_adr, TransportAddress dest_adr, int responseType, unsigned int rpcid, bool isSuccess, const GameObject& object = GameObject::UNSPECIFIED_OBJECT);
 
-		void sendUpperResponse(int responseType, unsigned int rpcid, bool isSuccess, GameObject object = GameObject::UNSPECIFIED_OBJECT);
+		void sendUpperResponse(int responseType, unsigned int rpcid, bool isSuccess, const GameObject& object = GameObject::UNSPECIFIED_OBJECT);
 
 		/**
 		 * Send a join request to the directory server or a super peer

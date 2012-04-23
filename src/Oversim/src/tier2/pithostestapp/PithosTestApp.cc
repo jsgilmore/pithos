@@ -245,7 +245,8 @@ void PithosTestApp::sendPutRequest()
 {
 	char name[41];
 
-	GameObject *go = new GameObject("GameObject");
+	GameObject *go = new GameObject();
+	go->setName("GameObject");
 	go->setSize(exponential(objectSize_av));
 	go->setCreationTime(simTime());
 
