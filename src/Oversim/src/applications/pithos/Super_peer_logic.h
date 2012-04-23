@@ -52,10 +52,13 @@ class Super_peer_logic : public cSimpleModule
 
 		int directory_port; /**< The port of the directory server */
 
-		bool objectReplication;
-
 		PeerData lastPeerLeft;		/**< The peer data of the last peer that left the group */
 		PeerData lastPeerJoined;	/**< The peer data of the last peer that joined the group */
+
+		bool objectRepair;
+		bool periodicRepair;
+		double repairTime;
+		cMessage *repairTimer; 	/**< timer self-message for repairing failed object replicas in periodic repair mode */
 
 		GroupLedger *group_ledger;
 
@@ -120,7 +123,9 @@ class Super_peer_logic : public cSimpleModule
 
 		void informLastJoinedOfLastLeft();
 
-		void replicateObjects(PeerDataPkt *peer_data_pkt);
+		void replicateObjectsOfPeer(PeerDataPkt *peer_data_pkt);
+
+		void repairMissingReplicas();
 };
 
 Define_Module(Super_peer_logic);

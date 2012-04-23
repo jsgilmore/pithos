@@ -134,9 +134,15 @@ class GroupStorage : public cSimpleModule
 		int getErrRequestOOG;
 		int putErrStoreOOG;
 
+		//Request settings
 		simtime_t requestTimeout;	/**< The amount of time to wait for a response to a request, before a node is removed from the group*/
-		bool gracefulMigration;
 		int numGetRequests;
+
+		bool gracefulMigration;
+
+		//Whether or not to repair, as well as the repair type
+		bool objectRepair;
+		bool periodicRepair;
 
 		/**
 		 * The function creates a write packet and fills it with address information, payload type and byte length.
