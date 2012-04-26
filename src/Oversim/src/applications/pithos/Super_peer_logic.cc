@@ -21,6 +21,8 @@ Super_peer_logic::Super_peer_logic()
 
 Super_peer_logic::~Super_peer_logic()
 {
+	if (objectRepair && periodicRepair)
+		cancelAndDelete(repairTimer);
 }
 
 void Super_peer_logic::initialize()
@@ -48,7 +50,24 @@ void Super_peer_logic::initialize()
 	latitude = uniform(0,100);		//Make this range changeable
 	longitude = uniform(0,100);		//Make this range changeable
 
-	objectReplication = par("objectReplication");
+	objectRepair = par("objectRepair");
+
+	//A bool is used here for faster comparisons when the simulation is running.
+	//Strings are used in the configuration to make the options more understandable.
+	if (strcmp(par("repairType"), "periodic") == 0)
+	{
+		periodicRepair = true;
+	}
+	else if (strcmp(par("repairType"), "leaving") == 0)
+	{
+		periodicRepair = false;
+	}else error("Invalid repair type specified. It should be \"leaving\", or \"periodic\"");
+
+	if (objectRepair && periodicRepair)
+	{
+			repairTimer = new cMessage("repairTimer");
+			repairTime = par("repairTime");
+	}
 
 	event = new cMessage("event");
 	scheduleAt(simTime()+par("wait_time"), event);
@@ -250,7 +269,48 @@ void Super_peer_logic::informLastJoinedOfLastLeft()
 	send(pkt, "comms_gate$o");
 }
 
-void Super_peer_logic::replicateObjects(PeerDataPkt *peer_data_pkt)
+void Super_peer_logic::repairMissingReplicas()
+{
+	ObjectLedgerMap::iterator object_map_it;
+	ObjectData object_data;
+	PeerData peer_data;
+	int known_replicas;
+	int expected_replicas = par("replicas");
+
+	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
+	TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
+
+	ReplicationReqPkt *replication_req = new ReplicationReqPkt();
+	replication_req->setSourceAddress(thisAdr);
+	replication_req->setPayloadType(REPLICATION_REQ);
+	replication_req->setGroupAddress(thisAdr);
+	replication_req->setByteLength(OBJECTDATA_PKT_SIZE);
+
+	//Do this for every object in the object map
+	for (object_map_it = group_ledger->getObjectMapBegin() ; object_map_it != group_ledger->getObjectMapEnd() ; object_map_it++)
+	{
+		object_data = *(object_map_it->second.objectDataPtr);
+		replication_req->setObjectData(object_data);
+
+		//Determine how many replications have to be made, by examining the current number of replicas.
+		known_replicas = group_ledger->getReplicaNum(object_data);
+
+		//There is no leaving peer, since these two occurrences are now independent, so equality has to be excluded
+		if (known_replicas < expected_replicas)
+		{
+			replication_req->setReplicaDiff(expected_replicas-known_replicas);	//+1 for the leaving peer
+
+			peer_data = group_ledger->getRandomPeer(object_data.getKey());
+
+			replication_req->setDestinationAddress(peer_data.getAddress());
+			send(replication_req->dup(), "comms_gate$o");
+		}
+	}
+
+	delete(replication_req);
+}
+
+void Super_peer_logic::replicateObjectsOfPeer(PeerDataPkt *peer_data_pkt)
 {
 	ObjectData object_data;
 	PeerData peer_data;
@@ -332,6 +392,19 @@ void Super_peer_logic::handleMessage(cMessage *msg)
 	{
 		//Add the information of this super peer to the directory server
 		addSuperPeer();
+
+		if (objectRepair && periodicRepair)
+		{
+			//Initialise the repair timer
+			scheduleAt(simTime(), repairTimer);
+		}
+		delete(msg);
+	}
+	else if (msg == repairTimer)
+	{
+		scheduleAt(simTime()+repairTime, repairTimer);
+
+		repairMissingReplicas();
 	}
 	else if (strcmp(msg->getArrivalGate()->getName(), "comms_gate$i") == 0)
 	{
@@ -349,14 +422,14 @@ void Super_peer_logic::handleMessage(cMessage *msg)
 		{
 			PeerDataPkt *peer_data_pkt = check_and_cast<PeerDataPkt *>(packet);
 
-			if (objectReplication)
+			if (objectRepair && !periodicRepair)
 			{
-				replicateObjects(peer_data_pkt);
+				replicateObjectsOfPeer(peer_data_pkt);
 			}
 
 			handlePeerLeaving(peer_data_pkt->getPeerData());
 
-		} else if (packet->getPayloadType() == SP_PEER_MIGRATED)
+		} else if (packet->getPayloadType() == SP_PEER_MIGRATED)	//The super peer should not replicate objects if the migrating peer already has
 		{
 			PeerDataPkt *peer_data_pkt = check_and_cast<PeerDataPkt *>(packet);
 
@@ -368,16 +441,11 @@ void Super_peer_logic::handleMessage(cMessage *msg)
 
 			emit(groupSizeSignal, group_ledger->getGroupSize());
 		} else error("Super peer received unknown group message from communicator");
-	}
-	else if (strcmp(msg->getArrivalGate()->getName(), "overlay_gate$i") == 0)
-	{
-		error("Unknown message received from overlay.");
-	}
-	else {
+		delete(msg);
+	} else {
 		char msg_str[100];
 		sprintf(msg_str, "Unknown message received at Super peer logic (%s)", msg->getName());
 		error(msg_str);
+		delete(msg);
 	}
-
-	delete(msg);
 }

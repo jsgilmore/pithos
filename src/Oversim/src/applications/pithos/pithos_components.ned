@@ -107,6 +107,8 @@ simple GroupStorage
         int replicas;
         int numGetRequests;
         
+        bool objectRepair;
+        string repairType;
         bool gracefulMigration;
     gates:
         inout comms_gate;
@@ -169,7 +171,10 @@ simple Super_peer_logic
         int directory_port;
         
         int replicas;
-        bool objectReplication;
+        
+        bool objectRepair;
+        string repairType;
+        double repairTime;
 
         @signal[OverlayWrite](type="int");
         @signal[GroupSize](type="int");
