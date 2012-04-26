@@ -2,7 +2,10 @@ close all
 clear all
 
 r = 15;
-n = 450;
+n = 250;
+
+str = sprintf('Calculating group replication Markov chain for %d states.', 0.5*r*(2*n-r+1));
+disp(str);
 
 %The parameters of a pareto distribution
 alpha = 3;
@@ -11,15 +14,17 @@ beta = 2;
 %Peer departure rate for a pareto distribution with parameters alpha and
 %beta
 theta = (alpha-2)/beta
+%theta = 0.03362; %Data measured from Pithos simulation
 
 %Peer arrival rate with the same arrival distribution as departure
 %distribution.
-phi = theta
+phi = theta; %Data measured from Pithos simulation
 
-mu = 2
+mu = 4; %Parameter as in Pithos simulation
 
 x = 1;
 
+disp('Generating states vector.')
 for i = n:-1:1
     for j = min(r,i):-1:1
         s(x,2) = i;
@@ -28,7 +33,7 @@ for i = n:-1:1
     end
 end
 
-disp('Finished generating states')
+disp('Finished generating states. Now calculating rate matrix and average duration vector.')
 
 %Initialise the transient rate matrix
 Q = zeros(0.5*r*(2*n-r+1), 0.5*r*(2*n-r+1));
@@ -42,7 +47,8 @@ for i=1:0.5*r*(2*n-r+1)
         %Nodes added to the group (no extra replicas)
         if s(i,1) == s(j,1)
             if s(j,2) == 1+s(i,2)    
-                Q(i,j) = phi;
+                Q(i,j) = (n-s(i,2))*phi;
+                %Q(i,j) = phi;
                 rates(i) = rates(i) + Q(i,j);
             end
         end
@@ -78,7 +84,7 @@ end
 
 rates = rates.^(-1);
 
-disp('Finished creating rate matrix and average duration vector')
+disp('Finished creating rate matrix and average duration vector. Now normalising the rate matrix.')
 
 %Normalised transient rate matrix
 Q_norm = zeros(0.5*r*(2*n-r+1), 0.5*r*(2*n-r+1));
@@ -89,11 +95,9 @@ for i=1:0.5*r*(2*n-r+1)
     for j=1:0.5*r*(2*n-r+1)
             Q_norm(i,j) = Q(i,j)*rates(i);
     end
-    str = sprintf('Completed normalising row %d of %d of the rate matrix.', i, 0.5*r*(2*n-r+1));
-    disp(str);
 end
 
-disp('Finished normalising the rate matrix')
+disp('Finished normalising the rate matrix. Now calculating the fundamental matrix.')
 
 I = eye(0.5*r*(2*n-r+1));
 
@@ -101,7 +105,7 @@ I = eye(0.5*r*(2*n-r+1));
 A = I - Q_norm;
 N = A^(-1);
 
-disp('Finished calculating the fundamental matrix')
+disp('Finished calculating the fundamental matrix. Now computing expected time to absorbtion.')
 
 E_T = N*rates;
 disp('Expected time to absorbtion calculated')
@@ -121,4 +125,5 @@ for i=1:0.5*r*(2*n-r+1)
     end
 end
 
-semilogy([n:-1:1], E_T_fullreps)
+%semilogy([n:-1:1], E_T_fullreps)
+plot([n:-1:1], E_T_fullreps)
