@@ -140,7 +140,10 @@ private:
 
     simtime_t writeTime_av;
 	simtime_t wait_time;
+	simtime_t join_time;
+	simtime_t start_time;
 	simtime_t generationTime;
+	simtime_t absRequestStopTime;
 	double objectSize_av;
 
 	bool groupMigration;
