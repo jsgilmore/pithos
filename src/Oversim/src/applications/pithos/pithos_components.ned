@@ -147,6 +147,7 @@ simple Peer_logic
         @display("i=block/cogwheel");
         
         int replicas;
+        bool disableDHT;
     gates:
         inout comms_gate;
         

@@ -36,6 +36,7 @@ simple PithosTestApp extends BaseApp
         double avObjectSize;	//1 KB average
         double wait_time @unit(s);
         double generation_time @unit(s);
+        double absRequestStopTime @unit(s);
         int groupProbability;
         bool groupMigration;
 }
