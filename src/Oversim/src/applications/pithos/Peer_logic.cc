@@ -39,6 +39,7 @@ Peer_logic::~Peer_logic()
 void Peer_logic::initialize()
 {
 	replicas = par("replicas");
+	disableDHT = par("disableDHT");
 }
 
 void Peer_logic::finalize()
@@ -79,7 +80,9 @@ void Peer_logic::handleGetCAPIRequest(RootObjectGetCAPICall* capiGetMsg)
 	send(read_pkt->dup(), "group_write");
 
 	//Send the game object to be stored in the overlay.
-	send(read_pkt, "overlay_write");
+	if (!disableDHT)
+		send(read_pkt, "overlay_write");
+	else delete(read_pkt);
 
     PendingRpcsEntry entry;
     entry.getCallMsg = capiGetMsg;
@@ -115,13 +118,20 @@ void Peer_logic::handlePutCAPIRequest(RootObjectPutCAPICall* capiPutMsg)
 	//Send the game object to be stored in the group.
 	send(write_pkt->dup(), "group_write");
 
+	PendingRpcsEntry entry;
+	entry.putCallMsg = capiPutMsg;
+
 	//Send the game object to be stored in the overlay.
-	send(write_pkt, "overlay_write");
+	if (!disableDHT)
+	{
+		send(write_pkt, "overlay_write");
+		entry.numSent = replicas + 1;		//Number of replicas required for group storage plus the ons DHT storage request
+	} else {
+		delete(write_pkt);
+		entry.numSent = replicas;			//Number of replicas required for group storage
+	}
 
 	//Add the received RPC to the list of RPC for which responses are still outstanding
-	PendingRpcsEntry entry;
-	entry.numSent = replicas + 1;		//Number of replicas required for group storage plus the ons DHT storage request
-	entry.putCallMsg = capiPutMsg;
 	pendingRpcs.insert(std::make_pair(capiPutMsg->getNonce(), entry));
 }
 
@@ -135,10 +145,10 @@ void Peer_logic::processPut(PendingRpcsEntry entry, ResponsePkt *response)
 	if (entry.numGroupPutSucceeded + entry.numGroupPutFailed +
 			entry.numDHTPutSucceeded + entry.numDHTPutFailed == entry.numSent)
 	{
-		if (entry.numDHTPutSucceeded > entry.numDHTPutFailed)
+		//Ensure that more group puts succeeded than failed
+		if (entry.numGroupPutSucceeded >= entry.numGroupPutFailed)
 		{
-			//Ensure that more group puts succeeded than failed
-			if (entry.numGroupPutSucceeded >= entry.numGroupPutFailed)
+			if ((entry.numDHTPutSucceeded > entry.numDHTPutFailed) || disableDHT)
 			{
 				RootObjectPutCAPIResponse* capiPutRespMsg = new RootObjectPutCAPIResponse();
 				capiPutRespMsg->setIsSuccess(true);
@@ -177,8 +187,8 @@ void Peer_logic::processGet(PendingRpcsEntry entry, ResponsePkt *response)
 		capiGetRespMsg->setResult(*object);	//The value is copied here and not the actual object
 		communicator->externallySendRpcResponse(entry.getCallMsg, capiGetRespMsg);
 		pendingRpcs.erase(response->getRpcid());
-
-	} else if ((entry.numDHTGetFailed == 1) && (entry.numGroupGetFailed == 1))
+	//If both the DHT get and the group get failed, or DHT is disabled and group get failed, a failure occurred
+	} else if (((entry.numDHTGetFailed == 1) || disableDHT) && (entry.numGroupGetFailed == 1))
 	{
 		//This is the failure response to both situations where either the group messages
 		//failed or the overlay messages failed. Notice the "return" in the success scenario.
