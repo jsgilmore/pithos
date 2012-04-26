@@ -55,6 +55,19 @@ void GroupStorage::initialize()
 
 	numGetRequests = par("numGetRequests");
 
+	objectRepair = par("objectRepair");
+
+	//A bool is used here for faster comparisons when the simulation is running.
+	//Strings are used in the configuration to make the options more understandable.
+	if (strcmp(par("repairType"), "periodic") == 0)
+	{
+		periodicRepair = true;
+	}
+	else if (strcmp(par("repairType"), "leaving") == 0)
+	{
+		periodicRepair = false;
+	}else error("Invalid repair type specified. It should be \"leaving\", or \"periodic\"");
+
 	//Link this node's group ledger with this group storage module
 	cModule *groupLedgerModule = getParentModule()->getSubmodule("group_ledger");
 	group_ledger = check_and_cast<GroupLedger *>(groupLedgerModule);
@@ -846,15 +859,13 @@ void GroupStorage::replicateLocalObjects()
 
 void GroupStorage::leaveGroup()
 {
-	if (gracefulMigration)
+	group_ledger->removePeer(PeerData(this_address));
+	if (objectRepair && !periodicRepair && gracefulMigration)
 	{
 		replicateLocalObjects();
-
-		group_ledger->removePeer(PeerData(this_address));
 		peerLeftInform(PeerData(this_address), SP_PEER_MIGRATED);
 	}
 	else {
-		group_ledger->removePeer(PeerData(this_address));
 		peerLeftInform(PeerData(this_address), SP_PEER_LEFT);
 	}
 
