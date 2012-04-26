@@ -107,6 +107,8 @@ class Peer_logic: public cSimpleModule
 
 		int replicas;	//The number of replicas group storage is set to.
 
+		bool disableDHT;
+
 	public:
 		Peer_logic();
 		virtual ~Peer_logic();

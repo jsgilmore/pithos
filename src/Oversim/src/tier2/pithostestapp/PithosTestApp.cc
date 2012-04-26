@@ -69,6 +69,8 @@ void PithosTestApp::initializeApp(int stage)
     objectSize_av = par("avObjectSize");
 	wait_time = par("wait_time");
 	generationTime = par("generation_time");
+	absRequestStopTime = par("absRequestStopTime");
+
     mean = par("testInterval");
     deviation = mean / 10;
 
@@ -328,6 +330,8 @@ void PithosTestApp::handleTimerEvent(cMessage* msg)
 			scheduleAt(simTime()+group_time, position_update_timer);		//TODO: These parameters should be made configurable
 		}
 
+		join_time = simTime() - wait_time;
+
 		PositionUpdatePkt *update_pkt = new PositionUpdatePkt();
 		update_pkt->setLatitude(uniform(0,100));	//TODO: These parameters should be made configurable
 		update_pkt->setLongitude(uniform(0,100));	//TODO: These parameters should be made configurable
@@ -336,11 +340,15 @@ void PithosTestApp::handleTimerEvent(cMessage* msg)
 	}
 	else if (msg->isName("pithostest_put_timer"))
     {
-    	if (simTime() > generationTime + simTime())	//This has the module only generate requests for a finite amount of time
+    	if (simTime() > generationTime + wait_time + join_time)	//This has the module only generate requests for a finite amount of time
     	{
-    		delete(msg);
     		return;
     	}
+
+    	if (simTime() > absRequestStopTime)	//This has a module not generate requests after some absolute time
+		{
+			return;
+		}
 
         // schedule next timer event
         scheduleAt(simTime() + truncnormal(mean, deviation), msg);
@@ -355,6 +363,11 @@ void PithosTestApp::handleTimerEvent(cMessage* msg)
 
     } else if (msg->isName("pithostest_get_timer"))
     {
+    	if (simTime() > absRequestStopTime)	//This has a module not generate requests after some absolute time
+		{
+			return;
+		}
+
         scheduleAt(simTime() + truncnormal(mean, deviation), msg);
 
         // do nothing if the network is still in the initialization phase
