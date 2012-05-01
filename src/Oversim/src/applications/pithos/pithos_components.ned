@@ -80,26 +80,8 @@ simple GroupStorage
         
         @signal[JoinTime](type="simtime_t");
         @statistic[JoinTime](title="group join time"; record=last);
-        
-        @signal[qlen](type="int");
-        @signal[qsize](type="int");
-        @signal[queueingTime](type="simtime_t");
-        @statistic[qlen](title="queue length"; record=vector,timeavg,max; interpolationmode=sample-hold);
-        @statistic[qsize](title="queue size"; record=vector,timeavg,max; interpolationmode=sample-hold);
-        @statistic[queueingTime](title="queueing time at dequeue"; unit=s; interpolationmode=none);
-        @statistic[storeTime](title="time taken to store an object"; record=histogram,vector,timeavg; interpolationmode=sample-hold);
-
-        @signal[storeTime](type="simtime_t");
-        @statistic[storeTime](title="time taken to store a root object"; record=histogram,vector,timeavg; interpolationmode=sample-hold);
-
-        @signal[Object](type="int");
-        @statistic[Object](title="Objects"; record=sum);
-        
         @signal[GroupSize](type="int");
-        @signal[GroupSendFail](type="int");
-        
         @statistic[GroupSize](title="Group size"; record=last);
-        @statistic[GroupSendFail](title="Group send fails"; record=sum);
         
         string directory_ip;
         int directory_port;
