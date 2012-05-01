@@ -62,6 +62,10 @@ class Super_peer_logic : public cSimpleModule
 
 		GroupLedger *group_ledger;
 
+		int numPeerArrivals;
+		int numPeerDepartures;
+		GlobalStatistics* globalStatistics; /**< pointer to GlobalStatistics module in this node*/
+
 		simsignal_t groupSizeSignal; /**< A signal that records the group size over time */
 
 		simsignal_t OverlayWriteSignal; /**< A signal that records the number of overlay writes performed */
