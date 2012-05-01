@@ -81,21 +81,8 @@ void GroupStorage::initialize()
 
 	//Register the signal that records the size of the group the peer is currently in
 	groupSizeSignal = registerSignal("GroupSize");
-	//Register the signal that records the number of times a put message failed
-	//(This is now mostly handled by failure response messages to the calling module)
-	groupSendFailSignal = registerSignal("GroupSendFail");
 	//Register the signal that records the time at which the specific peer joined a group
 	joinTimeSignal = registerSignal("JoinTime");
-	//Initialise queue statistics collection
-	qlenSignal = registerSignal("qlen");
-	qsizeSignal = registerSignal("qsize");
-	//Register the signals that record the time required for a specific type of object to be stored
-	storeTimeSignal = registerSignal("storeTime");
-	//Record the initial zero lengths of the object storage
-	emit(qlenSignal, storage_map.size());
-	emit(qsizeSignal, getStorageBytes());
-	//Register the signals that record the number of different types of objects in storage
-	objectsSignal = registerSignal("Object");
 
 	// statistics
 	numSent = 0;
@@ -476,7 +463,6 @@ int GroupStorage::getReplicaNr(unsigned int rpcid)
 		for (i = 0 ; i < replicas - group_ledger->getGroupSize() ; i++)
 			send(response->dup(), "read");
 
-		emit(groupSendFailSignal, replicas - group_ledger->getGroupSize());
 		RECORD_STATS(numPutError++);
 		replicas = group_ledger->getGroupSize();
 
@@ -727,10 +713,6 @@ void GroupStorage::store(Packet *pkt)
 	if (ret.second == false)
 		return;
 		//error("[GroupStorage::store]: Duplicate key inserted into storage.");
-
-	emit(qlenSignal, storage_map.size());
-	emit(qsizeSignal, getStorageBytes());
-	emit(objectsSignal, 1);
 
 	//Schedule the object to be removed when its TTL expires.
 	ObjectTTLTimer* timer = new ObjectTTLTimer();

@@ -121,7 +121,7 @@ void Peer_logic::handlePutCAPIRequest(RootObjectPutCAPICall* capiPutMsg)
 	PendingRpcsEntry entry;
 	entry.putCallMsg = capiPutMsg;
 
-	//Send the game object to be stored in the overlay.
+	//Send the game object to be stored in the overlay, if this option was not disabled
 	if (!disableDHT)
 	{
 		send(write_pkt, "overlay_write");

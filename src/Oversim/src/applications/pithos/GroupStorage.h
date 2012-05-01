@@ -239,18 +239,7 @@ class GroupStorage : public cSimpleModule
 		void removePeer(Packet *packet);
 
 	protected:
-		simsignal_t qlenSignal; /**< Signal for recording the number of objects stored */
-
-		simsignal_t qsizeSignal; /**< Signal for recording the size of objects stored in bytes */
-
-		simsignal_t objectsSignal; /**< Signal for recording the number of root objects stored */
-
-		simsignal_t storeTimeSignal; /**< Signal for recording the time that was required to store each object */
-
 		simsignal_t groupSizeSignal; /**< The signal recording the statistic of the group size. */
-
-		simsignal_t groupSendFailSignal; /**< The signal recording the statistic of how many times a group storage failed. */
-
 		simsignal_t joinTimeSignal; /**< The signal recording the statistic of the group size. */
 
 		void finish();
