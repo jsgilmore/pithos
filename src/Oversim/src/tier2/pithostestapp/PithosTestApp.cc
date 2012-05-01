@@ -287,9 +287,6 @@ void PithosTestApp::handleLowerMessage (cMessage *msg)
 			else error("The mean message creation time must be greater than zero.");
 		}
 
-		if (simTime() < generationTime + simTime())
-			sendPutRequest();
-
 		delete(msg);
 	}
 	else error("Game received unknown message\n");
@@ -357,17 +354,12 @@ void PithosTestApp::handleTimerEvent(cMessage* msg)
         if (((!activeNetwInitPhase) && (underlayConfigurator->isInInitPhase()))
                 || underlayConfigurator->isSimulationEndingSoon()
                 || nodeIsLeavingSoon)
-            return;
+        	return;
 
         sendPutRequest();
 
     } else if (msg->isName("pithostest_get_timer"))
     {
-    	if (simTime() > absRequestStopTime)	//This has a module not generate requests after some absolute time
-		{
-			return;
-		}
-
         scheduleAt(simTime() + truncnormal(mean, deviation), msg);
 
         // do nothing if the network is still in the initialization phase

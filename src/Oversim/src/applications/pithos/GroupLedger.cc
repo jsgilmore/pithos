@@ -602,9 +602,6 @@ void GroupLedger::addObject(ObjectData objectData, PeerData peer_data_recv)
 		delete(object_ledger);
 	}
 
-	/*if (simTime() > 6000.00 && isSuperPeerLedger())
-		std::cout << "It's now past 600";*/
-
 	data_size += objectData.getSize();
 	objects_total++;
 
