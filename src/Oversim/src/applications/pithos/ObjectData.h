@@ -48,6 +48,7 @@ private:
 
 	simtime_t creationTime; /**< The time when the object was created */
 	int init_group_size;	/**< The initial group size, when the object was inserted */
+	int max_group_size;		/**< The maximum group size, while the object was alive */
 
 	int ttl;				/**< The time-to-live of the object */
 
@@ -58,8 +59,8 @@ public:
 	static const ObjectData UNSPECIFIED_OBJECT;
 
 	//ObjectData();
-	ObjectData(std::string name = "Unspecified" , int siz = 0, OverlayKey k = OverlayKey::ZERO, simtime_t time = SIMTIME_ZERO, int t = 0, int group_size = 0);
-	ObjectData(const GameObject& go, int group_size);
+	ObjectData(std::string name = "Unspecified" , int siz = 0, OverlayKey k = OverlayKey::ZERO, simtime_t time = SIMTIME_ZERO, int t = 0, int i_group_size = 0);
+	ObjectData(const GameObject& go, int i_group_size);
 	virtual ~ObjectData();
 
 	ObjectData& operator=(const ObjectData& other);
@@ -90,6 +91,10 @@ public:
 	void setInitGroupSize(const int &siz);
 
 	int getInitGroupSize();
+
+	void setMaxGroupSize(const int &siz);
+
+	int getMaxGroupSize();
 
 	void setKey(const OverlayKey &k);
 

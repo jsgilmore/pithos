@@ -1,16 +1,18 @@
 PhD TODO list:
 
 Major:
-Improve replication mechanism to avoid object starvation under any level of churn for a given number of replicas
-Implement a get retry mechanisms (multiple get requests) to improve group get reliabiltiy at the cost of latency (if done sequentially) or bandwidth (if done in parallel).
-Define a set of metrics that can be recorded in simulation, which can be used to evaluate the performance of Pithos and allow it to be compared with other implementations
+Investigate why per group peer arrivals are SO much higher than per group peer departures
+Remove unused stats vectors from simulation
+Read papers that cite replication paper, to see whether any has expanded on the Markov chain in a similar way to I did.
+Determine distributions of object requests and peer lifetimes to be used in PithosTestApp
+
 Implment Pithos as a real world application
 Develop grouping algorithm based on player traces
 Have Pithos construct groups based on the grouping algorithm
 Write-up PhD
 
 Minor:
-Implement object update for group storage.
+Implement object modification for group storage.
 Extend the pithos test application to add modify testing.
 Test the system for various numbers of malicious peers
 

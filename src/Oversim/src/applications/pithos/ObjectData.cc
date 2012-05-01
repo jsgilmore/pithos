@@ -17,12 +17,6 @@
 
 const ObjectData ObjectData::UNSPECIFIED_OBJECT;
 
-/*ObjectData::ObjectData()
-{
-	size = 0;
-	key = OverlayKey::UNSPECIFIED_KEY;
-}*/
-
 ObjectData::ObjectData(std::string name, int siz, OverlayKey k, simtime_t time, int t, int group_size)
 {
 	object_name = name;
@@ -31,6 +25,7 @@ ObjectData::ObjectData(std::string name, int siz, OverlayKey k, simtime_t time, 
 	creationTime = time;
 	ttl = t;
 	init_group_size = group_size;
+	max_group_size = group_size;	//The maximum group size when the object is created is equal to the initial group size
 }
 
 ObjectData::ObjectData(const GameObject& go, int group_size)
@@ -41,6 +36,7 @@ ObjectData::ObjectData(const GameObject& go, int group_size)
 	creationTime = go.getCreationTime();
 	ttl = go.getTTL();
 	init_group_size = group_size;
+	max_group_size = group_size;
 }
 
 ObjectData::~ObjectData()
@@ -58,6 +54,7 @@ ObjectData& ObjectData::operator=(const ObjectData& other)
 	creationTime = other.creationTime;
 	ttl = other.ttl;
 	init_group_size = other.init_group_size;
+	max_group_size = other.max_group_size;
 
 	return *this;
 }
@@ -68,17 +65,6 @@ bool operator==(const ObjectData& object1, const ObjectData& object2)
 		return false;
 
 	//Other comparisons significantly slow down computation and keys already define a unique object
-	/*if (object1.object_name != object2.object_name)
-			return false;
-
-		if (object1.size != object2.size)
-			return false;
-
-	if (object1.creationTime != object2.creationTime)
-		return false;
-
-	if (object1.ttl != object2.ttl)
-		return false;*/
 
 	return true;
 }
@@ -136,6 +122,16 @@ void ObjectData::setInitGroupSize(const int &siz)
 int ObjectData::getInitGroupSize()
 {
 	return init_group_size;
+}
+
+void ObjectData::setMaxGroupSize(const int &siz)
+{
+	max_group_size = siz;
+}
+
+int ObjectData::getMaxGroupSize()
+{
+	return max_group_size;
 }
 
 OverlayKey ObjectData::getKey()

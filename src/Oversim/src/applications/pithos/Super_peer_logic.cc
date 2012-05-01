@@ -27,6 +27,11 @@ Super_peer_logic::~Super_peer_logic()
 
 void Super_peer_logic::initialize()
 {
+	numPeerArrivals = 0;
+	numPeerDepartures = 0;
+
+	globalStatistics = GlobalStatisticsAccess().get();
+
 	strcpy(directory_ip, par("directory_ip"));
 	directory_port = par("directory_port");
 
@@ -71,11 +76,30 @@ void Super_peer_logic::initialize()
 
 	event = new cMessage("event");
 	scheduleAt(simTime()+par("wait_time"), event);
+
+	WATCH(numPeerArrivals);
+	WATCH(numPeerDepartures);
 }
 
 void Super_peer_logic::finish()
 {
+	cModule *communicatorModule = getParentModule()->getSubmodule("communicator");
+	Communicator *communicator = check_and_cast<Communicator *>(communicatorModule);
 
+    simtime_t time = globalStatistics->calcMeasuredLifetime(communicator->getCreationTime());
+
+	std::ostringstream group_name;
+
+	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
+	TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
+
+	group_name << "Super_peer_logic (" << thisAdr << "): ";
+
+    if (time >= GlobalStatistics::MIN_MEASURED) {
+        // record scalar data
+    	globalStatistics->addStdDev((group_name.str() + std::string("Number of peer arrivals")).c_str() , numPeerArrivals);
+    	globalStatistics->addStdDev((group_name.str() + std::string("Number of peer departures")).c_str() , numPeerDepartures);
+    }
 }
 
 void Super_peer_logic::handleOverlayWrite(cMessage *msg)
@@ -200,6 +224,7 @@ void Super_peer_logic::handleJoinReq(cMessage *msg)
 
 	PeerData joining_peer(boot_req->getSourceAddress());
 
+	//Multiple join requests can arrive, since peers retry upon timeout and sometimes the network is slow
 	if (group_ledger->isPeerInGroup(joining_peer))
 		return;
 
@@ -217,6 +242,7 @@ void Super_peer_logic::handleJoinReq(cMessage *msg)
 	**/
 	group_ledger->addPeer(joining_peer);
 	lastPeerJoined = joining_peer;
+	RECORD_STATS(numPeerArrivals++);
 
 	informJoiningPeer(boot_req, sourceAdr);
 
@@ -377,6 +403,7 @@ void Super_peer_logic::replicateObjectsOfPeer(PeerDataPkt *peer_data_pkt)
 void Super_peer_logic::handlePeerLeaving(PeerData peer_data)
 {
 	group_ledger->removePeer(peer_data);
+	RECORD_STATS(numPeerDepartures++);
 
 	lastPeerLeft = peer_data;	//Record the data of the last peer that left, in case we get an outdated object add message from that peer
 

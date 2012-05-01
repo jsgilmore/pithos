@@ -56,7 +56,7 @@ void GroupLedger::initialize()
 
 void GroupLedger::recordAndClear()
 {
-	//Every time the group ledger is clear, the statistics are recorded for the time leading up to the clear.
+	//Every time the group ledger is cleared, the statistics are recorded for the time leading up to the clear.
 	finish();
 
 	numPeerRemoveFail = 0;
@@ -95,6 +95,24 @@ int GroupLedger::countTotalObjects()
 	return count;
 }
 
+void GroupLedger::updateMaxGroupPerObject()
+{
+	ObjectLedgerMap::iterator object_map_it;
+	ObjectDataPtr objectDataPtr;
+	int current_group_size = peer_list.size();
+
+	//Do this for every object in the object map
+	for (object_map_it = object_map.begin() ; object_map_it != object_map.end() ; object_map_it++)
+	{
+		objectDataPtr = object_map_it->second.objectDataPtr;
+
+		if (objectDataPtr->getMaxGroupSize() < current_group_size)
+		{
+			objectDataPtr->setMaxGroupSize(current_group_size);
+		}
+	}
+}
+
 void GroupLedger::handleMessage(cMessage* msg)
 {
     ObjectTTLTimer *ttlTimer = NULL;
@@ -109,12 +127,15 @@ void GroupLedger::handleMessage(cMessage* msg)
 
 		std::ostringstream group_name;
 
+		const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
+		TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
+
 		if (isSuperPeerLedger())
 		{
-			//If a peer is the super peer of a group, show its own address as both super peer address and peer address
-			const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
-			TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
+			//Record the largest group size per object for comparison with expected object lifetimes
+			updateMaxGroupPerObject();
 
+			//If a peer is the super peer of a group, show its own address as both super peer address and peer address
 			group_name << "GroupLedger (" << thisAdr << ":" << thisAdr <<"): ";
 
 			RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Data stored for known group objects")).c_str(), data_size));
@@ -128,9 +149,6 @@ void GroupLedger::handleMessage(cMessage* msg)
 		else if (!(groupStorage->getSuperPeerAddress().isUnspecified()))
 		{
 			//std::cout << "Peer address in group is: " << groupStorage->getSuperPeerAddress() << endl;
-			const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
-			TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
-
 			group_name << "GroupLedger (" << groupStorage->getSuperPeerAddress() << ":" << thisAdr <<"): ";
 		}
 		else {
@@ -236,14 +254,14 @@ void GroupLedger::finish()
         	group_name << "GroupLedger (" << groupStorage->getSuperPeerAddress() << "): ";
     	}
 
-    	globalStatistics->addStdDev((group_name.str() + std::string("GroupLedger: Failed object gets")).c_str() , numObjectGetFail);
-    	globalStatistics->addStdDev((group_name.str() + std::string("GroupLedger: Successful object gets")).c_str() , numObjectGetSuccess);
-		globalStatistics->addStdDev((group_name.str() + std::string("GroupLedger: Failed peer gets")).c_str(), numPeerRemoveFail);
-		globalStatistics->addStdDev((group_name.str() + std::string("GroupLedger: Successful peer gets")).c_str(), numPeerRemoveSuccess);
-		globalStatistics->addStdDev((group_name.str() + std::string("GroupLedger: Number of known peer insertion attempts")).c_str(), numPeerKnownError);
-		globalStatistics->addStdDev((group_name.str() + std::string("GroupLedger: Number of unknown peer insertions")).c_str(), numPeerKnownSuccess);
-		globalStatistics->addStdDev((group_name.str() + std::string("GroupLedger: Failed object removals")).c_str() , numObjectRemoveFail);
-		globalStatistics->addStdDev((group_name.str() + std::string("GroupLedger: Successful object removals")).c_str() , numObjectRemoveSuccess);
+    	globalStatistics->addStdDev((group_name.str() + std::string("Failed object gets")).c_str() , numObjectGetFail);
+    	globalStatistics->addStdDev((group_name.str() + std::string("Successful object gets")).c_str() , numObjectGetSuccess);
+		globalStatistics->addStdDev((group_name.str() + std::string("Failed peer gets")).c_str(), numPeerRemoveFail);
+		globalStatistics->addStdDev((group_name.str() + std::string("Successful peer gets")).c_str(), numPeerRemoveSuccess);
+		globalStatistics->addStdDev((group_name.str() + std::string("Number of known peer insertion attempts")).c_str(), numPeerKnownError);
+		globalStatistics->addStdDev((group_name.str() + std::string("Number of unknown peer insertions")).c_str(), numPeerKnownSuccess);
+		globalStatistics->addStdDev((group_name.str() + std::string("Failed object removals")).c_str() , numObjectRemoveFail);
+		globalStatistics->addStdDev((group_name.str() + std::string("Successful object removals")).c_str() , numObjectRemoveSuccess);
     }
 }
 
@@ -457,9 +475,9 @@ void GroupLedger::removePeer(PeerData peer_dat)
 			if (isSuperPeerLedger())
 			{
 				object_lifetime = (simTime() - object_ledger_it->second.objectDataPtr->getCreationTime()).dbl();
-				std::cout << "Object lifetime: " << object_lifetime << endl;
 				RECORD_STATS(globalStatistics->recordOutVector("GroupLedger: Object lifetime", object_lifetime));
 				RECORD_STATS(globalStatistics->recordOutVector("GroupLedger: Object initial group size", object_ledger_it->second.objectDataPtr->getInitGroupSize()));
+				RECORD_STATS(globalStatistics->recordOutVector("GroupLedger: Object maximum group size", object_ledger_it->second.objectDataPtr->getMaxGroupSize()));
 			}
 
 			object_map.erase(object_ledger_it);
@@ -583,6 +601,9 @@ void GroupLedger::addObject(ObjectData objectData, PeerData peer_data_recv)
 
 		delete(object_ledger);
 	}
+
+	/*if (simTime() > 6000.00 && isSuperPeerLedger())
+		std::cout << "It's now past 600";*/
 
 	data_size += objectData.getSize();
 	objects_total++;
