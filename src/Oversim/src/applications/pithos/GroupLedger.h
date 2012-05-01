@@ -99,6 +99,8 @@ class GroupLedger : public cSimpleModule
 		 */
 		bool verifyObjectOnPeer(ObjectData object_data, PeerData peer_data);
 
+		void updateMaxGroupPerObject();
+
 		/**
 		 * The functions returns a random peer in the ledger
 		 *
