@@ -1,0 +1,212 @@
+\chapter{Introduction}
+\label{chp:INTRO}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Background}
+\label{background}
+
+The IS-HSII project is a joint project undertaken between the Katholieke Universiteit (KU) Leuven and Stellenbosch
+University for the development of a satellite borne, electronically beam steerable antenna array. The
+ESAT-TELEMIC division of the Department of Electrical Engineering, of the KU Leuven, is currently developing
+techniques for electronic antenna beam steering in space. The purpose of the development is threefold:
+\begin{itemize}
+\item To undertake research and expand knowledge in the area of dynamically configurable antenna beam
+forming as an academic objective
+\item To prove the viability of this research for space purposes
+\item To demonstrate the feasibility of the development in a practical application, where ground-based
+environmental sensor data would be uploaded to a satellite carrying the steerable antenna array
+\end{itemize}
+
+The project is jointly undertaken between the KUL and the Digital Signal Processing (DSP)-Telecommunications group of the Department
+of Electrical and Electronic Engineering of Stellenbosch University. The antenna and
+associated components are developed in Leuven, while the satellite platform, ground station and
+ground-satellite communications link, are developed in Stellenbosch. The eventual objective is to fly the
+system on the next South African satellite.
+
+Part of the ground station-satellite communications link is the design of the protocol stack of the
+communications sub-system and the implementation of all layers thereof, to enable full store-and-forward functionality.
+A team of people were appointed to implement the communications sub-system.
+
+The implementation consists of both software and hardware development. Most of the hardware was developed
+by Sunspace for the SumbandilaSat project. The on-board computer used for the project is the same
+computer as on SumbandilaSat. Some experience could be transferred from the SumbandilaSat project to the Leuven
+project, but there were also some major differences. A key difference is the Sumbandila satellite is
+a half-duplex system, whereas the Leuven system is full-duplex. This allows for more freedom and functionality
+in the on-board software design.
+
+One component of the communications system is the Satellite Communications Software System (SCSS) that
+resides in the top layer of the protocol stack, in the application layer. The SCSS controls communication times
+and durations with ground stations, stores files received from ground stations and implements a store-and-forward system
+to deliver data to destination ground stations. The design and implementation of the SCSS is the focus
+of this work.
+
+\section{Objectives and contributions}
+\label{objectives}
+
+The objectives of this study was the design and implementation of the SCSS executing on the satellite
+on-board computer, while taking into account the resource limitations of the hardware. The design
+includes defining all message formats to be used for communications between the SCSS and ground stations.
+The purpose of the SCSS is to coordinate all high level communication operations of the satellite.
+
+Functionality expected from the SCSS are:
+\begin{itemize}
+\item Initiate connections with ground stations
+\item Allow ground stations to communicate with the satellite on a file level
+\item Allow ground stations to upload and download data
+\item Allow ground stations to send data to other ground stations
+\item Manage the communication times and durations to ensure that all ground stations receive equal service.
+\item Provide a means to store and retrieve uploaded data on the satellite
+\item Manage the steering of the satellite antenna, to point to the currently communicating ground station.
+\end{itemize}
+
+The SCSS was successfully developed and implemented on the satellite hardware. The SCSS
+consists of a station scheduler that manages the allowed communication times of all ground stations and
+the station handlers, which directly handle all requests from ground stations. A file store is also implemented
+to store all ground station messages, configuration data and schedules. Testing was performed to ensure the
+SCSS functions as designed and within the required resource constraints.
+
+A substantial amount of time was spent on developing an effective communications strategy. The strategy
+manages communication times with ground stations, including both allowed start times and communications
+duration. It was found that the volumetric throughput of the system could be maximised, by actively controlling
+ground station communication times. The active control is performed by the satellite and involves a schedule
+calculated off-line, making use of satellite and ground station position predictions.
+
+Predicting the satellite and ground station positions, allows the satellite to be aware of the link quality
+of every satellite pass. This allows a scheduler to select a ground station, having a high-quality link for
+the specific pass. In this way, every ground station is allowed a high quality pass when it communicates,
+while the strategy also equalises all ground station communication times. The calculated schedule drives
+the SCSS.
+
+The link predictions also allows for the analysis of the space mission, to calculate average and total communication
+times and thereby the overall system communications capacity.
+
+Angle predictions were also performed to allow for a directed antenna on the ground stations, instead of
+a basic omni-directional design. Angle predictions allow for the average angle to be predicted, which
+the satellite and ground station will communicate in, most of the time. This can be used to achieve
+an acceptable link margin, in applications where an omni-directional antenna produces an unacceptable
+link margin.
+
+\section{Applications}
+\label{applications}
+
+The satellite system under discussion is being designed for remote monitoring applications, as stated in Section
+\ref{background} and depicted in Figure \ref{fig_comms_overview}. A remote monitoring system exists of two types
+of ground stations, i.e. ground stations collecting data from sensor networks and those aggregating the collected
+data for further processing, or pass the data on to a server in the Internet for processing. The ground stations
+collecting the sensor data, are the data sources in the communications system and the ground stations aggregating
+the data, are the data sinks in the system.
+
+Ground stations collecting sensor data are placed in remote areas, with no Internet or cellular connection.
+There is, therefore, no way for data collected from these sensors to be processed without manual data collection
+techniques. This manual process of data collection is very labour intensive and allows little time for data processing
+during collection, or requires a large team to collect the data.
+
+A remote monitoring system collects the data from rural ground stations and only requires personnel to process the
+data at the data processing centre where the data are sent. Data are uploaded from rural ground stations and downloaded
+to the aggregator ground station where all data are stored in a database, or sent to a server for processing. Data mining
+can then be performed from a central location and different data sets from different sensor ground stations can easily
+be correlated and compared.
+
+Applications of remote monitoring systems are tracking, and climate and maritime monitoring. Climate monitoring
+systems monitor meteorological elements such as temperature, humidity, rainfall, wind and atmospheric pressure
+in a given region. In current times, these systems are of  great importance, because they enable the monitoring
+of the effects of global warming. It allows tracking of the global climate at near to real-time. Large data sets can
+then be processed after being delivered to a central processing facility with more powerful capabilities than what
+would be individually available at every monitoring site.
+
+The second example is that of tracking. Environmental research is done at the University of Stellenbosch
+to track Leopard movements with tracking collars. Another application of the satellite system is to
+have ground sensor stations monitoring the positions of the tracking collars. Multiple ground stations
+can then be set up to monitor leopards moving throughout their habitat. These stations will be set up
+in rural areas in the mountains and will have no form of communications, except the satellite system.
+Manual data retrieval is also difficult in these areas as researchers have to track the leopards with
+tracking equipment in the field. This can be a tedious as well as dangerous expedition.
+
+The final example is one where a satellite based tracking antenna can have a significant impact. This
+is in maritime monitoring operations. Shipping companies monitor their ships to enable them to gauge their times
+to arrival as well as other operational parameters. Currently, these ships have systems to communicate
+with a satellite and these communications are made possible with the use of an antenna enabling contact
+with the satellite. It is important that the antenna be pointed at the satellite at all times when communicating.
+The antenna must, therefore, possess stabilisers that maintain the correct pointing direction, even with
+the destabilising effect of ocean waves.
+
+Antennas currently used on ships are very expensive, as they employ sophisticated stabilisation techniques
+\cite{stable_antenna}. With the antenna mounted on the satellite, there is no need for stabilisation on
+the ship. The satellite is always able to point towards the ship and the movement of the ship will have no
+significant effect, provided that the ship-mounted antenna is reasonably omni-directional.
+
+For the design of the satellite communications system, the intended applications should at all times be kept
+in mind. The characteristics of a remote monitoring systems are low data volumes, high number of
+data sources, intermittent data production, text-based measurement data that are highly compressible
+and data not requiring immediate processing or transmission.
+
+The low data volumes stem from the nature of the data. The data are measurement data, which would
+consist of numbers and text. No video or audio data are transmitted. Since there may be many sensor networks
+and rural ground stations throughout the area being monitored, many data sources using the satellite exist in
+the system. The sensor system will, however, not be constantly producing data. Measurements are
+taken at certain times during the day and that data must then be uploaded for aggregation. The measurement
+data are also considered to be non-real-time off-line data. No immediate data processing is required
+and a delay in transmission will not adversely affect the system.
+
+\section{Overview of this work}
+\label{overview_intro}
+
+Chapter \ref{chp:LIT} provides the required background information on satellite communications and how
+this applies to LEO satellite systems and specifically to the LEO satellite system being designed.
+The chapter takes a top-down approach to provide perspective on where the SCSS fits in.
+It concludes by describing on-board processing and satellite autonomy, which forms part of the
+focus of this work.
+
+After satellite systems in general have been described, Chapter \ref{chp:system_overview} presents an
+overview of specifically the satellite being designed. It details the orbit characteristics to show what
+little time is available for LEO communications. It also describes the basics of how the satellite and
+the ground station will communicate and presents an overview of the protocol stack developed. The
+chapter then moves on to describe the hardware and interfaces of the system as well as to give
+some background information on the architecture of the operating system used on the on-board computer.
+The chapter also describes the KU Leuven steerable antenna, around which the project was designed and
+discusses how the antenna influenced design.
+
+Chapter \ref{chp:LINK_ACQ} describes a novel method of how the first function of the SCSS
+is implemented, namely, acquiring the satellite link. The chapter introduces the link acquisition technique
+and shows how links are acquired by predicting the positions of the satellite and ground stations in time and
+using these predictions to calculate a schedule for the system. The chapter also debates the merits
+of the prediction technique and how this improves the volumetric throughput of the communications
+system.
+
+Chapter \ref{chp:COMMS_CONCEPT} presents the design of the SCSS. Initially, a functional
+analysis is performed and then the high-level design is described. Two entities are introduced, the station
+server and station handler and the design of each system with flow diagrams is discussed in detail.
+Mechanisms used to ensure correct functionality within the limited resource environment are also presented.
+Message formats are also discussed, along with the choice of markup language. The different messages
+used by the system are also presented along with the structure of the file store. Another important part
+of the SCSS is logging and the implementation of this is also discussed.
+
+Chapter \ref{chp:IMP_TEST_PERFORM} discusses some implementation specific details of the SCSS.
+The communications system is discussed on a program level and the other supporting software and
+scripts are also discussed. The unique challenges faced when developing for an embedded system are
+presented, which is followed by testing and performance descriptions. All tests performed on the system are
+described and the importance of each test is explained. The chapter concludes by illustrating
+memory and CPU performance figures achieved. These figures illustrate the low resource
+usage of the SCSS.
+
+Chapter \ref{chp:CONC} concludes the work with a discussion on contributions made and recommendations
+regarding the path ahead as well as what sections require further investigation.
+
+%\section{Summary}
+
+%The history of the Leuven project was described along with where the department and this
+%thesis fit into that project. The SCSS, the focus of this work, was presented along with the
+%motivation for the system. This also includes the required functionality of a store-and-forward system.
+
+%The research objectives and contributions were then presented. The objectives being the design, implementation
+%and testing of  the SCSS, with store-and-forward functionality. Other contributions also included
+%the link prediction algorithm, communications strategy, communications statistics, angle prediction and maximisation
+%of the volumetric throughput of the communications system.
+
+%Remote monitoring applications were presented as the main application for the LEO satellite communications
+%system under investigation. Some examples were presented to illustrate the range of remote monitoring applications.
+%The main characteristics of remote monitoring applications were mentioned and discussed to present a perspective
+%from which to view the system design presented in later chapters.
+
+%An overview of the work was also presented, which summarises the remaining chapters in this work.

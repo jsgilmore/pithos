@@ -1,0 +1,173 @@
+\documentclass[11pt,oneside,openany,a4paper,%..... Layout
+               afrikaans, english%.............. Global language selection
+               ]{memoir}
+
+ \usepackage[masters-t,%.......................... Master thesis
+             goldenblock,%........................ A5 type block (or a5block or wide)
+            ]{usthesis}%.......................... US thesis style with memoir
+
+%
+% PLEASE read the USthesis documentation for the class options
+% and how to set line and paragraph spacing
+%
+%==== Language setup ================================================
+ \usepackage[latin1]{inputenc}%................... Recognizes �, �, etc
+ \usepackage{babel}%.............................. Language setup
+
+%==== Math setup ====================================================
+ \usepackage{amsmath}%............................ Advanced math (before fonts)
+ \usepackage{amssymb}%............................ AMS Symbol fonts
+
+%==== Font setup (default is Computer Modern) =======================
+ \usepackage[T1]{fontenc}%........................ Type 1 fonts
+ \usepackage{textcomp}%........................... Additional text character
+ \usepackage{bm}%................................. Bold math symbols (after fonts)
+
+%==== Ref's, Bib's and Nomencl ======================================
+ \usepackage{usnomencl}%.......................... List of symbols (in usthesis pack)
+ %\usepackage{usbib}%.............................. Bibliography    (in usthesis pack)
+%    \bibliographystyle{usmeg-n}
+%    \renewcommand\bibfont{\small}
+
+    %% For usmeg-a, the bib is a list of references. If you
+    %% are using usmeg-n comment out the following lines
+    %\addto{\captionsafrikaans}{\renewcommand{\bibname}{Lys van Verwysings}}
+    %\addto{\captionsenglish}{\renewcommand{\bibname}{List of References}}
+
+%==== Graphics and Color ============================================
+\usepackage{graphicx}%........................... Graphicx loaded in usthesis
+\usepackage{color}%.............................. Color setup
+\usepackage{eso-pic}%............................ Shipout commands for watermark
+    \newcommand*{\WaterMark}[2][0.2\paperwidth]{%
+        \AddToShipoutPicture*{\AtTextCenter{%
+                \parbox[c]{0pt}{\makebox[0pt][c]{%
+                    \includegraphics[width=#1]{#2}}}}}}
+
+%==== Local Defs ====================================================
+\makeatletter
+
+%
+% Please insert user defined commands here
+% and NOT in the document itself!
+%
+%\usepackage{hyperref}
+\usepackage[caption=false]{subfig}
+\usepackage{sistyle}
+    \SIstyle{S-Africa}
+    \SIunitspace{{\cdot}}
+    \SIunitdot{{\cdot}}
+    
+\renewcommand{\UScaptionsafrikaans}{%
+    \def\DeclarationName{Verklaring}%
+    \def\AbstractName   {Samevatting}%
+}
+
+\usepackage{listings}
+
+% generate nice bookmarks and hyperrefs when exporting to pdf and dvi (screen version):
+%\usepackage[a4paper,plainpages=false,colorlinks,linktocpage,bookmarks=true,bookmarksopen=false]{hyperref}
+% use this for printing only (no color, print version):
+\usepackage[a4paper,plainpages=false,colorlinks=false,linktocpage,bookmarks=true,bookmarksopen=false]{hyperref}
+
+\renewcommand{\lstlistlistingname}{List of Listings}
+
+\providecommand{\norm}[1]{\lVert#1\rVert}
+%\renewcommand{\vec}[1]{\vec{#1}}
+
+\hyphenation{MATLAB}
+
+\makeatother
+
+%==== TITLE PAGE ====================================================
+\title{\AorE{%-- Afrikaans ------------------------------------------
+             Ontwikkeling van 'n Satellietkommunikasie Sagtewarestelsel en Skeduleringsstrategie\\[1ex]
+             \normalfont\small\itshape
+             (``Development of a Satellite Communications Software System and Scheduling Strategy'')
+            }{%-- English -------------------------------------------
+             Development of a Satellite Communications Software System and Scheduling Strategy
+            }}
+
+\author{J.S.\ Gilmore}{John Sebastian Gilmore}
+
+\ThesisDescript{Thesis presented in partial fulfilment of the requirements for the degree of Master of Science in Engineering at Stellenbosch University}
+
+\degree{\AorE{MScIng}{MScEng}}
+       {\AorE{\\Magister in die Natuurwetenskappe in Ingenieurswese}
+             {\\Master of Science in Engineering}}
+
+%\address{\AorE{%-- Afrikaans ----------------------------------------
+%        Departement Elektries en Elektroniese Ingenieurswese,\\
+   %          }{%-- English ------------------------------------------
+      %  Department of Electrical and Electronic Engineering,\\
+         %    }}
+
+\studyleader{Dr.\  Riaan\ Wolhuter}
+\setdate{3}{2010}
+
+%====================================================================
+%     MAIN DOCUMENT
+%====================================================================
+\maxsecnumdepth{subsubsection}
+\maxtocdepth{section}
+
+\begin{document}
+
+%==== Front matter ==================================================
+ \frontmatter
+ \WaterMark{UScrest-WM}
+ \TitlePage
+
+%  \DeclarationSign{\includegraphics[width=2cm]{MySignatureFile}}
+%  \DeclarationDate{2010/12/10}
+\DeclarationPage[By submitting this thesis electronically, I declare that the entirety
+of the work contained therein is my own, original work, that I am the owner of the
+copyright thereof (unless to the extent explicitly otherwise stated) and that I have not
+previously in its entirety or in part submitted it for obtaining any qualification.\\\\March 2010]
+
+ \include{frontmatter/Chap-Front}
+
+ \tableofcontents
+ \clearpage
+
+ \setcounter{lofdepth}{2}
+ \listoffigures
+  \clearpage
+  
+  \listoftables
+\clearpage
+
+ \lstlistoflistings
+ \clearpage
+
+%\include{frontmatter/Abbreviations}
+\include{frontmatter/Nomencl}
+
+%==== Main document =================================================
+\mainmatter
+   \setsecnumdepth{subsubsection}
+   \numberwithin{equation}{section}
+   \numberwithin{figure}{chapter}
+   \numberwithin{table}{chapter}
+
+\include{contents/Introduction}
+\include{contents/Lit_study}
+\include{contents/System_overview}
+\include{contents/Link_acq}
+\include{contents/system_design}
+\include{contents/detail_imp_test}
+\include{contents/conclusion}
+
+%==== Appendices ====================================================
+\appendix
+\appendixpage\relax
+
+\include{contents/App-1}
+%\include{contents/App-2}
+
+%==== Bibliography acro's & Index ===================================
+\backmatter
+
+\bibliographystyle{IEEEtran}
+\bibliography{backmatter/comms_system}
+
+\end{document}

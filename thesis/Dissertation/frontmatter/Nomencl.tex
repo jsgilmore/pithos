@@ -1,0 +1,159 @@
+\chapter{Nomenclature}
+
+\newlength{\gnat}
+\settowidth{\gnat}{$GS_\textrm{dropped}$}
+
+\begin{Nomencl}[\gnat]
+
+\NomGroup{Satellite orbit characteristics}
+		\item[$R_E$]		Mean Earth radius
+		\item[$h$]			Satellite altitude
+		\item[$p$]			Length of one satellite orbit rotation
+		\item[$v$]			Satellite velocity
+		\item[$T_S$]		Satellite period
+		\item[$c$]			Speed of light in a vacuum
+		\item[$g$]			Nominal Earth gravitational acceleration at sea level
+		\item[$s$]			Satellite footprint velocity
+		\item[$l$]			Satellite arc length
+		\item[$t_x$]		Channel delay time
+		\item[RTT]			Round-trip-time
+		\item[$T_C$]		Communications time window length
+		\item[$d$]			Satellite-ground station communications range
+      
+\NomGroup{Scheduling theory}
+		\item[$\alpha$]						Machine environment
+		\item[$\beta$]						Job characteristic
+		\item[$\gamma$]					Optimality criteria
+		\item[$Pm$]							$m$ parallel machines
+		\item[$J_i$]							Job number $i$
+		\item[$r_i$]							Release time of $J_i$
+		\item[$d_i$]							Deadline of $J_i$
+		\item[$C_i$]							Completion time of $J_i$
+		\item[$f_i()$]							Cost function of $J_i$
+		\item[$GS_\textrm{dropped}$]	Total number of viable unscheduled ground stations
+		
+\NomGroup{Ground station communications}
+		\item[$t$]			Time
+		\item[$g_i$]		Ground station $i$
+		\item[$t_{is}$]	Communications start time of $g_i$
+		\item[$t_{ie}$]	Communications end time of $g_i$
+		\item[$\tau_i$]	Required communications time of $g_i$
+		
+\NomGroup{Satellite position prediction}
+		\item[$\mathbf{S}$]				Satellite position vector
+		\item[$K$]							Position vector length
+		\item[$t_{\textrm{end}}$]		Prediction end time
+		\item[$t_{\textrm{step}}$]	Prediction step time
+		\item[$\mathbf{s}_0$]			Initial satellite position
+		\item[$x,y,z$]						Coordinates in $\mathbb{R}^3$
+		\item[$\Delta\beta$]		Satellite step angle
+		\item[$\mathbf{S}_{0}$]		Initial uninclined satellite position vector
+		\item[$\mathbf{Q}$]			Satellite orbit rotation matrix
+		\item[$\mathbf{L}$]				Satellite inclination rotation matrix
+		\item[$\mathbf{S}_i$]			Inclined satellite position vector
+		\item[$\mathbf{H}$]				Satellite longitudinal rotation matrix
+		\item[$\omega$]					Longitudinal angle
+		
+\NomGroup{Ground station position prediction}
+		\item[$\mathbf{G}$]			Ground station position vector
+		\item[$\mathbf{R}$]				Ground station rotation matrix
+		\item[$\Delta\sigma$]	Ground station step angle
+		\item[$T_G$]						Period of one Earth rotation (1 day)
+		\item[$\vartheta$]				Latitude
+		\item[$\varphi$]					Longitude
+		\item[$h_s$]						Height above sea level
+		\item[$R_{\textrm{trans}}$]	Transverse radius of curvature
+		\item[$\varepsilon^2$]			Eccentricity of the Earth ellipsoid
+		\item[$a$]							Semi-major axis of the Earth ellipsoid
+		\item[$b$]							Semi-minor axis of the Earth ellipsoid
+
+\NomGroup{Visibility and angle prediction}
+		\item[$\mathbf{d}$]						Satellite-ground station distance vector
+		\item[$\gamma_{\textrm{sat}}$]	Satellite perspective angle
+		\item[$\gamma_{\textrm{gs}}$]	Ground station perspective angle
+		\item[$\phi$]								Vertical satellite-ground station angle
+		\item[$\theta$]							Horizontal satellite-ground station angle
+		\item[$\vec{N}$]							North vector
+		\item[$\vec{N}'$]							Projected North vector
+		\item[$\vec{S}'$]							Projected Satellite position vector
+		\item[$\hat{x}$]							Unit vector in the $x$ direction
+		\item[$\hat{y}$]							Unit vector in the $y$ direction
+		\item[$\hat{z}$]							Unit vector in the $z$ direction
+
+\NomGroup{System design}
+		\item[$t_\textrm{start}$]		Scheduled ground station start time
+		\item[$t_\textrm{stop}$]		Scheduled ground station stop time
+
+ \NomGroup{Subscripts}
+		\item[$\mathrm{min}$]	Minimum
+		\item[$\mathrm{max}$]	Maximum
+		\item[$\mathrm{cur}$]		Current
+		\item[$k$]						The $k$th vector element
+		\item[$x$]						The $x$ component of a vector
+		\item[$y$]						The $y$ component of a vector
+		\item[$z$]						The $z$ component of a vector
+		
+\NomGroup{Abbreviations}
+		\item[ACK]			Acknowledgement
+		\item[API]				Application Programming Interface
+		\item[ARQ]			Automatic Repeat-request
+		\item[AWS]			Amazon Web Services
+		\item[CCSDS]		Consultative Committee for Space Data Systems
+		\item[CPU]			Central Processing Unit
+		\item[CSV]			Comma-separated Values
+		\item[CTW]			Communications Time Window
+		\item[DSP]			Digital Signal Processing
+		\item[ECSS]			European Corporation for Space Standardisation
+		\item[FIX]				Financial Information Exchange
+		\item[FPGA]			Field-programmable Gate Array
+		\item[FTP]				File Transfer Protocol
+		\item[GEO]			Geostationary Earth Orbit
+		\item[GPS]			Global Positioning System
+		\item[GPX]				GPS Exchange Format
+		\item[GS]				Ground Station
+		\item[GSL]				Ground Station Link
+		\item[ICMP]			Internet Control Message Protocol
+		\item[ID]				Identifier
+		\item[IDE]				Integrated Development Environment
+		\item[IP]				Internet Protocol
+		\item[IPC]				Inter-process Communications
+		\item[JSON]			JavaScript Object Notation
+		\item[KU]				Katholieke Universiteit
+		\item[LEO]				Low Earth Orbit
+		\item[LNE]				Least Number of Exclusions
+		\item[MIME]			Multipurpose Internet Mail Extensions
+		\item[NASA]			National Aeronautics and Space Administration 
+		\item[OBC]			On-board Computer
+		\item[OS]				Operating System
+		\item[OSI]				Open System Interconnection
+		\item[PC]				Personal Computer
+		\item[POSIX]			Portable Operating System Interface
+		\item[QDE]			QNX Development Environment
+		\item[QoS]				Quality of Service
+		\item[QPSK]			Quadrature Phase-shift Keying
+		\item[RCT]				Required communications time
+		\item[RF]				Radio Frequency
+		\item[ROI]				Return on Investment
+		\item[RSS]			Really Simple Syndication
+		\item[RTC]				Real-time clock
+		\item[RTT]				Round-trip Time
+		\item[SCSS]			Satellite Communications Software System
+		\item[SCTF]			Shortest Communications Time First
+		\item[SGP]			Simplified General Perturbations
+		\item[SH]				SuperH
+		\item[SMS]			Short Message Service
+		\item[SSV]			Space-separated Values
+		\item[STK]				Satellite Tool Kit
+		\item[SVG]			Scalable Vector Graphics
+		\item[TCP]				Transmission Control Protocol
+		\item[TLE]				Two-line Element
+		\item[TM]				Telemetry
+		\item[UML]			Unified Modelling Language
+		\item[USA]			United States of America
+		\item[WGS]			World Geodetic System
+		\item[XML]				Extensible Markup Language
+		\item[XMPP]			Extensible Messaging and Presence Protocol
+		\item[XSD]				XML Standard Definition
+		\item[YAJL]			Yet Another JSON Library
+\end{Nomencl}
+\endinput

@@ -1,0 +1,233 @@
+\chapter{Conclusions and Recommendations}
+\label{chp:CONC}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\section{Introduction}
+
+%The final chapter in this work presents the conclusions drawn from the work performed as well
+%as making some recommendations on further work that might be performed. Two main areas
+%are investigated in this work. The one is the design of the communications strategy with the
+%focus on the link acquisition protocol and the other is the design and implementation of the
+%SCSS, driven by the designed communications strategy.
+
+%Section \ref{comms_strategy} discusses the communications strategy used.
+%
+%Section \ref{software_system} discusses the SCSS design.
+%
+%Section \ref{contributions} describes contributions made by this work.
+%
+%Section \ref{further_work} presents some areas where there further work can be undertaken
+%to improve the link quality prediction, communications strategy and the SCSS.
+
+\section{Communication strategy}
+\label{comms_strategy}
+
+When designing the SCSS, various methods were investigated for a means to efficiently establish
+the satellite-ground station connection. A few major factors specified the design of the protocol.
+These were:
+%
+\begin{enumerate}
+\item the satellite mounted steerable antenna,
+\item the need to produce low cost ground stations and
+\item the single available communications channel on the satellite.
+\end{enumerate}
+
+With the satellite mounted steerable antenna, a sufficient link margin was achieved, to not require steerable
+antennas on the ground stations. This did, however, create the requirement that the satellite, and not the
+ground stations, should initiate connections, as described in Section \ref{tracking_link_acq}. Two methods
+of tracking were also investigated: program tracking and tracking techniques, making use of satellite beacon
+transmissions, as presented in Section \ref{leo_comms}. Program tracking was chosen, as this requires
+no transmission of beacon packets, which frees up the communications channel for data.
+
+A broadcast method may be used for a single channel, where the satellite broadcasts until a
+ground station connection has been established, processes all ground stations requests, and
+then broadcasts again to establish a new connection. This method is inefficient, as no knowledge
+of the link quality or available communications time is taken into account. 
+
+If the system possesses knowledge of link quality and communications duration, it can intelligently
+schedule ground station connections, to optimise the volumetric data throughput of the system.
+Since the satellite has a known orbit track and the ground station also moves predictably with
+the movement of the Earth, the distance between these two entities may be predicted. The
+distance prediction produces a measure of link quality and, because time can also be linked
+to the movements, the communication duration may also be predicted.
+
+The predictions can then be used to schedule ground stations in such a way as to maximise
+the total communication time of the system and minimise the number of ground stations, not
+allowed to communicate. The schedule can then be uploaded to the satellite, from where
+connections are made. When the schedule is created, the total amount of communications time
+is also equalised among ground stations, which produces a fair schedule. These two techniques
+produce a more efficient method of link acquisition, than a system with no past or future knowledge
+of the established links.
+
+In scenarios where the link margin is not sufficient for communications, directional ground station
+antennas may be used. These antennas have to be pointed in some specific direction and only
+when the satellite flies through the antenna beam, will it be able to communicate. Angle predictions
+were performed to aid in calculating the optimal direction, in which the antenna should point, to
+communicate with the satellite for the maximum amount of time.
+
+\section{Satellite Communications Software System}
+\label{software_system}
+
+With the communications strategy devised, the SCSS was designed. The design is
+based on the client-server model of communications, where the server runs and creates handler
+threads for clients requiring service. From this model, the schedule was incorporated into
+the server.
+
+A deviation from the classic client-server model is present in the connection setup phase 
+of the SCSS. In the classic model, clients initiate connections to the server, but
+because of the schedule controlled communication times, the server must initiate connections
+to ground stations. This difference does not, however, change the basic functionality of the
+SCSS from that of a classic client server model.
+
+Multi-threading also allowed for the modularisation of the the SCSS. This simplified development,
+decreased the level of coupling and promoted encapsulation of data and functions. The multi-threaded
+approach also improved the robustness of the SCSS. If an unexpected scenario occurs, from
+which the SCSS cannot correct itself, only the current ground station connection is lost and
+further ground station may still be handled by other station handlers.
+
+During development, resource limitations were identified as a potential development risk. To
+manage this risk, various mechanisms were implemented to reduce memory and CPU usage.
+This led to an efficient design, well suited for an embedded implementation.
+
+The designed SCSS performed well under testing and well within resource limits
+set by the hardware. The thread cancellation mechanism used, requires involved memory
+management techniques, but the mechanism also increases the responsiveness of the SCSS.
+The cancellation mechanism ensures that no ground station can use more than its assigned
+communications time.
+
+The schedule driven design proved to be a robust and efficient design, while implementing
+all features required by other sub-systems and ground stations. Features required by other
+sub-systems include providing a pointing target for the antenna control software to point to
+and providing the lower lever protocol layers with data to transmit. Features required by
+ground stations are those enabling the ground stations to implement a store-and-forward
+system over the satellite link for remote monitoring applications. These features include:
+allowing ground stations to communicate with the satellite on a file level, allowing ground
+stations to upload and download data and allowing ground stations to send data to other
+ground stations.
+
+\section{Contributions}
+\label{contributions}
+
+The three main contributions of this work, are:
+\begin{enumerate}
+\item the development of a communications strategy,
+\item design and implementation of the SCSS
+\item and a centralised control approach.
+\end{enumerate}
+
+The main contributions of the SCSS are:
+\begin{itemize}
+\item A resource efficient and multi-threaded high level communications control system
+with a high level of responsiveness.
+\item The scheduler, which determines the communication times of ground stations.
+\item The definition of all messages and their formats, which will be used for satellite-
+ground station communications.
+\item The Station Server commanding the antenna control software and thereby
+supporting the satellite mounted steerable antenna.
+\end{itemize}
+
+The main contributions of the communications strategy are:
+\begin{itemize}
+\item The possible maximisation of volumetric data throughput of the satellite system.
+\item This is achieved by efficiently scheduling ground station communications.
+\item The calculation of the satellite position as a function of time, using orbital elements and
+orbital mechanics, enable the calculation of the communications schedule.
+\item Fair assignment of communication times are also ensured by the scheduling algorithm.
+\item Position prediction also allows for the calculation of the communications statistics
+by making use of visibility predictions. These predictions were compared to the STK
+software package and found to match closely with the values predicted by the STK.
+\item Predicted total communication times enable system designers to calculate the
+overall system capacity as well as the capacity of each ground station, according to its geographic location.
+\item Angle predictions also enable system designers to optimally point static directional ground
+station antennas. Directional antennas may be required in areas where the link margin is
+insufficient. The angle predictions provide an optimal elevation angle, as well as an optimal
+horizontal angle, measured from true North.
+\end{itemize}
+
+The main contributions of the implemented centralised control are:
+\begin{itemize}
+\item The promotion of on-board processing techniques as well as satellite autonomy.
+\item Ease of administration and coordination.
+\item Improved response time because of the link acquisition strategy as explained in Section \ref{on-board_proccessing}.
+\item By using satellite controlled link acquisition, together with a satellite mounted steerable antenna,
+steerable antennas can be removed from ground stations. This drastically decreases the
+costs of ground stations.
+\end{itemize}
+
+
+\section{Further work}
+\label{further_work}
+
+%Perform integration testing between software system and rest of protocol stack.
+Firstly, the SCSS should be integrated with the rest of the communications protocol
+stack. This could not be done during the implementation of the SCSS, as the other
+projects were not at a point in their development where they could be integrated. After integration,
+integration testing should be performed on the communications system as a whole.
+This should include sending a file over an RF link and checking whether the file was received.
+Smaller tests between the SCSS and the antenna control software should also be performed.
+
+Further required testing includes protocol tests, protocol efficiency evaluation and a comparison
+of these evaluations against other communications protocols. Protocol efficiency evaluation
+includes calculating the protocol overhead during a typical transmissions.
+
+%Directly download TLE's from Spacetrack
+For the position prediction scheme, the schedule generator should be automated to download
+the two-line-elements of the satellite from Spacetrack. This will enable the schedule generator to
+always use up-to-date orbital elements to achieve a maximum accuracy of orbit prediction.
+
+%Use commercial SGP4 algorithm, instead of custom algorithm
+For the orbital prediction itself, a more accurate orbit propagator can be used, for example the SGP4 algorithm
+or an improved variant thereof. This will also improve the accuracy of the visibility prediction and take
+into account orbit perturbations. A more accurate orbit propagator requires less frequent two-line-element
+updates. The corollary of this is that a less accurate orbit propagator may be used, when
+two-line-elements are updated more frequently.
+
+%Add and compare more scheduling schemes
+For the schedule generator, the performance of more scheduling schemes should be compared.
+Different schemes should be investigated to determine whether other schemes exist, that further
+reduce the number of ground stations not able to communicate. The \emph{least number of exclusions} (LNE)
+scheme, proposed in this work, should also be compared to other schemes. The LNE scheme can
+also be further extended by making the scheme $n$ levels deep, instead of one.
+
+Currently, the scheduler looks ahead one schedule time, to determine how many stations will
+be excluded. But this scheme can be extended, to evaluate all possibilities and find the scheme
+with the total minimum number of exclusions. This scheme will most likely have a very high order
+complexity.
+
+It could also be of worth further investigating the scheduling problem from a purely mathematical
+perspective. An optimal scheme may be proposed for the defined scheduling problem.
+
+Another algorithm should be developed to optimise the overall communications system, when
+directed antennas are taken into account. The predicted angle positions of every ground station
+in the system should be predicted and overlaid, with the CTWs. After all CTWs are scheduled,
+the optimal angle should be used from every ground station. This angle would preclude other
+possible communications times for that ground station. The scheduling algorithm will have to
+be rerun. Times when a scheduled ground station could communicate, may now no longer be
+valid. This will give rise to different angles that should be optimised. An algorithm should be
+developed, enabling this calculation to converge to a system where the total amount of
+communications time is maximised.
+
+Quality of service can also be implemented in the SCSS if more finely grained
+priority is used. The priority can then be used as a weight during the scheduling algorithm,
+together with the total allocated communications time, to create a schedule where some ground
+station receive proportionally more communications time than others.
+
+%\section{Summary}
+
+%The final chapter in this work, presented the important conclusions, contributions and further
+%work of the this thesis.
+
+%Initially, the chapter re-examined the two main parts of this thesis: the SCSS and the
+%communications strategy. A short overview was given of each of these areas
+%and a summarised view was presented of the development of each of the two areas in the work.
+
+%The contributions of this work were then summarised by again reviewing the main focus
+%areas of this work. The contributions include the design and implementation of the SCSS,
+%the development of the communications strategy and the position prediction and schedule
+%generation that go with it, as well as the move to a on-board processing satellite with aspects
+%of autonomy.
+
+%The chapter concluded with further work that might be undertaken in each of the research areas
+%touched.  The section again reviewed all relevant areas and discussed ways of further improving
+%the satellite system as a whole.
