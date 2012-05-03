@@ -2,10 +2,10 @@ clear all
 close all
 
 %The maximum number of replicas
-r = 10;
+r = 15;
 
 %The maximum number of nodes
-n = 60;
+n = 100;
 
 %Repair rate
 mu = 0;
@@ -16,10 +16,10 @@ beta = 2;
 
 %Peer departure rate for a pareto distribution with parameters alpha and
 %beta
-%theta = (alpha-2)/beta
+theta = (alpha-2)/beta
 
 %Peer departure rate as measured in simulation
-theta = 0.001425; %Data measured from Pithos simulation
+%theta = 0.001425; %Data measured from Pithos simulation
 
 %Peer arrival rate with the same arrival distribution as departure
 %distribution.
