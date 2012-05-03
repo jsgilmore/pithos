@@ -2,7 +2,7 @@
                afrikaans, english%.............. Global language selection
                ]{memoir}
 
- \usepackage[masters-t,%.......................... Master thesis
+ \usepackage[PhD,%................................ PhD dissertation
              goldenblock,%........................ A5 type block (or a5block or wide)
             ]{usthesis}%.......................... US thesis style with memoir
 
@@ -25,14 +25,7 @@
 
 %==== Ref's, Bib's and Nomencl ======================================
  \usepackage{usnomencl}%.......................... List of symbols (in usthesis pack)
- %\usepackage{usbib}%.............................. Bibliography    (in usthesis pack)
-%    \bibliographystyle{usmeg-n}
-%    \renewcommand\bibfont{\small}
-
-    %% For usmeg-a, the bib is a list of references. If you
-    %% are using usmeg-n comment out the following lines
-    %\addto{\captionsafrikaans}{\renewcommand{\bibname}{Lys van Verwysings}}
-    %\addto{\captionsenglish}{\renewcommand{\bibname}{List of References}}
+ \usepackage{cite}
 
 %==== Graphics and Color ============================================
 \usepackage{graphicx}%........................... Graphicx loaded in usthesis
@@ -50,29 +43,21 @@
 % Please insert user defined commands here
 % and NOT in the document itself!
 %
-%\usepackage{hyperref}
 \usepackage[caption=false]{subfig}
-\usepackage{sistyle}
-    \SIstyle{S-Africa}
-    \SIunitspace{{\cdot}}
-    \SIunitdot{{\cdot}}
-    
+
 \renewcommand{\UScaptionsafrikaans}{%
     \def\DeclarationName{Verklaring}%
     \def\AbstractName   {Samevatting}%
 }
 
-\usepackage{listings}
+%\usepackage{listings}
 
 % generate nice bookmarks and hyperrefs when exporting to pdf and dvi (screen version):
-%\usepackage[a4paper,plainpages=false,colorlinks,linktocpage,bookmarks=true,bookmarksopen=false]{hyperref}
+\usepackage[a4paper,plainpages=false,colorlinks,linktocpage,bookmarks=true,bookmarksopen=false]{hyperref}
 % use this for printing only (no color, print version):
-\usepackage[a4paper,plainpages=false,colorlinks=false,linktocpage,bookmarks=true,bookmarksopen=false]{hyperref}
+%\usepackage[a4paper,plainpages=false,colorlinks=false,linktocpage,bookmarks=true,bookmarksopen=false]{hyperref}
 
-\renewcommand{\lstlistlistingname}{List of Listings}
-
-\providecommand{\norm}[1]{\lVert#1\rVert}
-%\renewcommand{\vec}[1]{\vec{#1}}
+%\renewcommand{\lstlistlistingname}{List of Listings}
 
 \hyphenation{MATLAB}
 
@@ -80,29 +65,33 @@
 
 %==== TITLE PAGE ====================================================
 \title{\AorE{%-- Afrikaans ------------------------------------------
-             Ontwikkeling van 'n Satellietkommunikasie Sagtewarestelsel en Skeduleringsstrategie\\[1ex]
+             'n Toestandsbestuur en Stoor Argitektuur vir Eweknie Grootskaalse Multigebruiker Virtuele Omgewings \\[1ex]
              \normalfont\small\itshape
-             (``Development of a Satellite Communications Software System and Scheduling Strategy'')
+             (``A State Management and Persistency Architecture for Peer-to-Peer Massively Multiuser Virtual Environments'')
             }{%-- English -------------------------------------------
-             Development of a Satellite Communications Software System and Scheduling Strategy
+             A State Management and Persistency Architecture for Peer-to-Peer Massively Multiuser Virtual Environments
             }}
 
 \author{J.S.\ Gilmore}{John Sebastian Gilmore}
 
-\ThesisDescript{Thesis presented in partial fulfilment of the requirements for the degree of Master of Science in Engineering at Stellenbosch University}
+\ThesisDescript{Thesis presented in partial fulfilment of the requirements for the degree of Doctor of Philosophy at Stellenbosch University}
 
-\degree{\AorE{MScIng}{MScEng}}
-       {\AorE{\\Magister in die Natuurwetenskappe in Ingenieurswese}
-             {\\Master of Science in Engineering}}
+\degree{\AorE{PhD}{PhD}}
+       {\AorE{\\Doktor van Filosofie}
+             {\\Doctor of Philosophy}}
 
-%\address{\AorE{%-- Afrikaans ----------------------------------------
-%        Departement Elektries en Elektroniese Ingenieurswese,\\
-   %          }{%-- English ------------------------------------------
-      %  Department of Electrical and Electronic Engineering,\\
-         %    }}
+\address{\AorE{%-- Afrikaans ----------------------------------------
+        Departement Elektries en Elektroniese Ingenieurswese,\\
+        Universiteit van Stellenbosch,\\
+        Privaatsak X1, 7602 Matieland, Suid Afrika.
+              }{%-- English ------------------------------------------
+         Department of Electrical and Electronic Engineering,\\
+         University of Stellenbosch,\\
+         Private Bag X1, 7602 Matieland, South Africa.
+              }}
 
-\studyleader{Dr.\  Riaan\ Wolhuter}
-\setdate{3}{2010}
+\promotor{Dr.\  Herman\ A. Engelbrecht}
+\setdate{9}{2012}
 
 %====================================================================
 %     MAIN DOCUMENT
@@ -119,10 +108,9 @@
 
 %  \DeclarationSign{\includegraphics[width=2cm]{MySignatureFile}}
 %  \DeclarationDate{2010/12/10}
-\DeclarationPage[By submitting this thesis electronically, I declare that the entirety
-of the work contained therein is my own, original work, that I am the owner of the
-copyright thereof (unless to the extent explicitly otherwise stated) and that I have not
-previously in its entirety or in part submitted it for obtaining any qualification.\\\\March 2010]
+\DeclarationPage[By submitting this thesis electronically, I declare that the entirety of the work contained therein is my own, original work, that I
+am the owner of the copyright thereof (unless to the extent explicitly otherwise stated) and that I have not previously in its entirety or in part
+submitted it for obtaining any qualification.\\\\December 2012]
 
  \include{frontmatter/Chap-Front}
 
@@ -132,14 +120,10 @@ previously in its entirety or in part submitted it for obtaining any qualificati
  \setcounter{lofdepth}{2}
  \listoffigures
   \clearpage
-  
+
   \listoftables
 \clearpage
 
- \lstlistoflistings
- \clearpage
-
-%\include{frontmatter/Abbreviations}
 \include{frontmatter/Nomencl}
 
 %==== Main document =================================================
@@ -150,24 +134,19 @@ previously in its entirety or in part submitted it for obtaining any qualificati
    \numberwithin{table}{chapter}
 
 \include{contents/Introduction}
-\include{contents/Lit_study}
-\include{contents/System_overview}
-\include{contents/Link_acq}
-\include{contents/system_design}
-\include{contents/detail_imp_test}
+\include{contents/Body}
 \include{contents/conclusion}
 
 %==== Appendices ====================================================
-\appendix
-\appendixpage\relax
+%\appendix
+%\appendixpage\relax
 
-\include{contents/App-1}
-%\include{contents/App-2}
+%\include{contents/App-1}
 
 %==== Bibliography acro's & Index ===================================
-\backmatter
+%\backmatter
 
-\bibliographystyle{IEEEtran}
-\bibliography{backmatter/comms_system}
+%\bibliographystyle{IEEEtran}
+%\bibliography{backmatter/comms_system}
 
 \end{document}

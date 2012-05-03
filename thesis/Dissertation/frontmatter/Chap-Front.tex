@@ -1,112 +1,23 @@
 
 \chapter*{Abstract}
-Stellenbosch University and the Katholieke Universiteit Leuven has a joint undertaking to develop
-a satellite communications payload. The goals of the project are: to undertake research
-and expand knowledge in the area of dynamically configurable antenna beam forming, to prove
-the viability of this research for space purposes and to demonstrate the feasibility of the
-development in a practical application.
-
-The practical application is low Earth orbit satellite communication system for applications in remote monitoring.
-Sensor data will be uploaded to the satellite, stored and forwarded to a central processing
-ground station as the satellite passes over these ground stations. The system will utilise many
-low-cost ground sensor stations to collect data and distribute it to high-end ground stations
-for processing.
-
-Applications of remote monitoring systems are maritime- and climate change monitoring-
-and tracking. Climate change monitoring allows inter alia, for the monitoring of the effects and causes
-of global warming.
-
-The Katholieke Universiteit Leuven is developing a steerable antenna to be mounted on the
-satellite. Stellenbosch University is developing the communications payload to steer and use
-the antenna. The development of the communications protocol stack is part of the project.
-The focus of this work is to implement the application layer protocol, which handles all file level
-communications and also implements the communications strategy.
-
-The application layer protocol is called the \emph{Satellite Communications Software System}
-(SCSS). It handles all high level requests from ground stations, including requests to store
-data, download data, download log files and upload configuration information. The design
-is based on a client-server model, with a \emph{Station Server} and \emph{Station Handler}.
-The Station Server schedules ground stations for communication and creates a Station Handler
-for each ground station to handle all ground station requests. During the design, all file
-formats were defined for efficient ground station-satellite communications and system administration.
-All valid ground station requests and handler responses were also defined.
-
-It was also found that the system may be made more efficient by scheduling ground stations
-for communications, rather than polling each ground station until one responds. To be able
-to schedule ground station communications, the times when ground stations will come into
-view of the satellite have to be predicted. This is done by calculating the positions of the
-Satellite and ground stations as functions of time. A simple orbit propagator was developed to
-predict the satellite distance and to ease testing and integration with the communications system.
-The times when a ground station will be within range of the satellite were then predicted and
-a scheduling algorithm developed to minimise the number of ground stations not
-able to communicate.
-
-All systems were implemented and tested. The SCSS executing on the Satellite was
-developed and tested on the satellite on-board computer. Embedded implementations possess
-strict resource limitations, which were taken into account during the development process.
-The SCSS is a multi-threaded system that makes use of thread cancellation to improve
-responsiveness.
+Recently, there has been significant research focus on Peer-to-Peer (P2P) Massively Multiplayer Online Games (MMOGs). A number of architectures have
+been presented in the literature to implement the P2P approach. One aspect that has not received sufficient attention in these architectures is state
+persistency in P2P MMOGs. This survey presents an overview of the current challenges present in P2P MMOGs, followed by an overview of classic state
+consistency models used in C/S MMOGs. The survey then classifies the state persistency techniques currently used in P2P MMOGs into super peer
+storage, overlay storage, hybrid storage and distance-based storage. Key characteristics, namely scalability, fairness, reliability, responsiveness
+and security are then defined. Each state persistency technique is evaluated according to these characteristics and recommendations are then made of
+possible future areas of research into the different storage types.
 
 
 \chapter*{Samevatting}
-\hyphenation{grond-sta-sies}
 
-Die Universiteit van Stellenbosch ontwerp tans 'n satelliet kommunikasieloonvrag in
-samewerking met die Katolieke Universiteit van Leuven. Die doel van die projek is om
-navorsing te doen oor die lewensvatbaarheid van dinamies verstelbare antenna bundelvorming
-vir ruimte toepassings, asook om die haalbaarheid van hierdie navorsing in die praktyk
-te demonstreer.
-
-Die praktiese toepassing is 'n satellietkommunikasiestelsel vir afstandsmonitering,
-wat in 'n Lae-Aarde wentelbaan verkeer. Soos die satelliet in sy wentelbaan beweeg,
-sal sensor data na die satelliet toe gestuur, gestoor en weer aangestuur word. Die
-stelsel gebruik goedkoop sensorgrondstasies om data te versamel en aan te stuur na
-kragtiger grondstasies vir verwerking.
-
-Afstandsmoniteringstelsels kan gebruik word om klimaatsverandering, sowel as die
-posisie van skepe en voertuie, te monitor. Deur oa. klimaatsveranderinge te dokumenteer,
-kan gevolge en oorsake van globale verhitting gemonitor word.
-
-Die Katholieke Universiteit van Leuven is verantwoordelik vir die
-ontwerp en vervaardiging van die satelliet antenna, terwyl die Universiteit van
-Stellenbosch verantwoordelik is vir die ontwerp en bou van die
-kommunikasie loonvrag. 'n Gedeelte van hierdie ontwikkeling sluit die
-ontwerp en implementasie van al die protokolle van die
-kommunikasieprotokolstapel in. Dit fokus op die toepassingsvlak
-protokol van die protokolstapel, wat alle le\^{e}rvlak kommunikasie
-hanteer en die kommunikasiestrategie implementeer.
-
-Die toepassingsvlaksagteware word die Satellietkommunikasie sagtewarestelsel
-(SKSS) genoem. Die SKSS is daarvoor verantwoordelik om alle navrae
-vanaf grondstasies te hanteer. Hierdie navrae sluit die
-oplaai en stoor van data, die aflaai van data, die aflaai van logs en
-die oplaai van konfigurasie inligting in. Die ontwerp is op die standaard
-kli\"{e}nt-bediener model gebasseer, met 'n \emph{stasiebediener} en 'n
-\emph{stasiehanteerder}. Die stasiebediener skeduleer die tye wanneer
-grondstasies toegelaat sal word om te kommunikeer en skep stasiehanteerders om alle
-navrae vanaf die stasies te hanteer. Gedurende die ontwerp is alle
-le\^{e}rformate gedefinieer om doeltreffende adminstrasie van die
-stelsel, asook kommunikasie tussen grondstasies en die satelliet te
-ondersteun. Alle geldige boodskappe tussen die satelliet en grondstasies
-is ook gedefnieer.
-
-Daar is gevind dat die doeltreffendheid van die stelsel verhoog kan word deur die
-grondstasies wat wil kommunikeer te skeduleer, eerder as om alle stasies
-te pols totdat een reageer. Om so 'n skedule op te stel, moet die tye
-wanneer grondstasies binne bereik van die satelliet gaan wees voorspel
-word. Hierdie voorspelling is gedoen deur die posisies van die
-satelliet en die grondstasies as funksies van tyd te voorspel. 'n
-Eenvoudige satelliet posisievoorspeller is ontwikkel om toetsing en
-integrasie met die SKSS te vergemaklik. 'n Skeduleringsalgoritme is toe
-ontwikkel om die hoeveelheid grondstasies wat nie toegelaat word om te
-kommunikeer nie, te minimeer.
-
-Alle stelsels is geimplementeer en getoets. Die SKSS, wat op die
-satelliet loop, is ontwikkel en getoets op die satelliet se aanboord
-rekenaar. Die feit dat ingebedde stelsels oor baie min hulpbronne beskik,
-is in aanmerking geneem gedurende die ontwikkeling en implementasie van die SKSS.
-Angesien die SKSS 'n multidraadverwerkingsstelsel is, word daar van
-draadkansellasie gebruik gemaak om die stelsel se reaksietyd te verbeter.
+Recently, there has been significant research focus on Peer-to-Peer (P2P) Massively Multiplayer Online Games (MMOGs). A number of architectures have
+been presented in the literature to implement the P2P approach. One aspect that has not received sufficient attention in these architectures is state
+persistency in P2P MMOGs. This survey presents an overview of the current challenges present in P2P MMOGs, followed by an overview of classic state
+consistency models used in C/S MMOGs. The survey then classifies the state persistency techniques currently used in P2P MMOGs into super peer
+storage, overlay storage, hybrid storage and distance-based storage. Key characteristics, namely scalability, fairness, reliability, responsiveness
+and security are then defined. Each state persistency technique is evaluated according to these characteristics and recommendations are then made of
+possible future areas of research into the different storage types.
 
 
 \chapter{Acknowledgements}%==================================================
@@ -114,27 +25,20 @@ draadkansellasie gebruik gemaak om die stelsel se reaksietyd te verbeter.
 I would like to express my sincere gratitude to the following people and organisations:
 \begin{itemize}
   \item the Holy Father, for keeping me and blessing me with so much;
-  \item my study leader, Dr Riaan Wolhuter, for his continued guidance and support;
-  \item my fianc\'{e}e, Jacki van der Merwe, for her lasting love, support and understanding;
-  \item Francois Olivier and Shaun Lodder, for their valuable input during the late nights in the lab;
-  \item Dr Gert-Jan van Rooyen for his valuable feedback on the SCSS design;
-  \item Ewald van der Westhuizen for managing the Leuven project and for providing technical assistance;
-  \item Kobus Botha for always being ready to assist with technical issues;
-  \item Japie Engelbrecht, for helping me better understand satellite communication systems;
-  \item the Telkom Centre of Excellence and Stellenbosch University, for their financial aid;
+  \item my promotor, Dr Herman Engelbrecht, for his continued guidance and support;
+  \item my wife, Jacki van der Merwe, for her lasting love, support and understanding;
+  \item Peter Hayward and Rampie Bell, for their valuable input during the late nights in the lab;
+  \item MIH and the NRF, for their financial aid;
   \item my parents, John and Coreen Gilmore, for making me the man I am today and making
   my studies possible;
-  \item the QNX support team, for their prompt and knowledgeable assistance with QNX related implementation issues;
-  \item James Clark, for writing the Expat XML parser library;
-  \item Jean-Loup Gailly and Mark Adler, for writing the zlib compression library.
+  \item Dr Shun-Yun Hu and Dr Gregor Shiele, for their valuable feedback.
 \end{itemize}
 
 
 \chapter{Dedications}%=======================================================
  \vfill
  \begin{center}\itshape
-    In memory of my mother, Anita Gilmore, and my grandparents: Herman Kotze, Kotie Kotze and Hettie Gilmore.
-	I hope I've made you proud.
+    To my wife, Jacki Gilmore, for all your love and support.
  \end{center}
  \vfill
  \clearpage
