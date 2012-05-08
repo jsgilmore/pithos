@@ -1,30 +1,13 @@
-close all
-clear all
+%close all
+%clear all
 
-r = 15;
-n = 250;
+function[expected_lifetimes] = object_lifetime(r,n,theta,phi,mu)
 
-str = sprintf('Calculating group replication Markov chain for %d states.', 0.5*r*(2*n-r+1));
+str = sprintf('Calculating group replication Markov chain for %d replicas, %d nodes, mu=%f and %d states.', r, n, mu, 0.5*r*(2*n-r+1));
 disp(str);
-
-%The parameters of a pareto distribution
-alpha = 3;
-beta = 2;
-
-%Peer departure rate for a pareto distribution with parameters alpha and
-%beta
-theta = (alpha-2)/beta
-%theta = 0.03362; %Data measured from Pithos simulation
-
-%Peer arrival rate with the same arrival distribution as departure
-%distribution.
-phi = theta; %Data measured from Pithos simulation
-
-mu = 4; %Parameter as in Pithos simulation
 
 x = 1;
 
-disp('Generating states vector.')
 for i = n:-1:1
     for j = min(r,i):-1:1
         s(x,2) = i;
@@ -32,8 +15,6 @@ for i = n:-1:1
         x = x+1;
     end
 end
-
-disp('Finished generating states. Now calculating rate matrix and average duration vector.')
 
 %Initialise the transient rate matrix
 Q = zeros(0.5*r*(2*n-r+1), 0.5*r*(2*n-r+1));
@@ -84,8 +65,6 @@ end
 
 rates = rates.^(-1);
 
-disp('Finished creating rate matrix and average duration vector. Now normalising the rate matrix.')
-
 %Normalised transient rate matrix
 Q_norm = zeros(0.5*r*(2*n-r+1), 0.5*r*(2*n-r+1));
 
@@ -97,33 +76,25 @@ for i=1:0.5*r*(2*n-r+1)
     end
 end
 
-disp('Finished normalising the rate matrix. Now calculating the fundamental matrix.')
-
 I = eye(0.5*r*(2*n-r+1));
 
 %Calculate the fundamental matrix
 A = I - Q_norm;
 N = A^(-1);
 
-disp('Finished calculating the fundamental matrix. Now computing expected time to absorbtion.')
-
 E_T = N*rates;
-disp('Expected time to absorbtion calculated')
 
 x = 1;
 for i=1:0.5*r*(2*n-r+1)
     if s(i,1) == r
-        E_T_fullreps(x) = E_T(i);
+        expected_lifetimes(x) = E_T(i);
         x = x+1;
     end
     
     if s(i,1) < r
         if s(i,1) == s(i,2)
-            E_T_fullreps(x) = E_T(i);
+            expected_lifetimes(x) = E_T(i);
             x = x+1;
         end
     end
 end
-
-%semilogy([n:-1:1], E_T_fullreps)
-plot([n:-1:1], E_T_fullreps)
