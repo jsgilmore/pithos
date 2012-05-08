@@ -7,10 +7,10 @@ beta = 2;
 
 %The departure rate of peers under steady state
 theta = (alpha-2)/beta;
-%theta = 0.03362
+%theta = 0.001425
 
 %Replication rate
-mu = 4;
+mu = 1;
     
 %Replication factor sweep
 for r = 1:30
