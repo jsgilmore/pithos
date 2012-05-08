@@ -33,10 +33,13 @@
 #include "DHTStorage.h"
 
 #include "GameObject.h"
+#include "GroupStorage.h"
 #include "PithosMessages_m.h"
 #include "PithosTestMessages_m.h"
 
 #include "DHTMessage_m.h"
+
+class PeerStatsContext;
 
 /**
  * The Communicator class is the Tier1 class for Pithos and therefore the means by
@@ -132,6 +135,9 @@ class Communicator : public BaseApp
 		 */
 		void sendPacket(cMessage *msg);
 
+		void pingResponse(PingResponse* pingResponse, cPolymorphic* context, int rpcId, simtime_t rtt);
+		void pingTimeout(PingCall* pingCall, const TransportAddress& dest, cPolymorphic* context, int rpcId);
+
 	public:
 
 		Communicator() {};
@@ -143,7 +149,7 @@ class Communicator : public BaseApp
                 cPolymorphic* context = NULL, simtime_t timeout = -1, int retries = 0,
                 int rpcId = -1, RpcListener* rpcListener = NULL)
 		{
-			Enter_Method("externallySendInternalRpcCall()");	//Required for Omnet++ context switching between modules
+			Enter_Method_Silent();	//Required for Omnet++ context switching between modules
 			take(msg);	//This module should first take ownership of the received message before that message can be resent
 
 			return sendInternalRpcCall(destComp, msg, context, timeout, retries, rpcId, rpcListener);
@@ -151,11 +157,25 @@ class Communicator : public BaseApp
 
 		void externallySendRpcResponse(BaseCallMessage* call, BaseResponseMessage* response)
 		{
-			Enter_Method("externallySendRpcResponse()");	//Required for Omnet++ context switching between modules
+			Enter_Method_Silent();	//Required for Omnet++ context switching between modules
 			take(call);
 			take(response);
 
 			sendRpcResponse(INTERNAL_TRANSPORT, ROOTOBJECTUPDATER_COMP, TransportAddress::UNSPECIFIED_NODE, OverlayKey::UNSPECIFIED_KEY, call, response);
+		}
+
+		int externallyPingNode(const TransportAddress& dest,
+		                  simtime_t timeout = -1,
+		                  int retries = 0,
+		                  cPolymorphic* context = NULL,
+		                  const char* caption = "PING",
+		                  RpcListener* rpcListener = NULL,
+		                  int rpcId = -1,
+		                  TransportType transportType = INVALID_TRANSPORT)
+		{
+			Enter_Method_Silent();	//Required for Omnet++ context switching between modules
+
+			return pingNode(dest, timeout, retries, context, caption, rpcListener, rpcId, transportType);
 		}
 };
 

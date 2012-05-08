@@ -219,10 +219,8 @@ bool GroupLedger::isSuperPeerLedger()
 		return true;
 	else if  (strcmp(getName(), "group_ledger") == 0)
 		return false;
-	else
+	else error("Group ledger named incorrectly, expecting 'group_ledger' or 'sp_group_ledger'.");
 
-
-	error("Group ledger named incorrectly, expecting 'group_ledger' or 'sp_group_ledger'.");
 	return false;	//This value will never be returned.
 }
 
@@ -230,12 +228,13 @@ void GroupLedger::finish()
 {
 	//Bear in mind that whenever recordAndClear() is called, finish() is also called.
 
-    // record scalar data
+	//These stats can be collected when required, but they really fill up the results and slow finish() down
+    /*// record scalar data
 	cModule *communicatorModule = getParentModule()->getSubmodule("communicator");
 	Communicator *communicator = check_and_cast<Communicator *>(communicatorModule);
 
-    cModule *groupStorageModule = getParentModule()->getSubmodule("group_storage");
-    GroupStorage *groupStorage = check_and_cast<GroupStorage *>(groupStorageModule);
+	cModule *groupStorageModule = getParentModule()->getSubmodule("group_storage");
+	GroupStorage *groupStorage = check_and_cast<GroupStorage *>(groupStorageModule);
 
     simtime_t time = globalStatistics->calcMeasuredLifetime(communicator->getCreationTime());
 
@@ -250,7 +249,6 @@ void GroupLedger::finish()
 
     		group_name << "GroupLedger (" << thisAdr << "): ";
     	} else {
-
         	group_name << "GroupLedger (" << groupStorage->getSuperPeerAddress() << "): ";
     	}
 
@@ -262,7 +260,7 @@ void GroupLedger::finish()
 		globalStatistics->addStdDev((group_name.str() + std::string("Number of unknown peer insertions")).c_str(), numPeerKnownSuccess);
 		globalStatistics->addStdDev((group_name.str() + std::string("Failed object removals")).c_str() , numObjectRemoveFail);
 		globalStatistics->addStdDev((group_name.str() + std::string("Successful object removals")).c_str() , numObjectRemoveSuccess);
-    }
+    }*/
 }
 
 bool GroupLedger::isObjectInGroup(OverlayKey key)
@@ -474,10 +472,17 @@ void GroupLedger::removePeer(PeerData peer_dat)
 
 			if (isSuperPeerLedger())
 			{
+				std::ostringstream group_name;
+				const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
+				TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
+
+				group_name << "GroupLedger (" << thisAdr << "): ";
+
 				object_lifetime = (simTime() - object_ledger_it->second.objectDataPtr->getCreationTime()).dbl();
-				RECORD_STATS(globalStatistics->recordOutVector("GroupLedger: Object lifetime", object_lifetime));
-				RECORD_STATS(globalStatistics->recordOutVector("GroupLedger: Object initial group size", object_ledger_it->second.objectDataPtr->getInitGroupSize()));
-				RECORD_STATS(globalStatistics->recordOutVector("GroupLedger: Object maximum group size", object_ledger_it->second.objectDataPtr->getMaxGroupSize()));
+
+				RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Object lifetime")).c_str(), object_lifetime));
+				RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Object initial group size")).c_str(), object_ledger_it->second.objectDataPtr->getInitGroupSize()));
+				RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Object maximum group size")).c_str(), object_ledger_it->second.objectDataPtr->getMaxGroupSize()));
 			}
 
 			object_map.erase(object_ledger_it);
@@ -532,6 +537,9 @@ void GroupLedger::removeObject(OverlayKey key)
 	object_map.erase(object_ledger_it);
 }
 
+/**
+ * According to Valgrind's Callgrind, this is one of the most expensive functions in Pithos.
+ */
 void GroupLedger::addObject(ObjectData objectData, PeerData peer_data_recv)
 {
 	PeerLedgerList::iterator peer_ledger_it;

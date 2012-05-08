@@ -78,11 +78,6 @@ simple GroupStorage
         @class(GroupStorage);
         @display("i=abstract/cache");
         
-        @signal[JoinTime](type="simtime_t");
-        @statistic[JoinTime](title="group join time"; record=last);
-        @signal[GroupSize](type="int");
-        @statistic[GroupSize](title="Group size"; record=last);
-        
         string directory_ip;
         int directory_port;
         double requestTimeout @unit(s);
@@ -92,6 +87,7 @@ simple GroupStorage
         bool objectRepair;
         string repairType;
         bool gracefulMigration;
+        double pingTime @unit(s);
     gates:
         inout comms_gate;
         

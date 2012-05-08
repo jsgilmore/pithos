@@ -75,14 +75,21 @@ void GroupStorage::initialize()
 		throw cRuntimeError("GroupStorage::initializeApp(): Group ledger module not found!");
 	}
 
-	event = new cMessage();	//This is the join retry timer.
+	//Give group storage a handle to the communicator module, so it may use the communicator's public functions
+	cModule *communicatorModule = getParentModule()->getSubmodule("communicator");
+	communicator = check_and_cast<Communicator *>(communicatorModule);
+	if (communicator == NULL) {
+		throw cRuntimeError("GroupStorage::initializeApp(): Communicator module not found!");
+	}
+
+
+	event = new cMessage("event");	//This is the join retry timer.
+
+	pingTimer = new cMessage("pingTimer"); //The timer that triggers a group peer ping
+	pingTime = par("pingTime");
+	scheduleAt(simTime()+pingTime, pingTimer);
 
 	globalStatistics = GlobalStatisticsAccess().get();
-
-	//Register the signal that records the size of the group the peer is currently in
-	groupSizeSignal = registerSignal("GroupSize");
-	//Register the signal that records the time at which the specific peer joined a group
-	joinTimeSignal = registerSignal("JoinTime");
 
 	// statistics
 	numSent = 0;
@@ -122,9 +129,6 @@ void GroupStorage::initialize()
 
 void GroupStorage::finish()
 {
-	cModule *communicatorModule = getParentModule()->getSubmodule("communicator");
-	Communicator *communicator = check_and_cast<Communicator *>(communicatorModule);
-
     simtime_t time = globalStatistics->calcMeasuredLifetime(communicator->getCreationTime());
 
     if (time >= GlobalStatistics::MIN_MEASURED) {
@@ -729,6 +733,9 @@ void GroupStorage::store(Packet *pkt)
 	updatePeerObjects(*go);
 }
 
+/**
+ * According to Valgrind's Callgrind, this is one of the most expensive functions in Pithos.
+ */
 void GroupStorage::addToGroup(cMessage *msg)
 {
 	PeerListPkt *list_p = check_and_cast<PeerListPkt *>(msg);
@@ -749,7 +756,7 @@ void GroupStorage::addToGroup(cMessage *msg)
 		request_start->setByteLength(ADDRESS_SIZE);	//The super peer IP
 		send(request_start, "to_upperTier");
 
-		emit(joinTimeSignal, joinTime);
+		//This is where the join time can be recorded.
 	}
 
 	object_dat = list_p->getObjectData();
@@ -775,8 +782,6 @@ void GroupStorage::addToGroup(cMessage *msg)
 			std::cout << "[" << simTime() << ":" << this_address <<"]: Unsuccessful add, peer was last peer that left (" << peer_dat.getAddress() << ")\n";
 		}*/
 	}
-
-	emit(groupSizeSignal, group_ledger->getGroupSize() + 1);	//The peer's group size is one peer larger than its perceived group size, because itself is part of the group it is in
 
 	EV << "Added " << list_p->getPeer_listArraySize() << " new peers to the list.\n";
 }
@@ -875,7 +880,6 @@ void GroupStorage::addAndJoinSuperPeer(Packet *packet)
 		leaveGroup();
 	}
 
-
 	super_peer_address = boot_p->getSuperPeerAdr();
 	//std::cout << "[" << simTime() << ":" << this_address << "]: Adding new group address: " << super_peer_address << endl;
 
@@ -896,9 +900,6 @@ void GroupStorage::handleLeftPeer(PeerDataPkt *peer_data_pkt)
 	}
 
 	group_ledger->removePeer(peer_data_pkt->getPeerData());
-
-	//The peer's perceived group size is one larger, because itself is part of the group it is in
-	emit(groupSizeSignal, group_ledger->getGroupSize() + 1);
 
 	//Record the data of the last peer that left, in case we get an outdated object add message from that peer
 	lastPeerLeft = peer_data_pkt->getPeerData();
@@ -1104,6 +1105,39 @@ void GroupStorage::handleTimeout(ResponseTimeoutEvent *timeout)
 	peerLeftInform(peerData, SP_PEER_LEFT);
 }
 
+void GroupStorage::pingResponse(PingResponse* pingResponse, PeerStatsContext* context, int rpcId, simtime_t rtt)
+{
+	Enter_Method_Silent();	//Required for Omnet++ context switching between modules
+	delete(context);
+
+	//std::cout << "Received a ping response.\n";
+
+	return;	//The pinged peer responded, so all is well. We can collect some stats here is we want.
+}
+
+void GroupStorage::pingTimeout(PingCall* pingCall, const TransportAddress& dest, PeerStatsContext* context, int rpcId)
+{
+	Enter_Method_Silent();	//Required for Omnet++ context switching between modules
+
+	//std::cout << "Received a ping timeout.\n";
+
+	peerLeftInform(context->peer_data.getAddress(), SP_PEER_LEFT);
+
+	delete(context);
+}
+
+void GroupStorage::pingRandomGroupPeer()
+{
+	TransportAddress dest_adr;
+
+	if (group_ledger->getGroupSize() == 0)
+		return;
+
+	dest_adr = group_ledger->getRandomPeer().getAddress();
+
+	communicator->externallyPingNode(dest_adr, requestTimeout, 0, new PeerStatsContext(globalStatistics->isMeasuring(), PeerData(dest_adr)), "PING", NULL, -1, UDP_TRANSPORT);
+}
+
 void GroupStorage::handleMessage(cMessage *msg)
 {
 	ObjectTTLTimer *ttlTimer = NULL;
@@ -1117,12 +1151,18 @@ void GroupStorage::handleMessage(cMessage *msg)
 
 		scheduleAt(simTime()+1, event);		//TODO: make the 1 second wait time a configuration variable that may be set
 	}
-	else if (strcmp(msg->getName(), "timeout") == 0)
+	else if (msg->isName("timeout"))
 	{
 		ResponseTimeoutEvent *timeout = check_and_cast<ResponseTimeoutEvent *>(msg);
 
 		handleTimeout(timeout);
 
+	}
+	else if (msg->isName("pingTimer"))
+	{
+		scheduleAt(simTime()+pingTime, pingTimer);
+
+		pingRandomGroupPeer();
 	}
 	else if ((ttlTimer = dynamic_cast<ObjectTTLTimer*>(msg)) != NULL)
     {
@@ -1147,7 +1187,7 @@ void GroupStorage::handleMessage(cMessage *msg)
 		scheduleAt(simTime()+1, event);		//TODO: make the 1 second wait time a configuration variable that may be set
 
 		//Obtain this node's transport address from the communicator module
-		const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
+		const NodeHandle *thisNode = &(((BaseApp *)communicator)->getThisNode());
 		this_address = TransportAddress(thisNode->getIp(), thisNode->getPort());
 
 		delete(msg);

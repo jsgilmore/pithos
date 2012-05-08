@@ -1,10 +1,14 @@
 PhD TODO list:
 
 Major:
-Investigate why per group peer arrivals are SO much higher than per group peer departures
-Remove unused stats vectors from simulation
+Implement object modification for group storage.
+Extend the pithos test application to add modify testing.
 Read papers that cite replication paper, to see whether any has expanded on the Markov chain in a similar way to I did.
+	Read a few, none found so far.
 Determine distributions of object requests and peer lifetimes to be used in PithosTestApp
+	Intuitivly, many more updates will occur, compared to puts, which strengthens the case for implementing update.
+	Distributions for put, get and update will probably vary greatly.
+	These distributions have to be translated into their C/S counterparts, to enable profiling.
 
 Implment Pithos as a real world application
 Develop grouping algorithm based on player traces
@@ -12,8 +16,6 @@ Have Pithos construct groups based on the grouping algorithm
 Write-up PhD
 
 Minor:
-Implement object modification for group storage.
-Extend the pithos test application to add modify testing.
 Test the system for various numbers of malicious peers
 
 Make the latitude and longitude ranges for peers and super peers a changeable paramter instead of 100
