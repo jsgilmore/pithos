@@ -360,6 +360,11 @@ void PithosTestApp::handleTimerEvent(cMessage* msg)
 
     } else if (msg->isName("pithostest_get_timer"))
     {
+    	if (simTime() > absRequestStopTime)	//This has a module not generate requests after some absolute time
+		{
+			return;
+		}
+
         scheduleAt(simTime() + truncnormal(mean, deviation), msg);
 
         // do nothing if the network is still in the initialization phase

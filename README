@@ -1,0 +1,29 @@
+PhD TODO list:
+
+Major:
+Implement PING/PONG keep alive messages, to check whether peers are still in the group, in the absence of put requests.
+Read papers that cite replication paper, to see whether any has expanded on the Markov chain in a similar way to I did.
+	Read a few, none found so far.
+Determine distributions of object requests and peer lifetimes to be used in PithosTestApp
+	Intuitivly, many more updates will occur, compared to puts, which strengthens the case for implementing update.
+	Distributions for put, get and update will probably vary greatly.
+	These distributions have to be translated into their C/S counterparts, to enable profiling.
+
+Implment Pithos as a real world application
+Develop grouping algorithm based on player traces
+Have Pithos construct groups based on the grouping algorithm
+Write-up PhD
+
+Minor:
+Implement object modification for group storage.
+Extend the pithos test application to add modify testing.
+Test the system for various numbers of malicious peers
+
+Make the latitude and longitude ranges for peers and super peers a changeable paramter instead of 100
+Support can be added for partially connected groups that will reduce network bandwidth at the cost of latency
+Add a debug mode to the code, which ads the debugging code currently present in Pithos as an option and not always.
+The error condition of an unspecified peer should be logged.
+Group storage should record its own successes, failures and latencies and not depend on PithosTestApp from recording them indirectly.
+The DHT module can be changed so as to store and retrieve GameObjects instead of BinaryValues
+A maximum distance needs to be defined for the directory server
+Ensure correctness for pithos under 32bit systems. This includes testing long variable sizes and making them 32bit safe.

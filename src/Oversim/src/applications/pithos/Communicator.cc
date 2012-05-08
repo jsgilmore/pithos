@@ -65,6 +65,24 @@ void Communicator::finishApp()
 	}
 }
 
+void Communicator::pingTimeout(PingCall* pingCall, const TransportAddress& dest, cPolymorphic* context, int rpcId)
+{
+	cModule *GroupStorageModule = getParentModule()->getSubmodule("group_storage");
+	//This extra step ensures that the submodules exist and also does any other required error checking
+	GroupStorage *group_storage = check_and_cast<GroupStorage *>(GroupStorageModule);
+
+	group_storage->pingTimeout(pingCall, dest, (GroupStorage::PeerStatsContext *)context, rpcId);
+}
+
+void Communicator::pingResponse(PingResponse* pingResponse, cPolymorphic* context, int rpcId, simtime_t rtt)
+{
+	cModule *GroupStorageModule = getParentModule()->getSubmodule("group_storage");
+	//This extra step ensures that the submodules exist and also does any other required error checking
+	GroupStorage *group_storage = check_and_cast<GroupStorage *>(GroupStorageModule);
+
+	group_storage->pingResponse(pingResponse, (GroupStorage::PeerStatsContext *)context, rpcId, rtt);
+}
+
 void Communicator::handleTraceMessage(cMessage* msg)
 {
 	/*cModule *dht_storageModule = getParentModule()->getSubmodule("dht_storage");
@@ -222,15 +240,15 @@ void Communicator::handlePeerMsg(cMessage *msg)
 
 void Communicator::handleMessage(cMessage *msg)
 {
-	if (strcmp(msg->getArrivalGate()->getName(), "sp_group_gate$i") == 0)
+	if (msg->arrivedOn("sp_group_gate$i"))
 	{
 		handleSPMsg(msg);
 	}
-	else if ((strcmp(msg->getArrivalGate()->getName(), "peer_gate$i") == 0) || (strcmp(msg->getArrivalGate()->getName(), "gs_gate$i") == 0) || (strcmp(msg->getArrivalGate()->getName(), "os_gate$i") == 0))
+	else if (msg->arrivedOn("peer_gate$i") || msg->arrivedOn("gs_gate$i") || msg->arrivedOn("os_gate$i"))
 	{
 		handlePeerMsg(msg);
 	}
-	else if (strcmp(msg->getArrivalGate()->getName(), "fromPeer_toUpper") == 0)
+	else if (msg->arrivedOn("fromPeer_toUpper"))
 	{
 		send(msg, "to_upperTier");
 	} else BaseApp::handleMessage(msg);

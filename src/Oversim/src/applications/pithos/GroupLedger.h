@@ -25,6 +25,8 @@
 #include "GroupStorage.h"
 #include "PeerLedger.h"
 
+class PeerLedger;
+
 typedef std::vector<PeerLedger> PeerLedgerList;
 typedef std::map<OverlayKey, ObjectLedger> ObjectLedgerMap;
 
