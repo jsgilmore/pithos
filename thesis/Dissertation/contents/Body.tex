@@ -1,0 +1,135 @@
+\chapter{State Consistency Architecture}
+\label{chp:CONSISTENCY}
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    \section{Classic consistency models}
+
+        \subsection{Terminology}
+        \subsection{Event-based (fully distributed)}
+        \subsection{Update-based (C/S)}
+        \subsection{Client/multiserver consistency models}
+            \subsubsection{Sharding}
+            \subsubsection{Replication-based}
+            \subsubsection{Object-based}
+            \subsubsection{Region-based}
+
+    \section{Generic state consistency architecture}
+
+\chapter{Peer-to-peer MMVE state management and persistency models}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    \section{Characteristics}
+        \subsection{Overhead}
+        \subsection{Fairness}
+        \subsection{Reliability}
+        \subsection{Responsiveness}
+        \subsection{Security}
+    \section{Super peer storage}
+        \subsection{Overhead}
+        \subsection{Fairness}
+        \subsection{Reliability}
+        \subsection{Responsiveness}
+        \subsection{Security}
+        \subsection{Existing architectures}
+    \section{Overlay storage}
+        \subsection{Overhead}
+        \subsection{Fairness}
+        \subsection{Reliability}
+        \subsection{Responsiveness}
+        \subsection{Security}
+        \subsection{Existing architectures}
+    \section{Hybrid region-based storage}
+        \subsection{Overhead}
+        \subsection{Fairness}
+        \subsection{Reliability}
+        \subsection{Responsiveness}
+        \subsection{Security}
+        \subsection{Existing architectures}
+    \section{Distance-based storage}
+        \subsection{Overhead}
+        \subsection{Fairness}
+        \subsection{Reliability}
+        \subsection{Responsiveness}
+        \subsection{Security}
+        \subsection{Existing architectures}
+    \section{Summary and recommendations}
+
+\chapter{Pithos Design}
+\label{chp:DESIGN}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    \section{Use cases}
+
+    \section{Design goals}
+
+    \section{Oversim architecture}
+
+    \section{System overview}
+        \subsection{Architecture characteristics}
+        \subsection{Structure}
+
+        \subsection{DHT implementation}
+
+    \section{Data structures}
+
+        \subsection{Game object}
+
+        \subsection{Group ledger}
+
+    \section{Joining the network}
+
+    \section{Storing data}
+
+    \section{Retrieving data}
+
+    \section{Modifying data}
+
+    \section{Designing for network churn}
+
+    \section{Group consistency}
+
+    \section{Repair mechanisms}
+
+    \section{Group migration}
+
+\chapter{State Management Parameter Modelling}
+\label{chp:MODELLING}
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    \section{Overhead}
+    \section{Fairness}
+    \section{Reliability}
+    \section{Responsiveness}
+
+    \chapter{Pithos evaluation}
+    \label{chp:EVALUATION}
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    \section{Performance}
+
+    \subsection{Bandwidth requirements (overhead)}
+    %Mention something about low bandwidth links and how that influences timeout and what extra mechanisms were required.
+    %Check how this increases with increased network sizes and varying levels of network churn.
+
+        \subsection{Group consistency}
+        %Check how this increases with increased network sizes and varying levels of network churn.
+
+    \section{Metrics}
+
+    \section{Theoretical results}
+
+    \section{PithosTestApp}
+
+    \section{Comparison between theoretical and simulation results}
+
+        \subsection{Overhead}
+        \subsection{Fairness}
+        \subsection{Reliability}
+        \subsection{Responsiveness}
+
+    \section{Comparison between Pithos and other architectures}
+
+        \subsection{Overhead}
+        \subsection{Fairness}
+        \subsection{Reliability}
+        \subsection{Responsiveness}

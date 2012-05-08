@@ -1,0 +1,151 @@
+\documentclass[11pt,oneside,openany,a4paper,%..... Layout
+               afrikaans, english%.............. Global language selection
+               ]{memoir}
+
+ \usepackage[PhD,%................................ PhD dissertation
+             goldenblock,%........................ A5 type block (or a5block or wide)
+            ]{usthesis}%.......................... US thesis style with memoir
+
+%
+% PLEASE read the USthesis documentation for the class options
+% and how to set line and paragraph spacing
+%
+%==== Language setup ================================================
+ \usepackage[latin1]{inputenc}%................... Recognizes �, �, etc
+ \usepackage{babel}%.............................. Language setup
+
+%==== Math setup ====================================================
+ \usepackage{amsmath}%............................ Advanced math (before fonts)
+ \usepackage{amssymb}%............................ AMS Symbol fonts
+
+%==== Font setup (default is Computer Modern) =======================
+ \usepackage[T1]{fontenc}%........................ Type 1 fonts
+ \usepackage{textcomp}%........................... Additional text character
+ \usepackage{bm}%................................. Bold math symbols (after fonts)
+
+%==== Ref's, Bib's and Nomencl ======================================
+ \usepackage{usnomencl}%.......................... List of symbols (in usthesis pack)
+ \usepackage{cite}
+
+%==== Graphics and Color ============================================
+\usepackage{graphicx}%........................... Graphicx loaded in usthesis
+\usepackage{color}%.............................. Color setup
+\usepackage{eso-pic}%............................ Shipout commands for watermark
+    \newcommand*{\WaterMark}[2][0.2\paperwidth]{%
+        \AddToShipoutPicture*{\AtTextCenter{%
+                \parbox[c]{0pt}{\makebox[0pt][c]{%
+                    \includegraphics[width=#1]{#2}}}}}}
+
+%==== Local Defs ====================================================
+\makeatletter
+
+%
+% Please insert user defined commands here
+% and NOT in the document itself!
+%
+\usepackage[caption=false]{subfig}
+
+\renewcommand{\UScaptionsafrikaans}{%
+    \def\DeclarationName{Verklaring}%
+    \def\AbstractName   {Samevatting}%
+}
+
+%\usepackage{listings}
+
+% generate nice bookmarks and hyperrefs when exporting to pdf and dvi (screen version):
+\usepackage[a4paper,plainpages=false,colorlinks,linktocpage,bookmarks=true,bookmarksopen=false]{hyperref}
+% use this for printing only (no color, print version):
+%\usepackage[a4paper,plainpages=false,colorlinks=false,linktocpage,bookmarks=true,bookmarksopen=false]{hyperref}
+
+%\renewcommand{\lstlistlistingname}{List of Listings}
+
+\hyphenation{MATLAB}
+
+\makeatother
+
+%==== TITLE PAGE ====================================================
+\title{\AorE{%-- Afrikaans ------------------------------------------
+             'n Toestandsbestuur en Stoor Argitektuur vir Eweknie Grootskaalse Multigebruiker Virtuele Omgewings \\[1ex]
+             \normalfont\small\itshape
+             (``A State Management and Persistency Architecture for Peer-to-Peer Massively Multiuser Virtual Environments'')
+            }{%-- English -------------------------------------------
+             A State Management and Persistency Architecture for Peer-to-Peer Massively Multiuser Virtual Environments
+            }}
+
+\author{J.S.\ Gilmore}{John Sebastian Gilmore}
+
+\ThesisDescript{Dissertation presented for the degree of Doctor of Philosophy in the Faculty of Engineering at Stellenbosch University}
+
+\degree{\AorE{PhD}{PhD}}
+       {\AorE{\\Doktor van Filosofie}
+             {\\Doctor of Philosophy}}
+
+\address{\AorE{%-- Afrikaans ----------------------------------------
+        Departement Elektries en Elektroniese Ingenieurswese,\\
+        Universiteit van Stellenbosch,\\
+        Privaatsak X1, 7602 Matieland, Suid Afrika.
+              }{%-- English ------------------------------------------
+         Department of Electrical and Electronic Engineering,\\
+         University of Stellenbosch,\\
+         Private Bag X1, 7602 Matieland, South Africa.
+              }}
+
+\supervisor{Dr.\  Herman\ A. Engelbrecht}
+\setdate{12}{2012}
+
+%====================================================================
+%     MAIN DOCUMENT
+%====================================================================
+\maxsecnumdepth{subsubsection}
+\maxtocdepth{subsubsection}
+
+\begin{document}
+
+%==== Front matter ==================================================
+ \frontmatter
+ \WaterMark{UScrest-WM}
+ \TitlePage
+
+\DeclarationPage[By submitting this dissertation electronically, I declare that the entirety of the work contained therein is my own, original work,
+that I am the sole author thereof (save to the extent explicitly otherwise stated), that reproduction and publication thereof by Stellenbosch
+University will not infringe any third party rights and that I have not previously in its entirety of in part submitted it for obtaining any
+qualifications.]
+
+ \include{frontmatter/Chap-Front}
+
+ \tableofcontents
+ \clearpage
+
+ \setcounter{lofdepth}{2}
+ \listoffigures
+  \clearpage
+
+  \listoftables
+\clearpage
+
+\include{frontmatter/Nomencl}
+
+%==== Main document =================================================
+\mainmatter
+   \setsecnumdepth{subsubsection}
+   \numberwithin{equation}{section}
+   \numberwithin{figure}{chapter}
+   \numberwithin{table}{chapter}
+
+\include{contents/Introduction}
+\include{contents/Body}
+\include{contents/conclusion}
+
+%==== Appendices ====================================================
+%\appendix
+%\appendixpage\relax
+
+%\include{contents/App-1}
+
+%==== Bibliography acro's & Index ===================================
+%\backmatter
+
+%\bibliographystyle{IEEEtran}
+%\bibliography{backmatter/comms_system}
+
+\end{document}
