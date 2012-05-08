@@ -34,6 +34,7 @@
 
 class GlobalStatistics;
 class GroupLedger;
+class Communicator;
 
 /**
  * The GroupStorage module is responsible for handling all aspects of group
@@ -47,13 +48,24 @@ class GroupLedger;
 class GroupStorage : public cSimpleModule
 {
 	public:
-	GroupStorage();
+		class PeerStatsContext : public cPolymorphic
+		{
+			public:
+				bool measurementPhase;
+				PeerData peer_data;
+
+				PeerStatsContext(bool measurementPhase, const PeerData& peer_data) :
+					measurementPhase(measurementPhase), peer_data(peer_data) {};
+		};
+		GroupStorage();
 		virtual ~GroupStorage();
 		int getStorageBytes();
 		int getStorageFiles();
 
 		bool hasSuperPeer();
 		TransportAddress getSuperPeerAddress();
+		void pingResponse(PingResponse* pingResponse, PeerStatsContext* context, int rpcId, simtime_t rtt);
+		void pingTimeout(PingCall* pingCall, const TransportAddress& dest, PeerStatsContext* context, int rpcId);
 
 	private:
 
@@ -105,7 +117,9 @@ class GroupStorage : public cSimpleModule
 		TransportAddress super_peer_address; /**< The TransPort address of the group super peer (this address is set, after the peer has joined a group) */
 		TransportAddress this_address;		 /**< The TransPort address of the peer that houses the group storage module*/
 
-		cMessage *event;	//This event is required
+		cMessage *event;		//The event that triggers a join request to the Directory server
+		cMessage *pingTimer;	//The timer that trigeers a ping message to a random group peer, to monitor presence
+		double pingTime;
 
 		double latitude; /**< The latitude of this peer (position in the virtual world) */
 
@@ -116,6 +130,8 @@ class GroupStorage : public cSimpleModule
 		GroupLedger *group_ledger;
 
 		GlobalStatistics* globalStatistics; /**< pointer to GlobalStatistics module in this node*/
+
+		Communicator* communicator;
 
 		// statistics
 		int numSent; /**< number of sent packets*/
@@ -238,10 +254,9 @@ class GroupStorage : public cSimpleModule
 
 		void removePeer(Packet *packet);
 
-	protected:
-		simsignal_t groupSizeSignal; /**< The signal recording the statistic of the group size. */
-		simsignal_t joinTimeSignal; /**< The signal recording the statistic of the group size. */
+		void pingRandomGroupPeer();
 
+	protected:
 		void finish();
 		virtual void initialize();
 		void handleTimeout(ResponseTimeoutEvent *timeout);

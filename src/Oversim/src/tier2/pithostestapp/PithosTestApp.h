@@ -56,12 +56,6 @@ class GlobalPithosTestMap;
 class PithosTestApp : public BaseApp
 {
 private:
-    /**
-     * A container used by the PithosTestApp to
-     * store context information for statistics
-     *
-     * @author Ingmar Baumgart
-     */
     class PithosStatsContext : public cPolymorphic
     {
 		public:
