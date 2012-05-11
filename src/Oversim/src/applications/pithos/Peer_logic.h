@@ -106,6 +106,7 @@ class Peer_logic: public cSimpleModule
 		PendingRpcs pendingRpcs; /**< a map of all pending RPC operations */
 
 		int replicas;	//The number of replicas group storage is set to.
+		bool fastPut;
 
 		bool disableDHT;
 

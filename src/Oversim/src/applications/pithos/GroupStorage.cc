@@ -470,15 +470,15 @@ int GroupStorage::getReplicaNr(unsigned int rpcid)
 		RECORD_STATS(numPutError++);
 		replicas = group_ledger->getGroupSize();
 
-		//If there is only one peer available, the object will be lost as soon as that peer leaves the group,
+		//If there is only one peer available, the object will be lost as soon as that peer leaves the group, if periodic repair is not done when the group size increases,
 		//since there will be no other peers that can be used for replication. We therefore report put failure if no replication can be done.
-		//This only happens with new groups, where there are few peers in the group
-		if (replicas == 1)
+		//This happens with small groups, when only one peer exists
+		/*if (replicas == 1)
 		{
 			send(response, "read");
 			return 0;
 		}
-		else delete(response);
+		else*/ delete(response);
 	}
 
 	return replicas;

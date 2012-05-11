@@ -28,6 +28,7 @@ GroupLedger::~GroupLedger()
 
 	object_map.clear();
 	peer_list.clear();
+	group_size.clear();		//This will only have data if this is a super peer.
 }
 
 void GroupLedger::initialize()
@@ -134,6 +135,9 @@ void GroupLedger::handleMessage(cMessage* msg)
 		{
 			//Record the largest group size per object for comparison with expected object lifetimes
 			updateMaxGroupPerObject();
+
+			//Record the group size
+			group_size.push_back(std::make_pair(simTime(), peer_list.size()));
 
 			//If a peer is the super peer of a group, show its own address as both super peer address and peer address
 			group_name << "GroupLedger (" << thisAdr << ":" << thisAdr <<"): ";
@@ -470,6 +474,7 @@ void GroupLedger::removePeer(PeerData peer_dat)
 		{
 			std::ostringstream group_name;
 
+			//A peer has starved, record some lifetime stats for the group here
 			if (isSuperPeerLedger())
 			{
 				std::ostringstream group_name;
@@ -481,15 +486,15 @@ void GroupLedger::removePeer(PeerData peer_dat)
 				object_lifetime = (simTime() - object_ledger_it->second.objectDataPtr->getCreationTime()).dbl();
 
 				RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Object lifetime")).c_str(), object_lifetime));
+				RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Object starve time")).c_str(), simTime().dbl()));
+				RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Object creation time")).c_str(), object_ledger_it->second.objectDataPtr->getCreationTime().dbl()));
 				RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Object initial group size")).c_str(), object_ledger_it->second.objectDataPtr->getInitGroupSize()));
 				RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Object maximum group size")).c_str(), object_ledger_it->second.objectDataPtr->getMaxGroupSize()));
 			}
-
 			object_map.erase(object_ledger_it);
 			objects_starved++;
 		}
 	}
-
 	peer_list.erase(peer_ledger_it);
 }
 

@@ -55,6 +55,8 @@ class GroupLedger : public cSimpleModule
 		double object_lifetime;
 		int data_size;			//The total size in bytes stored in the ledger
 
+		std::vector<std::pair<simtime_t, int> > group_size;
+
 		int numPeerRemoveFail;
 		int numPeerRemoveSuccess;
 		int numObjectRemoveFail;
