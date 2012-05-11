@@ -38,7 +38,7 @@ void PeerLedger::addObjectRef(ObjectDataPtr object_data_ptr)
 		std::cout << "Already stored game object: " << **it << endl;
 	}*/
 
-	//This is a safer but MUCH slower approach. Test have shown that the error never occurs.
+	//This is a safer but MUCH slower approach. Tests have shown that the error never occurs.
 	/*if (!isObjectPresent(object_data_ptr))
 	{
 		ObjectDataPtr ptr(object_data_ptr);

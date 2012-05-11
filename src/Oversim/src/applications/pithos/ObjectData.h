@@ -58,8 +58,8 @@ public:
 
 	static const ObjectData UNSPECIFIED_OBJECT;
 
-	//ObjectData();
 	ObjectData(std::string name = "Unspecified" , int siz = 0, OverlayKey k = OverlayKey::ZERO, simtime_t time = SIMTIME_ZERO, int t = 0, int i_group_size = 0);
+	ObjectData(const ObjectData& other);
 	ObjectData(const GameObject& go, int i_group_size);
 	virtual ~ObjectData();
 
