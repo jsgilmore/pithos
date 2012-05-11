@@ -39,6 +39,11 @@ ObjectData::ObjectData(const GameObject& go, int group_size)
 	max_group_size = group_size;
 }
 
+ObjectData::ObjectData(const ObjectData& other)
+{
+	operator=(other);
+}
+
 ObjectData::~ObjectData()
 {
 }

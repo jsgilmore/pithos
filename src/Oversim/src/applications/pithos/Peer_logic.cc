@@ -40,6 +40,13 @@ void Peer_logic::initialize()
 {
 	replicas = par("replicas");
 	disableDHT = par("disableDHT");
+	std::string putType = par("putType");
+
+	if (putType == "fast")
+		fastPut = true;
+	else if (putType == "safe")
+		fastPut = false;
+	else error("Unknown put type specified.");
 }
 
 void Peer_logic::finalize()
@@ -141,29 +148,49 @@ void Peer_logic::processPut(PendingRpcsEntry entry, ResponsePkt *response)
 	//This extra step ensures that the submodules exist and also does any other required error checking
 	Communicator *communicator = check_and_cast<Communicator *>(communicatorModule);
 
-	//Ensure that the number of successes of both group and overlay stores as greater than or equal to the number of failures
-	if (entry.numGroupPutSucceeded + entry.numGroupPutFailed +
-			entry.numDHTPutSucceeded + entry.numDHTPutFailed == entry.numSent)
-	{
-		//Ensure that more group puts succeeded than failed
-		if (entry.numGroupPutSucceeded >= entry.numGroupPutFailed)
-		{
-			if ((entry.numDHTPutSucceeded > entry.numDHTPutFailed) || disableDHT)
-			{
-				RootObjectPutCAPIResponse* capiPutRespMsg = new RootObjectPutCAPIResponse();
-				capiPutRespMsg->setIsSuccess(true);
-				capiPutRespMsg->setGroupAddress(entry.group_address);
-				communicator->externallySendRpcResponse(entry.putCallMsg, capiPutRespMsg);
-				pendingRpcs.erase(response->getRpcid());
+	//Remember that these variables have been set false here, when reading the rest of the code
+	bool complete = false;
+	bool success = false;
 
-				return;
+	//If Safe put was selected
+	if (!fastPut)
+	{
+		//Ensure that the number of successes of both group and overlay stores as greater than or equal to the number of failures
+		if (entry.numGroupPutSucceeded + entry.numGroupPutFailed +
+				entry.numDHTPutSucceeded + entry.numDHTPutFailed == entry.numSent)
+		{
+			complete = true;
+			//Ensure that more group puts succeeded than failed
+			if (entry.numGroupPutSucceeded >= entry.numGroupPutFailed)
+			{
+				if ((entry.numDHTPutSucceeded > entry.numDHTPutFailed) || disableDHT)
+				{
+					success = true;
+				}
 			}
 		}
+	//If Fast put was selected
+	} else {
+		//For fast puts we just want one successful group or DHT put for a success
+		if (entry.numGroupPutSucceeded == 1 || entry.numDHTPutSucceeded == 1)
+		{
+			complete = true;
+			success = true;
+		}
+		else if (entry.numGroupPutFailed + entry.numDHTPutFailed == entry.numSent)
+		{
+			complete = true;
+		}
+	}
 
-		//This is the failure response to both situations where either the group messages
-		//failed or the overlay messages failed. Notice the "return" in the success scenario.
+	if (complete)
+	{
 		RootObjectPutCAPIResponse* capiPutRespMsg = new RootObjectPutCAPIResponse();
-		capiPutRespMsg->setIsSuccess(false);
+		capiPutRespMsg->setGroupAddress(entry.group_address);
+
+		if (success) capiPutRespMsg->setIsSuccess(true);
+		else capiPutRespMsg->setIsSuccess(false);
+
 		communicator->externallySendRpcResponse(entry.putCallMsg, capiPutRespMsg);
 		pendingRpcs.erase(response->getRpcid());
 	}
@@ -205,7 +232,8 @@ void Peer_logic::handleResponseMsg(cMessage *msg)
 
 	PendingRpcs::iterator it = pendingRpcs.find(response->getRpcid());
 
-	if (it == pendingRpcs.end()) // unknown request or request for already erased call
+	//Pithos has already decided whether the originating request succeeded or failed, so already informed the higher layer and removed this pending entry.
+	if (it == pendingRpcs.end())
 		return;
 
 	//Check what type of response was received and increment the successes or failures according to type
