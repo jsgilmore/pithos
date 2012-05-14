@@ -96,24 +96,6 @@ int GroupLedger::countTotalObjects()
 	return count;
 }
 
-void GroupLedger::updateMaxGroupPerObject()
-{
-	ObjectLedgerMap::iterator object_map_it;
-	ObjectDataPtr objectDataPtr;
-	int current_group_size = peer_list.size();
-
-	//Do this for every object in the object map
-	for (object_map_it = object_map.begin() ; object_map_it != object_map.end() ; object_map_it++)
-	{
-		objectDataPtr = object_map_it->second.objectDataPtr;
-
-		if (objectDataPtr->getMaxGroupSize() < current_group_size)
-		{
-			objectDataPtr->setMaxGroupSize(current_group_size);
-		}
-	}
-}
-
 void GroupLedger::handleMessage(cMessage* msg)
 {
     ObjectTTLTimer *ttlTimer = NULL;
@@ -133,9 +115,6 @@ void GroupLedger::handleMessage(cMessage* msg)
 
 		if (isSuperPeerLedger())
 		{
-			//Record the largest group size per object for comparison with expected object lifetimes
-			updateMaxGroupPerObject();
-
 			//Record the group size
 			group_size.push_back(std::make_pair(simTime(), peer_list.size()));
 
@@ -411,6 +390,73 @@ void GroupLedger::addPeer(PeerData peer_dat)
 	}
 }
 
+void GroupLedger::getAverageAndMaxGroupSize(simtime_t creationTime, double *group_size_av, int *group_size_max)
+{
+	int siz_total = 0;
+	int siz_max = 0;
+	int siz_count = 0;
+	std::vector<std::pair<simtime_t, int> >::iterator group_size_it;
+	/*
+	//First calculate the closest place in the group size vector to start seeking from
+	double current_t = simTime().dbl();
+	double creation_t = creationTime.dbl();
+	bool end_start = true;	//Set this to position from the end.
+
+	//Set the first difference to the difference between creation_time and the end (current_t)
+	double time_dif = current_t - creationTime;	//The current time will always be less than the creation time, so this will be positive
+
+	//Both are positive
+	//Compare the time_diff with the time diff from the beginning (creation_time - 0)
+	if (creation_t < time_dif)
+	{
+		time_dif = creation_t;
+		end_start = false;
+	}
+
+	//TODO: Add a "last starved time" as a possible position to start seeking from. This required an up to date pointer into the group_size vector
+
+	//We've now calculated the closest position to start seeking from in the group size vector.
+*/
+	//Find the position when the object was created
+	for (group_size_it = group_size.begin() ; group_size_it != group_size.end() ; group_size_it++)
+	{
+		if (group_size_it->first > creationTime)
+		{
+			//Calculate the average group size during the object's lifetime
+			siz_total += group_size_it->second;
+			siz_count++;
+
+			if (group_size_it->second > siz_max)
+				siz_max = group_size_it->second;
+		}
+	}
+
+	*group_size_av = ((double)siz_total)/siz_count;
+	*group_size_max = siz_max;
+}
+
+void GroupLedger::recordStarvationStats(ObjectData object_data)
+{
+	std::ostringstream group_name;
+	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
+	TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
+	double group_size_av;
+	int group_size_max;
+
+	getAverageAndMaxGroupSize(object_data.getCreationTime(), &group_size_av, &group_size_max);
+
+	group_name << "GroupLedger (" << thisAdr << "): ";
+
+	object_lifetime = (simTime() - object_data.getCreationTime()).dbl();
+
+	RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Object lifetime")).c_str(), object_lifetime));
+	RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Object starve time")).c_str(), simTime().dbl()));
+	RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Object creation time")).c_str(), object_data.getCreationTime().dbl()));
+	RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Object initial group size")).c_str(), object_data.getInitGroupSize()));
+	RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Object maximum group size")).c_str(), group_size_max));
+	RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Object average group size")).c_str(), group_size_av));
+}
+
 void GroupLedger::removePeer(PeerData peer_dat)
 {
 	PeerLedgerList::iterator peer_ledger_it;
@@ -477,19 +523,7 @@ void GroupLedger::removePeer(PeerData peer_dat)
 			//A peer has starved, record some lifetime stats for the group here
 			if (isSuperPeerLedger())
 			{
-				std::ostringstream group_name;
-				const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
-				TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
-
-				group_name << "GroupLedger (" << thisAdr << "): ";
-
-				object_lifetime = (simTime() - object_ledger_it->second.objectDataPtr->getCreationTime()).dbl();
-
-				RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Object lifetime")).c_str(), object_lifetime));
-				RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Object starve time")).c_str(), simTime().dbl()));
-				RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Object creation time")).c_str(), object_ledger_it->second.objectDataPtr->getCreationTime().dbl()));
-				RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Object initial group size")).c_str(), object_ledger_it->second.objectDataPtr->getInitGroupSize()));
-				RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Object maximum group size")).c_str(), object_ledger_it->second.objectDataPtr->getMaxGroupSize()));
+				recordStarvationStats(*(object_ledger_it->second.objectDataPtr));
 			}
 			object_map.erase(object_ledger_it);
 			objects_starved++;

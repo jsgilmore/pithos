@@ -25,7 +25,6 @@ ObjectData::ObjectData(std::string name, int siz, OverlayKey k, simtime_t time, 
 	creationTime = time;
 	ttl = t;
 	init_group_size = group_size;
-	max_group_size = group_size;	//The maximum group size when the object is created is equal to the initial group size
 }
 
 ObjectData::ObjectData(const GameObject& go, int group_size)
@@ -36,7 +35,6 @@ ObjectData::ObjectData(const GameObject& go, int group_size)
 	creationTime = go.getCreationTime();
 	ttl = go.getTTL();
 	init_group_size = group_size;
-	max_group_size = group_size;
 }
 
 ObjectData::ObjectData(const ObjectData& other)
@@ -59,7 +57,6 @@ ObjectData& ObjectData::operator=(const ObjectData& other)
 	creationTime = other.creationTime;
 	ttl = other.ttl;
 	init_group_size = other.init_group_size;
-	max_group_size = other.max_group_size;
 
 	return *this;
 }
@@ -127,16 +124,6 @@ void ObjectData::setInitGroupSize(const int &siz)
 int ObjectData::getInitGroupSize()
 {
 	return init_group_size;
-}
-
-void ObjectData::setMaxGroupSize(const int &siz)
-{
-	max_group_size = siz;
-}
-
-int ObjectData::getMaxGroupSize()
-{
-	return max_group_size;
 }
 
 OverlayKey ObjectData::getKey()
