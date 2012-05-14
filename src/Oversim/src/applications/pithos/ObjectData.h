@@ -48,7 +48,6 @@ private:
 
 	simtime_t creationTime; /**< The time when the object was created */
 	int init_group_size;	/**< The initial group size, when the object was inserted */
-	int max_group_size;		/**< The maximum group size, while the object was alive */
 
 	int ttl;				/**< The time-to-live of the object */
 

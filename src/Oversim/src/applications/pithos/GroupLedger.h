@@ -37,6 +37,8 @@ class GroupLedger : public cSimpleModule
 		void initialize();
 	    void handleMessage(cMessage* msg);
 	    void finish();
+	    void getAverageAndMaxGroupSize(simtime_t creationTime, double *group_size_av, int *group_size_max);
+	    void recordStarvationStats(ObjectData object_data);
 
 		/**< A map that records all peers that belong to this peer's group */
 		PeerLedgerList peer_list;
@@ -102,8 +104,6 @@ class GroupLedger : public cSimpleModule
 		 * @param peer_data The peer data containing the peer's transport address
 		 */
 		bool verifyObjectOnPeer(ObjectData object_data, PeerData peer_data);
-
-		void updateMaxGroupPerObject();
 
 		/**
 		 * The functions returns a random peer in the ledger
