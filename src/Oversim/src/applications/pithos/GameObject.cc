@@ -151,19 +151,6 @@ std::ostream& operator<<(std::ostream& stream, const GameObject go)
                   << " TTL: " << go.ttl;
 }
 
-void GameObject::getHash(char hash_str[41])
-{
-	CSHA1 hash;
-
-	for (int i = 0 ; i < 41 ; i++)	//The string has to be cleared for the OverlayKey constructor to correctly handle it.
-		hash_str[i] = 0;
-
-	//Create a hash of the game object's name
-	hash.Update(((unsigned char *)info().c_str()), strlen(info().c_str()));
-	hash.Final();
-	hash.ReportHash(hash_str, CSHA1::REPORT_HEX);
-}
-
 OverlayKey GameObject::getHash()
 {
 	return OverlayKey::sha1(getBinaryValue());
