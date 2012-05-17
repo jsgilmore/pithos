@@ -18,6 +18,7 @@ package oversim.applications.pithos;
 import oversim.common.BaseApp;
 import oversim.common.ITier;
 import oversim.common.ITier_overlay;
+import oversim.applications.pithos.*;
 
 module PeerSelect like ITier_overlay
 {
