@@ -17,6 +17,7 @@ package oversim.applications.pithos;
 
 import oversim.common.BaseApp;
 import oversim.common.ITier;
+import oversim.applications.pithos.*;
 
 module PeerCommon like ITier
 {
