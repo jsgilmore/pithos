@@ -1112,7 +1112,8 @@ void GroupStorage::pingResponse(PingResponse* pingResponse, PeerStatsContext* co
 
 	//std::cout << "Received a ping response.\n";
 
-	return;	//The pinged peer responded, so all is well. We can collect some stats here is we want.
+	//The pinged peer responded, so all is well. We can collect some stats here if we want.
+	return;
 }
 
 void GroupStorage::pingTimeout(PingCall* pingCall, const TransportAddress& dest, PeerStatsContext* context, int rpcId)
