@@ -306,3 +306,41 @@ module Super_peer extends Peer
         communicator.sp_group_gate <--> super_peer_logic.comms_gate;
         communicator.sp_overlay_gate <--> super_peer_logic.overlay_gate;
 }
+
+module Super_peer_pure like ITier_overlay
+{
+    parameters:
+        @display("i=device/pc_l");
+    gates:
+        input udpIn;             // gate from the UDP layer
+        output udpOut;           // gate to the UDP layer
+        input from_lowerTier;    // gate from the lower tier
+        input from_upperTier;    // gate from the upper tier
+        output to_lowerTier;     // gate to the lower tier
+        output to_upperTier;     // gate to the upper tier
+        input trace_in;          // gate for trace file commands
+        input tcpIn;             // gate from the TCP layer
+        output tcpOut;           // gate to the TCP layer
+        input overlayIn;         // gate from the Overlay layer
+        output overlayOut;       // gate to the Overlay layer
+    submodules:
+        communicator: Communicator;
+        super_peer_logic: Super_peer_logic;
+        sp_group_ledger: GroupLedger;
+    connections allowunconnected:
+        communicator.sp_group_gate <--> super_peer_logic.comms_gate;
+        communicator.sp_overlay_gate <--> super_peer_logic.overlay_gate;
+
+        //Connections to the Oversim simulation modules
+        from_lowerTier --> communicator.from_lowerTier;
+        to_lowerTier <-- communicator.to_lowerTier;
+        from_upperTier --> communicator.from_upperTier;
+        to_upperTier <-- communicator.to_upperTier;
+        udpIn --> communicator.udpIn;
+        udpOut <-- communicator.udpOut;
+        tcpIn --> communicator.tcpIn;
+        tcpOut <-- communicator.tcpOut;
+        overlayIn --> communicator.overlayIn;
+        overlayOut <-- communicator.overlayOut;
+        trace_in --> communicator.trace_in;
+}

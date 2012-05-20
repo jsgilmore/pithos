@@ -104,10 +104,6 @@ void GroupLedger::handleMessage(cMessage* msg)
     {
     	scheduleAt(simTime() + TEST_MAP_INTERVAL, msg);
 
-    	//If the peer is a node within a group, show its super peer address and its own address
-		cModule *groupStorageModule = getParentModule()->getSubmodule("group_storage");
-		GroupStorage *groupStorage = check_and_cast<GroupStorage *>(groupStorageModule);
-
 		std::ostringstream group_name;
 
 		const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
@@ -129,14 +125,20 @@ void GroupLedger::handleMessage(cMessage* msg)
 				RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Average number of replicas per object")).c_str(), double(objects_total)/(object_map.size() + objects_starved)));
 			else RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Average number of replicas per object")).c_str(), 0));
 		}
-		else if (!(groupStorage->getSuperPeerAddress().isUnspecified()))
-		{
-			//std::cout << "Peer address in group is: " << groupStorage->getSuperPeerAddress() << endl;
-			group_name << "GroupLedger (" << groupStorage->getSuperPeerAddress() << ":" << thisAdr <<"): ";
-		}
 		else {
-			//std::cout << "Unspecified address is: " << groupStorage->getSuperPeerAddress() << endl;
-			return;
+			//If the peer is a node within a group, show its super peer address and its own address
+			cModule *groupStorageModule = getParentModule()->getSubmodule("group_storage");
+			GroupStorage *groupStorage = check_and_cast<GroupStorage *>(groupStorageModule);
+
+			if (!(groupStorage->getSuperPeerAddress().isUnspecified()))
+			{
+				//std::cout << "Peer address in group is: " << groupStorage->getSuperPeerAddress() << endl;
+				group_name << "GroupLedger (" << groupStorage->getSuperPeerAddress() << ":" << thisAdr <<"): ";
+			}
+			else {
+				//std::cout << "Unspecified address is: " << groupStorage->getSuperPeerAddress() << endl;
+				return;
+			}
 		}
 
 		//Collect stats for both super peers and peers
@@ -202,9 +204,10 @@ bool GroupLedger::isSuperPeerLedger()
 		return true;
 	else if  (strcmp(getName(), "group_ledger") == 0)
 		return false;
-	else error("Group ledger named incorrectly, expecting 'group_ledger' or 'sp_group_ledger'.");
-
-	return false;	//This value will never be returned.
+	else {
+		error("Group ledger named incorrectly, expecting 'group_ledger' or 'sp_group_ledger'.");
+		return false;	//This value will never be returned.
+	}
 }
 
 void GroupLedger::finish()
@@ -462,7 +465,7 @@ void GroupLedger::removePeer(PeerData peer_dat)
 	PeerLedgerList::iterator peer_ledger_it;
 	ObjectDataPtr object_data_ptr;
 	ObjectLedgerMap::iterator object_ledger_it;
-	unsigned int objectListSize;
+	unsigned int objectListSize, peerListSize;
 
 	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
 	TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
@@ -485,7 +488,7 @@ void GroupLedger::removePeer(PeerData peer_dat)
 
 	if (peer_ledger_it == peer_list.end())
 	{
-		//error("Peer slated for removal not found in group.");
+		//std::cout << "Peer (" << peer_dat.getAddress() << ") slated for removal not found.\n";
 		RECORD_STATS(numPeerRemoveFail++);
 		RECORD_STATS(globalStatistics->recordOutVector(msg.str().c_str(), 10));
 		return;
@@ -515,8 +518,15 @@ void GroupLedger::removePeer(PeerData peer_dat)
 		data_size -= object_ledger_it->second.objectDataPtr->getSize();
 		objects_total--;
 
+		peerListSize = object_ledger_it->second.getPeerListSize();
+
+		/*std::cout << "There are now " << peerListSize << " copies of object " << object_ledger_it->second.objectDataPtr->getObjectName() << " available.\n";
+
+		if (peerListSize == 1)
+			std::cout << "The last copy is stored on " << object_ledger_it->second.getPeerRef(0)->getAddress() << endl;*/
+
 		//If the peer is removed and there are now no peers on which the object is stored, remove the object ledger entry
-		if (object_ledger_it->second.getPeerListSize() == 0)
+		if (peerListSize == 0)
 		{
 			std::ostringstream group_name;
 
