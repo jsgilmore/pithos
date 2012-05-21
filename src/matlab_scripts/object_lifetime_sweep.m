@@ -5,13 +5,13 @@ close all
 R = 10;
 
 %The maximum number of nodes
-N = 60;
+N = 30;
 
 %Time to live
 TTL = 172800;
 
 %Repair rate
-MU = 1;
+MU = 0.5;
 mu_step = 0.1;
 
 %Parameters of a pareto node lifetime distribution
@@ -23,7 +23,7 @@ beta = 2;
 %theta = (alpha-2)/beta
 
 %Peer departure rate as measured in simulation
-theta = 0.03362; %Data measured from Pithos simulation
+theta = 0.046518; %Data measured from Pithos simulation
 
 %Peer arrival rate with the same arrival distribution as departure
 %distribution.
