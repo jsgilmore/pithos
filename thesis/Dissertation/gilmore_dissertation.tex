@@ -6,6 +6,8 @@
              goldenblock,%........................ A5 type block (or a5block or wide)
             ]{usthesis}%.......................... US thesis style with memoir
 
+\OnehalfSpacing
+
 %
 % PLEASE read the USthesis documentation for the class options
 % and how to set line and paragraph spacing
@@ -80,15 +82,15 @@
        {\AorE{\\Doktor van Filosofie}
              {\\Doctor of Philosophy}}
 
-\address{\AorE{%-- Afrikaans ----------------------------------------
-        Departement Elektries en Elektroniese Ingenieurswese,\\
-        Universiteit van Stellenbosch,\\
-        Privaatsak X1, 7602 Matieland, Suid Afrika.
-              }{%-- English ------------------------------------------
-         Department of Electrical and Electronic Engineering,\\
-         University of Stellenbosch,\\
-         Private Bag X1, 7602 Matieland, South Africa.
-              }}
+%\address{\AorE{%-- Afrikaans ----------------------------------------
+%        Departement Elektries en Elektroniese Ingenieurswese,\\
+%        Universiteit van Stellenbosch,\\
+%        Privaatsak X1, 7602 Matieland, Suid Afrika.
+%              }{%-- English ------------------------------------------
+%         Department of Electrical and Electronic Engineering,\\
+%         University of Stellenbosch,\\
+%         Private Bag X1, 7602 Matieland, South Africa.
+%              }}
 
 \supervisor{Dr.\  Herman\ A. Engelbrecht}
 \setdate{12}{2012}
@@ -104,7 +106,9 @@
 %==== Front matter ==================================================
  \frontmatter
  \WaterMark{UScrest-WM}
- \TitlePage
+ \begin{SingleSpace}
+    \TitlePage
+ \end{SingleSpace}
 
 \DeclarationPage[By submitting this dissertation electronically, I declare that the entirety of the work contained therein is my own, original work,
 that I am the sole author thereof (save to the extent explicitly otherwise stated), that reproduction and publication thereof by Stellenbosch
