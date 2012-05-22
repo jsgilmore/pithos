@@ -2,15 +2,14 @@ close all
 clear all
 
 %The parameters of a pareto distribution
-alpha = 3;
-beta = 2;
+alpha = 2.427;
+beta = 632.952;
 
 %The departure rate of peers under steady state
 theta = (alpha-2)/beta;
-%theta = 0.001425
 
 %Replication rate
-mu = 1;
+mu = 0.1;
     
 %Replication factor sweep
 for r = 1:30
