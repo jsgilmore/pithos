@@ -2,24 +2,24 @@ clear all
 close all
 
 %The maximum number of replicas
-r = 15;
+r = 10;
 
 %The maximum number of nodes
-n = 100;
+n = 17;
 
 %Repair rate
 mu = 0;
 
 %Parameters of a pareto node lifetime distribution
-alpha = 3;
-beta = 2;
+alpha = 2.427;
+beta = 632.952;
 
 %Peer departure rate for a pareto distribution with parameters alpha and
 %beta
 theta = (alpha-2)/beta
 
 %Peer departure rate as measured in simulation
-%theta = 0.001425; %Data measured from Pithos simulation
+%theta = 0.047; %Data measured from Pithos simulation
 
 %Peer arrival rate with the same arrival distribution as departure
 %distribution.
