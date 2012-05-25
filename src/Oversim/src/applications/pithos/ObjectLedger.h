@@ -48,6 +48,8 @@ class ObjectLedger
 		 */
 		std::vector<PeerDataPtr> location_list;
 
+		//int replications;
+
 	public:
 
 		ObjectDataPtr objectDataPtr;
@@ -56,9 +58,9 @@ class ObjectLedger
 		virtual ~ObjectLedger();
 
 		/**
-		 * Add a TransportAddress to the list of object locations
+		 * Add a peer data item to the list of object locations
 		 *
-		 * @param adr A TransportAddress containing the IP and port information
+		 * @param peer_data_ptr A smart pointer to a peer data object, containing the peer's transport address
 		 */
 		void addPeerRef(PeerDataPtr peer_data_ptr);
 
