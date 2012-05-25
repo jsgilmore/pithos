@@ -151,7 +151,7 @@ void GroupStorage::finish()
 		globalStatistics->addStdDev("GroupStorage: GET error: Target of request out of group", getErrRequestOOG);
 		globalStatistics->addStdDev("GroupStorage: PUT error: Target of store out of group", putErrStoreOOG);
 
-		globalStatistics->addStdDev("GroupStorage: Measured Lifetime", time.dbl());
+		globalStatistics->recordOutVector("GroupStorage: Node Lifetime", time.dbl());
 
         if ((numGetSuccess + numGetError) > 0) {
             globalStatistics->addStdDev("GroupStorage: GET Success Ratio", (double) numGetSuccess / (double) (numGetSuccess + numGetError));
