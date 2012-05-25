@@ -16,6 +16,7 @@
 #include "ObjectLedger.h"
 
 ObjectLedger::ObjectLedger() {
+	//replications = 0;
 }
 
 ObjectLedger::~ObjectLedger() {
@@ -39,6 +40,9 @@ void ObjectLedger::addPeerRef(PeerDataPtr peer_data_ptr)
 
 		opp_error("[ObjectLedger]: Peer not found for insertion.");
 	}*/
+
+	//Record how many times an object was replicated
+	//replications++;
 }
 
 PeerDataPtr ObjectLedger::getPeerRef(const int &i)
