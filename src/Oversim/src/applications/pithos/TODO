@@ -3,7 +3,6 @@ PhD TODO list:
 Major:
 Update Matlab script to sort object lifetime average by initial and maximum group size and to plot lifetime vs. initial groupsize for a single maximum size.
 Check whether the Markov model is missing any states
-Check whether there is some form of "repair" already occurring in the simulation that might increase object lifetimes.
 Find the derivation of departure rate in the book: "Performance of computer communication systems".
 Read papers that cite replication paper, to see whether any has expanded on the Markov chain in a similar way to I did.
 	Read a few, none found so far.
