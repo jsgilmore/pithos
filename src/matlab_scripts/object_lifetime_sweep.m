@@ -11,19 +11,19 @@ N = 30;
 TTL = 172800;
 
 %Repair rate
-MU = 0.5;
-mu_step = 0.1;
+MU = 1/500;
+mu_step = 1/5000;
 
 %Parameters of a pareto node lifetime distribution
-alpha = 3;
-beta = 2;
+alpha = 2.4266;
+beta = 632.9519;
 
 %Peer departure rate for a pareto distribution with parameters alpha and
 %beta
-%theta = (alpha-2)/beta
+theta = (alpha-2)/beta
 
 %Peer departure rate as measured in simulation
-theta = 0.046518; %Data measured from Pithos simulation
+%theta = 0.046518; %Data measured from Pithos simulation
 
 %Peer arrival rate with the same arrival distribution as departure
 %distribution.
