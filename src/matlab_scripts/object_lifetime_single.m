@@ -5,21 +5,22 @@ close all
 r = 10;
 
 %The maximum number of nodes
-n = 17;
+n = 100;
 
 %Repair rate
-mu = 0;
+mu = 1/500;
 
 %Parameters of a pareto node lifetime distribution
-alpha = 2.427;
-beta = 632.952;
+alpha = 2.4147;
+beta = 142.5893;
 
 %Peer departure rate for a pareto distribution with parameters alpha and
 %beta
+%theta = (alpha-2.225)/beta
 theta = (alpha-2)/beta
 
 %Peer departure rate as measured in simulation
-%theta = 0.047; %Data measured from Pithos simulation
+%theta = 0.00032; %Data measured from Pithos simulation
 
 %Peer arrival rate with the same arrival distribution as departure
 %distribution.
