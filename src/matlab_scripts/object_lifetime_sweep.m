@@ -1,11 +1,14 @@
 clear all
 close all
 
+%Type can be either 'pareto' or 'exponential'
+type = 'exponential';
+
 %The maximum number of replicas
 R = 10;
 
 %The maximum number of nodes
-N = 30;
+N = 15;
 
 %Time to live
 TTL = 172800;
@@ -14,13 +17,22 @@ TTL = 172800;
 MU = 1/500;
 mu_step = 1/5000;
 
-%Parameters of a pareto node lifetime distribution
+%Parameters of a pareto node lifetime distribution (these values are
+%ignored if the specified distribution is exponential)
 alpha = 2.4266;
 beta = 632.9519;
 
+%Parameter of an exponential distribution (these values are ignored
+%if the specified distribution is pareto)
+lambda = 100.8
+
 %Peer departure rate for a pareto distribution with parameters alpha and
 %beta
-theta = (alpha-2)/beta
+if strcmp(type, 'pareto')
+    theta = (alpha-2)/beta;
+else strcmp(type, 'exponential')
+    theta = 1/lambda;
+end
 
 %Peer departure rate as measured in simulation
 %theta = 0.046518; %Data measured from Pithos simulation
