@@ -48,7 +48,8 @@ class ObjectLedger
 		 */
 		std::vector<PeerDataPtr> location_list;
 
-		//int replications;
+		//Records the number of times an object has been stored (object removals do not subtract from this number)
+		int replications;
 
 	public:
 

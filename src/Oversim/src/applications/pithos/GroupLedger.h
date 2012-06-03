@@ -48,7 +48,7 @@ class GroupLedger : public cSimpleModule
 
 		GlobalStatistics* globalStatistics; /**< pointer to GlobalStatistics module in this node*/
 
-		static const int TEST_MAP_INTERVAL = 50; /**< interval in seconds for writing periodic statistical information */
+		static const int TEST_MAP_INTERVAL = 10; /**< interval in seconds for writing periodic statistical information */
 
 		cMessage *periodicTimer; /**< timer self-message for writing periodic statistical information */
 
