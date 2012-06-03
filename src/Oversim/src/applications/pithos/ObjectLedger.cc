@@ -16,7 +16,7 @@
 #include "ObjectLedger.h"
 
 ObjectLedger::ObjectLedger() {
-	//replications = 0;
+	replications = 0;
 }
 
 ObjectLedger::~ObjectLedger() {
@@ -42,7 +42,10 @@ void ObjectLedger::addPeerRef(PeerDataPtr peer_data_ptr)
 	}*/
 
 	//Record how many times an object was replicated
-	//replications++;
+	replications++;
+
+	/*if (replications > objectDataPtr->getInitGroupSize())
+		std::cout << "More replicas stored than recorded initial group size.\n";*/
 }
 
 PeerDataPtr ObjectLedger::getPeerRef(const int &i)
