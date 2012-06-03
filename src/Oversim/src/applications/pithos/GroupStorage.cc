@@ -1038,10 +1038,10 @@ void GroupStorage::peerLeftInform(PeerData peerData, int sp_way_left)
 	pkt->setPeerData(peerData);
 	pkt->setByteLength(PEERDATA_PKT_SIZE);
 
-	std::ostringstream msg;
+	/*std::ostringstream msg;
 	msg << "[" << this_address << "]: Leaving peer group size\n";
 
-	RECORD_STATS(globalStatistics->recordOutVector(msg.str().c_str(), group_ledger->getGroupSize()));
+	RECORD_STATS(globalStatistics->recordOutVector(msg.str().c_str(), group_ledger->getGroupSize()));*/
 
 	for (unsigned int i = 0 ; i < group_ledger->getGroupSize() ; i++)
 	{

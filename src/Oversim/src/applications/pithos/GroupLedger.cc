@@ -111,9 +111,6 @@ void GroupLedger::handleMessage(cMessage* msg)
 
 		if (isSuperPeerLedger())
 		{
-			//Record the group size
-			group_size.push_back(std::make_pair(simTime(), peer_list.size()));
-
 			//If a peer is the super peer of a group, show its own address as both super peer address and peer address
 			group_name << "GroupLedger (" << thisAdr << ":" << thisAdr <<"): ";
 
@@ -142,8 +139,8 @@ void GroupLedger::handleMessage(cMessage* msg)
 		}
 
 		//Collect stats for both super peers and peers
-		RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of known group peers")).c_str(), peer_list.size()));
-		RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of unique group objects")).c_str(), object_map.size()));
+		//RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of known group peers")).c_str(), peer_list.size()));
+		//RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of unique group objects")).c_str(), object_map.size()));
     }
     else if ((ttlTimer = dynamic_cast<ObjectTTLTimer*>(msg)) != NULL)
 	{
@@ -380,6 +377,12 @@ void GroupLedger::addPeer(PeerData peer_dat)
 		peer_ledger.peerDataPtr = PeerDataPtr(new PeerData(peer_dat));
 		peer_list.push_back(peer_ledger);
 
+		if (isSuperPeerLedger())
+		{
+			//Record the group size
+			group_size.push_back(std::make_pair(simTime(), peer_list.size()));
+		}
+
 		/*if (isSuperPeerLedger())
 			std::cout << "[" << simTime() << ":super peer " << thisAdr << "]: Added peer from super peer: " << peer_dat.getAddress() << endl;
 		else std::cout << "[" << simTime() << ":peer " << thisAdr << "]: Added peer from super peer: " << peer_dat.getAddress() << endl;*/
@@ -424,15 +427,21 @@ void GroupLedger::getAverageAndMaxGroupSize(simtime_t creationTime, double *grou
 	for (group_size_it = group_size.begin() ; group_size_it != group_size.end() ; group_size_it++)
 	{
 		if (group_size_it->first > creationTime)
-		{
-			//Calculate the average group size during the object's lifetime
-			siz_total += group_size_it->second;
-			siz_count++;
-
-			if (group_size_it->second > siz_max)
-				siz_max = group_size_it->second;
-		}
+			break;
 	}
+
+	//Start recording one slot earlier, in the group size that was in effect when the object was created
+	for (group_size_it = group_size_it - 1 ; group_size_it != group_size.end() ; group_size_it++)
+	{
+		//Calculate the average group size during the object's lifetime
+		siz_total += group_size_it->second;
+		siz_count++;
+
+		if (group_size_it->second > siz_max)
+			siz_max = group_size_it->second;
+	}
+
+
 
 	*group_size_av = ((double)siz_total)/siz_count;
 	*group_size_max = siz_max;
@@ -483,18 +492,18 @@ void GroupLedger::removePeer(PeerData peer_dat)
 		}
 	}
 
-	std::ostringstream msg;
-	msg << "[" << thisAdr << "]: Peer remove error\n";
+	//std::ostringstream msg;
+	//msg << "[" << thisAdr << "]: Peer remove error\n";
 
 	if (peer_ledger_it == peer_list.end())
 	{
 		//std::cout << "Peer (" << peer_dat.getAddress() << ") slated for removal not found.\n";
 		RECORD_STATS(numPeerRemoveFail++);
-		RECORD_STATS(globalStatistics->recordOutVector(msg.str().c_str(), 10));
+		//RECORD_STATS(globalStatistics->recordOutVector(msg.str().c_str(), 10));
 		return;
 	} else {
 		RECORD_STATS(numPeerRemoveSuccess++);
-		RECORD_STATS(globalStatistics->recordOutVector(msg.str().c_str(), 0));
+		//RECORD_STATS(globalStatistics->recordOutVector(msg.str().c_str(), 0));
 	}
 
 	objectListSize = peer_ledger_it->getObjectListSize();
@@ -540,6 +549,13 @@ void GroupLedger::removePeer(PeerData peer_dat)
 		}
 	}
 	peer_list.erase(peer_ledger_it);
+
+	if (isSuperPeerLedger())
+	{
+		//Record the group size
+		group_size.push_back(std::make_pair(simTime(), peer_list.size()));
+	}
+
 }
 
 void GroupLedger::removeObject(OverlayKey key)
@@ -635,6 +651,12 @@ void GroupLedger::addObject(ObjectData objectData, PeerData peer_data_recv)
 		//std::cout << "[" << thisAdr << "]: ";
 		peer_ledger.addObjectRef(object_ledger->objectDataPtr);
 		peer_list.push_back(peer_ledger);
+
+		if (isSuperPeerLedger())
+		{
+			//Record the group size
+			group_size.push_back(std::make_pair(simTime(), peer_list.size()));
+		}
 
 		/*if (isSuperPeerLedger())
 			std::cout << "[" << simTime() << ":super peer" << thisAdr << "]: Added peer because of unknown object: " << peer_ledger.peerDataPtr->getAddress() << endl;
