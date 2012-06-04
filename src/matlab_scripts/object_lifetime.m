@@ -29,7 +29,6 @@ for i=1:0.5*r*(2*n-r+1)
         if s(i,1) == s(j,1)
             if s(j,2) == 1+s(i,2)    
                 Q(i,j) = (n-s(i,2))*phi;
-                %Q(i,j) = phi;
                 rates(i) = rates(i) + Q(i,j);
             end
         end
@@ -69,7 +68,7 @@ rates = rates.^(-1);
 Q_norm = zeros(0.5*r*(2*n-r+1), 0.5*r*(2*n-r+1));
 
 %Normalise the transition rate matrix, keeping in mind that states that
-%would leak to absorbtion states also have to be taken into account.
+%would lead to absorbtion states also have to be taken into account.
 for i=1:0.5*r*(2*n-r+1)
     for j=1:0.5*r*(2*n-r+1)
             Q_norm(i,j) = Q(i,j)*rates(i);

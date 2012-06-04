@@ -8,17 +8,17 @@ type = 'exponential';
 r = 10;
 
 %The maximum number of nodes
-n = 7;
+n = 100;
 
 %Repair rate
 mu = 1/500;
 
 %Parameters of a pareto node lifetime distribution
-alpha = 0.5239
-beta = 48.4389
+% alpha = 0.5239
+% beta = 48.4389
 
 %Parameter of an exponential distribution
-lambda = 100.8
+lambda = 100.9086
 
 %Peer departure rate for a pareto distribution with parameters alpha and
 %beta from the referenced research paper. (This formula cannot be verified
