@@ -324,7 +324,8 @@ void Super_peer_logic::repairMissingReplicas()
 		//There is no leaving peer, since these two occurrences are now independent, so equality has to be excluded
 		if (known_replicas < expected_replicas)
 		{
-			replication_req->setReplicaDiff(expected_replicas-known_replicas);	//+1 for the leaving peer
+			replication_req->setReplicaDiff(expected_replicas-known_replicas);
+			object_map_it->second.addRepairs(expected_replicas-known_replicas);		//Record the repairs performed for stat collection later.
 
 			peer_data = group_ledger->getRandomPeer(object_data.getKey());
 

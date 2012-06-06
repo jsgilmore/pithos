@@ -38,7 +38,7 @@ class GroupLedger : public cSimpleModule
 	    void handleMessage(cMessage* msg);
 	    void finish();
 	    void getAverageAndMaxGroupSize(simtime_t creationTime, double *group_size_av, int *group_size_max);
-	    void recordStarvationStats(ObjectData object_data);
+	    void recordStarvationStats(ObjectLedger object_ledger);
 
 		/**< A map that records all peers that belong to this peer's group */
 		PeerLedgerList peer_list;

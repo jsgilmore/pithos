@@ -50,6 +50,7 @@ class ObjectLedger
 
 		//Records the number of times an object has been stored (object removals do not subtract from this number)
 		int replications;
+		int repairs;
 
 	public:
 
@@ -79,6 +80,12 @@ class ObjectLedger
 		void erasePeerRef(const int &i);
 
 		void erasePeerRef(PeerDataPtr peer_data_ptr);
+
+		void resetReplications();
+		int getReplications();
+		void resetRepairs();
+		int getRepairs();
+		void addRepairs(int adds);
 };
 
 #endif /* OBJECTLEDGER_H_ */

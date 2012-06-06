@@ -447,13 +447,16 @@ void GroupLedger::getAverageAndMaxGroupSize(simtime_t creationTime, double *grou
 	*group_size_max = siz_max;
 }
 
-void GroupLedger::recordStarvationStats(ObjectData object_data)
+void GroupLedger::recordStarvationStats(ObjectLedger object_ledger)
 {
 	std::ostringstream group_name;
 	const NodeHandle *thisNode = &(((BaseApp *)getParentModule()->getSubmodule("communicator"))->getThisNode());
 	TransportAddress thisAdr(thisNode->getIp(), thisNode->getPort());
+
+	ObjectData object_data = *(object_ledger.objectDataPtr);
 	double group_size_av;
 	int group_size_max;
+	double repair_factor;
 
 	getAverageAndMaxGroupSize(object_data.getCreationTime(), &group_size_av, &group_size_max);
 
@@ -467,6 +470,9 @@ void GroupLedger::recordStarvationStats(ObjectData object_data)
 	RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Object initial group size")).c_str(), object_data.getInitGroupSize()));
 	RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Object maximum group size")).c_str(), group_size_max));
 	RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Object average group size")).c_str(), group_size_av));
+
+	repair_factor = ((double)object_ledger.getReplications())/(object_ledger.getRepairs() + object_data.getInitGroupSize());
+	RECORD_STATS(globalStatistics->addStdDev((group_name.str() + std::string("Repair factor")).c_str(), repair_factor));
 }
 
 void GroupLedger::removePeer(PeerData peer_dat)
@@ -542,7 +548,7 @@ void GroupLedger::removePeer(PeerData peer_dat)
 			//A peer has starved, record some lifetime stats for the group here
 			if (isSuperPeerLedger())
 			{
-				recordStarvationStats(*(object_ledger_it->second.objectDataPtr));
+				recordStarvationStats(object_ledger_it->second);
 			}
 			object_map.erase(object_ledger_it);
 			objects_starved++;
