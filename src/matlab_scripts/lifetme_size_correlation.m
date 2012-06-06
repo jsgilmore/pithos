@@ -5,7 +5,7 @@ clear all
 %Set to zero for only a single group with no numbered postfix
 number = 0;
 %The folder to load the data from
-folder = '500_10_small_100_1';
+folder = '20_10_size15_100_exp_1';
 %0 for old naming scheme and 1 for new naming scheme
 scheme = 1;
 
@@ -85,46 +85,69 @@ if exist(starve_time_str, 'file')
     eval(['starve_time = csvread(''' starve_time_str ''');']);
 end
 
-bin_siz = 2;
 
+%--------------------------------------------------------------------------
+%Create the required data structured beforehand to speed up runtime
+%--------------------------------------------------------------------------
 initial_size_objects = [initial_groupsize(:,2) , lifetime(:, 2)];
 initial_size_lifetime_counts = zeros(max(initial_groupsize(:,2)), 2);
 
 max_size_objects = [max_groupsize(:, 2), lifetime(:, 2)];
 max_size_lifetime_counts = zeros(max(max_groupsize(:, 2)), 2);
 
+size_lifetime_counts = zeros(max(initial_groupsize(:,2)), max(max_groupsize(:, 2)), 2);
+
 if exist(average_groupsize_str, 'file')
     average_size_objects = [average_groupsize(:, 2), lifetime(:, 2)];
+    average_size_lifetime_counts = zeros(max(round(average_groupsize(:, 2))), 2);
 end
 
-bins = ceil(length(initial_size_lifetime_counts(:, 1))/bin_siz);
-initial_size_lifetime_aggr = zeros(bins, 2);
-max_size_lifetime_aggr = zeros(bins, 2);
+x = 1;
+y = 1;
 
+boxplot_max_group = round(mean(average_size_objects(:, 1)));
+%boxplot_max_group = 10;
+boxplot_init_group = round(mean(initial_size_objects(:, 1)));
+%boxplot_init_group = 10;
+
+%--------------------------------------------------------------------------
+%Total the object lifetimes for every maximum group size and every initial
+%group size and count how many measurements were made for each.
+%--------------------------------------------------------------------------
 for i=1:length(initial_size_objects(:,1))
+    if round(average_size_objects(i, 1)) == boxplot_max_group
+        initial_size_objects_forMeanAv(x, 1) = initial_size_objects(i,1);
+        initial_size_objects_forMeanAv(x, 2) = initial_size_objects(i,2);
+        x = x+1;
+    end
+
+    if initial_size_objects(i, 1) == boxplot_init_group
+        average_size_objects_forMeanInit(y, 1) = max_size_objects(i,1);
+        average_size_objects_forMeanInit(y, 2) = max_size_objects(i,2);
+        y = y+1;
+    end
+
     initial_size_lifetime_counts(initial_size_objects(i, 1), 1) = initial_size_lifetime_counts(initial_size_objects(i, 1), 1) + initial_size_objects(i, 2);
     initial_size_lifetime_counts(initial_size_objects(i, 1), 2) = initial_size_lifetime_counts(initial_size_objects(i, 1), 2) + 1;
-    
-    max_size_lifetime_counts(max_size_objects(i, 1), 1) = max_size_lifetime_counts(max_size_objects(i, 1), 1) + max_size_objects(i, 2);
-    max_size_lifetime_counts(max_size_objects(i, 1), 2) = max_size_lifetime_counts(max_size_objects(i, 1), 2) + 1;
+
+    average_size_lifetime_counts(round(average_size_objects(i, 1)), 1) = average_size_lifetime_counts(round(average_size_objects(i, 1)), 1) + average_size_objects(i, 2);
+    average_size_lifetime_counts(round(average_size_objects(i, 1)), 2) = average_size_lifetime_counts(round(average_size_objects(i, 1)), 2) + 1;
+
+    size_lifetime_counts(initial_size_objects(i, 1), round(average_size_objects(i, 1)), 1) = size_lifetime_counts(initial_size_objects(i, 1), round(average_size_objects(i, 1)), 1) + average_size_objects(i, 2);
+    size_lifetime_counts(initial_size_objects(i, 1), round(average_size_objects(i, 1)), 2) = size_lifetime_counts(initial_size_objects(i, 1), round(average_size_objects(i, 1)), 2) + 1;
 end
 
-% aggr_pos = 1;
-% for i=0:length(initial_size_lifetime_counts(:,1))-1
-%     aggr_pos = floor(i/bin_siz) + 1;
-%     initial_size_lifetime_aggr(aggr_pos, 1) = initial_size_lifetime_aggr(aggr_pos, 1) + initial_size_lifetime_counts(i+1, 1);
-%     initial_size_lifetime_aggr(aggr_pos, 2) = initial_size_lifetime_aggr(aggr_pos, 2) + initial_size_lifetime_counts(i+1, 2);
-%     
-%     max_size_lifetime_aggr(aggr_pos, 1) = max_size_lifetime_aggr(aggr_pos, 1) + max_size_lifetime_aggr(i+1, 1);
-%     max_size_lifetime_aggr(aggr_pos, 2) = max_size_lifetime_aggr(aggr_pos, 2) + max_size_lifetime_aggr(i+1, 2);
-% end
-
+%--------------------------------------------------------------------------
+%Use the totals and counts computed in the previous step to compute average
+%lifetime values.
+%--------------------------------------------------------------------------
 initial_size_lifetime_count_av = initial_size_lifetime_counts(:, 1)./initial_size_lifetime_counts(:,2);
-% initial_size_lifetime_aggr = initial_size_lifetime_aggr(:,1)./initial_size_lifetime_aggr(:,2);
-max_size_lifetime_count_av = max_size_lifetime_counts(:, 1)./max_size_lifetime_counts(:,2);
-% max_size_lifetime_aggr = max_size_lifetime_aggr(:,1)./max_size_lifetime_aggr(:,2);
+average_size_lifetime_count_av = average_size_lifetime_counts(:, 1)./average_size_lifetime_counts(:,2);
+size_lifetime_count_av = size_lifetime_counts(:, :, 1)./size_lifetime_counts(:, :,2);
 
-scatter3(initial_size_objects(:,1), max_size_objects(:,1), initial_size_objects(:, 2));
+%--------------------------------------------------------------------------
+%Draw some cool looking graphs
+%--------------------------------------------------------------------------
 
 % if exist(average_groupsize_str, 'file')
 %     figure
@@ -137,17 +160,64 @@ scatter3(initial_size_objects(:,1), max_size_objects(:,1), initial_size_objects(
 %     scatter3(starve_time(:,2), average_size_objects(:,1), initial_size_objects(:, 2));
 %     figure
 % end
+% 
+% scatter3(initial_size_objects(:,1), max_size_objects(:,1), initial_size_objects(:, 2));
+% xlabel('Initial group size');
+% ylabel('Maximum group size');
+% zlabel('Object lifetime (s)');
+% title('Scatter plot of measured object lifetimes vs. initial group size and maximum group size.');
 
 %This only works if one has Matlab's statistical toolbox
-% boxplot(initial_size_objects(:, 2), initial_size_objects(:,1));
-% figure
-% boxplot(max_size_objects(:, 2), max_size_objects(:,1));
-% figure
+figure
+boxplot(initial_size_objects(:, 2), initial_size_objects(:,1), 'notch', 'on');
+ylabel('Object lifetime (s)');
+xlabel('Initial group size');
+title('Box plot of measured object lifetimes vs. initial group size for any maximum group size.');
+
+figure
+boxplot(average_size_objects(:, 2), round(average_size_objects(:,1)), 'notch', 'on');
+ylabel('Object lifetime (s)');
+xlabel('Average group size');
+title('Box plot of measured object lifetimes vs. maximum group size for any initial group size.');
 
 figure
 plot(initial_size_lifetime_count_av, 'o');
-figure
-hist(initial_size_objects(:, 2), 50);
+ylabel('Object lifetime (s)');
+xlabel('Initial group size');
+title('Average object lifetimes vs. initial group size for any maximum group size.');
 
 figure
-plot(max_size_lifetime_count_av, 'o');
+hist(initial_size_objects(:, 2), 500);
+xlabel('Object lifetime (s)');
+
+figure
+plot(average_size_lifetime_count_av, 'o');
+ylabel('Object lifetime (s)');
+xlabel('Average group size');
+title('Average object lifetimes vs. maximum group size for any initial group size.');
+
+figure
+surf(size_lifetime_counts(:,:,2));
+xlabel('Average group size');
+ylabel('Initial group size');
+zlabel('Number of lifetime measurements');
+title('Surface plot of the number of lifetime measurements vs. maximum group size and initial group size.');
+
+figure
+surf(size_lifetime_count_av);
+xlabel('Maximum group size');
+ylabel('Initial group size');
+zlabel('Object lifetime (s)');
+title('Surface plot of average object lifetimes vs. maximum group size and initial group size.');
+
+figure
+boxplot(initial_size_objects_forMeanAv(:, 2), initial_size_objects_forMeanAv(:, 1), 'notch', 'on');
+ylabel('Object lifetime (s)');
+xlabel('Initial group size');
+title('Box plot of measured object lifetimes vs. initial group size for a specific maximum group size.');
+
+figure
+boxplot(average_size_objects_forMeanInit(:, 2), average_size_objects_forMeanInit(:, 1), 'notch', 'on');
+ylabel('Object lifetime (s)');
+xlabel('Maximum group size');
+title('Box plot of measured object lifetimes vs. maximum group size for a specific initial group size.');

@@ -202,13 +202,36 @@ Because all objects will eventually be destroyed in a distributed storage system
 
 In order to design such a storage system, it is therefore of great interest to know the expected lifetime of objects in the system under the expected network conditions and to be able to alter parameters in a predictable way to choose object lifetimes. While other papers, which will be reviewed in Section \ref{related_work}, have also looked at the problem of object lifetimes, none have considered the issue of limited size networks.
 
-In this paper we'll show that object lifetimes are reduced if the network size is limited, compared to the total number of object replicas stored. While large networks do exist, most networks will practically start out as size limited networks and grow over time as the systems gains popularity. Size limited networks have also shown themselves in our research, where we've developed an hierarchical distributed storage system, called Pithos \cite{}. On the second tier of storage, nodes mapped to a two dimensional Euclidean space and grouped by distance. Each group forms a size limited network, which stores objects. It was found that the lifetime of these objects are affected by the maximum group size during the lifetime of an object.
+In this paper it will be shown that object lifetimes are reduced if the network size is limited, compared to the total number of object replicas stored. While large networks do exist, most networks will practically start out as size limited networks and grow over time as the system gains popularity. Size limited networks have also shown themselves in our research, where we've developed an hierarchical distributed storage system, called Pithos \cite{}. On the second tier of storage, nodes are mapped to a two dimensional Euclidean space and grouped by distance. Each group forms a size limited network, which stores objects. It was found that the lifetime of these objects are affected by the maximum group size during the lifetime of an object.
+
+The paper is structured as follows: Section \ref{background} explains how object storage and repair are generally implemented in a distributed storage system,
+%
+Section \ref{related_work} discusses other work that has focussed on predicting object lifetimes in distributed storage systems,
+%
+Section \ref{model} introduces the model that we developed to model object lifetimes,
+%
+Section \ref{results} presents the results obtained from the model,
+%
+Section \ref{simulation} briefly introduces the Pithos simulation,
+%
+Section \ref{comparison} compares the model results with simulation results as well as results from other models and
+%
+Section \ref{conclusion} concludes.
 
 \section{Background}
+\label{background}
+
+When there is referred to a distributed storage system in this paper, it is assumed that there exists some higher layer application that generates objects which it sends to the storage system for storage. The storage system attempts to store an object for as long as possible.
+
+In an attempt to maximise the time an object exists within the storage system, two techniques are used. These are replication and repair.
 
 \subsection{Replication schemes}
 
-Two methods employed to overcome network churn in distributed storage systems are replication and erasure coding. Replication, the simpler of the two schemes, stores multiple copies of every file in the system. While replication
+There exists two types of what can be termed replication in distributed storage: simple replication and erasure coding \cite{}.
+
+In a storage system using simple replication, $r$ replicas of an object are stored for every object received from the higher layer for storage. Where the number of replicas $r$ is a design decision, which will be discussed in Section \ref{}. This has the effect that an object will remain available until the peer with the longest lifetimes on which it was stored leaves the network, when no repair is done. Intuitively then, it can be expected that the higher the value of $r$, the longer an object will live. This will be shown to be the case in Section \ref{results}.
+
+
 
 \subsection{Repair schemes}
 
@@ -222,11 +245,19 @@ The work is described.
 
 The work is described.
 
-\section{Results}
+\section{Model results}
+\label{results}
 
 The work is described.
 
+\section{Simulation}
+\label{simulation}
+
+The work is described.
+
+
 \section{Comparison}
+\label{comparison}
 
 The work is described.
 
