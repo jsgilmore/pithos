@@ -17,6 +17,7 @@
 
 ObjectLedger::ObjectLedger() {
 	replications = 0;
+	repairs = 0;
 }
 
 ObjectLedger::~ObjectLedger() {
@@ -95,4 +96,29 @@ void ObjectLedger::erasePeerRef(PeerDataPtr peer_data_ptr)
 	}
 
 	opp_error("Peer pointer not found when erasing.");
+}
+
+void ObjectLedger::resetReplications()
+{
+	replications = 0;
+}
+
+int ObjectLedger::getReplications()
+{
+	return replications;
+}
+
+void ObjectLedger::resetRepairs()
+{
+	repairs = 0;
+}
+
+int ObjectLedger::getRepairs()
+{
+	return repairs;
+}
+
+void ObjectLedger::addRepairs(int adds)
+{
+	repairs += adds;
 }
