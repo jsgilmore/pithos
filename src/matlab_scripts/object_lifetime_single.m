@@ -7,11 +7,13 @@ type = 'exponential';
 %The maximum number of replicas
 r = 10;
 
-%The maximum number of nodes
+%The maximum number of nodes in the larger network
 n = 100;
 
+group_size_av = 7;
+
 %Repair rate
-mu = 1/500;
+mu = 0.68/20;
 
 %Parameters of a pareto node lifetime distribution
 % alpha = 0.5239
@@ -32,8 +34,9 @@ end
 
 %Peer arrival rate with the same arrival distribution as departure
 %distribution.
-phi = theta; %Data measured from Pithos simulation
+%phi = theta;
+phi = group_size_av*theta/(n - group_size_av)
 
 expected_lifetimes = object_lifetime(r, n, theta, phi, mu);
 
-plot(n:-1:1, expected_lifetimes);
+plot(expected_lifetimes);

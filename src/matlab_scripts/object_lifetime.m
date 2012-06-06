@@ -3,6 +3,14 @@
 
 function[expected_lifetimes] = object_lifetime(r,n,theta,phi,mu)
 
+%The system wil never be able to store more replicas than the maximum group
+%size. If the maximum group size if thus larger than the number of
+%replicas, the effective maximum number of replicas is just equal to the
+%maximum group size.
+if r > n
+    r = n;
+end
+
 str = sprintf('Calculating group replication Markov chain for %d replicas, %d nodes, mu=%f and %d states.', r, n, mu, 0.5*r*(2*n-r+1));
 disp(str);
 
@@ -83,17 +91,17 @@ N = A^(-1);
 
 E_T = N*rates;
 
-x = 1;
+x = n;
 for i=1:0.5*r*(2*n-r+1)
     if s(i,1) == r
         expected_lifetimes(x) = E_T(i);
-        x = x+1;
+        x = x-1;
     end
     
     if s(i,1) < r
         if s(i,1) == s(i,2)
             expected_lifetimes(x) = E_T(i);
-            x = x+1;
+            x = x-1;
         end
     end
 end
