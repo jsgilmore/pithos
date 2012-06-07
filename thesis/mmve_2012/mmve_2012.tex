@@ -175,7 +175,7 @@
 
 %
 % paper title
-\title{Predicting Object Lifetimes in Finite Distributed Systems Under Churn}
+\title{Predicting Object Lifetimes in Finite Distributed Storage Systems Under Churn}
 
 \author{\IEEEauthorblockN{John S. Gilmore and Herman A. Engelbrecht\\
 \IEEEauthorblockA{MIH Media Lab, Electrical and Electronic Engineering Department\\
@@ -243,7 +243,63 @@ The work is described.
 \section{The model}
 \label{model}
 
-The work is described.
+In order to model the effects of a finite network size on the lifetime of an object, the continuous time Markov chain model introduced in Section \ref{related_work} is expanded by adding a second parameter to every state, namely the network size. This effectively adds another dimension to the Markov chain. The resulting Markov chain is shown in Figure \ref{}.
+
+\simeq
+
+\begin{equation}
+    F(x) = 1 - e^{-\lambda x},\quad \lambda > 0
+\end{equation}
+
+\begin{equation}
+    \theta = \lambda
+\end{equation}
+
+\begin{equation}
+    q(i k,j l) = (N - k)\phi,\quad\textrm{for}\quad i = j,\quad l = k + 1
+\end{equation}
+
+\begin{equation}
+    q(i k,j l) = i\theta,\quad\textrm{for}\quad j = i - 1,\quad l = k - 1
+\end{equation}
+
+\begin{equation}
+    q(i k,j l) = (k - i)\theta,\quad\textrm{for}\quad i = j,\quad l = k - 1
+\end{equation}
+
+\begin{equation}
+    q(i k,j l) = \mu,\quad\textrm{for}\quad i \neq j,\quad l = k,\quad j = \min(r, l)
+\end{equation}
+
+\begin{equation}
+    q(i k,j l) = 0,\quad\textrm{elsewhere} 
+\end{equation}
+
+\begin{align}\label{states_num}
+  states & = (N - r + 1) + \sum_{x=1}^{r-1} x\notag \\
+         & = (N - r + 1) + 0.5 (r - 1) r\notag \\
+         & = 0.5 r (2 N - r + 1)
+\end{align}
+
+\begin{equation}
+    \textbf{P} = \left[\begin{array}{c|c}
+                   \textbf{Q} & \textbf{R} \\
+                   \hline
+                   \textbf{0} & \textbf{I}
+                 \end{array}\right]
+\end{equation}
+
+\begin{equation}
+    \textbf{N} = (\textbf{I} - \textbf{Q})^{-1}
+\end{equation}
+
+\begin{equation}
+    \textbf{E[L]} = \textbf{Nt}
+\end{equation}
+
+\begin{equation}
+    \phi = \frac{\tilde{n}\theta}{N - \tilde{n}}
+\end{equation}
 
 \section{Model results}
 \label{results}
