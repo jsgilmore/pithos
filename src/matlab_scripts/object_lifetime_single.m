@@ -13,14 +13,14 @@ n = 100;
 group_size_av = 7;
 
 %Repair rate
-mu = 0.68/20;
+mu = 0.7/150;
 
 %Parameters of a pareto node lifetime distribution
 % alpha = 0.5239
 % beta = 48.4389
 
 %Parameter of an exponential distribution
-lambda = 100.9086
+lambda = 500
 
 %Peer departure rate for a pareto distribution with parameters alpha and
 %beta from the referenced research paper. (This formula cannot be verified
