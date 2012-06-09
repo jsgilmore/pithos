@@ -238,17 +238,53 @@ In a storage system using simple replication, $r$ replicas of an object are stor
 \section{Related work}
 \label{related_work}
 
-The work is described.
+Related work is described, mostly about \cite{replication_article}.
 
 \section{The model}
 \label{model}
 
-In order to model the effects of a finite network size on the lifetime of an object, the continuous time Markov chain model introduced in Section \ref{related_work} is expanded by adding a second parameter to every state, namely the network size. This effectively adds another dimension to the Markov chain. The resulting Markov chain is shown in Figure \ref{}.
+In order to model the effects of a finite network size on the lifetime of an object, the continuous time Markov chain model introduced in Section \ref{related_work} is expanded by adding a second parameter to every state, namely the network size. This effectively adds another dimension to the Markov chain. The resulting Markov chain is shown in Figure \ref{fig_markov_chain}.
 
-\simeq
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=0.5cm 19.5cm 8.5cm 29.5cm, width=\columnwidth]{Markov_chain_repair_compact}
+ \caption{Markov chain modeling object replica number as well as network size}
+ \label{fig_markov_chain}
+\end{figure}
+
+The dual parameter states can be seen in the Markov chain in Figure \ref{fig_markov_chain}. Every state is a tuple of the form \verb.(replicas,nodes).. Where $r$ is the required number of object replicas and $N$ is the maximum number of nodes in the network. There are four types of transitions possible in our Markov model:
+\begin{enumerate}
+\item A node that contains a replica departs the network.
+\item A node that does not contain a replica departs the network.
+\item A node joins the network.
+\item An object is repaired.
+\end{enumerate}
+
+%In a continous Markov chain we define delta small enough so only one event can occur at any point in time
+
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=0.0cm 24.5cm 5.0cm 30cm, width=0.6\columnwidth]{Markov_example}
+ \caption{Markov chain modeling object replica number as well as network size}
+ \label{fig_markov_example}
+\end{figure}
+
+State transitions can be explained by the example in Figure \ref{fig_markov_example}. The figure shows all state transitions relative to the centre state ($x,y$). For the purposes of explanation, only transitions to and from the centre state are shown. Starting at state ($x+1,y+1$), where $x+1$ replicas and $y+1$ nodes are present. If a node that contains a replica departs the network, the system moves to state ($x,y$): one fewer replica and one less node.
+
+If a node that does not contain a replica now departs from the network, the system moves from state ($x,y$) to ($x,y-1$): no fewer replicas and one fewer node. A node can join the network, which will have the model move from ($x,y-1$) to ($x,y$) and another node joining the network will move the system into state ($x,y$+1).
+
+A repair process can also occur. Repair is modeled as a complete repair, which instantly replaces all object replicas if sufficient nodes are available, otherwise it replaces replicas to the number of available nodes. With sufficient nodes available for a full repair, the system moves from state ($x,y$) to ($r,y$) or when the network size is smaller than the required number of replicas the system moves to state ($N,y$).
+
+The transition rates between states are also shown. As with the previous model, the rate at which replicas depart from the network is equal to the product of the number of replicas present in the network at that point in time $r$ and the departure rate of a single peer under steady state $\theta$.
+
+In a continuous time Markov model, moving from one state to the next is characterised by rates, instead of probabilities. This is as opposed to a discrete time Markov model that uses probabilities. Let $\theta$ be the departure rate of nodes under steady state. For $x$ replicas, the node departure rate from the network is then $x\theta$.
+
+The Markov model assumes the presence of a finite sized network, $N$ is chosen sufficiently large.
+
+Taking into account the number of nodes in the network
 
 \begin{equation}
-    F(x) = 1 - e^{-\lambda x},\quad \lambda > 0
+    F(x) = 1 - e^{-\lambda x},\quad\textrm{for}\quad \lambda > 0
 \end{equation}
 
 \begin{equation}
@@ -272,11 +308,11 @@ In order to model the effects of a finite network size on the lifetime of an obj
 \end{equation}
 
 \begin{equation}
-    q(i k,j l) = 0,\quad\textrm{elsewhere} 
+    q(i k,j l) = 0,\quad\textrm{elsewhere}
 \end{equation}
 
 \begin{align}\label{states_num}
-  states & = (N - r + 1) + \sum_{x=1}^{r-1} x\notag \\
+       S & = (N - r + 1) + \sum_{x=1}^{r-1} x\notag \\
          & = (N - r + 1) + 0.5 (r - 1) r\notag \\
          & = 0.5 r (2 N - r + 1)
 \end{align}
