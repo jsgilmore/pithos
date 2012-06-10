@@ -275,9 +275,13 @@ If a node that does not contain a replica now departs from the network, the syst
 
 A repair process can also occur. Repair is modeled as a complete repair, which instantly replaces all object replicas if sufficient nodes are available, otherwise it replaces replicas to the number of available nodes. With sufficient nodes available for a full repair, the system moves from state ($x,y$) to ($r,y$) or when the network size is smaller than the required number of replicas the system moves to state ($N,y$).
 
-The transition rates between states are also shown. As with the previous model, the rate at which replicas depart from the network is equal to the product of the number of replicas present in the network at that point in time $r$ and the departure rate of a single peer under steady state $\theta$.
+The transitions in a Markov chain are classily characterised by the rate of moving from state $i$ to state $j$. For the dual states used in the model presented in this paper, state transitions are characterised by moving from state $i k$ to state $j l$, where $i$ is the number of replicas in the current state, $k$ the number of nodes in the current state, $j$ the number of replicas in the next state, and $l$ the number of nodes in the next state.
 
-In a continuous time Markov model, moving from one state to the next is characterised by rates, instead of probabilities. This is as opposed to a discrete time Markov model that uses probabilities. Let $\theta$ be the departure rate of nodes under steady state. For $x$ replicas, the node departure rate from the network is then $x\theta$.
+In a continuous time Markov model, moving from one state to the next is characterised by rates, instead of the probabilities used in a discrete time Markov model. Let $\theta$ be the departure rate of nodes under steady state. For $x$ replicas, the node departure rate from the network is then $x\theta$. This transition can be expressed in terms of the dual state transition Equation \ref{eq_rep_left}.
+
+\begin{equation} \label{eq_rep_left}
+    q(i k,j l) = i\theta,\quad\textrm{for}\quad j = i - 1,\quad l = k - 1
+\end{equation}
 
 The Markov model assumes the presence of a finite sized network, $N$ is chosen sufficiently large.
 
@@ -293,10 +297,6 @@ Taking into account the number of nodes in the network
 
 \begin{equation}
     q(i k,j l) = (N - k)\phi,\quad\textrm{for}\quad i = j,\quad l = k + 1
-\end{equation}
-
-\begin{equation}
-    q(i k,j l) = i\theta,\quad\textrm{for}\quad j = i - 1,\quad l = k - 1
 \end{equation}
 
 \begin{equation}
