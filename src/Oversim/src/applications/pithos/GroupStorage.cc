@@ -82,6 +82,9 @@ void GroupStorage::initialize()
 		throw cRuntimeError("GroupStorage::initializeApp(): Communicator module not found!");
 	}
 
+	if (uniform(0.0, 1.0) < par("malicious_peer_p").doubleValue())
+		isMalicious = true;
+	else isMalicious = false;
 
 	event = new cMessage("event");	//This is the join retry timer.
 
@@ -150,6 +153,10 @@ void GroupStorage::finish()
 		globalStatistics->addStdDev("GroupStorage: GET error: Missing objects on target peer", getErrMissingObjectOtherPeer);
 		globalStatistics->addStdDev("GroupStorage: GET error: Target of request out of group", getErrRequestOOG);
 		globalStatistics->addStdDev("GroupStorage: PUT error: Target of store out of group", putErrStoreOOG);
+
+		if (isMalicious)
+			globalStatistics->addStdDev("GroupStorage: Was malicious", 1);
+		else globalStatistics->addStdDev("GroupStorage: Was malicious", 0);
 
 		globalStatistics->recordOutVector("GroupStorage: Node Lifetime", time.dbl());
 

@@ -89,6 +89,8 @@ simple GroupStorage
         string repairType;
         bool gracefulMigration;
         double pingTime @unit(s);
+        
+        double malicious_peer_p;
     gates:
         inout comms_gate;
         
