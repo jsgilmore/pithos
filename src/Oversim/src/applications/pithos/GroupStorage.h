@@ -160,6 +160,9 @@ class GroupStorage : public cSimpleModule
 		bool objectRepair;
 		bool periodicRepair;
 
+		//Security parameters
+		bool isMalicious;
+
 		/**
 		 * The function creates a write packet and fills it with address information, payload type and byte length.
 		 *
