@@ -202,7 +202,7 @@ Because all objects will eventually be destroyed in a distributed storage system
 
 In order to design such a storage system, it is therefore of great interest to know the expected lifetime of objects in the system under the expected network conditions and to be able to alter parameters in a predictable way to choose object lifetimes. While other papers, which will be reviewed in Section \ref{related_work}, have also looked at the problem of object lifetimes, none have considered the issue of limited size networks.
 
-In this paper it will be shown that object lifetimes are reduced if the network size is limited, compared to the total number of object replicas stored. While large networks do exist, most networks will practically start out as size limited networks and grow over time as the system gains popularity. Size limited networks have also shown themselves in our research, where we've developed an hierarchical distributed storage system, called Pithos \cite{}. On the second tier of storage, nodes are mapped to a two dimensional Euclidean space and grouped by distance. Each group forms a size limited network, which stores objects. It was found that the lifetime of these objects are affected by the maximum group size during the lifetime of an object.
+In this paper it will be shown that object lifetimes are reduced if the network size is limited, compared to the total number of object replicas stored. While large networks do exist, most networks will practically start out as size limited networks and grow over time as the system gains popularity. Size limited networks have also shown themselves in our research, where we've developed an hierarchical distributed storage system, called Pithos \cite{Pithos_mmve_2011}. On the second tier of storage, nodes are mapped to a two dimensional Euclidean space and grouped by distance. Each group forms a size limited network, which stores objects. It was found that the lifetime of these objects are affected by the maximum group size during the lifetime of an object.
 
 The paper is structured as follows: Section \ref{background} explains how object storage and repair are generally implemented in a distributed storage system,
 %
@@ -229,16 +229,33 @@ In an attempt to maximise the time an object exists within the storage system, t
 
 There exists two types of what can be termed replication in distributed storage: simple replication and erasure coding \cite{}.
 
-In a storage system using simple replication, $r$ replicas of an object are stored for every object received from the higher layer for storage. Where the number of replicas $r$ is a design decision, which will be discussed in Section \ref{}. This has the effect that an object will remain available until the peer with the longest lifetimes on which it was stored leaves the network, when no repair is done. Intuitively then, it can be expected that the higher the value of $r$, the longer an object will live. This will be shown to be the case in Section \ref{results}.
-
-
+In a storage system using simple replication, $R$ replicas of an object are stored for every object received from the higher layer for storage. Where the number of required replicas $R$ is a design decision, which will be discussed in Section \ref{}. This has the effect that an object will remain available until the peer with the longest lifetimes on which it was stored leaves the network, when no repair is done. Intuitively then, it can be expected that the higher the value of $R$, the longer an object will live. This will be shown to be the case in Section \ref{results}.
 
 \subsection{Repair schemes}
 
 \section{Related work}
 \label{related_work}
 
-Related work is described, mostly about \cite{replication_article}.
+This paper mainly extends and improves upon the work by Wu, Tian and Ng \cite{replication_article}. The related work models three characteristics of distributed hash table (DHT) lookup under churn: expected lookup latency of various routing schemes, expected lookup overhead of various routing schemes and expected object lifetime.
+
+Our paper focuses on the object lifetime characteristic. Wu, Tian and Ng find two closed loop expressions for object lifetime when exponentially distributed node lifetimes are assumed. One for the case without object repair, shown in Equation \eqref{eq_other_lifetime_norep}, and one for the case with object repair, shown in Equation \eqref{eq_other_lifetime_rep} \cite{replication_article}.
+
+\begin{equation} \label{eq_other_lifetime_norep}
+    E[L] = \sum_{i = 1}^{R}{{R}\choose{i}}\frac{(-1)^{(i+1)}}{\lambda i}
+\end{equation}
+
+\begin{equation} \label{eq_other_lifetime_rep}
+    E[L] = \frac{1}{\prod_{k=1}^{R-1}\frac{k\theta}{k\theta+\mu}} \left[\frac{1}{R\theta} + \left(1 - \prod_{k=1}^{R-1}\frac{k\theta}{k\theta + \mu}\right)\frac{1}{\mu}\right]
+\end{equation}
+
+Variable names of the equations have been altered to be consistent with the notation used in the remainder of this paper, where $\lambda$ is the rate parameter of the exponential distribution, $\theta$ is the node departure rate, $R$ is the required number of object replicas and $\mu$ is the object repair rate.
+
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=0.0cm 27.5cm 8.0cm 30.0cm, width=0.7\columnwidth]{inifinite_network_chain}
+ \caption{Markov chain modeling object replica number for an infinite network size}
+ \label{fig_markov_chain}
+\end{figure}
 
 \section{The model}
 \label{model}
@@ -247,12 +264,20 @@ In order to model the effects of a finite network size on the lifetime of an obj
 
 \begin{figure}[htbp]
  \centering
- \includegraphics[clip=true, viewport=0.5cm 19.5cm 8.5cm 29.5cm, width=\columnwidth]{Markov_chain_repair_compact}
+ \includegraphics[clip=true, viewport=0.5cm 19.5cm 8.5cm 29.5cm, width=0.7\columnwidth]{Markov_chain_repair_compact}
  \caption{Markov chain modeling object replica number as well as network size}
  \label{fig_markov_chain}
 \end{figure}
 
-The dual parameter states can be seen in the Markov chain in Figure \ref{fig_markov_chain}. Every state is a tuple of the form \verb.(replicas,nodes).. Where $r$ is the required number of object replicas and $N$ is the maximum number of nodes in the network. There are four types of transitions possible in our Markov model:
+%Explain transient and absorbtion states here somewhere.
+
+The dual parameter states can be seen in the Markov chain in Figure \ref{fig_markov_chain}. Every state is a tuple of the form \verb.(replicas,nodes).. Where $R$ is the required number of object replicas and $N$ is the maximum number of nodes in the network. It is assumed that $R$ replicas are always stored in the network, if sufficient space is available. If the number of nodes currently in the network $n$ are fewer than the required number of replicas ($n < R$), only $n$ replicas are stored. The initial states of the Markov chain are therefore all the states ($R,n$) as well as all the states ($n,n$), for $n < R$. There are therefore $N$ initial states, one for every possible network size. The initial state is the initial network size that an object is placed in.
+
+If there are no more replicas in the network, an object cannot be repaired and the Markov chains remains in the set of states ($0,n$). These are said to be the absorbing states of the Markov chain and there exists $N - R + 1$ absorbing states in the model presented here. All other states out of which transition is possible are said to be transient states. When these states exist, the Markov chain is said to be absorbing. It can be shown that if sets of transient and absorbing states exist, the system will always end up in the absorbing states \cite{grinstead1997introduction_probability}. The time to absorbtion can be calculated, which in the case of object storage means the time when no more objects exist in the network.
+
+\subsection{State transition rates}
+
+There are four types of state transitions possible in our Markov model:
 \begin{enumerate}
 \item A node that contains a replica departs the network.
 \item A node that does not contain a replica departs the network.
@@ -264,18 +289,18 @@ The dual parameter states can be seen in the Markov chain in Figure \ref{fig_mar
 
 \begin{figure}[htbp]
  \centering
- \includegraphics[clip=true, viewport=0.0cm 24.5cm 5.0cm 30cm, width=0.6\columnwidth]{Markov_example}
+ \includegraphics[clip=true, viewport=0.0cm 24.5cm 5.0cm 30cm, width=0.4\columnwidth]{Markov_example}
  \caption{Markov chain modeling object replica number as well as network size}
  \label{fig_markov_example}
 \end{figure}
 
-State transitions can be explained by the example in Figure \ref{fig_markov_example}. The figure shows all state transitions relative to the centre state ($x,y$). For the purposes of explanation, only transitions to and from the centre state are shown. Starting at state ($x+1,y+1$), where $x+1$ replicas and $y+1$ nodes are present. If a node that contains a replica departs the network, the system moves to state ($x,y$): one fewer replica and one less node.
+State transitions can be explained by the example in Figure \ref{fig_markov_example}. The figure shows all state transitions relative to the centre state ($i,k$). For the purposes of explanation, only transitions to and from the centre state are shown. Starting at state ($i+1,k+1$), where $i+1$ replicas and $k+1$ nodes are present. If a node that contains a replica departs the network, the system moves to state ($i,k$): one fewer replica and one less node.
 
-If a node that does not contain a replica now departs from the network, the system moves from state ($x,y$) to ($x,y-1$): no fewer replicas and one fewer node. A node can join the network, which will have the model move from ($x,y-1$) to ($x,y$) and another node joining the network will move the system into state ($x,y$+1).
+If a node that does not contain a replica now departs from the network, the system moves from state ($i,k$) to ($i,k-1$): no fewer replicas and one fewer node. A node can join the network, which will have the model move from ($i,k-1$) to ($i,k$) and another node joining the network will move the system into state ($i,k+1$).
 
-A repair process can also occur. Repair is modeled as a complete repair, which instantly replaces all object replicas if sufficient nodes are available, otherwise it replaces replicas to the number of available nodes. With sufficient nodes available for a full repair, the system moves from state ($x,y$) to ($r,y$) or when the network size is smaller than the required number of replicas the system moves to state ($N,y$).
+A repair process can also occur. Repair is modeled as a complete repair, which instantly replaces all object replicas if sufficient nodes are available, otherwise it replaces replicas to the number of available nodes. With sufficient nodes available for a full repair, the system moves from state ($i,k$) to ($R,k$) or when the network size is smaller than the required number of replicas the system moves to state ($N,k$).
 
-The transitions in a Markov chain are classily characterised by the rate of moving from state $i$ to state $j$. For the dual states used in the model presented in this paper, state transition rates are characterised by moving from state $i k$ to state $j l$, where $i$ is the number of replicas in the current state, $k$ the number of nodes in the current state, $j$ the number of replicas in the next state, and $l$ the number of nodes in the next state. Every state transition rate can then be expressed as a dual state transition equation.
+The transitions in a Markov chain are classically characterised by the rate of moving from state $i$ to state $j$. For the dual states used in the model presented in this paper, state transition rates are characterised by moving from state $i k$ to state $j l$, where $i$ is the number of replicas in the current state, $k$ the number of nodes in the current state, $j$ the number of replicas in the next state, and $l$ the number of nodes in the next state. Every state transition rate can then be expressed as a dual state transition equation.
 
 In a continuous time Markov model, moving from one state to the next is characterised by transition rates, instead of the transition probabilities used in a discrete time Markov model. Let $\theta$ be the departure rate of nodes under steady state. For a current state of $i$ replicas, the departure rate of nodes containing replicas from the network is $i\theta$. This transition can be expressed in terms of the dual state transition equation: Equation \eqref{eq_rep_left}, where the next state contains one less replica and one less node than the current state.
 %
@@ -311,10 +336,12 @@ Making $\phi$ the subject of Equation \eqref{eq_phi_theta_ratio} produces Equati
 As stated earlier, a periodic repair mechanism is assumed. It is assumed that this mechanism repairs objects once every $T_{\textrm{repair}}$ time or at a rate of $\mu = 1/T_{\textrm{repair}}$, as shown in Equation \ref{eq_repair}. The number of replicas in the next state is either equal to the required number of replicas or the current number of nodes, whichever one is smallest, and the number of number remain the same as the current state.
 %
 \begin{equation} \label{eq_repair}
-    p(i k,j l)_{(\textrm{repair})} = \mu,\quad\textrm{for}\quad j = \min(r, l),\quad l = k,\quad i \neq j
+    p(i k,j l)_{(\textrm{repair})} = \mu,\quad\textrm{for}\quad j = \min(R, l),\quad l = k,\quad i \neq j
 \end{equation}
 
 No transitions other than the ones described above can occur in the presented Markov model, therefore $p(i k,j l) = 0$ for all other state transitions.
+
+\subsection{Node departure rate}
 
 The node departure rate $\theta$ can be calculated from the lifetime distributions of the nodes in the network. As in the related work discussed in Section \ref{related_work}, all node lifetimes are assumed to be statistically independent and exponentially distributed with the cumulative density function (CDF) of Equation \eqref{exp_dist}. The exponential distribution is characterised by the single ``rate'' parameter $\lambda$.
 %
@@ -322,45 +349,110 @@ The node departure rate $\theta$ can be calculated from the lifetime distributio
     F(x) = 1 - e^{-\lambda x},\quad\textrm{for}\quad \lambda > 0
 \end{equation}
 
-The departure rate of nodes correspond to the failure rate (also called the hazard rate) of the node lifetime distribution \cite{}. An advantage of the exponential distribution is its ``memoryless'' property, which has a constant failure rate $h = \lambda$ \cite{}. The exponential distribution is the only distribution with a constant failure rate. Node lifetimes modelled with other distributions will have to take into account the variability of the failure rate as a function of the node lifetime $h(x)$. For nodes with exponential lifetime distributions, the node departure rate is therefore $\theta = \lambda$.
+The departure rate of nodes correspond to the failure rate (also called the hazard rate) of the node lifetime distribution \cite{rausand2004systemreliability}. An advantage of the exponential distribution is its ``memoryless'' property, which has a constant failure rate $h = \lambda$ \cite{rausand2004systemreliability}. The exponential distribution is the only distribution with a constant failure rate. Node lifetimes modelled with other distributions will have to take into account the variability of the failure rate as a function of the node lifetime $h(x)$. For nodes with exponential lifetime distributions, the node departure rate is therefore $\theta = \lambda$.
 
-The Markov model presented in this paper possesses a large number of states. To calculate the total number of states, two groups of states are identified. The total number of states is the sum of the two groups. The first group of states is the group of states where the number of nodes in the network is greater or equal to the required number of replicas $k \geq r$. For every possible network size in this group, there are $r$ states and $N - r + 1$ possible network sizes. From this it is evident that there are $(N - r + 1)r$ of these states. The second group is the group where the number of nodes in the network is fewer than the required number of replicas. For every possible network size in this group, the number of states are equal to the number of nodes in the network, going from $r-1$ to 1. Equation \eqref{eq_states_num_init} shows the sum of states of these two groups, which gives the total number of states in Equation \eqref{eq_states_num_ans}.
+\subsection{Number of states}
+
+The Markov model presented in this paper possesses a large number of states. To calculate the total number of states, two groups of states are identified. The total number of states is the sum of the two groups. The first group of states is the group of states where the number of nodes in the network is greater or equal to the required number of replicas $k \geq R$. For every possible network size in this group, there are $R$ states and $N - R + 1$ possible network sizes. From this it is evident that there are $(N - R + 1)R$ of these states. The second group is the group where the number of nodes in the network is fewer than the required number of replicas. For every possible network size in this group, the number of states are equal to the number of nodes in the network, going from $R-1$ to 1. Equation \eqref{eq_states_num_init} shows the sum of states of these two groups, which gives the total number of states in Equation \eqref{eq_states_num_ans}.
 
 \begin{align}
-       S & = (N - r + 1)r + \sum_{x=1}^{r-1} x\label{eq_states_num_init}\\
-         & = (N - r + 1) + 0.5 (r - 1) r, \quad \textrm{after applying a stardard series formula}\notag \\
-         & = 0.5 r (2 N - r + 1), \quad\textrm{where}\quad N \geq r \label{eq_states_num_ans}
+       S & = R(N - R + 1) + \sum_{x=1}^{R-1} x\label{eq_states_num_init}\\
+         & = R(N - R + 1) + 0.5 (R - 1) R\notag\\
+         & = 0.5 R (2 N - R + 1), \quad\textrm{where}\quad N \geq R \label{eq_states_num_ans}
 \end{align}
 %
-If for example, a small network of 500 nodes with objects each having 10 replicas is modeled, the resulting Markov chain contains 4955 states. The large number of states makes a closed form solution to the object lifetime problem intractable. Fortunately, numerical methods can be used to calculate object lifetimes for a given numbers of replicas and maximum node sizes. Object lifetime can be calculated by calculating the expected time to absorbtion of the embedded continuous time Markov chain. To do this, the transitional rates matrix is partitioned into the form shown in Equation \eqref{matrix_partition}.
+If for example, a small network of 500 nodes with objects each having 10 replicas is modeled, the resulting Markov chain contains 4955 states. The large number of states makes a closed form solution to the object lifetime problem intractable. Fortunately, numerical methods can be used to calculate object lifetimes for a given numbers of replicas and maximum node sizes.
+
+\subsection{Calculating object lifetimes}
+
+Since each element in the transitional rates matrix is a rate, the sum of all the elements in a single row of the rates matrix gives the rate of moving from that state to any other state. The inverse of this rate is the expected time $t_i$ the Markov chain spends in state $i$, shown in Equation \eqref{eq_markov_rates}.
+%
+\begin{equation} \label{eq_markov_rates}
+    t_i = \left(\sum_{j} p_{i, j}\right)^{-1}\\
+\end{equation}
+
+In a Markov chain the sum of all rows in the transitional rates matrix \textbf{P} must equal one, where \textbf{P} is the transitional rates matrix containing the rates: $p(i k,j l)_{(\textrm{replica left})}$, $p(i k,j l)_{(\textrm{node left})}$, $p(i k,j l)_{(\textrm{node arrived})}$ and $p(i k,j l)_{(\textrm{repair})}$ presented earlier. For an embedded Markov chain, this result is achieved by normalising each row in the transitional rates matrix to produce the normalised transitional rates matrix \textbf{\^{P}}, where each row in the matrix must satisfy Equation \eqref{eq_markov_sum}.
+%
+\begin{equation} \label{eq_markov_sum}
+    \sum_{j} \hat{p}_{i, j} = 1
+\end{equation}
+
+Using the expected time spent in state $i$ from $t_i$, \textbf{\^{P}} is produces using Equation \eqref{eq_markov_normalisation}.
+
+\begin{equation} \label{eq_markov_normalisation}
+    \hat{p}_{i, j} = p_{i, j} t_i
+\end{equation}
+
+Object lifetime can be calculated by calculating the expected time to absorbtion of the embedded continuous time Markov chain. To do this, the normalised transitional rates matrix is partitioned into the form shown in Equation \eqref{matrix_partition}. Every state transition can be considered as a discrete event. When this is done, the continuous time Markov chain is said to be ``embedded'' and theory from discrete time Markov chains can be used, with the exception that events are not equally spaced in time.
 
 \begin{equation} \label{matrix_partition}
-    \textbf{P} = \left[\begin{array}{c|c}
+    \textbf{\^{P}} = \left[\begin{array}{c|c}
                    \textbf{Q} & \textbf{R} \\
                    \hline
                    \textbf{0} & \textbf{I}
                  \end{array}\right],
 \end{equation}
+
+\textbf{\^{P}} is partitioned in such a way that all absorbing states are in the last row and columns of \textbf{\^{P}}. Suppose there are $a$ absorbing states and $\tau$ transient states in the model. The matrix \textbf{Q} is then a $\tau\times\tau$ sub-matrix of \textbf{\^{P}} that contains all transient states. \textbf{I} is a $a \times a$ identity matrix, \textbf{0} is a $a\times\tau$ zero matrix and \textbf{R} (not to be confused with $R$) is a nonzero $\tau\times a$ matrix.
+
+From \textbf{Q}, the fundamental matrix \textbf{N} may be calculated as shown in Equation \eqref{eq_fundamental_mat} \cite{grinstead1997introduction_probability},
 %
-where \textbf{P} is the transitional rates matrix containing the rates: $p(i k,j l)_{(\textrm{replica left})}$, $p(i k,j l)_{(\textrm{node left})}$, $p(i k,j l)_{(\textrm{node arrived})}$ and $p(i k,j l)_{(\textrm{repair})}$, where each row has been normalised to ensure the sum of all columns of each row is 1.
-
-\begin{equation}
-    \textbf{N} = (\textbf{I} - \textbf{Q})^{-1}
+\begin{equation} \label{eq_fundamental_mat}
+    \textbf{N} = (\textbf{I} - \textbf{Q})^{-1},
 \end{equation}
+%
+where \textbf{I} is the identity matrix. Every element $n_{x,y}$ in the fundamental matrix \textbf{N} gives the expected number of times that the model is in the state $y$, if it started in the transient state $x$.
 
-\begin{equation}
+The expected time to absorbtion is then the product of the time spent in each state and the expected number of times a state will be entered, as shown in Equation \eqref{expected_lifetime}.
+%
+\begin{equation} \label{expected_lifetime}
     \textbf{E[L]} = \textbf{Nt}
 \end{equation}
 
 \section{Model results}
 \label{results}
 
-The work is described.
+The equations developed in Section \ref{model} were implemented in Matlab, with sweeps performed over all parameters in questions. The results of these sweeps will be shown in this section and compared to the theoretical results of related work presented in Section \ref{related_work}.
 
-\section{Simulation}
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=2.5cm 1.0cm 27.5cm 19.15cm, width=\columnwidth]{lifetime_av_init_groupsize}
+ \caption{Surface plot of expected object lifetimes as functions of initial and average group sizes.}
+ \label{fig_markov_example}
+\end{figure}
+
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=2.5cm 1.0cm 27.5cm 19.15cm, width=\columnwidth]{lifetime_av_init_groupsize_norep}
+ \caption{Surface plot of expected object lifetimes as functions of initial and average group sizes.}
+ \label{fig_markov_example}
+\end{figure}
+
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=2.5cm 1.0cm 27.5cm 19.15cm, width=\columnwidth]{lifetime_replicas_av_groupsize}
+ \caption{Surface plot of expected object lifetimes as functions of initial and average group sizes.}
+ \label{fig_markov_example}
+\end{figure}
+
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=1.5cm 6.5cm 26.5cm 20cm, width=\columnwidth]{lifetime_replication_repair}
+ \caption{Surface plot of expected object lifetimes as functions of initial and average group sizes.}
+ \label{fig_markov_example}
+\end{figure}
+
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=2.0cm 1.0cm 27.5cm 20cm, width=0.7\columnwidth]{lifetime_av_models_compare}
+ \caption{Surface plot of expected object lifetimes as functions of initial and average group sizes.}
+ \label{fig_markov_example}
+\end{figure}
+
+\section{Pithos simulation}
 \label{simulation}
 
-The work is described.
+To determine practical usability of the theoretical results presented in Section \ref{results}, a comparison was performed against the Pithos simulation \cite{Pithos_mmve_2011}.
 
 
 \section{Comparison}
