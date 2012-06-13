@@ -8,7 +8,7 @@ type = 'exponential';
 r = 10;
 
 %The maximum number of nodes in the larger network
-n = 100;
+n = 500;
 
 group_size_av = 7;
 
