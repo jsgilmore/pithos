@@ -240,22 +240,32 @@ This paper mainly extends and improves upon the work by Wu, Tian and Ng \cite{re
 
 Our paper focuses on the object lifetime characteristic. Wu, Tian and Ng find two closed loop expressions for object lifetime when exponentially distributed node lifetimes are assumed. One for the case without object repair, shown in Equation \eqref{eq_other_lifetime_norep}, and one for the case with object repair, shown in Equation \eqref{eq_other_lifetime_rep} \cite{replication_article}.
 
+Variable names of the equations have been altered to be consistent with the notation used in the remainder of this paper, where $\lambda$ is the rate parameter of the exponential distribution, $\theta$ is the steady state node departure rate, $R$ is the required number of object replicas and $\mu$ is the object repair rate. All variables will be introduced in detail in Section \ref{model}.
+
 \begin{equation} \label{eq_other_lifetime_norep}
     E[L] = \sum_{i = 1}^{R}{{R}\choose{i}}\frac{(-1)^{(i+1)}}{\lambda i}
 \end{equation}
+
+Node residual lifetimes are used when calculating expected object lifetimes without repair, as expressed in Equation \eqref{eq_other_lifetime_norep}. When an object is stored in the network, it is replicated on a certain number of nodes. The object lifetime is equal to the maximum residual lifetime of the nodes it was replicated on.
 
 \begin{equation} \label{eq_other_lifetime_rep}
     E[L] = \frac{1}{\prod_{k=1}^{R-1}\frac{k\theta}{k\theta+\mu}} \left[\frac{1}{R\theta} + \left(1 - \prod_{k=1}^{R-1}\frac{k\theta}{k\theta + \mu}\right)\frac{1}{\mu}\right]
 \end{equation}
 
-Variable names of the equations have been altered to be consistent with the notation used in the remainder of this paper, where $\lambda$ is the rate parameter of the exponential distribution, $\theta$ is the node departure rate, $R$ is the required number of object replicas and $\mu$ is the object repair rate.
+A continuous time Markov chain is used to model the expected object lifetimes for the case with repair, given in Equation \eqref{eq_other_lifetime_rep}. The Markov model itself is shown in Figure \ref{fig_other_markov_chain}.
 
 \begin{figure}[htbp]
  \centering
  \includegraphics[clip=true, viewport=0.0cm 27.5cm 8.0cm 30.0cm, width=0.7\columnwidth]{inifinite_network_chain}
  \caption{Markov chain modeling object replica number for an infinite network size}
- \label{fig_markov_chain}
+ \label{fig_other_markov_chain}
 \end{figure}
+
+The model has $R+1$ states and is in state $k$ when $R+1-k$ replicas are alive in the network. The system is, therefore, in state $1$ when all replicas are present and in state $R+1$ when no replicas are present. If the node departure rate under steady state is $\theta$ and there are $r$ replicas present in the network, the replica departure rate under steady state is $r\theta$.
+
+It is assumed that the Markov chain can lose a single replica at any time instance and that when repair occurs, at a rate of $\mu = 1/T_{\textrm{repair}}$, all replicas are replaced and the object is as healthy as it was when it was initially stored.
+
+Our paper improves on the work by Wu, Tian and Ng \cite{replication_article} in two ways: firstly, the model is extended to take into account a finite network size. The fact that there might not be sufficient nodes to replicate the data on when objects are stored or when the repair mechanism activates. Secondly, our model unifies the cases with and without repair, to produce a single model where the effects of both might be seen. As expected, when our model is used to model larger average network sizes, expected object lifetimes converge to those shown in the work by Wu, Tian and Ng, using their two separate models.
 
 \section{The model}
 \label{model}
@@ -289,7 +299,7 @@ There are four types of state transitions possible in our Markov model:
 
 \begin{figure}[htbp]
  \centering
- \includegraphics[clip=true, viewport=0.0cm 24.5cm 5.0cm 30cm, width=0.4\columnwidth]{Markov_example}
+ \includegraphics[clip=true, viewport=0.0cm 24.5cm 5.0cm 30cm, width=0.6\columnwidth]{Markov_example}
  \caption{Markov chain modeling object replica number as well as network size}
  \label{fig_markov_example}
 \end{figure}
@@ -328,12 +338,12 @@ $N$ should be chosen sufficiently large, compared to the average network size $\
 %
 \begin{align}
     (N - \tilde{n})\phi &= \tilde{n}\theta\label{eq_phi_theta_ratio}\\
-    \phi &= \frac{\tilde{n}\theta}{N - \tilde{n}},
+    \phi &= \frac{\tilde{n}\theta}{N - \tilde{n}}\label{eq_phi}
 \end{align}
 %
-Making $\phi$ the subject of Equation \eqref{eq_phi_theta_ratio} produces Equation \eqref{eq_phi_theta_ratio}, which provides a value for $\phi$ that will produce a network with the desired average network size, for a given $\theta$ and $N$.
+Making $\phi$ the subject of Equation \eqref{eq_phi_theta_ratio} produces Equation \eqref{eq_phi}, which provides a value for $\phi$ that will produce a network with the desired average network size, for a given $\theta$ and $N$.
 
-As stated earlier, a periodic repair mechanism is assumed. It is assumed that this mechanism repairs objects once every $T_{\textrm{repair}}$ time or at a rate of $\mu = 1/T_{\textrm{repair}}$, as shown in Equation \ref{eq_repair}. The number of replicas in the next state is either equal to the required number of replicas or the current number of nodes, whichever one is smallest, and the number of number remain the same as the current state.
+As stated earlier, a periodic repair mechanism is assumed. It is assumed that this mechanism repairs objects once every $T_{\textrm{repair}}$ time or at a rate of $\mu = 1/T_{\textrm{repair}}$, as shown in Equation \ref{eq_repair}. The number of replicas in the next state is either equal to the required number of replicas or the current number of nodes, whichever one is smallest, and the number of nodes remain the same as in the current state. When no replicas are missing, no repair occurs.
 %
 \begin{equation} \label{eq_repair}
     p(i k,j l)_{(\textrm{repair})} = \mu,\quad\textrm{for}\quad j = \min(R, l),\quad l = k,\quad i \neq j
@@ -412,42 +422,64 @@ The expected time to absorbtion is then the product of the time spent in each st
 \section{Model results}
 \label{results}
 
-The equations developed in Section \ref{model} were implemented in Matlab, with sweeps performed over all parameters in questions. The results of these sweeps will be shown in this section and compared to the theoretical results of related work presented in Section \ref{related_work}.
+The equations developed in Section \ref{model} were implemented in Matlab, with sweeps performed over all parameters in questions. The results of these sweeps will be shown in this section and compared to the theoretical results of related work presented in Section \ref{related_work}. For all results presented here, the following parameter values are used: a maximum network size of $N=120$, a required number of replicas of $R = 10$ and exponential node lifetime distributions with $\lambda = \theta = 1/1800$, which gives expected \emph{node} lifetimes of $1800$ seconds.
+
+%Maybe explain where these values come from or why the were used.
 
 \begin{figure}[htbp]
  \centering
- \includegraphics[clip=true, viewport=2.5cm 1.0cm 27.5cm 19.15cm, width=\columnwidth]{lifetime_av_init_groupsize}
- \caption{Surface plot of expected object lifetimes as functions of initial and average group sizes.}
- \label{fig_markov_example}
+ \includegraphics[clip=true, viewport=2.0cm 1.0cm 27.5cm 19.15cm, width=\columnwidth]{lifetime_av_init_groupsize}
+ \caption{Surface plot of expected object lifetimes as functions of initial and average network sizes for $\mu = 1/180$.}
+ \label{fig_lifetime_average_vs_initial_rep}
 \end{figure}
+
+Figure \ref{fig_lifetime_average_vs_initial} shows a surface plot of expected object lifetimes against initial and average network sizes for a repair rate of $\mu = 1/180$ (or $T_{\textrm{repair}}$ $10\%$ of the expected node lifetime). It is evident that object lifetimes decrease greatly for average network sizes smaller than 20 nodes. This is the case any time the average network size is comparable to the required number of replicas.
+
+Figure \ref{fig_lifetime_average_vs_initial} also shows that expected object lifetimes decrease when the initial network size is smaller than the required number of replicas. The percentage decrease is studied in more depth, later in this section.
 
 \begin{figure}[htbp]
  \centering
  \includegraphics[clip=true, viewport=2.5cm 1.0cm 27.5cm 19.15cm, width=\columnwidth]{lifetime_av_init_groupsize_norep}
- \caption{Surface plot of expected object lifetimes as functions of initial and average group sizes.}
- \label{fig_markov_example}
+ \caption{Surface plot of expected object lifetimes as functions of initial and average network sizes for $\mu = 0$.}
+ \label{fig_lifetime_average_vs_initial_norep}
 \end{figure}
+
+Figure \ref{fig_lifetime_average_vs_initial_norep} illustrates the effects of initial network size and average network size on expected object lifetime when no repair is performed. For the case of no repair, the average network size has no effect on the expected object lifetime. This result is intuitive, since an object's lifetime only depends on the lifetimes of the nodes on which it was initially placed when no repair is performed.
+
+The initial network size, on the other hand, has a significant effect on the expected object lifetime. Object lifetimes decrease when fewer replicas than the required number of replicas can be stored.
 
 \begin{figure}[htbp]
  \centering
  \includegraphics[clip=true, viewport=2.5cm 1.0cm 27.5cm 19.15cm, width=\columnwidth]{lifetime_replicas_av_groupsize}
- \caption{Surface plot of expected object lifetimes as functions of initial and average group sizes.}
- \label{fig_markov_example}
+ \caption{Surface plot of expected object lifetimes as functions of average network size and required number of replicas $R$ for $mu = 1/180$.}
+ \label{fig_lifetime_average_vs_replicas}
 \end{figure}
+
+Figure \ref{fig_lifetime_average_vs_replicas} depicts expected object lifetime as functions of average network size and required number of replicas $R$ for a repair rate of $\mu = 1/180$. To generate this figure, $R$ is swept from 1 to 10 to illustrate the effect that an increase in the number of replicas has on the expected node lifetime. The figure shows that an increase in $R$ leads to an exponential increase in the expected object lifetime, but that this gain is limited when the average network size is small, compared to the required number of replicas.
 
 \begin{figure}[htbp]
  \centering
- \includegraphics[clip=true, viewport=1.5cm 6.5cm 26.5cm 20cm, width=\columnwidth]{lifetime_replication_repair}
- \caption{Surface plot of expected object lifetimes as functions of initial and average group sizes.}
- \label{fig_markov_example}
+ \includegraphics[clip=true, viewport=1.0cm 6.5cm 24.7cm 22.0cm, width=0.9\columnwidth]{lifetime_replication_repair}
+ \caption{Comparison of the effects of different repair rates on object lifetime for initial network sizes smaller than the required number of replicas.}
+ \label{fig_lifetime_replication_effect_on_initial}
 \end{figure}
+
+Figure \ref{fig_lifetime_replication_effect_on_initial} illustrates the effect various repair rates have on the object lifetime as functions of initial network size. The figure was generated with an average network size of 50 nodes. The figure shows that for higher repair rates, object lifetimes are less influenced by the case where insufficient replicas were available for storage.
+
+This result is also intuitive. For a sufficiently large average network size, if there were insufficient nodes available in the network at the time when an object was stored, if the repair rate is high, as soon as the network size increases, the object will be repaired to the same number of replicas as every other object in the network. This would mean less dependance on initial network size.
 
 \begin{figure}[htbp]
  \centering
- \includegraphics[clip=true, viewport=2.0cm 1.0cm 27.5cm 20cm, width=0.7\columnwidth]{lifetime_av_models_compare}
+ \includegraphics[clip=true, viewport=1.0cm 6.5cm 26.5cm 20.5cm, width=0.9\columnwidth]{lifetime_av_models_compare}
  \caption{Surface plot of expected object lifetimes as functions of initial and average group sizes.}
- \label{fig_markov_example}
+ \label{fig_lifetime_vs_other_model}
 \end{figure}
+
+Figure \ref{fig_lifetime_vs_other_model} compares the model presented in this paper with the model of Wu, Tian and Ng that assumes object repair \cite{replication_article}. For this figure, a repair rate of $\mu = 1/180$ and a required number of replicas of $R = 10$ were used. A shown, because the model by Wu, Tian and Ng does not take average network size into account (or initial network size for that matter) it cannot predict the object lifetimes correctly for average network sizes comparable to the required number of replicas.
+
+On the other hand, a reliability test of the model presented in this paper is that for sufficiently large network sizes, the model should converge to a model that effectively assumes an infinite network size. This is also shown to be the case.
+
+What remains is to compare the model presented in this paper with practical results.
 
 \section{Pithos simulation}
 \label{simulation}
