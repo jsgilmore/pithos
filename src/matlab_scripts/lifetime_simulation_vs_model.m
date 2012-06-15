@@ -3,13 +3,13 @@ clear all
 
 %Which group's data to load
 %The folder to load the data from
-folder = '20_10_size15_100_exp_1';
+folder = 'none_10_size30_100_exp_1';
 
 %Number of replications in the simulation
 r = 10;
 
 %Repair rate as set in the simulation
-repair_rate = 1/20;
+repair_rate = 0;
 
 %Repair success factor as measured after the simulation
 repair_factor = 0.7;
@@ -64,10 +64,20 @@ expected_lifetimes = object_lifetime(r, N, theta, phi, mu);
 %Draw some cool looking graphs
 %--------------------------------------------------------------------------
 %This only works if one has Matlab's statistical toolbox
-boxplot(initial_size_objects(:, 2), initial_size_objects(:,1), 'notch', 'on', 'whisker', 10);
+set(gca, 'FontSize', 24) 
+box = boxplot(initial_size_objects(:, 2), initial_size_objects(:,1), 'notch', 'on', 'whisker', 10);
 ylabel('Object lifetime (s)');
-xlabel('Initial group size');
-title('Box plot of measured object lifetimes vs. initial group size for any maximum group size.');
+xlabel('Initial network size');
+
+%Adjust x-axis sizes and positions of the stupid boxplot object
+text_h = findobj(gca, 'Type', 'text');
+for cnt = 1:length(text_h)
+        set(text_h(cnt), 'FontSize', 24);
+        yshift=get(text_h(cnt), 'Position');
+        yshift(2)=-35;
+        set(text_h(cnt), 'Position', yshift);
+end
+
 hold on
 plot(means, 'rx');
 plot(expected_lifetimes(min(initial_groupsize(:, 2)):max(initial_groupsize(:, 2))), 'k');
