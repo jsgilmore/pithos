@@ -186,19 +186,15 @@ mail: jgilmore@ml.sun.ac.za and hebrecht@sun.ac.za}}}
 
 \begin{abstract}
 %\boldmath
-Peer-to-peer network storage systems regularly make use of object replication to achieve sufficient levels of reliability under network churn. To maintain reliability, a repair mechanism is employed, which replaces destroyed replicas. For a given system with an expected churn rate, network size and repair rate, it will be beneficial to know the expected object lifetimes. That is to say, the expected time that an object will remain available in the storage network under known network conditions. This paper proposes an embedded continuous time Markov chain to model objects replicated in a network under churn, with repair. Object lifetimes are found to be dependant on peer departure and arrival rates, initial network size and the maximum network size experienced by an object during its lifetime. The theoretical model results are compared to an Omnet++ network simulation and found to compare favourably.
+Distributed network storage systems regularly make use of object replication to achieve sufficient levels of reliability under network churn. To maintain reliability, a repair mechanism is employed, which replaces destroyed replicas. For a given system with an expected churn rate, network size and repair rate, it will be beneficial to know the expected object lifetimes. That is to say, the expected time that an object will remain available in the storage network under known network conditions. This paper proposes an embedded continuous time Markov chain to model objects replicated in a network under churn, with repair. Object lifetimes are found to be dependant on node departure and arrival rates, initial network size and the maximum network size experienced by an object during its lifetime. The theoretical model results are compared to an Omnet++ network simulation and found to compare favourably.
 \end{abstract}
 
 \section{Introduction}
 \label{introduction}
 
-Research into distributed systems have received significant research attention over the past few years \cite{}. One of the reasons this has occurred is due to the high costs involved in running centralised systems \cite{}. Centralised systems usually require expensive servers to serve the clients. The interest in distributed systems was initiated by the realisation that for some applications, client machines possess sufficient resources to theoretically serve themselves, thereby removing the need for a server and allowing for significant cost savings \cite{}.
+Distributed storage systems store objects on a number of nodes in a storage network. Data stored in a distributed storage system is distributed amongst all nodes requiring use of the storage service. This is opposed to centralised storage that stores objects on a single server in a file database. Distributed storage systems have been developed to remove the need for an expensive centralised data server. Examples of distributed storage systems include ``Oceanstore'', ``CFS'', ``Freenet'' and ``PAST'' to name a few \cite{distributed_storage_survey}.
 
-One application of the distributed architecture is the distributed storage system. In centralised storage systems, data are stored on a single machine. The machine can either be a remote data server, or the local machine itself. In attempting to remove the need for a data server, distributed storage systems have been developed. Examples of distributed storage systems include ``Oceanstore'', ``BitTorrent'', ``Freenet'' and ``Past''.
-
-Data stored in a distributed storage system is physically stored on all nodes requiring storage. The issue with this storage scheme is that nodes are connected to the network of their own volition and can leave the network at any time. Nodes joining and leaving the network cause network churn that will eventually destroy any objects stored in the network. The fact that all objects are eventually destroyed, i.e. have a finite lifetime, will be shown by our model in Section \ref{model}.
-
-Because all objects will eventually be destroyed in a distributed storage system, the goal is to design the system so all objects are available for a sufficiently long time. In distributed hash table (DHT) systems, for example, an object usually has a specified time-to-live (TTL), because of the difficulties in deleting objects in the system. Objects in this system just have to live as long as their TTL. In other archival storage systems, objects lifetimes are made longer than the expected lifetime of the systems (thousands of years for example).
+Nodes are usually connected to the storage network of their own volition and can leave the network at any time, this causes network churn that will eventually destroy any objects stored in the network, as discussed in Section \ref{model}. Because of finite object lifetimes, the goal is to design the storage system so all objects are available for a sufficiently long time. In distributed hash table (DHT) systems, for example, an object usually has a specified time-to-live (TTL), because of the difficulties in deleting objects in the system. Objects in this system just have to live as long as their TTL. In other archival storage systems, object lifetimes are made longer than the expected lifetime of the systems (thousands of years for example).
 
 In order to design such a storage system, it is therefore of great interest to know the expected lifetime of objects in the system under the expected network conditions and to be able to alter parameters in a predictable way to choose object lifetimes. While other papers, which will be reviewed in Section \ref{related_work}, have also looked at the problem of object lifetimes, none have considered the issue of limited size networks.
 
@@ -212,26 +208,23 @@ Section \ref{model} introduces the model that we developed to model object lifet
 %
 Section \ref{results} presents the results obtained from the model,
 %
-Section \ref{simulation} briefly introduces the Pithos simulation,
-%
-Section \ref{comparison} compares the model results with simulation results as well as results from other models and
+Section \ref{simulation} briefly introduces the Pithos simulation and compares the model results with simulation results, and
 %
 Section \ref{conclusion} concludes.
 
 \section{Background}
 \label{background}
 
-When there is referred to a distributed storage system in this paper, it is assumed that there exists some higher layer application that generates objects which it sends to the storage system for storage. The storage system attempts to store an object for as long as possible.
+A distributed storage system assumes some higher layer application that generates objects which it sends to the storage system for storage. The storage system attempts to store an object for as long as possible or until its TTL expires. In an attempt to maximise the time an object is available within the storage system, two techniques are used: redundancy and repair.
 
-In an attempt to maximise the time an object exists within the storage system, two techniques are used. These are replication and repair.
+Two types of redundancy schemes are discussed: replication and erasure coding. Replication stores multiple copies of an object. Only when all nodes containing object replicas have left the network, is the object no longer available.
+%Which storage schemes use replication
 
-\subsection{Replication schemes}
+In a storage system using replication, $R$ replicas of an object are stored for every object received from the higher layer for storage. The number of required replicas $R$ is a design decision, the effect of which will be shown in Section \ref{results}. When all nodes containing an object's replicas have left the network, the object is no longer available.
 
-There exists two types of what can be termed replication in distributed storage: simple replication and erasure coding \cite{}.
+Another redundancy scheme used to prolong object lifetime is erasure coding \cite{erasure_codes}. Erasure coding in its original form is not considered suitable for distributed storage systems, because of the large overhead due to the low availability of nodes in a distributed storage network. Hybrid techniques have been proposed to remedy this weakness at the cost of additional complexity \cite{erasure_coding_vs_replication}, \cite{erasure_code_improvements}. This paper will consider only the object replication redundancy scheme.
 
-In a storage system using simple replication, $R$ replicas of an object are stored for every object received from the higher layer for storage. Where the number of required replicas $R$ is a design decision, which will be discussed in Section \ref{}. This has the effect that an object will remain available until the peer with the longest lifetimes on which it was stored leaves the network, when no repair is done. Intuitively then, it can be expected that the higher the value of $R$, the longer an object will live. This will be shown to be the case in Section \ref{results}.
-
-\subsection{Repair schemes}
+Repair schemes are also employed in distributed storage systems. The repair mechanism replicates missing object replicas on nodes that do not yet contain any. This replaces lost replicas and theoretically returns an object to the state it was in when it was first stored. A focus of this paper is where an object cannot be repaired to its original number of replicas, due to limited network size.
 
 \section{Related work}
 \label{related_work}
@@ -505,13 +498,6 @@ Figure \ref{fig_lifetime_simulation_model_none_100} compares the theoretical res
 
 The expected object lifetimes as predicted by the theoretical model pass through the crosses that show the simulation data means. It can, therefore, be seen that the theoretical model matches the simulation data well for the case with no repair.
 
-%\begin{figure}[htbp]
-% \centering
-% \includegraphics[clip=true, viewport=0.5cm 7.0cm 26.0cm 20.0cm, width=\columnwidth]{lifetime_simulation_model_500_100}
-% \caption{Comparison of object lifetime simulation results, as a box plot, with theoretical model results for a repair time of $500 s$, node lifetimes of $100 s$ and an average network size of 7 nodes.}
-% \label{fig_lifetime_vs_other_model}
-%\end{figure}
-
 \begin{figure}[htbp]
  \centering
  \includegraphics[clip=true, viewport=0.5cm 7.0cm 26.0cm 21cm, width=\columnwidth]{lifetime_simulation_model_20_100}
@@ -523,11 +509,27 @@ Figure \ref{fig_lifetime_simulation_model_20_100} shows simulation data and theo
 
 One issue that was encountered when comparing simulation data to model data was the imperfect repair scheme used in simulation. In the simulation, every $T_{\textrm{repair}}$ time, a repair of all objects in the system is initiated. There is, however, a chance that the node that was chosen to repair an object leaves the network before the repair can complete. This reduces the effectiveness of the repair mechanism, effectively reducing the repair rate. The percentage repair successes was measured during simulation and found to be $70 \%$. All repair rates in the simulation were adjusted with this number, which successfully aligned the simulation data means with the model data means.
 
+What is evident from all box-and-whiskers plots is the large variance and large maximum values of object lifetimes measured in the simulation. This ``heavy-tailed'' distribution is also evident when looking at the overall object lifetime distribution shown in Figure \ref{fig_object_lifetimes}. 
+
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=0.5cm 6.0cm 26.0cm 20.5cm, width=0.8\columnwidth]{object_lifetimes}
+ \caption{Simulated object lifetime distribution}
+ \label{fig_object_lifetimes}
+\end{figure}
+%
+This shows that although expected object lifetimes can be accurately predicted, actual object lifetimes can vary greatly from the mean and can be much longer than expected. The heavy-tailed distribution might be as a consequence of an effect that is not yet being modelled.
 
 \section{Conclusion}
 \label{conclusion}
 
-We reach some conclusion.
+A Markov chain that takes network size into account when predicting object lifetimes was presented in this paper. Results show that when the average network size is comparable to the required number of replicas, object lifetimes are significantly decreased.
+
+The theoretical model was shown to be equivalent to a model that ignores network size, when the average network size is large, compared to the required number of replicas. The model was also shown to compare well to simulation, with mean values being almost equal.
+
+Although lifetimes means of the model were found to match well with the simulation, the simulation data showed a large variance, with a heavy tailed distribution. This leads one to believe that some other effect exists that is not yet being modelled. Further research into the phenomenon is required.
+
+%What remains to be done.
 
 %\newpage
 % use section* for acknowledgement
