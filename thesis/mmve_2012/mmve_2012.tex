@@ -442,7 +442,7 @@ The equations developed in Section \ref{model} were implemented in Matlab, with 
 
 \begin{figure}[htbp]
  \centering
- \includegraphics[clip=true, viewport=2.0cm 1.0cm 27.5cm 19.15cm, width=\columnwidth]{lifetime_av_init_groupsize}
+ \includegraphics[clip=true, viewport=2.0cm 1.0cm 27.5cm 19.15cm, width=0.8\columnwidth]{lifetime_av_init_groupsize}
  \caption{Surface plot of expected object lifetimes as functions of initial and average network sizes for $\mu = 1/180$.}
  \label{fig_lifetime_average_vs_initial_rep}
 \end{figure}
@@ -453,7 +453,7 @@ Figure \ref{fig_lifetime_average_vs_initial} also shows that expected object lif
 
 \begin{figure}[htbp]
  \centering
- \includegraphics[clip=true, viewport=2.5cm 1.0cm 27.5cm 19.15cm, width=\columnwidth]{lifetime_av_init_groupsize_norep}
+ \includegraphics[clip=true, viewport=1.5cm 1.0cm 27.5cm 19.15cm, width=0.8\columnwidth]{lifetime_av_init_groupsize_norep}
  \caption{Surface plot of expected object lifetimes as functions of initial and average network sizes for $\mu = 0$.}
  \label{fig_lifetime_average_vs_initial_norep}
 \end{figure}
@@ -464,7 +464,7 @@ The initial network size, on the other hand, has a significant effect on the exp
 
 \begin{figure}[htbp]
  \centering
- \includegraphics[clip=true, viewport=2.5cm 1.0cm 27.5cm 19.15cm, width=\columnwidth]{lifetime_replicas_av_groupsize}
+ \includegraphics[clip=true, viewport=2.5cm 1.0cm 27.5cm 19.15cm, width=0.8\columnwidth]{lifetime_replicas_av_groupsize}
  \caption{Surface plot of expected object lifetimes as functions of average network size and required number of replicas $R$ for $mu = 1/180$.}
  \label{fig_lifetime_average_vs_replicas}
 \end{figure}
@@ -473,18 +473,7 @@ Figure \ref{fig_lifetime_average_vs_replicas} depicts expected object lifetime a
 
 \begin{figure}[htbp]
  \centering
- \includegraphics[clip=true, viewport=1.0cm 6.5cm 24.7cm 22.0cm, width=0.9\columnwidth]{lifetime_replication_repair}
- \caption{Comparison of the effects of different repair rates on object lifetime for initial network sizes smaller than the required number of replicas.}
- \label{fig_lifetime_replication_effect_on_initial}
-\end{figure}
-
-Figure \ref{fig_lifetime_replication_effect_on_initial} illustrates the effect various repair rates have on the object lifetime as functions of initial network size. The figure was generated with an average network size of 50 nodes. The figure shows that for higher repair rates, object lifetimes are less influenced by the case where insufficient replicas were available for storage.
-
-This result is also intuitive. For a sufficiently large average network size, if there were insufficient nodes available in the network at the time when an object was stored, if the repair rate is high, as soon as the network size increases, the object will be repaired to the same number of replicas as every other object in the network. This would mean less dependance on initial network size.
-
-\begin{figure}[htbp]
- \centering
- \includegraphics[clip=true, viewport=1.0cm 6.5cm 26.5cm 20.5cm, width=0.9\columnwidth]{lifetime_av_models_compare}
+ \includegraphics[clip=true, viewport=1.0cm 6.5cm 26.5cm 20.5cm, width=0.8\columnwidth]{lifetime_av_models_compare}
  \caption{Surface plot of expected object lifetimes as functions of initial and average group sizes.}
  \label{fig_lifetime_vs_other_model}
 \end{figure}
@@ -498,15 +487,15 @@ What remains is to compare the model presented in this paper with some practical
 \section{Comparison with Pithos simulation}
 \label{simulation}
 
-To determine practical usability of the theoretical results presented in Section \ref{results}, a comparison was performed against the Pithos simulation \cite{Pithos_mmve_2011}.
+To determine practical usability of the theoretical results presented in Section \ref{results}, a comparison was performed against the Pithos simulation \cite{Pithos_mmve_2011}. Pithos is a hierarchical distributed storage system that uses grouping to reduce latencies of store and retrieve requests, as is required by massively multiuser virtual environments (MMVEs) \cite{gilmore_p2p_mmog_state_persistency}. A single group was used to allow for control over the average network size.
 
-%Explain the basics of Pithos 
+The Oversim environment contains churn generators that create \emph{peers} with lifetimes sampled from an exponential distribution. A single \emph{super peer} was also created and never destroyed. Super peers allow new nodes to join the group by working with the dedicated \emph{directory server} for network bootstrapping. A single group was used, because multiple groups have different average group sizes during different simulations. This created a situation where too few object lifetime measurements could be made to obtain a statistically significant lifetime measurement for a given average group size.
 
-Pithos was used to generate simulation data to compare with the theoretical model. A single group was used to allow for control over the average network size. All nodes posses exponential lifetime distributions to match the theoretical model.
+During a simulation run, the \emph{Pithos test application} would generate random objects and require these objects to be stored in the network. Every node only generated objects for a specified amount of time. This is done to limit the total number of objects present in the system to a few hundred thousand. For numbers larger than this, the simulation would run out of memory and grind to a halt. Memory was always an issue when simulating the case with repair, because objects live much longer, there are many more objects in the system. To allow simulation of this case, the Pithos simulation was deployed on a ``High-Memory Quadruple Extra Large Instance'' in the Amazon EC2 cloud, which contains 68.4 GB of RAM.
 
-``Box and whiskers plots'' are used to compare the simulation data with the theoretical model. This allows for comparisons of mean values, but also shows how the data are distributed. In the box plot, the black striped whiskers show the minima and maxima of the data sets. The lower and upper bounds of the boxes show the 25th and 75th percentile of the simulation data respectively. The horizontal lines in the boxes show the medians of the data, and the ``notches'' around the medians show the 5\% significance levels. Two medians are significantly different if their significance intervals do not overlap \cite{}.
+The super peer tracks all objects present in the group, including on which peers they reside. Whenever the super peer is informed by another peer that some peer has left the network, it can check how many other peers every object is still stored on. When the last peer containing an object leaves, an object starvation event occurs and the relevant statistics are collected.
 
-The cross present in every box shows the simulation data mean and the solid line running through the boxes shows expected object lifetimes as predicted by the theoretical model.
+``Box and whiskers plots'' are used to compare the simulation data with the theoretical model. This allows for comparisons of mean values, but also shows how the data are distributed. In the box plot, the black striped whiskers show the minima and maxima of the data sets. The lower and upper bounds of the boxes show the 25th and 75th percentile of the simulation data respectively. The horizontal lines in the boxes show the medians of the data, and the ``notches'' around the medians show the 5\% significance levels. The cross present in every box shows the simulation data mean and the solid line running through the boxes shows expected object lifetimes as predicted by the theoretical model.
 
 \begin{figure}[htbp]
  \centering
@@ -521,25 +510,14 @@ The expected object lifetimes as predicted by the theoretical model pass through
 
 \begin{figure}[htbp]
  \centering
- \includegraphics[clip=true, viewport=0.5cm 7.0cm 26.0cm 21cm, width=\columnwidth]{lifetime_simulation_model_20_100}
+ \includegraphics[clip=true, viewport=1.2cm 7.0cm 26.0cm 21cm, width=\columnwidth]{lifetime_simulation_model_20_100}
  \caption{Comparison of object lifetime simulation results, as a box plot, with theoretical model results for a repair time of $20 s$, node lifetimes of $100 s$ and an average network size of 7 nodes.}
  \label{fig_lifetime_simulation_model_20_100}
 \end{figure}
 %
 Figure \ref{fig_lifetime_simulation_model_20_100} shows simulation data and theoretical model data for the same parameters as the previous figure, but for the case with $20 s$ repair time. A significant increase in object lifetimes can be observed. Again, the expected object lifetime as predicted by the model pass through the measured object lifetime means of the simulations.
 
-One issue that was encountered when comparing simulation data to model data was the imperfect repair scheme used in simulation. In the simulation, every $T_{\textrm{repair}}$ time, a repair of all objects in the system is initiated. There is, however, a chance that the node that was chosen to repair an object leaves the network before the repair can complete. This reduces the effectiveness of the repair mechanism, effectively reducing the repair rate. The percentage repair successes was measured during simulation and found to be $70 \%$. All repair rates in the simulation were adjusted with this number, which successfully aligned the simulation data means with the model data means.
-
-What is evident from all box-and-whiskers plots is the large variance and large maximum values of object lifetimes measured in the simulation. This ``heavy-tailed'' distribution is also evident when looking at the overall object lifetime distribution shown in Figure \ref{fig_object_lifetimes}. 
-
-\begin{figure}[htbp]
- \centering
- \includegraphics[clip=true, viewport=0.5cm 6.0cm 26.0cm 20.5cm, width=0.8\columnwidth]{object_lifetimes}
- \caption{Simulated object lifetime distribution}
- \label{fig_object_lifetimes}
-\end{figure}
-%
-This shows that although expected object lifetimes can be accurately predicted, actual object lifetimes can vary greatly from the mean and can be much longer than expected. The heavy-tailed distribution might be as a consequence of an effect that is not yet being modelled.
+One issue that was encountered when comparing simulation data to model data was the imperfect repair scheme used in simulation. In the simulation, every $T_{\textrm{repair}}$ time, a repair of all objects in the system is initiated. In our simulation, there is, however, a chance that the node that was chosen to repair an object leaves the network before the repair can complete. This reduces the effectiveness of the repair mechanism, effectively reducing the repair rate. The percentage repair successes was measured during simulation and found to be $70 \%$. All repair rates in the simulation were adjusted with this number, which successfully aligned the simulation data means with the model data means.
 
 \section{Conclusion}
 \label{conclusion}
