@@ -46,6 +46,8 @@ class GameObject : public cOwnedObject
 
 		TransportAddress group_address;
 
+		int value;	//This variable represents the data contained in the game object
+
 		friend std::ostream& operator<<(std::ostream& Stream, const GameObject entry);
 
 	public:
@@ -61,12 +63,19 @@ class GameObject : public cOwnedObject
 		GameObject& operator=(const BinaryValue& binval);
 		friend bool operator==(const GameObject& object1, const GameObject& object2);
 		friend bool operator!=(const GameObject& object1, const GameObject& object2);
+
+		//This is used when a GameObject is the key in a map
+		friend bool operator<(const GameObject& object1, const GameObject& object2);
 		virtual std::string info();
 		virtual std::string info() const;
 
-		void getHash(char hash_str[41]);
-		OverlayKey getHash();
-		OverlayKey getHash() const;
+		//The name hash is used to store and retrieve objects in the system.
+		OverlayKey getNameHash();
+		OverlayKey getNameHash() const;
+
+		//The content hash is used to compare the contents of different object, removing the need for the complete object to be transferred.
+		OverlayKey getContentHash();
+		OverlayKey getContentHash() const;
 
 		/** @returns Duplicate of the game object */
 		virtual GameObject *dup() const;
@@ -81,6 +90,10 @@ class GameObject : public cOwnedObject
 		int getTTL() const;
 		int getTTL();
 		void setTTL(const int &o_ttl);
+
+		int getValue();
+		int getValue() const;
+		void setValue(const int &val);
 
 		void setObjectName(const std::string& o_Name);
 

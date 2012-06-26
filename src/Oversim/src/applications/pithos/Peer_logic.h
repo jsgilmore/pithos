@@ -98,6 +98,8 @@ class Peer_logic: public cSimpleModule
 				int numGroupGetSucceeded;
 				int numDHTGetSucceeded;
 				int numDHTGetFailed;
+
+				std::vector<GameObject> objectsReceived;
 		};
 
 		//friend std::ostream& operator<<(std::ostream& Stream, const PendingRpcsEntry& entry);
@@ -106,7 +108,10 @@ class Peer_logic: public cSimpleModule
 		PendingRpcs pendingRpcs; /**< a map of all pending RPC operations */
 
 		int replicas;	//The number of replicas group storage is set to.
+		int numGetRequests;	//How many get requests to send out for every request received from the higher layer
+		int numGetCompares;	//How many objects to compare for safe retrieval, before a decision is made
 		bool fastPut;
+		bool fastGet;
 
 		bool disableDHT;
 
@@ -135,7 +140,8 @@ class Peer_logic: public cSimpleModule
 
 		void processPut(PendingRpcsEntry entry, ResponsePkt *response);
 
-		void processGet(PendingRpcsEntry entry, ResponsePkt *response);
+		GameObject pickObject(std::vector<GameObject>objectsReceived);
+		void processGet(PendingRpcsEntry *entry, ResponsePkt *response);
 
 		void handleResponseMsg(cMessage *msg);
 };

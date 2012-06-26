@@ -39,14 +39,23 @@ Peer_logic::~Peer_logic()
 void Peer_logic::initialize()
 {
 	replicas = par("replicas");
+	numGetRequests = par("numGetRequests");
+	numGetCompares = par("numGetCompares");
 	disableDHT = par("disableDHT");
 	std::string putType = par("putType");
+	std::string getType = par("getType");
 
 	if (putType == "fast")
 		fastPut = true;
 	else if (putType == "safe")
 		fastPut = false;
 	else error("Unknown put type specified.");
+
+	if (getType == "fast")
+		fastGet = true;
+	else if (getType == "safe")
+		fastGet = false;
+	else error("Unknown get type specified.");
 }
 
 void Peer_logic::finalize()
@@ -93,7 +102,7 @@ void Peer_logic::handleGetCAPIRequest(RootObjectGetCAPICall* capiGetMsg)
 
     PendingRpcsEntry entry;
     entry.getCallMsg = capiGetMsg;
-    entry.numSent = 1;		//Only one of the responses from either DHT storage or group storage is required
+    entry.numSent = numGetRequests;
     pendingRpcs.insert(std::make_pair(capiGetMsg->getNonce(), entry));
 }
 
@@ -196,33 +205,110 @@ void Peer_logic::processPut(PendingRpcsEntry entry, ResponsePkt *response)
 	}
 }
 
-void Peer_logic::processGet(PendingRpcsEntry entry, ResponsePkt *response)
+GameObject Peer_logic::pickObject(std::vector<GameObject>objectsReceived)
+{
+	//A vector of GameObjects and the number peers that returned that object
+	std::map<GameObject, int> objectValueMap;
+	std::vector<GameObject>::iterator received_object_it;
+	std::map<GameObject, int>::iterator counting_object_it;
+	std::map<GameObject, int>::iterator picked_object_it;
+
+
+	for (received_object_it = objectsReceived.begin() ; received_object_it != objectsReceived.end() ; received_object_it++)
+	{
+		counting_object_it = objectValueMap.find(*received_object_it);
+		if (counting_object_it == objectValueMap.end())
+		{
+			objectValueMap.insert(std::make_pair(*received_object_it, 1));
+		} else {
+			counting_object_it->second = counting_object_it->second +1;
+		}
+	}
+
+	picked_object_it = objectValueMap.begin();
+	for (counting_object_it = objectValueMap.begin() ; counting_object_it != objectValueMap.end() ; counting_object_it++)
+	{
+		if (counting_object_it->second > picked_object_it->second)
+		{
+			picked_object_it = counting_object_it;
+		}
+	}
+
+	//There must at least have been some majority
+	if (picked_object_it->second > 1)
+		return picked_object_it->first;
+	else return GameObject::UNSPECIFIED_OBJECT;
+}
+
+void Peer_logic::processGet(PendingRpcsEntry *entry, ResponsePkt *response)
 {
 	cModule *communicatorModule = getParentModule()->getSubmodule("communicator");
 	//This extra step ensures that the submodules exist and also does any other required error checking
 	Communicator *communicator = check_and_cast<Communicator *>(communicatorModule);
 
-	if ((entry.numGroupGetSucceeded == 1) || (entry.numDHTGetSucceeded == 1))
+	if (fastGet)
 	{
-		//TODO: Attach the actual GameObject to the RPC response, instead of copying it into a new object
-		GameObject *object = (GameObject *)response->getObject("GameObject");
-		if (object == NULL)
-			error("No object was attached to DHT Storage response message");
+		if ((entry->numGroupGetSucceeded == 1) || (entry->numDHTGetSucceeded == 1))
+		{
+			//TODO: Attach the actual GameObject to the RPC response, instead of copying it into a new object
+			GameObject *object = (GameObject *)response->getObject("GameObject");
+			if (object == NULL)
+				error("No object was attached to DHT Storage response message");
 
-		RootObjectGetCAPIResponse* capiGetRespMsg = new RootObjectGetCAPIResponse();
-		capiGetRespMsg->setIsSuccess(true);
-		capiGetRespMsg->setResult(*object);	//The value is copied here and not the actual object
-		communicator->externallySendRpcResponse(entry.getCallMsg, capiGetRespMsg);
-		pendingRpcs.erase(response->getRpcid());
-	//If both the DHT get and the group get failed, or DHT is disabled and group get failed, a failure occurred
-	} else if (((entry.numDHTGetFailed == 1) || disableDHT) && (entry.numGroupGetFailed == 1))
-	{
-		//This is the failure response to both situations where either the group messages
-		//failed or the overlay messages failed. Notice the "return" in the success scenario.
-		RootObjectGetCAPIResponse* capiGetRespMsg = new RootObjectGetCAPIResponse();
-		capiGetRespMsg->setIsSuccess(false);
-		communicator->externallySendRpcResponse(entry.getCallMsg, capiGetRespMsg);
-		pendingRpcs.erase(response->getRpcid());
+			RootObjectGetCAPIResponse* capiGetRespMsg = new RootObjectGetCAPIResponse();
+			capiGetRespMsg->setIsSuccess(true);
+			capiGetRespMsg->setResult(*object);	//The value is copied here and not the actual object
+			communicator->externallySendRpcResponse(entry->getCallMsg, capiGetRespMsg);
+			pendingRpcs.erase(response->getRpcid());
+		//If both the DHT get and all group gets failed, or DHT is disabled and all group gets failed, a failure occurred
+		} else if (((entry->numDHTGetFailed == 1) || disableDHT) && (entry->numGroupGetFailed == numGetRequests))
+		{
+			//This is the failure response to both situations where either the group messages
+			//failed or the overlay messages failed. Notice the "return" in the success scenario.
+			RootObjectGetCAPIResponse* capiGetRespMsg = new RootObjectGetCAPIResponse();
+			capiGetRespMsg->setIsSuccess(false);
+			communicator->externallySendRpcResponse(entry->getCallMsg, capiGetRespMsg);
+			pendingRpcs.erase(response->getRpcid());
+		}
+	} else {
+
+		if (response->getIsSuccess())
+		{
+			GameObject *object = (GameObject *)response->getObject("GameObject");
+			if (object == NULL)
+				error("No object was attached to DHT Storage response message");
+
+			//Add the received object to the received objects vector for comparison
+			entry->objectsReceived.push_back(*object);
+		}
+
+		if (entry->numGroupGetSucceeded + entry->numDHTGetSucceeded == numGetCompares)
+		{
+			GameObject object = pickObject(entry->objectsReceived);
+
+			RootObjectGetCAPIResponse* capiGetRespMsg = new RootObjectGetCAPIResponse();
+
+			if (object != GameObject::UNSPECIFIED_OBJECT)
+			{
+				capiGetRespMsg->setIsSuccess(true);
+				capiGetRespMsg->setResult(object);	//The value is copied here and not the actual object
+			}
+			//If it could not be determined which was the correct object, don't send any object
+			else capiGetRespMsg->setIsSuccess(false);
+
+			communicator->externallySendRpcResponse(entry->getCallMsg, capiGetRespMsg);
+
+			pendingRpcs.erase(response->getRpcid());
+		//If both the DHT get and the group get failed, or DHT is disabled and group get failed, a failure occurred
+		} else if (((entry->numDHTGetFailed == 1) || disableDHT) && (entry->numGroupGetFailed == numGetRequests))
+		{
+			//This is the failure response to both situations where either the group messages
+			//failed or the overlay messages failed. Notice the "return" in the success scenario.
+			RootObjectGetCAPIResponse* capiGetRespMsg = new RootObjectGetCAPIResponse();
+			capiGetRespMsg->setIsSuccess(false);
+			communicator->externallySendRpcResponse(entry->getCallMsg, capiGetRespMsg);
+			pendingRpcs.erase(response->getRpcid());
+		}
 	}
 }
 
@@ -273,14 +359,14 @@ void Peer_logic::handleResponseMsg(cMessage *msg)
 			it->second.numDHTGetSucceeded++;
 		else it->second.numDHTGetFailed++;
 
-		processGet(it->second, response);
+		processGet(&(it->second), response);
 	} else if (response->getResponseType() == GROUP_GET)
 	{
 		if (response->getIsSuccess())
 			it->second.numGroupGetSucceeded++;
 		else it->second.numGroupGetFailed++;
 
-		processGet(it->second, response);
+		processGet(&(it->second), response);
 	} else error("Unknown response type received");
 }
 
