@@ -191,7 +191,7 @@ OverlayKey GlobalPithosTestMap::getRandomGroupKey(TransportAddress group_address
 	//Select object within group in O(1)
 	object = (it->second).at(intuniform(0, it->second.size()-1));
 
-	return object.getHash();
+	return object.getNameHash();
 }
 
 const OverlayKey& GlobalPithosTestMap::getRandomKey()
@@ -206,5 +206,3 @@ const OverlayKey& GlobalPithosTestMap::getRandomKey()
 
     return it->first;
 }
-
-

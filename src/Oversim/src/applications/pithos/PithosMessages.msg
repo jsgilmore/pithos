@@ -60,6 +60,8 @@ enum PacketTypes
     POSITION_UPDATE = 16;
     REPLICATION_REQ = 17;
     REPLICATE = 18;
+    HASH_REQ = 19;
+    HASH = 20;
 };
 
 enum OverlayTypes 
@@ -116,6 +118,7 @@ message ResponsePkt extends Packet
 {
     unsigned int rpcid;
     bool isSuccess;
+    bool isCorrupted;
     int responseType enum(ResponseTypes);
 }
 

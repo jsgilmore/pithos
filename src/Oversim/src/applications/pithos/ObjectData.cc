@@ -31,7 +31,7 @@ ObjectData::ObjectData(const GameObject& go, int group_size)
 {
 	object_name = go.getObjectName();
 	size = go.getSize();
-	key = go.getHash();
+	key = go.getNameHash();
 	creationTime = go.getCreationTime();
 	ttl = go.getTTL();
 	init_group_size = group_size;
