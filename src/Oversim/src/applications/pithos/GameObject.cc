@@ -50,6 +50,7 @@ GameObject& GameObject::operator=(const GameObject& other)
 	objectName = other.objectName;
 	creationTime = other.creationTime;
 	group_address = other.group_address;
+	value = other.value;
 
 	return *this;
 }
@@ -60,6 +61,9 @@ bool operator==(const GameObject& object1, const GameObject& object2)
 		return false;
 
 	if (object1.ttl != object2.ttl)
+		return false;
+
+	if (object1.value != object2.value)
 		return false;
 
 	if (object1.objectName != object2.objectName)
@@ -79,6 +83,11 @@ bool operator!=(const GameObject& object1, const GameObject& object2)
 	return !(object1 == object2);
 }
 
+bool operator<(const GameObject& object1, const GameObject& object2)
+{
+	return object1.getContentHash() < object2.getContentHash();
+}
+
 GameObject::GameObject(const BinaryValue& binval) : cOwnedObject("GameObject")
 {
 	operator=(binval);
@@ -93,6 +102,7 @@ GameObject& GameObject::operator=(const BinaryValue& binval)
 		size = 0;
 		creationTime = SIMTIME_ZERO;
 		ttl = 0;
+		value = 0;
 
 		return *this;
 	}
@@ -100,7 +110,7 @@ GameObject& GameObject::operator=(const BinaryValue& binval)
 	std::string buf;			//Have a buffer string
 	std::stringstream ss;		//Create a string stream
 
-	//This part tokenises the string value of BinaryValue in order to repopulate GameObject
+	//This part tokenises the string value of BinaryValue in order to recreate the original GameObject from a given BinaryValue (string)
 	ss << binval;						//Insert the string into a stream
 	std::vector<std::string> tokens;	//Create vector to hold our words
 
@@ -112,6 +122,7 @@ GameObject& GameObject::operator=(const BinaryValue& binval)
 	size = atol((tokens[1]).c_str());		//TODO: I'm quite sure this long will be 64 bits in a 64 bit system, but unsure about 32 bit systems
 	creationTime = atof((tokens[2]).c_str());
 	ttl = atoi((tokens[3]).c_str());
+	value = atoi((tokens[4]).c_str());
 
 	return *this;
 }
@@ -131,14 +142,14 @@ std::string GameObject::info()
 	 */
 
 	std::stringstream out;
-	out << objectName << " " << size << " " << creationTime << " " << ttl;
+	out << objectName << " " << size << " " << creationTime << " " << ttl << " " <<value;
 	return out.str();
 }
 
 std::string GameObject::info() const
 {
 	std::stringstream out;
-	out << objectName << " " << size << " " << creationTime << " " << ttl;
+	out << objectName << " " << size << " " << creationTime << " " << ttl << " " <<value;
 	return out.str();
 }
 
@@ -151,14 +162,36 @@ std::ostream& operator<<(std::ostream& stream, const GameObject go)
                   << " TTL: " << go.ttl;
 }
 
-OverlayKey GameObject::getHash()
+BinaryValue GameObject::getBinaryValue()
+{
+	return BinaryValue(info());
+}
+
+BinaryValue GameObject::getBinaryValue() const
+{
+	BinaryValue binval(info());
+
+	return binval;
+}
+
+OverlayKey GameObject::getContentHash()
 {
 	return OverlayKey::sha1(getBinaryValue());
 }
 
-OverlayKey GameObject::getHash() const
+OverlayKey GameObject::getContentHash() const
 {
 	return OverlayKey::sha1(getBinaryValue());
+}
+
+OverlayKey GameObject::getNameHash()
+{
+	return OverlayKey::sha1(BinaryValue(objectName));
+}
+
+OverlayKey GameObject::getNameHash() const
+{
+	return OverlayKey::sha1(BinaryValue(objectName));
 }
 
 GameObject *GameObject::dup() const
@@ -191,6 +224,22 @@ int GameObject::getTTL() const
 {
 	return ttl;
 }
+
+int GameObject::getValue()
+{
+	return value;
+}
+
+int GameObject::getValue() const
+{
+	return value;
+}
+
+void GameObject::setValue(const int &val)
+{
+	value = val;
+}
+
 
 void GameObject::setTTL(const int &o_ttl)
 {
@@ -225,20 +274,6 @@ simtime_t GameObject::getCreationTime()
 simtime_t GameObject::getCreationTime() const
 {
 	return creationTime;
-}
-
-BinaryValue GameObject::getBinaryValue()
-{
-	BinaryValue binval(info());
-
-	return binval;
-}
-
-BinaryValue GameObject::getBinaryValue() const
-{
-	BinaryValue binval(info());
-
-	return binval;
 }
 
 TransportAddress GameObject::getGroupAddress()

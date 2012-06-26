@@ -157,16 +157,9 @@ void PithosTestApp::handlePutResponse(RootObjectPutCAPIResponse* msg, PithosStat
     {
         GameObject object(context->go);
 
-        if (msg->getGroupAddress().isUnspecified())
-        	error("Received unspecified group address for stored object from Pithos.");
+        globalPithosTestMap->insertEntry(object.getNameHash(), object);
 
-        //This allows us to perform group specific queries (Changing the group address does not change the object hash)
-        object.setGroupAddress(msg->getGroupAddress());
-
-        //globalPithosTestMap->insertEntry(context->go.getHash(), context->go);
-        globalPithosTestMap->insertEntry(object.getHash(), object);
-
-        EV << "Storing pithos entry: " << object.getHash() << endl;
+        EV << "Storing pithos entry: " << object.getNameHash() << endl;
 
         RECORD_STATS(numPutSuccess++);
         RECORD_STATS(globalStatistics->addStdDev("PithosTestApp: PUT Latency (s)", SIMTIME_DBL(simTime() - context->requestTime)));
@@ -208,7 +201,8 @@ void PithosTestApp::handleGetResponse(RootObjectGetCAPIResponse* msg, PithosStat
         return;
     }
 
-    if (simTime() > entry->getCreationTime() + entry->getTTL()) {
+    if (simTime() > entry->getCreationTime() + entry->getTTL())
+    {
         //this key doesn't exist anymore in Pithos, delete it in our hashtable
 
     	globalPithosTestMap->eraseEntry(context->key);
@@ -256,6 +250,7 @@ void PithosTestApp::sendPutRequest()
 	sprintf(name, "Node:%d,Object:%d", getParentModule()->getParentModule()->getIndex(), numPutSent);	//The name is later combined with the remaining object values
 	go->setObjectName(name);
 	go->setTTL(ttl);
+	go->setValue(-1);	//A value that a player will always want to change
 
 	RootObjectPutCAPICall* capiPutMsg = new RootObjectPutCAPICall();
 

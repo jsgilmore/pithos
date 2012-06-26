@@ -323,7 +323,7 @@ void DHTStorage::send_forstore(Packet *pkt)
 	if (go == NULL)
 		error("No object was attached to be stored in group storage");
 
-	OverlayKey destkey = go->getHash();		//Setting the hash here, means that it's the same hash as the root object type stored by the higher layer.
+	OverlayKey destkey = go->getNameHash();		//Setting the hash here, means that it's the same hash as the root object type stored by the higher layer.
 
 	unsigned int parent_rpcid = write_pkt->getValue();	//The RPC ID of the original request received from above the Pithos layer
 

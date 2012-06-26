@@ -130,6 +130,9 @@ simple Peer_logic
         int replicas;
         bool disableDHT;
         string putType;
+        string getType;
+        int numGetRequests;
+        int numGetCompares;
     gates:
         inout comms_gate;
         

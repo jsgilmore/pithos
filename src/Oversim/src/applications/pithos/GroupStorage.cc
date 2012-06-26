@@ -191,14 +191,22 @@ void GroupStorage::createResponseMsg(ResponsePkt **response, int responseType, u
 	(*response)->setResponseType(responseType);
 	(*response)->setPayloadType(RESPONSE);
 	(*response)->setIsSuccess(isSuccess);
+	(*response)->setIsCorrupted(isMalicious);
 	(*response)->setRpcid(rpcid);		//This allows the higher layer to know which RPC call is being acknowledged.
 
 	if (object != GameObject::UNSPECIFIED_OBJECT)
 	{
-		EV << "[GroupStorage] returning result: " << object << endl;
 		GameObject *object_ptr =  new GameObject(object);
-		(*response)->addObject(object_ptr);
+		//If this is a malicious node, randomly change the value of the object
+		if (isMalicious)
+		{
+			object_ptr->setValue(intuniform(0, 100000));
+			globalStatistics->addStdDev("GroupStorage: Packets corrupted", 1);
+		} else {
+			globalStatistics->addStdDev("GroupStorage: Packets corrupted", 0);
+		}
 
+		(*response)->addObject(object_ptr);
 		//Response packet + object size
 		(*response)->setByteLength(RESPONSE_PKT_SIZE + object.getSize());
 	} else {
@@ -719,7 +727,7 @@ void GroupStorage::store(Packet *pkt)
 	EV << getName() << " " << getIndex() << " received Game Object of size " << go->getSize() << "\n";
 	EV << getName() << " " << getIndex() << " received write command of size " << go->getSize() << " with delay " << go->getCreationTime() << "\n";
 
-	ret = storage_map.insert(std::make_pair(go->getHash(), *go));
+	ret = storage_map.insert(std::make_pair(go->getNameHash(), *go));
 	//Ensure that a duplicate key wasn't inserted
 	if (ret.second == false)
 		return;
@@ -727,7 +735,7 @@ void GroupStorage::store(Packet *pkt)
 
 	//Schedule the object to be removed when its TTL expires.
 	ObjectTTLTimer* timer = new ObjectTTLTimer();
-	timer->setKey(go->getHash());
+	timer->setKey(go->getNameHash());
 	scheduleAt(go->getCreationTime() + go->getTTL(), timer);
 
 	if (pkt->getPayloadType() == WRITE)
