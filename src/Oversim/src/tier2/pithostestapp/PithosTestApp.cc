@@ -152,14 +152,17 @@ void PithosTestApp::handlePutResponse(RootObjectPutCAPIResponse* msg, PithosStat
         return;
     }
 
-    //Only add the object to the global test map if it was successful
+    //Only add the object to the global test map if it was successful and a group response (otherwise it is not possible to get within a group)
     if (msg->getIsSuccess())
     {
         GameObject object(context->go);
 
-        globalPithosTestMap->insertEntry(object.getNameHash(), object);
-
-        EV << "Storing pithos entry: " << object.getNameHash() << endl;
+        if (!(msg->getGroupAddress().isUnspecified()))
+		{
+        	//This allows us to perform group specific queries (Changing the group address does not change the object hash)
+			object.setGroupAddress(msg->getGroupAddress());
+			globalPithosTestMap->insertEntry(object.getNameHash(), object);
+		}
 
         RECORD_STATS(numPutSuccess++);
         RECORD_STATS(globalStatistics->addStdDev("PithosTestApp: PUT Latency (s)", SIMTIME_DBL(simTime() - context->requestTime)));
