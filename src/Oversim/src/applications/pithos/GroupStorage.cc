@@ -255,6 +255,7 @@ void GroupStorage::forwardRequest(OverlayKeyPkt *retrieve_req)
 
 	entry.numGetSent = numGetRequests;
 	entry.responseType = GROUP_GET;
+	entry.numGetSent = 0;
 
 	for (int i = 0 ; i < numGetRequests ; i++)
 	{
@@ -284,6 +285,7 @@ void GroupStorage::forwardRequest(OverlayKeyPkt *retrieve_req)
 		retrieve_dup->setHops(retrieve_req->getHops()+1);
 
 		send(retrieve_dup, "comms_gate$o");
+		entry.numGetSent++;
 		RECORD_STATS(numSent++; numGetSent++);
 
 		//Create and schedule request timeout timer
