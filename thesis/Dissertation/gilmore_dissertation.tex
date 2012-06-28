@@ -30,7 +30,11 @@
  \usepackage{cite}
 
 %==== Graphics and Color ============================================
-\usepackage{graphicx}%........................... Graphicx loaded in usthesis
+  \usepackage[pdftex]{graphicx}
+  \graphicspath{{../Figures/}}
+%  \DeclareGraphicsExtensions{.pdf,.png}
+  \usepackage{color}
+  
 \usepackage{color}%.............................. Color setup
 \usepackage{eso-pic}%............................ Shipout commands for watermark
     \newcommand*{\WaterMark}[2][0.2\paperwidth]{%
@@ -51,6 +55,9 @@
     \def\DeclarationName{Verklaring}%
     \def\AbstractName   {Samevatting}%
 }
+
+%Add elegant support for Big-O notation
+\providecommand{\OO}[1]{\operatorname{O}\left(#1\right)}
 
 %\usepackage{listings}
 
@@ -137,7 +144,11 @@ qualifications.]
    \numberwithin{table}{chapter}
 
 \include{contents/Introduction}
-\include{contents/Body}
+\include{contents/Chapter_1}
+\include{contents/Chapter_2}
+\include{contents/Chapter_3}
+\include{contents/Chapter_4}
+\include{contents/Chapter_5}
 \include{contents/conclusion}
 
 %==== Appendices ====================================================
@@ -149,7 +160,9 @@ qualifications.]
 %==== Bibliography acro's & Index ===================================
 %\backmatter
 
-%\bibliographystyle{IEEEtran}
-%\bibliography{backmatter/comms_system}
+%\newpage
+%\IEEEtriggeratref{43} %Balance the bibliography
+\bibliographystyle{IEEEtran}
+\bibliography{../BibTeX/P2P_MMOG}
 
 \end{document}
