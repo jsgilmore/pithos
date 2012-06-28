@@ -90,6 +90,7 @@ A = I - Q_norm;
 N = A^(-1);
 
 E_T = N*rates;
+%E_T = (N'*ones(0.5*r*(2*n-r+1), 1)).*rates;
 
 x = n;
 for i=1:0.5*r*(2*n-r+1)
