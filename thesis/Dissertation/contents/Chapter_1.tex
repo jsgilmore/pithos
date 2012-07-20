@@ -37,7 +37,19 @@ Authoritative objects are the objects traditionally housed on the server in the 
  \label{fig_event_update_flow_graphic}
 \end{figure}
 
+Figure \ref{fig_event_update_flow_graphic} depicts the flow of events and updates in response to the generation of an event by some agent. Agents are defined to be some form of intelligence that can interact with the virtual environment. An agent can either be a human or an artificial intelligence script driving some object in the VE.
 
+In Figure \ref{fig_event_update_flow_graphic}, Agent 1 generates Event 1 at the remote location shown. To maintain generality, events are defined to possess areas of effect (AoEs). An event's AoE determines which objects are in range to be potentially affected by an event. When an event's AoE encloses an object, that object is in range to be affected by the event. Whether the object is affected by the event, will be determined by the game logic.
+
+In Figure \ref{fig_event_update_flow_graphic}, Event 1 affect Object 1. Event 1 is, therefore, sent to Object 1's root node, i.e. the peer housing the authoritative copy of Object 1. Determining which objects are affected by an event is termed \emph{event layer interest management}. Delivering the event to the root nodes of the affected object is termed \emph{event dissemination}.
+
+When Event 1 arrives at Peer 1, containing Object 1, the event is placed in a event queue in an order based on the time each event occurred. The process of determining which order events have to be processed in is called \emph{event ordering}. Many events will be arriving at an object's root node from multiple agents simultaneously.
+
+After event ordering has been performed, environment logic is applied to determine hoe a specific event will affect a specific object. To determine possible updates, that state of other objects might also have to be taken into account. An example is firing at a player through a wall. If the thickness of the wall determines how much damage is delivered to the player, the root node processing the damage to the player object will have to know the thickness of the wall.
+
+When an event has been translated into a state update, the root object on the root node is updated. The new state of the object should also be communicated with all agents that can perceive the object in the virtual world. An object is perceived by an agent if the agent's area of interest (AoI) encompasses the object. Determining which agents should receive objext state updates is termed \emph{update layer interest management}. In the figure, Object 1 is perceived by Agent 2. Peer 1 therefore has to send an update to the peer housing agent 2. Delivering state updates to the affected agent peers is termed \emph{update dissemination}.
+
+When the update is delivered to Agent 2, the local object state is updated and the object's new state is displayed to the agent to allow the agent to make decisions and, therefore, generate events based on the new object state.
 
 \section{Classic consistency models}
 \label{classic_models}
