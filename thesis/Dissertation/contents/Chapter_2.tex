@@ -1,54 +1,44 @@
-\chapter{P2P MMVE state management and state persistency models}
+\chapter{P2P MMVE state management and persistency}
 \label{p2p_mmog_state_persistency}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Introduction}
 
-The focus of this paper is exclusively on one of the key challenges present in P2P MMOGs, namely: state persistency. The implementation of state
-persistency in P2P MMOGs allows for the storage of game data. The fact that game data must now be distributed amongst various peers in the network
-creates challenges not usually present in classic C/S MMOGs.
+While the previous chapter broadly introduced all the concepts of state consistency, this chapter will focus solely on state management and state persistency in P2P MMVEs. The implementation of state persistency in P2P MMOGs allows for the storage of game data. The fact that game data must now be distributed amongst various peers in the network creates challenges not usually present in classic C/S MMOGs.
 
-The paper classifies the techniques used in documented P2P MMOG architectures and discusses the advantages and disadvantages of the different types of storage. The paper also shows that no current storage type is well suited to P2P MMOGs. As the field of P2P MMOGs is a growing one, it is believed
-that a comprehensive survey of persistency techniques is required to act as a basis for further research into the field.
+This chapter classifies the techniques used in documented P2P MMOG architectures and discusses the advantages and disadvantages of the different types of storage. The chapter also shows that no current storage type is well suited to P2P MMOGs. As the field of P2P MMOGs is a growing one, it is believed that a comprehensive survey of persistency techniques is required to act as a basis for further research into the field. To the best of our knowledge, such a classification, where a focus is placed specifically on state persistency in P2P MMOGs, has not been undertaken in the literature.
 
-To the best of our knowledge, such a classification, where a focus is placed specifically on state persistency in P2P MMOGs, has not been undertaken
-in the literature. Other surveys, relating to P2P MMOGs and P2P overlays in general are discussed in Section \ref{related_work}. For each included
-survey, the differences between this paper and the included survey are discussed.
+This chapter identifies state persistency techniques used in P2P MMOGs. To achieve state persistency in P2P MMOGs, a type of distributed storage is required. Two classic distributed storage architectures are the Network File System (NFS) \cite{NFS4_protocol} and Coda \cite{Kistler_Coda_disconnected}. There are, however, some major differences between the requirements of a P2P state persistency model and the classic distributed file storage model.
 
-This section identifies state persistency techniques used in P2P MMOGs. To achieve state persistency in P2P MMOGs, a type of distributed storage is
-required. Two classic distributed storage architectures are the Network File System (NFS) \cite{NFS4_protocol} and Coda
-\cite{Kistler_Coda_disconnected}. There are, however, some major differences between the requirements of a P2P state persistency model and the
-classic distributed file storage model.
+Firstly, NFS and Coda still require servers. One of the main advantages of P2P MMOGs is that servers are, for the most part, not required. The other requirement is low latency file storage and retrieval, discussed in Section \ref{char_responsiveness}, which NFS and Coda also do not address. Conflicts are also an issue with the Coda system, which allows multiple nodes to modify the same object. Despite the many differences, the divergent applications share some of the same requirements, namely: scalability, reliability, security and responsiveness.
 
-Firstly, NFS and Coda still require servers. One of the main advantages of P2P MMOGs is that servers are, for the most part, not required. The other
-requirement is low latency file storage and retrieval, which NFS and Coda also do not address. Conflicts are also an issue with the Coda system,
-which allows multiple nodes to modify the same object. Despite the many differences, the divergent applications share some of the same requirements,
-including: scalability, reliability, security and responsiveness.
+The requirement of disconnected operation is generally not applicable to most interactive online games, where a player has to stay connected to the world, to be able to interact with it. One area where disconnected operation is of interest to game state persistency is in the area of mobile gaming. A major challenge for mobile games is the large variances in network latency. Such networks require games that are resistent to network jitter.
 
-The requirement of disconnected operation is generally not applicable to most interactive online games, where a player has to stay connected to the
-world, to be able to interact with it. One area where disconnected operation might be of interest to game state persistency is in the area of mobile
-gaming. A major challenge for mobile games is the large variances in network latency. Such networks require games that are resistent to network
-jitter.
+One approach has been proposed in \cite{Chandler_disconnected_games}, where every game client serialises its game state and distributes this game state to all other clients. Each client then creates some target game state from all received game states as well as its own state. The game client then attempts to manipulate all NPCs in the game in order to achieve the target game state. The target game state is constantly updated and thus remains a moving target. This is a new type of consistency model with many research opportunities.
 
-One approach has been proposed in \cite{Chandler_disconnected_games}, where every game client serialises its game state and distributes this game
-state to all other clients. Each client then creates some target game state from all received game states as well as its own state. The game client
-then attempts to manipulate all NPCs in the game in order to achieve the target game state. The target game state is constantly updated and thus
-remains a moving target. This is a new type of consistency model with many research opportunities.
+\section{State management and state persistency}
+A discussion of state storage requires an understanding of the difference between state management and state persistency. These terms are regularly confused in the literature and sometimes one is used where the other is more appropriate. Other times, authors describe both mechanisms as if it is all part of the same model.
+
+In this work, state persistency is defined to mean long term data storage. Meaning that if a server or client goes off-line, the state persistency mechanism will ensure the safe storage of the state for when the server or client starts up again. State persistency is, therefore, storage in secondary persistent memory. All servers require state persistency to back-up the VE state in case of some outage or in case a server restart is required. This storage type does not have to be fast, but it has to be reliable. State persistency in P2P MMVEs is therefore taken to mean the same. It does not have to be fast, but when a client logs out of the VE and logs back in again, the stored state should remain.
+
+State management on the other hand is defined to mean the storage of the VE state in primary memory. This is the state with which the server and clients will interact. It is the state that will be displayed to the agent on the client and it is the state that will require fast reads and writes as consequences of received events or updates. Every time an object update is generated, it will be applied to the objects by state management. Every time the game logic requires the information of other objects to determine which update to generate on account of a received event, it will make use of state management.
+
+Although these are two different types of storage, with different storage requirements, there are also aspects of state management and persistency that are the same. The similarities and differences will be reviewed in Section \ref{key_challenges_cm}. The similarities between state management and state persistency are explained in this chapter by using the generic term ``storage''. There are many ``storage types'' that will be introduced in this chapter. These storage types can either be state management or state persistency. The relevance of difference storage types to state management and consistency will, however, be discussed.
+
+\section{Overview of approaches}
+\label{storage_type_overview}
 
 %Overview of four approaches
-Four approaches have been identified by which state persistency is achieved in P2P MMOGs: \emph{super peer storage}, \emph{overlay storage},
-\emph{distance-based storage} and \emph{hybrid storage}. These four storage architectures are detailed in Sections \ref{super_peer_storage},
-\ref{overlay_storage}, \ref{hybrid_storage} and \ref{distance_based_storage}.
+Four approaches have been identified by which state persistency is achieved in P2P MMOGs: \emph{super peer storage}, \emph{overlay storage}, \emph{distance-based storage} and \emph{hybrid storage}. These four storage architectures are detailed in Sections \ref{super_peer_storage}, \ref{overlay_storage}, \ref{hybrid_storage} and \ref{distance_based_storage}.
 
 %Centralised storage
-Two other types of storage sometimes described in P2P MMOGs papers are \emph{centralised storage} and \emph{individual storage}. Centralised storage is storage in a centralised database, the same as for a C/S MMOG \cite{badumna_engine}, \cite{rooney_centralised_storage},
-\cite{hybrid_p2p_cs_centralised}. Centralised storage for an MMOG requires the same large expensive servers and high bandwidth as required by a classic C/S architecture and therefore does not fit into the P2P MMOG paradigm. For this reason, centralised storage will not be evaluated in this paper.
+Two other types of storage sometimes described in P2P MMOGs papers are \emph{centralised storage} and \emph{individual storage}. Centralised storage is storage in a centralised database, the same as for a C/S MMVE \cite{badumna_engine}, \cite{rooney_centralised_storage}, \cite{hybrid_p2p_cs_centralised}. Centralised storage for an MMOG requires the same large expensive servers and high bandwidth as required by a classic C/S architecture and therefore does not fit into the P2P MMOG paradigm. For this reason, centralised storage will not be evaluated in this chapter.
 
 %Individual storage
 With individual storage, player data are stored on a player's own computer \cite{individual_storage1}, \cite{cheat_proof_playout}. These
 architectures do not address the storage of NPC state or mutable objects. These objects cannot be as easily mapped to a single node in the network as
-player state can and therefore require a mapping mechanism to decide where to host these objects. Individual storage will not be explicitly discussed
-in this survey, however, individual storage can be regarded as a subset of distance-based storage, which will be discussed in detail in Section
+player state can and, therefore, require a mapping mechanism to decide where to host these objects. Individual storage will not be explicitly discussed
+in this chapter, however, individual storage can be regarded as a subset of distance-based storage, which will be discussed in detail in Section
 \ref{distance_based_storage}.
 
 \begin{table}[htbp]
@@ -78,10 +68,7 @@ provide a measure of how difficult it will be for an application developer to us
 \label{key_challenges_cm}
 
 %Consistency issues
-The key challenges related to P2P MMOG persistency models identified during this literature study were: scalability, reliability, responsiveness,
-security and fairness. All state persistency models will be reviewed with these characteristics in mind. In order to evaluate any persistency model,
-metrics have to be defined to measure the key characteristics of a storage system. This will allow for different persistency models to be compared
-and provide a measure of the applicability of any persistency model to P2P MMOGs.
+The key challenges related to P2P MMOG storage models are: scalability, reliability, responsiveness, security and fairness. All storage models will be reviewed with these characteristics in mind. In order to evaluate any storage model, metrics have to be defined to measure the key characteristics of a storage system. This will allow for different storage models to be compared and provide a measure of the applicability of any storage model to P2P MMOGs.
 
 \subsection{Scalability}
 Scalability underpins all evaluation criteria. This implies that for a system to be scalable, all other evaluation criteria should be satisfied for
@@ -105,9 +92,11 @@ Ensuring fairness in the system means distributing load evenly according to the 
 number of nodes provide all system resources required for the system to function, but that all nodes contribute what they can, in order to support
 the system.
 
+Fairness does not exclude heterogeneity of nodes. It is accepted that nodes have different amounts of available resources. It also does not exclude node specialisation. It is accepted that some P2P architecture require specialised nodes or require a set of different types of super peers to function. Fairness merely states that when all node contributions have been counted, the sum of node contributions should be equal.
+
 Fairness can be evaluated by evaluating the distribution of game state amongst all nodes in the P2P network. This can be measured at a file level,
-i.e. what is the variance of the number of files contained on each node, or on byte level, i.e. what is the variance of the number of bytes stored on
-each node. A lower variance will point to a fairer data persistency scheme.
+i.e. what is the standard deviation of the number of files contained on each node, or on byte level, i.e. what is the standard deviation of the number of bytes stored on
+each node. A lower standard deviation will point to a fairer data storage scheme, if it is assumed that all nodes should contribute an equal amount of storage.
 
 \subsection{Reliability}
 
@@ -115,41 +104,39 @@ For the storage to be reliable, it must be impossible for data to be lost, and s
 Reliability encompasses both robustness and availability. Robustness means that the data should be resilient to network churn and availability means
 that data should be available to any node in the network, with the correct permissions.
 
-\subsection{Responsiveness}
+Reliability can be measured as the percentage of successful storage and retrieval requests, compared to the total number of storage and retrieval requests.
 
-To ensure system responsiveness, data must be stored or retrieved in real-time. With real-time, it is meant that data should be available within a
-certain time frame that would ensure correct functionality of the MMOG requiring it. The variance in data retrieval times should be small.
-Responsiveness can be measured by the time it takes for an object to be available for reading, anywhere in the network, after having been written.
-How long it takes to read or write data to the storage network can also be measured.
+\subsection{Responsiveness}
+\label{char_responsiveness}
+
+Responsiveness is the only requirement that is less important for state persistency, compared to state management. Because state persistency merely acts to back-up the data, fast storage or retrieval is not as important as it is for state management. Highly responsive state persistency will still improve data throughput and ensure that less data will be lost in the event of a failure, but highly responsive state management is required for the correct functioning of the state consistency mechanism.
+
+To ensure system responsiveness, objects must be stored or retrieved in real-time. With real-time, it is meant that data should be available within a
+certain time frame that would ensure correct functionality of the MMVE requiring it. The variance in data retrieval times should be small. Responsiveness can be measured by the time it takes to read or write data to the storage network.
 
 \subsection{Security}
 \label{characteristics_security}
 
-The storing system should store data securely. It should not be possible for data to be altered in ways that are inconsistent with the game rules. It
+The storage system should store data securely. It should not be possible for data to be altered in ways that are inconsistent with the game rules. It
 should also be possible to identify nodes that alter the data in a malicious way. This also adds the requirement that nodes should be authenticated
 in the storage system and that only authorised nodes should be able to alter data. Security is the combination of a number of objectives:
 Authentication, Authorisation, Data Integrity, Confidentiality, Availability, Trust, Privacy and Identity Management
 \cite{distributed_systems_security}.
 
-For a state persistency model to address the security objectives of authentication, authorisation, confidentiality, trust, privacy and identity
+For a storage model to address the security objectives of authentication, authorisation, confidentiality, trust, privacy and identity
 management, a certification scheme with public and private key encryption is required. Such a scheme allows for the identification of users, and by
 having users sign any storage interactions, every change made to the storage system can be tracked. This is a major differentiating factor from
 classic distributed storage systems such as Freenet, where a primary objective is anonymity. If all operations are logged and all users have to be
-identifiable for a secure system, no users can truly be anonymous.
+identifiable for a secure system, no users can be anonymous.
 
 \section{Client/Multi-Server state management and persistency models}
 \label{cms_models}
 
-%Should I add diagrams here?
-
-Apart from the two classic models, there are also models based on the C/MS network model, which are: shard-based, replication-based, object-based and
-zone-based \cite{Hu_voronoi_IM}.
+This section introduces the classic state management and persistency architectures used in server cluster or client/muli-server based systems \cite{Hu_voronoi_IM}.
 
 \subsection{Sharding}
 
-The consistency model that is exemplified by having a state persistency model where the game state (world) is duplicated over multiple servers, with
-players connecting to one of these servers is termed ``sharding''. Clients are not able to interact or communicate with players on other shards,
-which reduces game immersion. This method does, however, allow for a more scalable system as maximum load is fixed.
+A storage model where the VE state is duplicated over multiple servers, with players connecting to one of these servers is termed ``sharding''. Clients are not able to interact or communicate with players on other shards, which reduces game immersion. This method does, however, allow for a more scalable system as maximum load is fixed.
 
 Players are not able to enter a shard if that shard has reached its capacity. In the past, this has caused unhappiness amongst players, since popular
 shards could be difficult to log in to. Players are also reluctant to move to a new shard, because a lot of time is invested in their characters in
@@ -174,10 +161,7 @@ different worlds.
 
 \subsection{Object-based}
 %Object based
-The state persistency model of the object-based consistency model equally distributes all in-game objects amongst the servers
-\cite{object_based_consistency1}, \cite{object_based_consistency2}, \cite{object_based_consistency3}. For an MMOG, most of these objects are expected
-to be player objects. The advantage of this method is that the system load is fixed for a certain player population and that the load is equally
-distributed amongst all servers. This allows for more accurate prediction and provisioning of resources, but still does not handle transient loads
+The object-based storage model equally distributes all in-game objects amongst the servers \cite{object_based_consistency1}, \cite{object_based_consistency2}, \cite{object_based_consistency3}. For an MMOG, most of these objects are expected to be player objects. The advantage of this method is that the system load is fixed for a certain player population and that the load is equally distributed amongst all servers. This allows for more accurate prediction and provisioning of resources, but still does not handle transient loads
 well.
 
 Another issue is inter-server communications for this architecture. The inter-server communications are random and also more than the inter-server
@@ -187,7 +171,7 @@ interactions remain local to the server.
 
 \subsection{Zone/Region-based}
 %Zone-based
-The state persistency model of the zone-based consistency model divides the virtual world into zones or regions, which are hosted on different
+The zone-based storage model divides the virtual world into zones or regions, which are hosted on different
 servers \cite{zone_based_stat}, \cite{zone_based_dyn}. A well known example of this model is Eve Online. Busy regions are hosted on their own
 servers, while multiple quiet regions are hosted on a single server. This is termed the static region approach \cite{zone_based_stat}.
 
@@ -202,24 +186,7 @@ Dynamic regions are being investigated, where regions can be dynamically shifted
 \label{super_peer_storage}
 
 %Super peer storage - description
-Super peer storage relies on the super peer storing all information that is in its domain. A domain is usually created by segmenting the world into
-regions and super peers act as regional servers to all peers in their region. Each super peer handles all game logic and distributes updates to all peers in its region. The super peer also handles state persistency for its region, hosting NPCs, objects and persistent player data.
-
-\begin{figure}[htbp]
- \centering
- \includegraphics[clip=true, viewport=2cm 5cm 27cm 16.5cm, width=\textwidth]{region_based_CS_CM}
- \caption{Region-based Client/Server consistency model}
- \label{fig_cs_region_cm}
-\end{figure}
-%
-The consistency model for this approach is depicted in Figure \ref{fig_cs_region_cm}. One can see that this approach is modelled on the update based
-model, but segmented into separate regions. The role of the server is here fulfilled by a super peer, which is a peer that is selected in some
-logical way, from the available set of peers and then promoted. Server selection in itself is a complex topic that has to deal with determining
-whether a peer has sufficient resources available and also whether the peer is trustworthy.
-
-Each super peer in this model houses the complete region state as shown. Super peers also house the game logic. Clients in the region only house
-copies of the regional objects and some client logic to update the local copies of objects. Like the C/S model, clients only send events to super
-peers, where super peers apply the game logic and send state updates to clients.
+Super peer storage makes use of the region-based P2P MMVE consistency model described in Section \ref{p2p_mmve_state_consistency}. Super peer storage relies on the super peer storing all information that is in its region.
 
 \subsection{Fairness}
 %Super peer storage - issues

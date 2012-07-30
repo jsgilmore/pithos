@@ -204,14 +204,24 @@ Another reason why the update based model is successful is because it is more sc
 The main disadvantage is the high cost involved in obtaining and maintaining the computer clusters and server hardware, required to host the VE.
 
 \section{P2P MMVE state consistency models}
+\label{p2p_mmve_state_consistency}
 
 An issue with the development of P2P MMVEs is that no complete consistency model has been proposed and implemented. Various schemes have been proposed to address the various challenges of P2P MMVE state consistency, but these have mostly occurred in isolation. Some of the proposed schemes will be reviewed. What should be noted is that the various areas of state consistency is quite modular, which might allow for the integration of the best schemes in each area into a comprehensive P2P MMVE state consistency model.
 
-P2P MMVE schemes are based on one of the two classic consistency models described in Section \ref{classic_models}. Although it might seem that the fully distributed model is a better fit for P2P MMVE state consistency, this model has received less attention than the C/S model. The reason for this is partly because of the difficulties in getting the fully distributed model to scale.
+P2P MMVE schemes are based on one of the two classic consistency models described in Section \ref{classic_models}. Although it might seem that the fully distributed model is a better fit for P2P MMVE state consistency, this model has received less attention than the C/S model. The reason for this is partly because of the difficulties in getting the fully distributed model to scale. Usually the fully distributed model makes use of rounds, where players submit actions and all player actions are executed at the end of a round. In an MMVE with tens of thousands to millions of players, designing the round mechanism to remain scalable is a challenge. Rounds are required, because of the event ordering mechanism that ensures state consistency.
 
-Usually the fully distributed model makes use of rounds, where players submit actions and all player actions are executed at the end of a round. In an MMVE with tens of thousands to millions of players, designing the round mechanism to remain scalable is a challenge. Rounds are required, because of the event ordering mechanism that ensures state consistency.
+The C/S consistency architecture is applied to P2P MMVEs by distributing authoritative objects. Every authoritative object is maintained by a single node, that received all events for the object, applies the game logic and informs all nodes of the generated game updates. This effectively creates a C/S consistency model from the perspective of each authoritative object. An example of such a consistency model is the region-based model.
 
-The C/S consistency architecture is applied to P2P MMVEs by distributing authoritative objects. Every authoritative object is maintained by a single node, that received all events for the object, applies the game logic and informs all nodes of the generated game updates. This effectively creates a C/S consistency model from the perspective of each authoritative object.
+A region is usually created by segmenting the world and super peers act as regional servers to all peers in their region. Each super peer receives all events, handles all game logic and distributes updates to all peers in its region. The super peer also handles state management and persistency for its region, hosting NPCs, objects and persistent player data. Clients in the region only house copies of the regional objects and some client logic to update the local copies of objects.
+
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=2cm 5cm 27cm 16.5cm, width=\textwidth]{region_based_CS_CM}
+ \caption{Region-based Client/Server consistency model}
+ \label{fig_cs_region_cm}
+\end{figure}
+%
+The consistency model is depicted in Figure \ref{fig_cs_region_cm}. One can see that this approach is modelled on the update based model, but segmented into separate regions. The role of the server is here fulfilled by a super peer, which is a peer that is selected in some logical way, from the available set of peers and then promoted. Server selection in itself is a complex topic that has to deal with determining whether a peer has sufficient resources available and also whether the peer is trustworthy.
 
 It should be noted that the overview presented here is only an overview of the different techniques and general trends present in the different areas
 of peer-to-peer MMOGs. This overview does not presume to present an exhaustive list of papers in these areas, rather to place the topic of state persistency in context; to show readers how state persistency fits into the context of peer-to-peer games and to allow readers to distinguish between, for example, the topics of state persistency, interest management and event dissemination.
@@ -305,3 +315,9 @@ The issue of game state persistency in P2P MMOGs is the focus of this paper and 
 However, before the different storage types are reviewed, some classic C/S models are presented for comparison with the fully distributed model.
 
 \section{Conclusion}
+
+This chapter introduced the event-update consistency model that is mostly used in MMVE. From the literature reviewed, a generic process was developed that will ensure state consistency. Classic state consistency models were introduced and it was shown how these models relate to the generic state consistency process. After this, state consistency for P2P MMVEs were described. It was shown how the models used are all based on the classic consistency models. Some research into every area of P2P MMVE state consistency was discussed to enable the reader to place the work done here, into perspective.
+
+In this chapter it was shown that the field of P2P MMVE state consistency is a growing one, already containing many significant contributions. But is was also shown that there is still much room for improvement on how we think about state management and state persistency and that there are still many open questions in these fields.
+
+The next chapter will further investigate a key part of state consistency introduced in this chapter, namely state management and persistency.
