@@ -1,35 +1,45 @@
-\chapter{Pithos Design}
+\chapter{Pithos Design and Implementation}
 \label{chp:DESIGN}
 
-%Key challenges and focus
-Recently, six key challenges of P2P systems have been identified: \emph{interest management}, \emph{game event dissemination}, \emph{non-player
-character (NPC) host allocation}, \emph{game state persistency}, \emph{cheating mitigation} and \emph{incentive mechanisms}
-\cite{Fan_deisgn_issues_p2p}. Most of the challenges mentioned have received significant attention from the research community, with the exception of
-state persistency.
+The generic state consistency model was presented in Section \ref{generic_event_update_model}. One of the key challenges that still remain was determined to be designing a root storage module specifically tailored to P2P MMVEs. The root storage model identifies in Section \ref{generic_event_update_model} includes the processes of state management and state persistency for the authoritative objects.
 
-State persistency defines how object states should be stored. Objects states can be anything from a user's position to the state of the virtual
-market in an MMVE. For a P2P MMVE, game data must be distributed amongst various peers in the network. This creates challenges not usually present in
-classic C/S MMVEs. We've identified the main requirements of P2P MMVE state persistency in \cite{gilmore_p2p_mmog_state_persistency} as scalability,
-reliability, fairness, responsiveness and security.
+We've identified the main requirements of P2P MMVE state management and persistency in in Section \ref{key_challenges_cm} as: scalability,
+reliability, fairness, responsiveness and security. In Chapter \ref{p2p_MMVE_state_persistency} it is argued that none of the current approaches to state persistency satisfy all identified requirements,
 
-In \cite{gilmore_p2p_mmog_state_persistency} we argue that none of the current approaches to state persistency satisfy all identified requirements.
-The focus of this paper is, therefore, exclusively on state persistency in P2P MMVEs. It presents a design that satisfies all the identified
-requirements, along with some implementation details and preliminary results. Pithos, a novel hybrid multi-tiered state persistency architecture is
+The focus of this thesis is, therefore exclusively on state management and persistency in P2P MMVEs. This chapter presents a design that satisfies all the identified requirements, along with implementation details and results.
+
+Pithos, a novel hybrid multi-tiered state persistency architecture is
 proposed. The novelty of Pithos lies in its support for both a responsive and a fair storage system, while also taking into account security aspects
-of distributed storage. To the best of our knowledge, there are some storage systems that provide responsive or fair storage, but none that provide
-both. No storage system, designed specifically for P2P MMVEs, have taken security into account.
+of distributed storage. There are some storage systems that provide responsive or fair storage, but none that provide both. No storage system, designed specifically for P2P MMVEs, have taken security into account.
 
-If Pithos is incorporated into an existing P2P MMVE network architecture, it will add the ability to reliability share the storage load of long and
-short term game state. The addition of a robust state persistency mechanism, specifically designed for P2P MMVEs, will bring us one step closer to
+If Pithos is incorporated into an existing P2P MMVE consistency architecture, it will add the ability to handle both state management and state persistency. The addition of a robust state persistency mechanism, specifically designed for P2P MMVEs, will bring us one step closer to
 the creation of a complete P2P MMVE architecture.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    \section{Use cases}
 
-    \section{Design goals}
+\section{Use cases}
 
-    \section{Oversim architecture}
+The purpose of Pithos is to allow for efficient object storage and retrieval that satisfies all identified requirements. As is evident from root storage in the flow diagram in Figure \ref{fig_event_update_flowdiagram}, Pithos will interface directly with the VE logic, as well as receive updates from the update generator. For the purposes of this discussion, update generation is assumed to be part of game logic.
 
-    \section{Architecture characteristics}
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=28mm 223mm 82mm 282mm, width=0.5\textwidth]{pithos_use_case}
+ \caption{Use case diagram of Pithos}
+ \label{fig_pithos_use_case}
+\end{figure}
+
+As shown in the use case diagram in Figure \ref{fig_pithos_use_case}, the VE logic should be able to use Pithos in four ways: store, retrieve, modify and remove. These are the use cases generally required of any storage system.
+
+The VE logic will store data when a new object is added to the VE state. This can happen as a consequence of an event leading to the generation of a new object. An example of this is a rocket firing at a target. This event might generate a missile object to be sent towards the target.
+
+Object retrieval will be required every time an event is received. The VE logic will retrieve the object state from memory, which is part of state management. Object states, other than the one being altered, might also be required by the logic to determine the effect an event will have, as discussed in Section \ref{event_logic_update}.
+
+Object modification occurs every time an object update is generated. An object update, by definition, required a modification of the object state.
+
+Object removal might also be required to save storage space, although this is not essential to the correct functioning of the storage system.
+
+\section{Design goals}
+
+\section{Architecture characteristics}
 
 In this section, ``Pithos'', the proposed P2P MMVE state persistency architecture design is described. The inspiration for this architecture come
 from two observations:
@@ -55,7 +65,7 @@ Pithos groups peers to form a two tiered storage model. The first tier is a stor
 groups. On the first tier, which is the intra-group level, a fully distributed storage system is used to allow for highly responsive read and write
 operations within the group. On the second tier, which is the inter-group level, a P2P overlay is used to store data between groups.
 
-According to categorisation of \ref{current_models}, Pithos is a type of hybrid storage, that incorporates overlay storage and distance-based
+According to categorisation of \ref{storage_type_overview}, Pithos is a type of hybrid storage, that incorporates overlay storage and distance-based
 storage. Responsiveness is achieved by constructing fully connected networks amongst groups of players and then storing objects that are mostly used
 by the group within the group, as described in Sections \ref{grouping}, \ref{store_retrieve} and \ref{distance_based}. Reliability is achieved by
 making use of replication and migration mechanisms as described in Section \ref{store_retrieve}. Security is achieved by using a certification
@@ -131,6 +141,9 @@ Whenever an object is stored or updated in the storage network, nodes have to si
 life of the object. This system is very different from classic distributed file storage designs that advocate anonymity in storage. The fact that all
 changes can be tracked to a specific node will simplify the task of eliminating user cheating.
 
+\section{Implementation details}
+
+\subsection{Oversim architecture}
     \subsection{Structure}
 
         \subsection{DHT implementation}
@@ -152,10 +165,15 @@ changes can be tracked to a specific node will simplify the task of eliminating 
     \section{Designing for network churn}
 
     \section{Group consistency}
+    %Check how this increases with increased network sizes and varying levels of network churn.
 
     \section{Repair mechanisms}
 
     \section{Group migration}
+    
+        \section{Bandwidth requirements (overhead)}
+    %Mention something about low bandwidth links and how that influences timeout and what extra mechanisms were required.
+    %Check how this increases with increased network sizes and varying levels of network churn.
 
     \section{Implementation}
     The proposed multi-tiered model is currently being implemented in Oversim \cite{OverSim_2007}, a P2P simulation environment based in Omnet++, which

@@ -47,7 +47,7 @@ Environment logic communicates how the world should change via \emph{state updat
 
 An object exists in two forms: the authoritative object and the non-authoritative object. The state of the authoritative object is considered to be the true state or absolute state. Copies of the authoritative object can be made, but these copies are all non-authoritative objects. If a discrepancy occurs between an authoritative object and a non-authoritative object, the state of the authoritative object is considered to be the true state. The work of the consistency mechanism in the VE is to ensure that all non-authoritative object states follows the authoritative object state within a time frame that is reasonable for the particular VE and the particular type of object.
 
-Authoritative objects are the objects traditionally housed on the server in the C/S based MMOGs. All clients obtain replicas of these objects and duplicate them locally in order to perform low latency computations. An example would be an NPC monster. When players perceive the monster in the virtual world, a duplicate of the NPC objects is sent to the user's computer for display purposes. When another player attacks the NPC, the change in health will be computed at the server and an update is then sent in order to ensure consistency between root and replica objects.
+Authoritative objects are the objects traditionally housed on the server in the C/S based MMVEs. All clients obtain replicas of these objects and duplicate them locally in order to perform low latency computations. An example would be an NPC monster. When players perceive the monster in the virtual world, a duplicate of the NPC objects is sent to the user's computer for display purposes. When another player attacks the NPC, the change in health will be computed at the server and an update is then sent in order to ensure consistency between root and replica objects.
 
 \subsection{General flow}
 \label{general_flow}
@@ -74,6 +74,7 @@ When an event has been translated into a state update, the root object on the ro
 When the update is delivered to Agent 2, the local object state is updated and the object's new state is displayed to the agent to allow the agent to make decisions and, therefore, generate events based on the new object state.
 
 \subsection{Generic event-update model}
+\label{generic_event_update_model}
 
 During the literature review process, many papers were reviewed that were said to deal with state consistency in P2P MMVEs \cite{}. These papers that were said to contain novel state consistency methods for P2P MMVEs, always only pertained to a specific part of the state consistency model and compared other papers related to the same part. All these papers improved on the various modules that make up a state consistency model, but failed to provide an overview of the bigger picture and how to place the work in the paper in the framework of a state consistency model.
 
@@ -92,7 +93,7 @@ Event layer interest management determines which objects will be affected and on
 
 The game logic is then applied to each received event and a corresponding update is generated. It is possible that the future state of an object might depend on the current state of the object, the received event and the state of some other object. The game logic might, therefore, require the states of other authoritative objects.
 
-Storing authoritative data requires state management and state persistency. State management is the storage of objects in primary storage, while state persistency is the storage of the VE on secondary storage. State persistency does not have such rigorous responsiveness requirements as state management, as described in Section \ref{}.
+Storing authoritative data requires state management and state persistency. State management is the storage of objects in primary storage, while state persistency is the storage of the VE on secondary storage. State persistency does not have such rigorous responsiveness requirements as state management, as described in Section \ref{char_responsiveness}.
 
 After the combination of event, object states and game logic, an event is generated. Update layer interest management determines which nodes require this update. These will typically be the nodes whose agents can perceive the object in the virtual environment and, therefore, stores local copies of the object.
 
@@ -105,7 +106,7 @@ What changes for the various architectures is where the root object is housed, a
 \section{Classic consistency models}
 \label{classic_models}
 
-An overview of the two common models, currently used in computer games will be described. The models used in P2P MMOGs are all permutations of these two basic models. The two models are based on the two different network models. These are the fully distributed model, also called the event-based model \cite{p2p_cm_aoe}, and the C/S-based model, also called update-based model
+An overview of the two common models, currently used in computer games will be described. The models used in P2P MMVEs are all permutations of these two basic models. The two models are based on the two different network models. These are the fully distributed model, also called the event-based model \cite{p2p_cm_aoe}, and the C/S-based model, also called update-based model
 \cite{unreal_networking}.
 
 \subsection{Event-based (Fully distributed)}
@@ -191,7 +192,7 @@ Update level interest management is required to determine which clients can perc
 An authoritative global game state is housed on the server and a  non-authoritative local game state is housed on all clients for display purposes.
 
 \subsubsection{Advantages}
-The update-based model is used in many, if not all, MMOGs currently in operation. This includes games like World of Warcraft, Eve Online and Ultima Online, to name just a few.
+The update-based model is used in many, if not all, MMVEs currently in operation. This includes games like World of Warcraft, Eve Online and Ultima Online, to name just a few.
 
 This approach greatly assists with security, as clients cannot influence the state of any other clients and every client's state depends on updates
 received from the server. The server state is also termed authoritative, because if there is a conflict, the server state is always the state to
@@ -224,7 +225,7 @@ A region is usually created by segmenting the world and super peers act as regio
 The consistency model is depicted in Figure \ref{fig_cs_region_cm}. One can see that this approach is modelled on the update based model, but segmented into separate regions. The role of the server is here fulfilled by a super peer, which is a peer that is selected in some logical way, from the available set of peers and then promoted. Server selection in itself is a complex topic that has to deal with determining whether a peer has sufficient resources available and also whether the peer is trustworthy.
 
 It should be noted that the overview presented here is only an overview of the different techniques and general trends present in the different areas
-of peer-to-peer MMOGs. This overview does not presume to present an exhaustive list of papers in these areas, rather to place the topic of state persistency in context; to show readers how state persistency fits into the context of peer-to-peer games and to allow readers to distinguish between, for example, the topics of state persistency, interest management and event dissemination.
+of peer-to-peer MMVEs. This overview does not presume to present an exhaustive list of papers in these areas, rather to place the topic of state persistency in context; to show readers how state persistency fits into the context of peer-to-peer games and to allow readers to distinguish between, for example, the topics of state persistency, interest management and event dissemination.
 
 %Include the actual consistency models here. Region-based update-based, fully distributed
 
@@ -270,7 +271,7 @@ Thus far in P2P MMVE literature, little attention has been paid to whether the i
 
 Interest management is used to determine the smallest amount of information that a peer requires, in order to present an accurate representation of
 the world to players. In consistency terms, it provides a means to determine which replica objects require updates of the root object. The idea is
-not specific to P2P MMOGs and was already formally suggested in \cite{First_IM} and later with greater focus on a distributed environment in \cite{Whang_agent_based_IM}. Extensive research has been done into solving AoI problems and a comparison of techniques can be found in
+not specific to P2P MMVEs and was already formally suggested in \cite{First_IM} and later with greater focus on a distributed environment in \cite{Whang_agent_based_IM}. Extensive research has been done into solving AoI problems and a comparison of techniques can be found in
 \cite{Boulanger_IM_compare} and \cite{IM_and_ED_survey_Krause}.
 
 The main idea is that a player has a limited visual range and area around the player in which it can interact with objects. The player requires
@@ -305,13 +306,13 @@ region. Masters inform their slaves of a new neighbour. Slaves communicate direc
 \subsection{Root object store}
 
 
-In a recently completed PhD on the subject of P2P MMOGs, Lu Fan had this to say about state persistency: ``Game state persistency is a major challenge for P2P MMOGs as existing P2P storage infrastructures are designed to support file sharing, and seldom fulfil the performance and security requirements of a MMOG. \ldots the persistency area is still immature with many problems waiting to be investigated.'' \cite{Fan_phd}.
+In a recently completed PhD on the subject of P2P MMVEs, Lu Fan had this to say about state persistency: ``Game state persistency is a major challenge for P2P MMVEs as existing P2P storage infrastructures are designed to support file sharing, and seldom fulfil the performance and security requirements of a MMVE. \ldots the persistency area is still immature with many problems waiting to be investigated.'' \cite{Fan_phd}.
 
 State persistency is treated as a sub domain of state consistency, in that state persistency models define where and how the root or authoritive
 objects are stored. It is assumed that replica objects are always stored in the primary memory of the clients that immediately require the
 information contained in the root object.
 
-The issue of game state persistency in P2P MMOGs is the focus of this paper and the remainder of the paper will deal exclusively with this subject.
+The issue of game state persistency in P2P MMVEs is the focus of this paper and the remainder of the paper will deal exclusively with this subject.
 However, before the different storage types are reviewed, some classic C/S models are presented for comparison with the fully distributed model.
 
 \section{Conclusion}

@@ -23,7 +23,7 @@ Gnutella and Skype. The reason for this is the high level of duplication in thes
 perform keyword searches in unstructured networks and the overlay requires less maintenance.
 
 Because there is no assurance that a data item might be retrieved from an unstructured network, especially when that item is scarce, unstructured
-overlays are not considered adequate as a basis for P2P MMOGs, where all data items must be available at all times.
+overlays are not considered adequate as a basis for P2P MMVEs, where all data items must be available at all times.
 
 Structured overlays have been proposed that provide for efficient routing and reliable retrieval of data items. Some of these well known overlays
 are: CAN \cite{CAN}, Chord \cite{chord}, Tapestry \cite{tapestry} and Pastry \cite{pastry}.
@@ -39,29 +39,29 @@ finding ``needles'' \cite{Rodrigues_acm_comms_p2p}.
 \section{P2P MMVEs}
 \label{background}
 
-Peer-to-Peer (P2P) Massively Multiplayer Online Games (MMOGs) have received significant attention from the research community, since
-the first publication on the subject by Knutssonn et al. in 2004 \cite{knutsson_p2p_first}. P2P MMOGs promise to solve many issues prevalent in
-today's Client/Server (C/S) based MMOGs. Some key issues have to be solved before P2P MMOGs can be implemented commercially. Over the past few years,
+Peer-to-Peer (P2P) Massively Multiuser Virtual Environments (MMVEs) have received significant attention from the research community, since
+the first publication on the subject by Knutssonn et al. in 2004 \cite{knutsson_p2p_first}. P2P MMVEs promise to solve many issues prevalent in
+today's Client/Server (C/S) based MMVEs. Some key issues have to be solved before P2P MMVEs can be implemented commercially. Over the past few years,
 researchers have been addressing these challenges.
 
 The remainder of this paper is structured as follows:
 %
-the field of P2P MMOGs is introduced in Section  \ref{p2p_network_architectures}, which contains an introduction to P2P overlays, the major advantages of P2P MMOGs and the key challenges that P2P MMOGs face.
+the field of P2P MMVEs is introduced in Section  \ref{p2p_network_architectures}, which contains an introduction to P2P overlays, the major advantages of P2P MMVEs and the key challenges that P2P MMVEs face.
 %
 An introduction to some classic consistency models, currently used in computer games, are introduced in Section \ref{classic_models}.
 %
-Section \ref{related_work} discusses some related surveys that have been completed in the field of P2P MMOGs and P2P applications in general.
+Section \ref{related_work} discusses some related surveys that have been completed in the field of P2P MMVEs and P2P applications in general.
 %
-Section \ref{p2p_mmog_state_persistency} contains an analysis of different types of distributed storage for MMOGs. The section defines characteristics against which all storage schemes are evaluated. The section concludes with recommendations to implementers as to the applicability of the different types of storage to different types of games.
+Section \ref{p2p_MMVE_state_persistency} contains an analysis of different types of distributed storage for MMVEs. The section defines characteristics against which all storage schemes are evaluated. The section concludes with recommendations to implementers as to the applicability of the different types of storage to different types of games.
 %
 Section \ref{conclusion} concludes the paper by providing a brief summary and suggesting a number of areas for future work.
 
 \section{Peer-to-Peer MMVE network architectures}
 \label{p2p_network_architectures}
 
-In 2004, an architecture using the peer-to-peer networking model to host MMOGs was proposed by Knutsson et al. \cite{knutsson_p2p_first}. This
+In 2004, an architecture using the peer-to-peer networking model to host MMVEs was proposed by Knutsson et al. \cite{knutsson_p2p_first}. This
 revealed a new research field, which attempts to establish the P2P model as a viable alternative to the classic C/S and Client/MultiServer (C/MS)
-architectures. This architecture does, however, still have a few major issues that need to be solved before MMOGs can be developed that use it. If
+architectures. This architecture does, however, still have a few major issues that need to be solved before MMVEs can be developed that use it. If
 these issues, discussed in Section \ref{key_challenges}, can be solved, a P2P architecture holds some powerful advantages over a C/S system.
 
 The core idea of the P2P model is that each peer contributes sufficient resources to the network to host itself. This also means that all functions
@@ -70,7 +70,7 @@ of the server in the classic C/S model are distributed amongst all peers.
 \subsection{Advantages}
 \label{p2p_advantages}
 
-There are various advantages to moving from C/S to P2P in MMOGs. These include: increased robustness, improved scalability, lower operator costs,
+There are various advantages to moving from C/S to P2P in MMVEs. These include: increased robustness, improved scalability, lower operator costs,
 improved handling of transient player load and lower latencies.
 
 The P2P system is robust, because there is no server that can fail, only individual peers. Individual peers failing will not affect any other peers
@@ -95,18 +95,18 @@ The distribution of the load as well as direct communication will further reduce
 A key challenge with any networked game is how to maintain state consistency between root and replica objects. A root object is the authoritive
 version of an object and the replica object is usually a local non-authoritive version. Root objects are usually found on the server and replica
 objects are found in the local object cache of clients. The method by which the states between root and replica objects are updated is called the
-consistency model. Solving the state consistency problem for P2P MMOGs is one of the major development challenges.
+consistency model. Solving the state consistency problem for P2P MMVEs is one of the major development challenges.
 
 %Describe the challenge of state consistency
 
 Another challenge for P2P systems is the required peer bandwidth. In a paper by Miller and Crowcroft, a packet simulator was created to determine the
 required bandwidth and effective latency, if a game such as World of Warcraft were to be implemented using P2P technologies
-\cite{Miller_p2p_infeasability}. Their simulation results indicate that today's networks are not able to host P2P MMOGs, with the required bandwidth
+\cite{Miller_p2p_infeasability}. Their simulation results indicate that today's networks are not able to host P2P MMVEs, with the required bandwidth
 and latency constraints. Such a significant result requires verification, but at the least, it shows that reducing bandwidth and latencies for P2P
-MMOGs should be a primary design requirement.
+MMVEs should be a primary design requirement.
 
 It should be noted that the overview presented here is only an overview of the different techniques and general trends present in the different areas
-of peer-to-peer MMOGs. This overview does not presume to present an exhaustive list of papers in these areas, rather to place the topic of state
+of peer-to-peer MMVEs. This overview does not presume to present an exhaustive list of papers in these areas, rather to place the topic of state
 persistency in context; to show readers how state persistency fits into the context of peer-to-peer games and to allow readers to distinguish
 between, for example, the topics of state persistency, interest management and event dissemination.
 
@@ -134,7 +134,7 @@ Protocol level cheats are cheats based on the different methods of communicating
 
 As with all taxonomies, all cheats may not cleanly fit into one if these boxes, some cheats may occur over multiple levels or a cheat with a specific outcome can be implemented differently on different levels. The field of P2P security has recently received more attention than in the past and has
 started to bear fruit \cite{survey_p2p_game_cheats}. This is, however, an ongoing research field with many issues still open. For an in-depth review
-of the security issues facing peer-to-peer system in general, refer to \cite{p2p_security_issues}. These issues are the same issues facing P2P MMOGs, with the exception of the game and application layer issues.
+of the security issues facing peer-to-peer system in general, refer to \cite{p2p_security_issues}. These issues are the same issues facing P2P MMVEs, with the exception of the game and application layer issues.
 
 \subsubsection{Incentive mechanisms}
 
@@ -142,8 +142,8 @@ P2P schemes require all players to share resources in order to ensure correct fu
 mechanisms is to ensure that all players contribute resources, by incentivised contribution.
 
 All distributed resource sharing models require incentive mechanisms. For example, Bittorrent systems use the tit-for-tat protocol to ensure that all
-people downloading data are also contributing data \cite{tit_for_tat}. Such mechanisms are also required with P2P MMOGs. One advantage in designing
-an incentive algorithm for a P2P MMOG is that players can be made to contribute resources for the duration of play. The issues with file sharing
+people downloading data are also contributing data \cite{tit_for_tat}. Such mechanisms are also required with P2P MMVEs. One advantage in designing
+an incentive algorithm for a P2P MMVE is that players can be made to contribute resources for the duration of play. The issues with file sharing
 systems are not present where a peer, after downloading a file, has no more incentive to contribute. When a peer plays a game, incentive can be
 created to provide resources for the duration of the game.
 
@@ -158,7 +158,7 @@ that there exists space for more research in this field.
 \subsubsection{Distributed computation}
 
 Non-Player Characters (NPCs) are characters that are not controlled by any human player, but are rather controlled by some artificial intelligence
-routine or script executing on some host machine. These characters represent the traders and monsters in MMOGs and usually contain sets of rules that
+routine or script executing on some host machine. These characters represent the traders and monsters in MMVEs and usually contain sets of rules that
 determine how they should interact with Player Characters (PCs) as well as their own state information. An NPC's state can be how much money and
 items it has to trade or how much health it still has after being attacked by a player.
 
