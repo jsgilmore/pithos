@@ -22,7 +22,7 @@ The purpose of Pithos is to allow for efficient object storage and retrieval tha
 
 \begin{figure}[htbp]
  \centering
- \includegraphics[clip=true, viewport=28mm 223mm 82mm 282mm, width=0.5\textwidth]{pithos_use_case}
+ \includegraphics[clip=true, viewport=28mm 223mm 82mm 282mm, width=0.3\textwidth]{pithos_use_case}
  \caption{Use case diagram of Pithos}
  \label{fig_pithos_use_case}
 \end{figure}
@@ -39,17 +39,20 @@ Object removal might also be required to save storage space, although this is no
 
 \section{Design goals}
 
-\section{Architecture characteristics}
+Pithos is designed to fulfill all use case requirements as well as the requirements for P2P MMVE storage architectures as set out in Section \ref{key_challenges_cm}.
 
-In this section, ``Pithos'', the proposed P2P MMVE state persistency architecture design is described. The inspiration for this architecture come
-from two observations:
+In order to fulfill the P2P MMVE storage requirements, the following design decisions were made:
+
+The inspiration for Pithos come from two observations:
 %
 \begin{enumerate}
   \item One can combine multiple storage models and arrive at a model which possesses fewer disadvantages than any of the models used.
   \item Responsiveness is greatly increased in a fully distributed model, where there is no intermediate server that relays all information.
-      However, fully distributed architectures are not scalable because the number of messages scaling by $O(N^2)$, where $N$ is the number of
-      nodes in the network.
 \end{enumerate}
+
+Fully distributed architectures are, however, not scalable because the number of messages scaling by $O(N^2)$, where $N$ is the number of nodes in the network.
+
+\section{Architecture}
 
 \begin{figure}[htbp]
  \centering
@@ -62,8 +65,7 @@ Figure \ref{fig_pithos} shows the Pithos architecture. The figure shows groups o
 are connected to each other in an P2P overlay through super peers (red).
 
 Pithos groups peers to form a two tiered storage model. The first tier is a storage model at group level and the second is a storage model over all
-groups. On the first tier, which is the intra-group level, a fully distributed storage system is used to allow for highly responsive read and write
-operations within the group. On the second tier, which is the inter-group level, a P2P overlay is used to store data between groups.
+groups. On the first tier, which is the intra-group level, a fully distributed storage system is used to allow for highly responsive read and write operations within the group. On the second tier, which is the inter-group level, a P2P overlay is used to store data between groups.
 
 According to categorisation of \ref{storage_type_overview}, Pithos is a type of hybrid storage, that incorporates overlay storage and distance-based
 storage. Responsiveness is achieved by constructing fully connected networks amongst groups of players and then storing objects that are mostly used
@@ -141,12 +143,52 @@ Whenever an object is stored or updated in the storage network, nodes have to si
 life of the object. This system is very different from classic distributed file storage designs that advocate anonymity in storage. The fact that all
 changes can be tracked to a specific node will simplify the task of eliminating user cheating.
 
-\section{Implementation details}
+\section{Oversim}
 
-\subsection{Oversim architecture}
-    \subsection{Structure}
+Pithos has been implemented in Oversim \cite{OverSim_2007}, a P2P simulation environment based in Omnet++, which allows for the measurement of identified requirements. Furthermore, it allows for the comparison of the current model with other state persistency models.
 
-        \subsection{DHT implementation}
+Oversim is a peer-to-peer and overlay network framework for the Omnet++ simulator. Oversim allows for the simulation of many well known structured or unstructured overlay protocols. It also allows for the development of applications that can use the already implemented overlays in a well defined architecture.
+
+\subsection{Motivation}
+
+To allow for greater control of the environment, as well as greater scale, it was decided to implement the first version of Pithos as a large scale network simulation. A simulation allows for careful selection of the environment parameters and tight control of the parameter values. This in turns allows one to keep all but one parameters constant and evaluate the effect of a design decision on the system for varying values of the free parameter.
+
+The underlying Omnet++ simulation environment is a powerful network simulator in its own right. It allows for robust message and module definitions and contains many tools to assist with simulation measurement and monitoring.
+
+Simulation also allows for greater scalability and simulating on a network with global Internet characteristics. Greater scalability is achieved, because thousands of nodes can easily be created, where all the nodes have global scale latency characteristics.
+
+Implementing a large scale network application in the real-world would require thousands of computers spread across the globe. Such an environment will contain many variables out of the designer's control. Issues such as router congestion for example varies from day to day, which will produce varying latency results.
+
+Because of these reasons, it was decided to first implement Pithos in simulation. This allows for the perfection of the design, under laboratory conditions, before the real world implementation is completed.
+
+Pithos is intended for future real world implementation, however, so all modules created were written in such a manner to allow for easy porting. No tasks that are performed in Pithos make use of any simulation ``short cuts'', such as accessing the global peer list. Only statistics gathering modules are allowed to make use of these simulation features.
+
+
+\subsection{Architecture}
+
+\subsubsection{Layers}
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=57mm 260mm 100mm 287mm, width=0.5\columnwidth]{Oversim_layers}
+ \caption{Oversim architecture layers}
+ \label{fig_oversim_layers}
+\end{figure}
+
+Oversim is a layered architecture, as shown in Figure \ref{fig_oversim_layers}. The Oversim architecture contains the layers: TCP, UDP, Overlay, Tier 1, Tier 2 and Tier 3.
+
+The transport control protocol (TCP) and user datagram protocol (UDP) are both transport level protocols, according to the OSI protocol stack specification. These two layers are the lowest communications layers in Oversim and allows message passing to other nodes.
+
+The overlay layer is where the P2P overlay is housed. This can be any of the well known structured or unstructured overlays, such as Pastry, Chord or Gia. The three tiers above the overlay layer are the application level layers and is where application that use an overlay may be implemented. Three application layers are allowed.
+
+Tier 1 can communicate with the Tier 2, overlay, TCP and UDP layers. Tier 2 can communicate with the Tier 1, Tier 3, TCP and UDP layers. Tier 3 can communicate with the Tier 2, TCP and UDP layers. Internal communications are usually between tiers and TCP and UDP communication occurs when a layer wishes to send a message to the same layer on a different node.
+
+\subsubsection{Churn generators}
+
+\subsection{Generic consistency extension}
+
+\subsection{Pithos in Oversim}
+
+\subsection{DHT implementation}
 
     \section{Data structures}
 
@@ -176,10 +218,7 @@ changes can be tracked to a specific node will simplify the task of eliminating 
     %Check how this increases with increased network sizes and varying levels of network churn.
 
     \section{Implementation}
-    The proposed multi-tiered model is currently being implemented in Oversim \cite{OverSim_2007}, a P2P simulation environment based in Omnet++, which
-allows for the measurement of identified requirements. Furthermore, it allows for the comparison of the current model with other state persistency
-models. Initial results are promising, with the implemented model functioning as expected. The simulated system is very responsive when storing data
-within a group and as responsive as storing data in an overlay, when storing data between groups.
+
 
 Pithos is designed to form part of a complete P2P MMVE network solution. It is assumed that there exists some intelligence that drives Pithos and has
 to determine when objects have to be stored and retrieved on each peer. This driving intelligence is termed the game layer.
