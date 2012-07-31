@@ -26,6 +26,9 @@ Ensure correctness for pithos under 32bit systems. This includes testing long va
 Dissertation:
 Make sure the dissertation never talks about "this paper".
 Make sure the state management and persistency chapter uses the terms state management and persistency correctly.
+Remove the term "game" where it is not required and replace with environment and VE.
+Replance "player" with "user".
+In the introduction, talk about MMVEs, and what applications they can be. Then name MMOGs as exmample of MMVEs.
 
 Make sure all introductions are relevant.
 Make sure all conclusions are relevant.
