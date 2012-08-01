@@ -9,6 +9,8 @@ Determine distributions of object requests and peer lifetimes to be used in Pith
 Distributions for put, get and update will probably vary greatly.
 These distributions have to be translated into their C/S counterparts, to enable profiling.
 
+Ensure sent get stats in Pithos test app, match the stats in Group storage. This can probably be fixed by recording the number of unhandled requests.
+
 Implement Pithos as a real world application
 Develop grouping algorithm based on player traces
 Have Pithos construct groups based on the grouping algorithm
