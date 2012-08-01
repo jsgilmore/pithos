@@ -167,6 +167,14 @@ Pithos is intended for future real world implementation, however, so all modules
     \subsection{Architecture}
 
         \subsubsection{Layers}
+        
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=33mm 27mm 262mm 197mm, width=\columnwidth]{Oversim_architecture}
+ \caption{The default}
+ \label{fig_oversim_architecture}
+\end{figure}
+
 \begin{figure}[htbp]
  \centering
  \includegraphics[clip=true, viewport=57mm 260mm 100mm 287mm, width=0.5\columnwidth]{Oversim_layers}
@@ -220,6 +228,13 @@ Every module can contain a collection of sub-modules which implements the layer 
 
 \section{Pithos nodes and modules}
 
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=49mm 48mm 245mm 173mm, width=0.5\columnwidth]{Oversim_terminals}
+ \caption{The Oversim simple underlay network with the three Pithos terminal types}
+ \label{fig_oversim_terminals}
+\end{figure}
+
 Three types of Pithos nodes exist: super peers, peers and a directory server. The single directory server is a normal three-tiered Oversim node, which places joining peers into groups represented by super peers, as explained in Section \ref{network_join_iplementation}.
 
 Super peers represent and manage groups. This includes ensuring group consistency, which is to say, ensuring that all nodes perceive the same peers as being part of their group. Super peers also inform joining peers of objects available in a group.
@@ -227,6 +242,13 @@ Super peers represent and manage groups. This includes ensuring group consistenc
 Peers in Pithos contain peer logic, communicator, group storage, DHT storage and group ledger modules.
 
 In the Pithos implementation, the only difference between a super peer and a peer is that a super peer node, in addition to all peer modules, also contain super peer logic and a super peer group ledger.
+
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=64mm 39mm 227mm 186mm, width=0.5\columnwidth]{Oversim_root_object_store}
+ \caption{Pithos super peer and peer modules in Oversim}
+ \label{fig_oversim_root_object_store}
+\end{figure}
 
 \section{DHT modules}
 %Generic architecture required extension
@@ -236,8 +258,8 @@ In the Pithos implementation, the only difference between a super peer and a pee
 \section{Key mechanisms}
     \subsection{Joining the network}
     \label{network_join_iplementation}
-    All super peers advertise their locations with the directory server. When a 
-    
+    All super peers advertise their locations with the directory server. When a
+
     \subsection{Grouping}
 
     \subsection{Storing data}
@@ -251,7 +273,7 @@ In the Pithos implementation, the only difference between a super peer and a pee
 \section{Designing for network churn}
 
     \subsection{Repair mechanisms}
-        
+
     \subsection{Group consistency}
     %Check how this increases with increased network sizes and varying levels of network churn.
 
