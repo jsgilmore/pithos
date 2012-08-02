@@ -165,9 +165,23 @@ Pithos is intended for future real world implementation, however, so all modules
 
 
     \subsection{Architecture}
+        \subsubsection{Simple underlay network}
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=49mm 48mm 245mm 173mm, width=0.5\columnwidth]{Oversim_terminals}
+ \caption{The Oversim simple underlay network with the three Pithos terminal types}
+ \label{fig_oversim_terminals}
+\end{figure}
 
-        \subsubsection{Layers}
-        
+
+Oversim also contains the concept of a churn generator. Churn generators model users joining and leaving the network. There are three types of churn generators: ``no churn'', ``lifetime churn'' and ``Pareto churn''. The ``no churn'' churn generator creates nodes every specified number of seconds until a specified number of nodes are reached and does nothing further. This generator can be used to test simple networks, where churn is not an issue, or for initial testing of the first prototype.
+
+Lifetime churn creates nodes with specified average lifetimes, sampled from an exponential distribution. This is a distribution regularly used to model lifetimes in reliability engineering. Pareto churn samples node lifetimes from a Pareto distribution, instead of an exponential distribution. This churn generator type requires mean node lifetime as well as mean node dead time to be specified.
+
+Multiple churn generators can exist in an Oversim simulation. Each churn generator can create a unique terminal type. A terminal type is determined by the protocols executing on every layer of the Oversim architecture.
+
+        \subsubsection{Node architecture}
+
 \begin{figure}[htbp]
  \centering
  \includegraphics[clip=true, viewport=33mm 27mm 262mm 197mm, width=\columnwidth]{Oversim_architecture}
@@ -191,14 +205,6 @@ The transport control protocol (TCP) and user datagram protocol (UDP) are both t
 The overlay layer is where the P2P overlay is housed. This can be any of the well known structured or unstructured overlays, such as Pastry, Chord or Gia. The three tiers above the overlay layer are the application level layers and is where application that use an overlay may be implemented. Three application layers are allowed.
 
 Tier 1 can communicate with the Tier 2, overlay, TCP and UDP layers. Tier 2 can communicate with the Tier 1, Tier 3, TCP and UDP layers. Tier 3 can communicate with the Tier 2, TCP and UDP layers. Internal communications are usually between tiers and TCP and UDP communication occurs when a layer wishes to send a message to the same layer on a different node.
-
-        \subsubsection{Churn generators}
-
-Oversim also contains the concept of a churn generator. Churn generators model users joining and leaving the network. There are three types of churn generators: ``no churn'', ``lifetime churn'' and ``Pareto churn''. The ``no churn'' churn generator creates nodes every specified number of seconds until a specified number of nodes are reached and does nothing further. This generator can be used to test simple networks, where churn is not an issue, or for initial testing of the first prototype.
-
-Lifetime churn creates nodes with specified average lifetimes, sampled from an exponential distribution. This is a distribution regularly used to model lifetimes in reliability engineering. Pareto churn samples node lifetimes from a Pareto distribution, instead of an exponential distribution. This churn generator type requires mean node lifetime as well as mean node dead time to be specified.
-
-Multiple churn generators can exist in an Oversim simulation. Each churn generator can create a unique terminal type. A terminal type is determined by the protocols executing on every layer of the Oversim architecture.
 
     \subsection{Generic consistency extension}
 
@@ -226,14 +232,9 @@ Every new layer can communicate with the layer above and below it, and can also 
 
 Every module can contain a collection of sub-modules which implements the layer itself. It the layer is not implemented, a dummy layer may be specified. The Pithos implementation is located within the root object store module. An application that provides Pithos with test inputs called ``PithosTestApp'' is situated within the root object updater layer. Pithos also makes use of overlay storage, which is implemented in the overlay storage module. Overlay storage requires a P2P overlay for routing purposes, which is why it is connected to the overlay layer.
 
-\section{Pithos nodes and modules}
+\section{Pithos implementation}
 
-\begin{figure}[htbp]
- \centering
- \includegraphics[clip=true, viewport=49mm 48mm 245mm 173mm, width=0.5\columnwidth]{Oversim_terminals}
- \caption{The Oversim simple underlay network with the three Pithos terminal types}
- \label{fig_oversim_terminals}
-\end{figure}
+\subsection{Node types}
 
 Three types of Pithos nodes exist: super peers, peers and a directory server. The single directory server is a normal three-tiered Oversim node, which places joining peers into groups represented by super peers, as explained in Section \ref{network_join_iplementation}.
 
@@ -243,6 +244,8 @@ Peers in Pithos contain peer logic, communicator, group storage, DHT storage and
 
 In the Pithos implementation, the only difference between a super peer and a peer is that a super peer node, in addition to all peer modules, also contain super peer logic and a super peer group ledger.
 
+\subsection{Module types}
+
 \begin{figure}[htbp]
  \centering
  \includegraphics[clip=true, viewport=64mm 39mm 227mm 186mm, width=0.5\columnwidth]{Oversim_root_object_store}
@@ -250,10 +253,17 @@ In the Pithos implementation, the only difference between a super peer and a pee
  \label{fig_oversim_root_object_store}
 \end{figure}
 
-\section{DHT modules}
-%Generic architecture required extension
+\subsubsection{Peer logic}
 
-\section{PithosTestApp modules}
+\subsubsection{Super peer logic}
+
+\subsubsection{Group storage}
+
+\subsubsection{DHT storage}
+
+\subsubsection{Ledgers}
+
+\section{PithosTestApp implementation}
 
 \section{Key mechanisms}
     \subsection{Joining the network}
