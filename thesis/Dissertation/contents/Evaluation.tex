@@ -7,12 +7,7 @@ of 1024 byte objects was chosen to be much larger than Quake 3 game objects with
 designed for the low latency storage of small game objects.
 
 For the results shown, 14499 peers, 500 super peers and a single directory server are created at the start of the simulation. The directory server
-publishes super peer information, which allows a peer to join the group nearest to it. Because of the way Pithos is structured, each super peer node
-is also a peer node, which gives a total of 15000 Oversim nodes.
-
-To be able to simulate Pithos for 15000 nodes, it runs on the Oversim simple underlay network \cite{oversim_applications}, where node latencies are
-determined by the distance between nodes placed in an $n$-dimensional Euclidean space. The positions of the nodes are chosen to match the latencies
-of the CAIDA/Skitter project. Different nodes are also assigned different bandwidth and jitter parameters to simulate a heterogenous network.
+publishes super peer information, which allows a peer to join the group nearest to it. Because of the way Pithos is structured, each super peer node is also a peer node, which gives a total of 15000 Oversim nodes.
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     \section{Performance}

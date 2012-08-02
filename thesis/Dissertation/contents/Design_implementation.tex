@@ -149,6 +149,8 @@ Pithos has been implemented in Oversim \cite{OverSim_2007}, a P2P simulation env
 
 Oversim is a peer-to-peer and overlay network framework for the Omnet++ simulator. Oversim allows for the simulation of many well known structured or unstructured overlay protocols. It also allows for the development of applications that can use the already implemented overlays in a well defined architecture.
 
+%Discuss the lack of documentation
+
     \subsection{Motivation}
 
 To allow for greater control of the environment, as well as greater scale, it was decided to implement the first version of Pithos as a large scale network simulation. A simulation allows for careful selection of the environment parameters and tight control of the parameter values. This in turns allows one to keep all but one parameters constant and evaluate the effect of a design decision on the system for varying values of the free parameter.
@@ -164,8 +166,18 @@ Because of these reasons, it was decided to first implement Pithos in simulation
 Pithos is intended for future real world implementation, however, so all modules created were written in such a manner to allow for easy porting. No tasks that are performed in Pithos make use of any simulation ``short cuts'', such as accessing the global peer list. Only statistics gathering modules are allowed to make use of these simulation features.
 
 
-    \subsection{Architecture}
-        \subsubsection{Simple underlay network}
+    \subsection{Underlay network}
+    
+At the base of an Oversim simulation is the underlay network. The underlay network determines the types of nodes in the Oversim simulation. Three underlay types exist: the ``simple'', ``INET'' and ``SingleHost'' underlays \cite{oversim_applications}.
+
+In the simple underlay, node latencies are determined by the distance between nodes placed in an $n$-dimensional Euclidean space. The positions of the nodes are chosen to match the latencies of the CAIDA/Skitter project. Different nodes are also assigned different bandwidth and jitter parameters to simulate a heterogenous network. The simple underlay, therefore, captures the delay characteristics of a global scale network in an abstract way. The simple underlay network is ideal for simulating large scale overlay networks because of its simplicity and high accuracy.
+
+The INET underlay is based on the Omnet++ INET underlay and allows for the simulation of the complete IP level stack. This includes backbone routers and gateways. It also contains many implemented MAC layer protocols. The INET underlay is well suited to simulating lower level communication protocols or wireless protocols such as IEEE 802.11 (Wi-Fi).
+
+The SingleHost underlay allows for interaction with a physical network. It allows for the implementation of physical nodes, running on networks computers. These physical nodes can then connect to a simulated network and receive packets with bandwidth and delay characteristics as if they were situated on a network with the simulation's specific characteristics.
+
+To be able to simulate Pithos for the large numbers of nodes required, as discussed in Section \ref{scalability_req}, it runs on the simple underlay. Pithos is dependant on the delay characteristics of the lower level protocols, but the CAIDA and Skitter measurements capture these quantities in their measurements. The reasons for different delay characteristics in the network is not required.
+
 \begin{figure}[htbp]
  \centering
  \includegraphics[clip=true, viewport=49mm 48mm 245mm 173mm, width=0.5\columnwidth]{Oversim_terminals}
@@ -173,32 +185,26 @@ Pithos is intended for future real world implementation, however, so all modules
  \label{fig_oversim_terminals}
 \end{figure}
 
+Figure \ref{fig_oversim_terminals} shows the Pithos simple underlay network after the first five nodes have been generated. Each overlay terminal is an Oversim node containing its own protocol stack. The underlay configurator is responsible for setting up the network. The global observer contains the global node list, global statistics and parameters modules. It is used to generate global statistics and by the lower levels to keep track of all nodes.
 
-Oversim also contains the concept of a churn generator. Churn generators model users joining and leaving the network. There are three types of churn generators: ``no churn'', ``lifetime churn'' and ``Pareto churn''. The ``no churn'' churn generator creates nodes every specified number of seconds until a specified number of nodes are reached and does nothing further. This generator can be used to test simple networks, where churn is not an issue, or for initial testing of the first prototype.
+Three churn generators also exist, one for generating each of the three Pithos node types. Churn generators model users joining and leaving the network. There are three types of churn generators: ``no churn'', ``lifetime churn'' and ``Pareto churn''. The ``no churn'' churn generator creates nodes every specified number of seconds until a specified number of nodes are reached and does nothing further. This generator can be used to test simple networks, where churn is not an issue, or for initial testing of the first prototype.
 
 Lifetime churn creates nodes with specified average lifetimes, sampled from an exponential distribution. This is a distribution regularly used to model lifetimes in reliability engineering. Pareto churn samples node lifetimes from a Pareto distribution, instead of an exponential distribution. This churn generator type requires mean node lifetime as well as mean node dead time to be specified.
 
-Multiple churn generators can exist in an Oversim simulation. Each churn generator can create a unique terminal type. A terminal type is determined by the protocols executing on every layer of the Oversim architecture.
+A node type is determined by the protocols executing on every layer of the Oversim architecture. The Pithos node types will be explained in Section \ref{pithos_node_types}.
 
-        \subsubsection{Node architecture}
-
-\begin{figure}[htbp]
- \centering
- \includegraphics[clip=true, viewport=33mm 27mm 262mm 197mm, width=\columnwidth]{Oversim_architecture}
- \caption{The default}
- \label{fig_oversim_architecture}
-\end{figure}
+    \subsection{Node architecture}
 
 \begin{figure}[htbp]
  \centering
  \includegraphics[clip=true, viewport=57mm 260mm 100mm 287mm, width=0.5\columnwidth]{Oversim_layers}
- \caption{Oversim architecture layers}
+ \caption{Oversim node architecture layers}
  \label{fig_oversim_layers}
 \end{figure}
 
 %Also show the Oversim picture
 
-Oversim is a layered architecture, as shown in Figure \ref{fig_oversim_layers}. The Oversim architecture contains the layers: TCP, UDP, Overlay, Tier 1, Tier 2 and Tier 3.
+Every node in Oversim contains a layered architecture, as shown in Figure \ref{fig_oversim_layers}. The Oversim node architecture contains the layers: TCP, UDP, Overlay, Tier 1, Tier 2 and Tier 3.
 
 The transport control protocol (TCP) and user datagram protocol (UDP) are both transport level protocols, according to the OSI protocol stack specification. These two layers are the lowest communications layers in Oversim and allows message passing to other nodes.
 
@@ -206,11 +212,21 @@ The overlay layer is where the P2P overlay is housed. This can be any of the wel
 
 Tier 1 can communicate with the Tier 2, overlay, TCP and UDP layers. Tier 2 can communicate with the Tier 1, Tier 3, TCP and UDP layers. Tier 3 can communicate with the Tier 2, TCP and UDP layers. Internal communications are usually between tiers and TCP and UDP communication occurs when a layer wishes to send a message to the same layer on a different node.
 
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=33mm 27mm 262mm 197mm, width=\columnwidth]{Oversim_architecture}
+ \caption{The components of an Oversim terminal, including the tiered node architecture.}
+ \label{fig_oversim_architecture}
+\end{figure}
+
+Figure \ref{fig_oversim_architecture} shows the complete Oversim node architecture. The tiers, udp, tcp and overlay are connected as explained earlier. UDP is also connected to a bootstrap list module, which assists nodes with joining the UDP network. The neighbourhood cache, interface table, crypto module and notification board modules are also present, but these modules are unused in Pithos.
+
     \subsection{Generic consistency extension}
 
 %Show the generic consistency architecture in Oversim
 
-To allow Oversim to simulate a complete consistency architecture, the Oversim framework itself was extended. The three tiers were replaced with all the elements identified in the generic consistency model in Section \ref{generic_event_update_model}. Figure \ref{} shows the extended Oversim framework containing the following layers:
+To allow Oversim to simulate a complete consistency architecture, the Oversim framework itself was extended. The three tiers were replaced with all the elements identified in the generic consistency model in Section \ref{generic_event_update_model}. Practically, this required the implementation of a new type of overlay terminal type, replacing the tiers with the following layers:
+%
 \begin{itemize}
     \item Agent
     \item Event layer IM
@@ -234,17 +250,23 @@ Every module can contain a collection of sub-modules which implements the layer 
 
 \section{Pithos implementation}
 
+Pithos is implemented in the root object store layer of the generic consistency model in the extended Oversim architecture. On a network level, Pithos consists out of three node types: super peers, peers and a directory server. The terminal types will be explained in Section \ref{pithos_node_types}.
+
+On a terminal (node) level, Pithos consists out of the following modules: super peer logic, peer logic, ledgers, DHT storage, group storage and a communicator. The modules will be explained in Section \ref{pithos_module_types}.
+
 \subsection{Node types}
+\label{pithos_node_types}
 
-Three types of Pithos nodes exist: super peers, peers and a directory server. The single directory server is a normal three-tiered Oversim node, which places joining peers into groups represented by super peers, as explained in Section \ref{network_join_iplementation}.
+The simulation contains a single directory server, which is a normal three-tiered Oversim node. The directory server places joining peers into groups represented by super peers. The directory server allows peers to join the network (Section \ref{network_join_iplementation}) and be placed into groups (Section \ref{grouping_implementation}).
 
-Super peers represent and manage groups. This includes ensuring group consistency, which is to say, ensuring that all nodes perceive the same peers as being part of their group. Super peers also inform joining peers of objects available in a group.
+Super peers represent and manage groups. This includes handling joining peers, ensuring group consistency (Section \ref{group_migration_implementation}) and initiating object repair (Section \ref{object_implementation_implementation}).
 
-Peers in Pithos contain peer logic, communicator, group storage, DHT storage and group ledger modules.
+Peers handle requests to store (Section \ref{store_implementation}), retrieve (Section \ref{retrieve_implementation}) or modify (Section \ref{modify_implementation}) data from the object updater and game logic layers of the consistency model. Peers also verify received data from multiple sources for added security (Section \ref{object_verification_implementation}).
 
-In the Pithos implementation, the only difference between a super peer and a peer is that a super peer node, in addition to all peer modules, also contain super peer logic and a super peer group ledger.
+It is possible for a single Pithos terminal to be both a peer and a super peer. In that case, it contains all modules of both node types.
 
 \subsection{Module types}
+\label{pithos_module_types}
 
 \begin{figure}[htbp]
  \centering
@@ -263,29 +285,47 @@ In the Pithos implementation, the only difference between a super peer and a pee
 
 \subsubsection{Ledgers}
 
-\section{PithosTestApp implementation}
-
-\section{Key mechanisms}
-    \subsection{Joining the network}
-    \label{network_join_iplementation}
+\subsection{Key mechanisms}
+    \subsubsection{Joining the network}
+    \label{network_join_implementation}
     All super peers advertise their locations with the directory server. When a
 
-    \subsection{Grouping}
+    \subsubsection{Grouping}
+    \label{grouping_implementation}
 
-    \subsection{Storing data}
+    \subsubsection{Storing data}
+    \label{store_implementation}
+    
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=2mm 143mm 185mm 289mm, width=\columnwidth]{Pithos_msg_flows_store}
+ \caption{Pithos message flow as a response to a store request}
+ \label{fig_pithos_msg_flow_store}
+\end{figure}
 
-    \subsection{Retrieving data}
+    \subsubsection{Retrieving data}
+    \label{retrieve_implementation}
+    
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=3mm 73mm 189mm 219mm, width=\columnwidth]{Pithos_msg_flows_retrieve}
+ \caption{Pithos message flow as a response to a retrieve request}
+ \label{fig_pithos_msg_flow_retrieve}
+\end{figure}
 
-    \subsection{Modifying data}
+    \subsubsection{Modifying data}
+    \label{modify_implementation}
 
-    \subsection{Group migration}
+    \subsubsection{Group migration}
+    \label{group_migration_implementation}
+    
+    \subsubsection{Object repair}
+    \label{object_repair_implementation}
+    
+    \subsubsection{Object verification}
+    \label{object_verification_implementation}
 
-\section{Designing for network churn}
-
-    \subsection{Repair mechanisms}
-
-    \subsection{Group consistency}
-    %Check how this increases with increased network sizes and varying levels of network churn.
+\section{PithosTestApp implementation}
 
 \section{Bandwidth requirements (overhead)}
     %Mention something about low bandwidth links and how that influences timeout and what extra mechanisms were required.
