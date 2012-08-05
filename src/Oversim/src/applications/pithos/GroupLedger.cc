@@ -139,8 +139,8 @@ void GroupLedger::handleMessage(cMessage* msg)
 		}
 
 		//Collect stats for both super peers and peers
-		//RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of known group peers")).c_str(), peer_list.size()));
-		//RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of unique group objects")).c_str(), object_map.size()));
+		RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of known group peers")).c_str(), peer_list.size()));
+		RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of unique group objects")).c_str(), object_map.size()));
     }
     else if ((ttlTimer = dynamic_cast<ObjectTTLTimer*>(msg)) != NULL)
 	{
@@ -216,12 +216,12 @@ void GroupLedger::finish()
 	cModule *communicatorModule = getParentModule()->getSubmodule("communicator");
 	Communicator *communicator = check_and_cast<Communicator *>(communicatorModule);
 
-	cModule *groupStorageModule = getParentModule()->getSubmodule("group_storage");
-	GroupStorage *groupStorage = check_and_cast<GroupStorage *>(groupStorageModule);
+	cModule *groupStorageModule;
+	GroupStorage *groupStorage;
 
     simtime_t time = globalStatistics->calcMeasuredLifetime(communicator->getCreationTime());
 
-    if ((time >= GlobalStatistics::MIN_MEASURED) && !(groupStorage->getSuperPeerAddress().isUnspecified()))
+    if (time >= GlobalStatistics::MIN_MEASURED)
     {
     	std::ostringstream group_name;
 
@@ -232,6 +232,15 @@ void GroupLedger::finish()
 
     		group_name << "GroupLedger (" << thisAdr << "): ";
     	} else {
+    		//The group storage module should only be referenced if we're actually dealing with a peer module, and not a super peer module.
+    		//The reason being is that pure super peers do not posess group storage modules.
+    		groupStorageModule = getParentModule()->getSubmodule("group_storage");
+    		groupStorage = check_and_cast<GroupStorage *>(groupStorageModule);
+
+    		//If no super peer has been recorded for this peer, ignore the statistics
+    		if (groupStorage->getSuperPeerAddress().isUnspecified())
+    			return;
+
         	group_name << "GroupLedger (" << groupStorage->getSuperPeerAddress() << "): ";
     	}
 
