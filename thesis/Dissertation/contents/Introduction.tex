@@ -1,6 +1,24 @@
 \chapter{Introduction}
 \label{chp:INTRO}
 
+\section{MMOGs: The cost of doing business}
+Massively Multiplayer Online Games are characterised by thousands of players interacting in the same virtual environment or game world; socially, cooperatively or competitively. A popular MMOG genre is the MMO role playing game (MMORPG). In an MMORPG, players are represented by avatars that inhabit a virtual world. In this virtual world there are quests that a player may undertake to gain experience in classic RPG style. Gaining experience allows a player to gain levels, which makes the player character more powerful.
+
+Players play the game to become sufficiently powerful to play the end-game content. End-game content requires large groups of players to work together in a highly coordinated way to achieve some set of objectives. This activity is called ``raiding''. Raiding is usually done by groups of players that have decided to play together and form a guild. Guilds have complex social structures, which allows for various social interactions. Usually it is this high degree of social interaction that attracts players to MMOGs. Players are no longer playing by themselves in a lonely world, but rather playing with other players in a large open virtual world. 
+
+Massively Multiplayer Online Games (MMOGs) have seen tremendous growth over the past decade, growing from less than 500,000 active subscribers in 1999 to over 21 million in 2011 \cite{mmo_growth_chart}. In 2011, the MMOG market was a \$2,6 billion industry in the United States alone \cite{newzoo_mmo_report}.
+
+With the fast growing MMOG market, many companies are spending a significant amount of money to produce AAA MMOG titles. Some development cost estimates are: \$18 mil. for Aion, \$20 mil., for Everquest \cite{aion_everquest_cost}, \$63 mil. for World of Warcraft \cite{wow_cost} and \$100 mil. to \$200 mil. for Star Wars: The Old Republic \cite{star_wars_cost_1}, \cite{star_wars_cost_2}. Although these figures are purely estimates, it does show that to develop a AAA MMOG title costs a lot of money.
+
+The issue with MMOG development is that, although they cost more to develop than single player or smaller scale multiplayer games, they are just as likely to fail. Despite this, game publishers are spending a lot of money in an attempt to recreate the success that is World of Warcraft.
+
+Because of the large revenues being generated from MMOGs, many competitors are entering the MMOG space. Currently, the rate at which new MMOGs are added to the market is outstripping the growth of the market itself \cite{newzoo_mmo_report}. Furthermore, because of the recession, over the past two or three years, game subscriptions have been shown to stabilise or even decline \cite{mmo_growth_chart}.
+
+The significant initial investment required to develop an MMOG also doesn't present the complete picture. Another factor driving up costs for an MMOG is the money required for server hardware, maintenance and support. An MMOG is not finished when it goes live. A team of developers are required to maintain the game, release patches fixing bugs and to produce more content to keep the player base sufficiently interested to ensure that players will continue to pay \$15 per month to play the game. Development and maintenance costs for World of Warcraft for four years is estimated at \$100 mil. to \$200 mil. \cite{wow_cost}.
+
+With the costs involved, it is therefore difficult for a new developer to enter into this space. After the large initial investment into the game's development, all server hardware must be acquired and people appointed to maintain the game. This money has to be spent before it is known whether the game will succeed or fail. It has been estimated that during the lifetime of an MMOG, 80\% of the game revenue goes into hardware and maintenance costs \cite{cs_mmog_cost}.
+
+In order to reduce the costs associated with classic MMOGs, peer-to-peer (P2P) MMOGs are being investigated. The challenges of P2P MMOGs provides the basis for this work.
 
 \section{Peer-to-Peer}
 
@@ -10,8 +28,7 @@
 P2P networks are created and maintained in the application layer of the Open Systems Interconnection (OSI) model protocol stack. This application
 layer network is called the P2P overlay. Peers in an overlay network might have neighbours that have no relationship to their physical position in
 the underlying network. Overlays can broadly be classified into structured and unstructured types. The classification is mostly based on the
-differing methods of routing and content retrieval in the network. This section only provides a brief comparison between structured and unstructured
-overlays. For a detailed comparison between the two types that also deals with many of the myths of structured overlays, please refer to
+differing methods of routing and content retrieval in the network. This section only provides a brief comparison between structured and unstructured overlays. For a detailed comparison between the two types that also deals with many of the myths of structured overlays, please refer to
 \cite{Castro_structured_overlay_myths}.
 
 With unstructured approaches, one is never assured that a data item will be retrieved, even if that data item is present in the network. If many
@@ -35,29 +52,10 @@ finding ``needles'' \cite{Rodrigues_acm_comms_p2p}.
 
 %TODO: Add something about the effect of the hashing and why it's important
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{P2P MMVEs}
-\label{background}
-
-Peer-to-Peer (P2P) Massively Multiuser Virtual Environments (MMVEs) have received significant attention from the research community, since
-the first publication on the subject by Knutssonn et al. in 2004 \cite{knutsson_p2p_first}. P2P MMVEs promise to solve many issues prevalent in
-today's Client/Server (C/S) based MMVEs. Some key issues have to be solved before P2P MMVEs can be implemented commercially. Over the past few years,
-researchers have been addressing these challenges.
-
-The remainder of this paper is structured as follows:
-%
-the field of P2P MMVEs is introduced in Section  \ref{p2p_network_architectures}, which contains an introduction to P2P overlays, the major advantages of P2P MMVEs and the key challenges that P2P MMVEs face.
-%
-An introduction to some classic consistency models, currently used in computer games, are introduced in Section \ref{classic_models}.
-%
-Section \ref{related_work} discusses some related surveys that have been completed in the field of P2P MMVEs and P2P applications in general.
-%
-Section \ref{p2p_MMVE_state_persistency} contains an analysis of different types of distributed storage for MMVEs. The section defines characteristics against which all storage schemes are evaluated. The section concludes with recommendations to implementers as to the applicability of the different types of storage to different types of games.
-%
-Section \ref{conclusion} concludes the paper by providing a brief summary and suggesting a number of areas for future work.
-
 \section{Peer-to-Peer MMVE network architectures}
 \label{p2p_network_architectures}
+
+P2P MMOGs are considered a sub-class of P2P Massively Multiuser Virtual Environments (MMVEs), a class that also includes large scale military simulators.
 
 In 2004, an architecture using the peer-to-peer networking model to host MMVEs was proposed by Knutsson et al. \cite{knutsson_p2p_first}. This
 revealed a new research field, which attempts to establish the P2P model as a viable alternative to the classic C/S and Client/MultiServer (C/MS)
@@ -175,7 +173,3 @@ tasks \cite{fan_mediator_paper}.
 
 \section{Objectives and contributions}
 \label{objectives}
-
-
-\section{Overview of this work}
-\label{overview_intro}

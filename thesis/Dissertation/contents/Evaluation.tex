@@ -1,55 +1,81 @@
 \chapter{Pithos Evaluation}
     \label{chp:EVALUATION}
+\section{Introduction}
+The Pithos design and implementation has now been discussed. In this chapter, the various mechanisms of Pithos will be evaluated and compared to other implementations.
 
-In the results shown, Pastry was used as the P2P overlay and Pithos was driven by a \emph{Game} module developed for this purpose. After a node has
-joined a group, the game module starts to generate store and retrieve requests at a rate of 10 objects per second and a size of 1024 bytes. The size
-of 1024 byte objects was chosen to be much larger than Quake 3 game objects without delta encoding, used in \cite{Bharambe_Donnybrook}. Pithos is
-designed for the low latency storage of small game objects.
+Section \ref{key_mechanisms} presents the key mechanisms that Pithos uses to enable it to satisfy the goals set out in Section \ref{use_cases_goals}. Section \ref{key_mechanisms} often described multiple methods in which a mechanism was implemented. The reason for implementing mechanisms using multiple methods is to be able to compare them. Some methods are theoretically better than others, while some methods are better suited to differing network conditions.
 
-For the results shown, 14499 peers, 500 super peers and a single directory server are created at the start of the simulation. The directory server
-publishes super peer information, which allows a peer to join the group nearest to it. Because of the way Pithos is structured, each super peer node is also a peer node, which gives a total of 15000 Oversim nodes.
+The purpose of this chapter is twofold. To compare the various methods of mechanism implementation and to compare Pithos with other storage architectures reviewed in Chapter \ref{p2p_MMVE_state_persistency}. Each comparison will be performed using the metrics defined in Section \ref{key_challenges_cm}. All metrics were also measured as described in that section, but specific measurement details, as it relates to the simulation implementation will also be presented in this chapter.
 
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    \section{Performance}
+\section{Simulation setup}
+In the results shown, Chord was used as the P2P overlay, mainly due to its faster simulation time. Pithos has, however, also been tested with Pastry and results are similar. After a node has joined the network, PithosTestApp starts to generate store and retrieve requests at a rate of one objects every 5 seconds and a size of 1024 bytes. The size of 1024 byte objects was chosen to be much larger than Quake 3 game objects without delta encoding, used in \cite{Bharambe_Donnybrook}. Pithos is designed for the low latency storage of small game objects.
 
-    \subsection{Bandwidth requirements (overhead)}
-    %Mention something about low bandwidth links and how that influences timeout and what extra mechanisms were required.
-    %Check how this increases with increased network sizes and varying levels of network churn.
+%The node lifetime should still be justified
+For the results shown, 2500 peers, 100 super peers and a single directory server are created at the start of the simulation. The simulation runs for 10,000 seconds. Exponential node lifetimes with 1800 seconds averages are used when testing the store and retrieve requests. The applicability of this lifetime distribution will be explored in Section \ref{}.
 
-    \section{Metrics}
-        \subsection{Overhead}
-        \subsection{Fairness}
-        \subsection{Reliability}
-        \subsection{Responsiveness}
+The simulation used a channel bandwidth of 10 Mbps. Pithos has also been successfully tested for a 1 Mbps link, which initially caused some bugs due to timeouts not being sufficient for the bandwidth, but has since been corrected. Results of the 1 Mbps link is also similar to the 10 Mbps results.
 
-    \section{Overhead}
-    \section{Fairness}
-    \section{Reliability}
-            \subsection{Storage}
-        \label{reliability_compare_storage}
-            \subsubsection{Safe}
-            \subsubsection{Fast}
-            \subsubsection{Comparison with overlay storage}
-            \subsubsection{Comparison with super peer storage}
-            \subsection{Retrieval}
-        \label{reliability_compare_retrieval}
-            \subsubsection{Fast}
-            \subsubsection{Parallel}
-            \subsubsection{Safe}
-            \subsubsection{Comparison with overlay storage}
-            \subsubsection{Comparison with super peer storage}
-    \section{Responsiveness}
-    \label{responsiveness_compare}
-        \subsection{Storage}
-        \label{responsiveness_compare_storage}
-            \subsubsection{Safe}
-            \subsubsection{Fast}
-            \subsubsection{Comparison with overlay storage}
-            \subsubsection{Comparison with super peer storage}
-        \subsection{Retrieval}
-        \label{responsiveness_compare_retrieval}
-            \subsubsection{Fast}
-            \subsubsection{Parallel}
-            \subsubsection{Safe}
-            \subsubsection{Comparison with overlay storage}
-            \subsubsection{Comparison with super peer storage}
+For testing store and retrieve requests, a time-to-live (TTL) of 300s were chosen.
+
+    \section{Storage}
+            \subsection{Safe}
+                \subsubsection{Responsiveness}
+                \subsubsection{Reliability}
+                        \label{reliability_compare_storage}
+                \subsubsection{Fairness}
+                \subsubsection{Overhead}
+            \subsection{Fast}
+                \subsubsection{Responsiveness}
+                \subsubsection{Reliability}
+                \subsubsection{Fairness}
+                \subsubsection{Overhead}
+            \subsection{Overlay storage}
+                \subsubsection{Responsiveness}
+                \subsubsection{Reliability}
+                \subsubsection{Fairness}
+                \subsubsection{Overhead}
+            \subsection{Super peer storage}
+                \subsubsection{Responsiveness}
+                \subsubsection{Reliability}
+                \subsubsection{Fairness}
+                \subsubsection{Overhead}
+            \subsection{Comparison}
+            
+    \section{Retrieval}
+    \label{reliability_compare_retrieval}
+            \subsection{Fast}
+                \subsubsection{Responsiveness}
+                \subsubsection{Reliability}
+                \subsubsection{Fairness}
+                \subsubsection{Security}
+            \subsection{Parallel}
+                \subsubsection{Responsiveness}
+                \subsubsection{Reliability}
+                \subsubsection{Fairness}
+                \subsubsection{Security}
+            \subsection{Safe}
+                \subsubsection{Responsiveness}
+                \subsubsection{Reliability}
+                \subsubsection{Fairness}
+                \subsubsection{Security}
+            \subsection{Comparison with overlay storage}
+                \subsubsection{Responsiveness}
+                \subsubsection{Reliability}
+                \subsubsection{Fairness}
+                \subsubsection{Security}
+            \subsection{Comparison with super peer storage}
+                \subsubsection{Responsiveness}
+                \subsubsection{Reliability}
+                \subsubsection{Fairness}
+                \subsubsection{Security}
+                
+    \section{Repair}
+    \label{reliability_compare_retrieval}
+            \subsection{Periodic}
+                \subsubsection{Reliability}
+                \subsubsection{Overhead}
+            \subsection{Lazy}
+                \subsubsection{Reliability}
+                \subsubsection{Overhead}
+                
+\section{Conclusion}

@@ -592,70 +592,10 @@ does, however, provide a lot of opportunities for research.
 \section{Conclusion}
 \label{conclusion}
 
-\subsection{Summary}
-%Paper summary
-After providing an overview of the classic C/S and C/MS state persistency techniques, this survey classified P2P MMVE state persistency techniques
+After providing an overview of the classic C/S and C/MS state persistency techniques, the chapter classified P2P MMVE state persistency techniques
 into super peer based, overlay based, distance based and hybrid storage. The advantages and disadvantages of each method were discussed after
 identifying key challenges that state persistency techniques have to solve. These challenges are: Reliability, Security, Fairness and Responsiveness.
 
-We conclude that there exists no single state persistency architecture, currently in use, that is suited to P2P MMVEs. None of the storage techniques
-reviewed meet the requirements of a real-time distributed application, such as an MMVE. What is required is a state persistency architecture,
-specifically geared towards data persistency in P2P MMVEs, that meet all the challenges of the application.
+We conclude that there exists no single state persistency architecture, currently in use, that is suited to P2P MMVEs. None of the storage techniques reviewed meet the requirements of a real-time distributed application, such as an MMVE. What is required is a state persistency architecture, specifically geared towards data persistency in P2P MMVEs, that meet all the challenges of the application.
 
-%Reason for paper
-This survey was written, because of an identified need for a concise summary of the field of P2P MMVE game state persistency. Many techniques used in
-the past were used because of the ease with which they could be integrated into a P2P MMVE. The purpose of this survey is to identify those
-techniques and to stimulate further research, using empirical methods to compare the different storage techniques used.
-
-\subsection{Prospective research directions}
-%How to address storage challenges
-One of three paths may be followed in order to create a storage type that is suitable to modern hardcore MMVEs. The first would be to take a look at
-the deficiencies mentioned in the different storage types and to then improve one of these types. The other path is what was seen with hybrid
-storage, where multiple types of storage are combined in order to form a new and improved storage type. The third path would be to create a new
-storage type, based on some novel insight into the ways in which games are designed.
-
-%What are some of the challenges of the different storage types
-What follows is a discussion on what work is required in order to improve the current storage types and attempts to define the gaps present that
-should still be solved by future researchers.
-
-For super peer storage to become viable, a means is required to secure the data stored in the super peers and ensure that no super peer is able to
-access the data stored. If this issue is solved, the fairness issue still exists, but might be allowable depending on the type of application.
-
-%Overlay storage - reason
-Overlay storage is a popular storage method in the literature. This is believed to be more as a consequence of the use of Scribe \cite{scribe} than
-any inherit benefit to P2P MMVEs \cite{past_storage_focus}, \cite{Fan_phd}. The reason for using overlay storage in so many implementations seem to
-be merely the availability of PAST, after having already decided to use Scribe. In other words, researchers use Scribe for ALM, Scribe runs on
-Pastry, and PAST is then a readily available storage implementation which also runs on Pastry.
-
-The applicability of overlay storage to MMVEs is still unknown and further research is required. This paper showed that while PAST is regularly used
-in P2P MMVEs, it is not because of the applicability of PAST to P2P MMVEs.
-
-One type of hybrid storage was investigated in this paper, namely overlay/super peer storage, since this is a hybrid type currently seen in P2P
-MMVEs. Other hybrid types should also be investigated, for example a distance based/overlay storage hybrid might improve the reliability of distance
-based storage. Multi-tiered storage might also be of interest, where players or areas are grouped in some way. One type of storage might then be
-implemented amongst the members of a group, with another storage type implemented over all groups. Such a storage type might improve responsiveness
-amongst group members, while adding reliability because of an inter-group backup mechanism.
-
-Distance-based storage still seems immature, with many open questions. Currently, distance-based storage is based on Voronoi diagrams, which seem
-promising. But Voronoi diagrams only provide for a means to identify which objects should be under a specific node's control. Object migration, which
-will occur frequently in this type of storage should still be addressed. The number of migrations should be kept to a minimum to ensure responsive
-access to all stored objects.
-
-The storage is also not yet reliable, but it could be possible to add overlay storage as a backup to the system and thereby add reliability. If
-voting techniques can be used to update game state, some of the security issues might also be solved. With these two issues addressed, the high
-degree of fairness of distance-based storage makes it an excellent candidate to power the P2P MMVEs of the future.
-
-%Performance comparison of storage
-An empirical comparison of the performances of the different storage types is also required. It is believed that the metrics presented in this paper
-could provide a common basis to use in comparing the different storage types.
-
-%Need for storage characteristics
-Research is still required into the characteristics of data stored by MMVEs. This includes how regularly game objects are stored as well as the sizes
-of these objects. It is also expected that different read and write patterns exist for different types of game objects. These patterns should be
-explored in order to determine what the required performance is for P2P MMVEs storage mechanisms.
-
-It is recommended that C/S MMVE storage patterns initially be investigated to provide a benchmark of the required storage performance for a mature
-MMVEs. The storage patterns for a C/S compared to P2P MMVEs might be different. The storage patterns amongst different MMVEs might also differ
-greatly, but for an immature field any data is better than no data.
-
-In conclusion, this paper describes a possible new research field with many open questions still to be answered.
+Whilst doing the literature study a need was identified for a concise summary of the field of P2P MMVE game state persistency. Many techniques used in the past were used because of the ease with which they could be integrated into a P2P MMVE. To inform other researchers in this field and stimulate further research, we published a survey paper on this work in the IEEE Transactions on Parallel and Distributed Systems journal \cite{gilmore_p2p_mmog_state_persistency}.
