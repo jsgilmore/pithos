@@ -162,21 +162,11 @@ simple Super_peer_logic
         string repairType;
         double repairTime;
 
-        @signal[OverlayWrite](type="int");
-        @signal[GroupSize](type="int");
-        @signal[OverlayDelivered](type="int");
-        @signal[overlaysStoreFail](type="int");
-        @signal[JoinTime](type="simtime_t");
-        @signal[StoreNumber](type="int");
-        @signal[OverlayNumber](type="int");
+        //@signal[GroupSize](type="int");
+        //@signal[JoinTime](type="simtime_t");
 
-        @statistic[OverlayNumber](title="Number of overlay files in the group"; record=sum);
-        @statistic[StoreNumber](title="Number of root/replica files in the group"; record=sum);
-        @statistic[JoinTime](title="group join time"; record=vector);
-        @statistic[OverlayWrite](title="Overlay writes"; record=sum);
-        @statistic[GroupSize](title="Group size"; record=vector,max; interpolationmode=sample-hold);
-        @statistic[OverlayDelivered](title="Delivered to Overlay"; record=sum);
-        @statistic[overlaysStoreFail](title="Overlay store failures"; record=sum);
+        //@statistic[JoinTime](title="group join time"; record=vector);
+        //@statistic[GroupSize](title="Group size"; record=vector,max; interpolationmode=sample-hold);
     gates:
         inout comms_gate;
         inout overlay_gate;
