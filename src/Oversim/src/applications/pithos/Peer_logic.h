@@ -115,6 +115,8 @@ class Peer_logic: public cSimpleModule
 
 		bool disableDHT;
 
+		GlobalStatistics* globalStatistics; /**< pointer to GlobalStatistics module in this node*/
+
 	public:
 		Peer_logic();
 		virtual ~Peer_logic();

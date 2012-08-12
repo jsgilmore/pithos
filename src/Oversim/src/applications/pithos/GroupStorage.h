@@ -88,6 +88,7 @@ class GroupStorage : public cSimpleModule
 					numGroupGetFailed = 0;
 					numGroupGetSucceeded = 0;
 					responseType = UNSPECIFIED;
+					request_time = SIMTIME_ZERO;
 				};
 
 				int numGetSent;
@@ -97,6 +98,7 @@ class GroupStorage : public cSimpleModule
 				int numGroupGetFailed;
 				int numGroupGetSucceeded;
 				int responseType;
+				simtime_t request_time;
 
 				//Smart pointers are not required here, since the pointers do not point to elements in dynamic containers
 				std::vector<ResponseTimeoutEvent *> timeouts;
@@ -144,6 +146,9 @@ class GroupStorage : public cSimpleModule
 		int numGetSecondGood;
 		int	numGetSecondBad;
 
+		int numGetReponses;
+		int numPutReponses;
+
 		//Get and Put error reasons
 		int getErrMissingObjectSamePeer;
 		int getErrMissingObjectOtherPeer;
@@ -169,7 +174,7 @@ class GroupStorage : public cSimpleModule
 		 * @param write A pointer to the write packet to be created and filled
 		 * @param rpcid The RPC ID of the original request from the higher layer
 		 */
-		void createWritePkt(ValuePkt **write, unsigned int rpcid);
+		void createWritePkt(ValuePkt **write, simtime_t request_time, unsigned int rpcid);
 
 		//void addObject(cMessage *msg);
 
@@ -198,11 +203,11 @@ class GroupStorage : public cSimpleModule
 
 		void respond_toUpper(cMessage *msg);
 
-		void createResponseMsg(ResponsePkt **response, int responseType, unsigned int rpcid, bool isSuccess, const GameObject& object);
+		void createResponseMsg(ResponsePkt **response, int responseType, simtime_t request_time, unsigned int rpcid, bool isSuccess, const GameObject& object);
 
-		void sendUDPResponse(TransportAddress src_adr, TransportAddress dest_adr, int responseType, unsigned int rpcid, bool isSuccess, const GameObject& object = GameObject::UNSPECIFIED_OBJECT);
+		void sendUDPResponse(TransportAddress src_adr, TransportAddress dest_adr, int responseType,  simtime_t request_time, unsigned int rpcid, bool isSuccess, const GameObject& object = GameObject::UNSPECIFIED_OBJECT);
 
-		void sendUpperResponse(int responseType, unsigned int rpcid, bool isSuccess, const GameObject& object = GameObject::UNSPECIFIED_OBJECT);
+		void sendUpperResponse(int responseType,  simtime_t request_time, unsigned int rpcid, bool isSuccess, const GameObject& object = GameObject::UNSPECIFIED_OBJECT);
 
 		/**
 		 * Send a join request to the directory server or a super peer
