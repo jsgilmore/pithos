@@ -66,8 +66,8 @@ class Super_peer_logic : public cSimpleModule
 		int numPeerDepartures;
 		GlobalStatistics* globalStatistics; /**< pointer to GlobalStatistics module in this node*/
 
-		//simsignal_t groupSizeSignal; /**< A signal that records the group size over time */
-		//simsignal_t joinTimeSignal; /**< A signal that records when this super peer was listed in the directory server */
+		simsignal_t joinTimeSignal; /**< A signal that records when this super peer was listed in the directory server */
+
 	public:
 		Super_peer_logic();
 		virtual ~Super_peer_logic();
