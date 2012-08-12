@@ -2,7 +2,7 @@
 \label{chp:INTRO}
 
 \section{MMOGs: The cost of doing business}
-Massively Multiplayer Online Games are characterised by thousands of players interacting in the same virtual environment or game world; socially, cooperatively or competitively. A popular MMOG genre is the MMO role playing game (MMORPG). In an MMORPG, players are represented by avatars that inhabit a virtual world. In this virtual world there are quests that a player may undertake to gain experience in classic RPG style. Gaining experience allows a player to gain levels, which makes the player character more powerful.
+Massively Multiplayer Online Games (MMOGs) are characterised by thousands of players interacting in the same virtual environment or game world; socially, cooperatively or competitively. A popular MMOG genre is the MMO role playing game (MMORPG). In an MMORPG, players are represented by avatars that inhabit a virtual world. In this virtual world there are quests that a player may undertake to gain experience in classic RPG style. Gaining experience allows a player to gain levels, which makes the player character more powerful.
 
 Players play the game to become sufficiently powerful to play the end-game content. End-game content requires large groups of players to work together in a highly coordinated way to achieve some set of objectives. This activity is called ``raiding''. Raiding is usually done by groups of players that have decided to play together and form a guild. Guilds have complex social structures, which allows for various social interactions. Usually it is this high degree of social interaction that attracts players to MMOGs. Players are no longer playing by themselves in a lonely world, but rather playing with other players in a large open virtual world. 
 
@@ -21,6 +21,8 @@ With the costs involved, it is therefore difficult for a new developer to enter 
 In order to reduce the costs associated with classic MMOGs, peer-to-peer (P2P) MMOGs are being investigated. The challenges of P2P MMOGs provides the basis for this work.
 
 \section{Peer-to-Peer}
+
+
 
 \subsection{Structured and unstructured P2P overlay networks}
 \label{overlays}
@@ -88,27 +90,18 @@ The distribution of the load as well as direct communication will further reduce
 
 \subsection{Key challenges}
 \label{key_challenges}
+Although many advantages can be had from P2P MMVEs, some challenges still remain. The main challenges are state consistency, limited peer bandwidth, cheating mitigation, incentive mechanisms and distributed computation.
 
+\subsubsection{State consistency}
 %State persistency, compared to state consistency
-A key challenge with any networked game is how to maintain state consistency between root and replica objects. A root object is the authoritive
-version of an object and the replica object is usually a local non-authoritive version. Root objects are usually found on the server and replica
-objects are found in the local object cache of clients. The method by which the states between root and replica objects are updated is called the
-consistency model. Solving the state consistency problem for P2P MMVEs is one of the major development challenges.
+A key challenge with any networked game is how to maintain state consistency between users in the virtual world. In other words, to ensure that all users perceive a virtual world in the same state. Solving the state consistency problem for P2P MMVEs is one of the major development challenges and forms the focus of this work. The challenge of state consistency will be described in detail in Chapter \ref{chp:CONSISTENCY}.
 
-%Describe the challenge of state consistency
-
+\subsubsection{Peer bandwidth}
 Another challenge for P2P systems is the required peer bandwidth. In a paper by Miller and Crowcroft, a packet simulator was created to determine the
 required bandwidth and effective latency, if a game such as World of Warcraft were to be implemented using P2P technologies
 \cite{Miller_p2p_infeasability}. Their simulation results indicate that today's networks are not able to host P2P MMVEs, with the required bandwidth
 and latency constraints. Such a significant result requires verification, but at the least, it shows that reducing bandwidth and latencies for P2P
 MMVEs should be a primary design requirement.
-
-It should be noted that the overview presented here is only an overview of the different techniques and general trends present in the different areas
-of peer-to-peer MMVEs. This overview does not presume to present an exhaustive list of papers in these areas, rather to place the topic of state
-persistency in context; to show readers how state persistency fits into the context of peer-to-peer games and to allow readers to distinguish
-between, for example, the topics of state persistency, interest management and event dissemination.
-
-\subsubsection{State consistency}
 
 \subsubsection{Cheating mitigation}
 \label{key_challenges_cheating}
@@ -128,7 +121,6 @@ the game state to which they should not have access at the current time. An exam
 ``fog of war'' is removed and the player can observe all the opponent's movements. Other cheats are sometimes used that augment the player's UI with extra information that allows the player to make more informed decisions. It is debatable whether these additions are cheats. They are, however, considered almost essential for competitive WoW play.
 
 Protocol level cheats are cheats based on the different methods of communicating data across the system. These usually concern dropping, delaying of modifying IP packets to achieve certain outcomes in the game. Infrastructure level cheats concern exploiting the underlying infrastructure on which the games are built. These include hacking the hardware or P2P overlay.
-
 
 As with all taxonomies, all cheats may not cleanly fit into one if these boxes, some cheats may occur over multiple levels or a cheat with a specific outcome can be implemented differently on different levels. The field of P2P security has recently received more attention than in the past and has
 started to bear fruit \cite{survey_p2p_game_cheats}. This is, however, an ongoing research field with many issues still open. For an in-depth review
@@ -173,3 +165,33 @@ tasks \cite{fan_mediator_paper}.
 
 \section{Objectives and contributions}
 \label{objectives}
+
+The main objective of this work is to advance the state of the art of P2P MMVEs. Early in the literature study phase, it was discovered that no research projects that deal with P2P MMVEs present the complete picture of the field. A significant amount of research has been done in the field of state consistency (reviewed in Chapter \ref{chp:CONSISTENCY}), but in this field, no model has been provided which shows what is required to build a complete state consistency architecture. The first contribution of this work is to provide such an architecture at the start of Chapter \ref{chp:CONSISTENCY}.
+
+The generic consistency model that is developed is not only applicable to P2P MMVEs, but to any networked virtual environment that required state consistency. The generic consistency model is also compared with well known client/server and P2P consistency models, to show how the existing models can be seen as more specialised versions of the generic consistency model.
+
+After developing a generic consistency model, this work then focusses on an area of state consistency that has received little attention from the research community, namely: state management and state persistency. This area is concerned with managing object states as they are updated by events occurring in the virtual environment. Also during a literature review of this field, it was found that no thorough review of this field has been done to compare the different types of storage systems present in P2P MMVEs and presented in the literature. We then preceded to perform such a review, presented in Chapter \ref{p2p_MMVE_state_persistency}. The results of this survey has also been published in the IEEE Transactions of Parallel and Distributed Systems \cite{gilmore_p2p_mmog_state_persistency}.
+
+During the survey, some key metrics were identified by which state management and state persistency systems may be described. A proposal was also made as to how these metrics may be measured. What was found upon completion of the survey is that no storage system has thus far been created to satisfy all identified metrics. Work was then undertaken to develop a novel state management and persistency architecture that satisfies all identified requirements.
+
+The state management and persistency architecture has been developed and called ``Pithos''. Pithos has been implemented in a network simulation framework, called Oversim, which runs on the Omnet++ simulation environment. The Oversim framework itself has also been extended to implement our novel generic consistency architecture. Pithos has been implemented in the root object store section of this architecture.
+
+Many of the key mechanisms in Pithos, such as object retrieval, have been implemented using multiple methods. These methods are then compared to determine the advantages and disadvantages of each. Pithos is also compared to the storage systems identified. Pithos always shows similar or improved performance over classic storage systems in all identified areas.
+
+In order to verify the correct functioning of Pithos, mathematical models are also developed to describe Pithos's performance in the various identified metrics. Amongst these is a novel Mathematical model that makes use of an embedded continuous time Markov chain to determine expected object lifetime for varying amounts of network churn, various network sizes and replication rate. The mathematical model is compared with actual Pithos results and appears to match almost exactly.
+
+\section{Summary of this work}
+
+Chapter \ref{chp:CONSISTENCY} presents an overview of state consistency models. Initially, it describes the general process by which state consistency is achieved. Some classic consistency models are then presented in terms of the generic model. Consistency models for P2P MMVEs are then presented, with an overview of work that has been done in each of the various sections required to implement a complete consistency model.
+
+Chapter \ref{p2p_MMVE_state_persistency} focuses on the state management and state persistency aspect of P2P MMVE state consistency. Initially, some metrics are defined according to which different storage architecture may be compared. A literature review is then presented, where papers that deal with various storage techniques are grouped and the advantages and disadvantages of each group is then discussed. This chapter also identifies a need for a novel state management and persistency architecture.
+
+Chapter \ref{chp:DESIGN} describes the design and implementation of Pithos, the novel state management and persistency architecture. Initially, the overarching Pithos design is described, including the perceived use case and design goals. The Oversim simulation environment is then described, along with the extensions that were made to model the generic consistency model. The Pithos implementation is then described in terms of Oversim modules. Key mechanisms that implement that Pithos design are then presented with reference to the Pithos Oversim modules. Various methods to implement some mechanisms are descried.
+
+Chapter \ref{chp:EVALUATION} evaluates the Pithos implementation. The performance of the key mechanisms are presented and the various implementation methods are compared. Pithos is also compared with other storage implementations.
+
+Chapter \ref{chp:MODELLING} models Pithos's performance with reference to the identified metrics for P2P MMVE storage systems. A focus is placed on expected object lifetime and a novel model is developed, based on an embedded continuous time Markov chain.
+
+Chapter \ref{chp:VERIFICATION} compares model results with Pithos simulation results. The purpose of this chapter is to verify the correct functionality of Pithos, according to mathematical models. The chapter also explores how to design storage systems with desired object lifetimes.
+
+Chapter \ref{chp:CONC} concludes the work. It presents a summary of the work, lists contributions made and discusses some future areas of research.

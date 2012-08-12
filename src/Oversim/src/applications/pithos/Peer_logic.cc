@@ -38,6 +38,8 @@ Peer_logic::~Peer_logic()
 
 void Peer_logic::initialize()
 {
+	globalStatistics = GlobalStatisticsAccess().get();
+
 	replicas = par("replicas");
 	numGetRequests = par("numGetRequests");
 	numGetCompares = par("numGetCompares");
@@ -88,6 +90,8 @@ void Peer_logic::handleGetCAPIRequest(RootObjectGetCAPICall* capiGetMsg)
 	read_pkt->setValue(capiGetMsg->getNonce());
 	read_pkt->setKey(capiGetMsg->getKey());
 
+	read_pkt->setTimestamp(capiGetMsg->getCreationTime()); //Record the creation time of the original request.
+
 	//std::cout << "[Peer_logic] Retrieving object with key: " << capiGetMsg->getKey() << endl;
 
 	read_pkt->setHops(0);
@@ -130,6 +134,8 @@ void Peer_logic::handlePutCAPIRequest(RootObjectPutCAPICall* capiPutMsg)
 	//This is the RPC ID of capiPutMsg and will be added to the response msg which the
 	//peer logic can then use to match the received response to the relevant RPC call.
 	write_pkt->setValue(capiPutMsg->getNonce());
+
+	write_pkt->setTimestamp(capiPutMsg->getCreationTime()); //Record the creation time of the original request.
 
 	//Send the game object to be stored in the group.
 	send(write_pkt->dup(), "group_write");
@@ -326,6 +332,8 @@ void Peer_logic::handleResponseMsg(cMessage *msg)
 	//Then process the RPC relating to the response, by checking whether sufficient responses were received, taking action if this was the case
 	if (response->getResponseType() == GROUP_PUT)
 	{
+		RECORD_STATS(globalStatistics->recordOutVector("GroupStorage: PUT Latency (s)", SIMTIME_DBL(simTime() - response->getTimestamp())));
+
 		if (response->getIsSuccess())
 		{
 			it->second.numGroupPutSucceeded++;
@@ -362,6 +370,8 @@ void Peer_logic::handleResponseMsg(cMessage *msg)
 		processGet(&(it->second), response);
 	} else if (response->getResponseType() == GROUP_GET)
 	{
+		RECORD_STATS(globalStatistics->recordOutVector("GroupStorage: GET Latency (s)", SIMTIME_DBL(simTime() - response->getTimestamp())));
+
 		if (response->getIsSuccess())
 			it->second.numGroupGetSucceeded++;
 		else it->second.numGroupGetFailed++;

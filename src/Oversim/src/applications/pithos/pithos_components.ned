@@ -162,11 +162,8 @@ simple Super_peer_logic
         string repairType;
         double repairTime;
 
-        //@signal[GroupSize](type="int");
-        //@signal[JoinTime](type="simtime_t");
-
-        //@statistic[JoinTime](title="group join time"; record=vector);
-        //@statistic[GroupSize](title="Group size"; record=vector,max; interpolationmode=sample-hold);
+        @signal[JoinTime](type="simtime_t");
+        @statistic[JoinTime](title="group join time"; record=vector);
     gates:
         inout comms_gate;
         inout overlay_gate;
