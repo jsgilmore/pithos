@@ -39,6 +39,7 @@ simple PithosTestApp extends BaseApp
         double absRequestStopTime @unit(s);
         int groupProbability;
         bool groupMigration;
+        double migrationTime @unit(s);
 }
 
 

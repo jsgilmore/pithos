@@ -136,23 +136,23 @@ void GroupStorage::finish()
 
     if (time >= GlobalStatistics::MIN_MEASURED) {
         // record scalar data
-        globalStatistics->addStdDev("GroupStorage: Sent Total Messages", numSent);
+        globalStatistics->addStdDev("GroupStorage: Sent Total Messages/s", numSent / time);
 
-        globalStatistics->addStdDev("GroupStorage: Sent PUT Messages", numPutSent);
-        globalStatistics->addStdDev("GroupStorage: Failed PUT Requests", numPutError);
-        globalStatistics->addStdDev("GroupStorage: Successful PUT Requests", numPutSuccess);
+        globalStatistics->addStdDev("GroupStorage: Sent PUT Messages/s", numPutSent / time);
+        globalStatistics->addStdDev("GroupStorage: Failed PUT Requests/s", numPutError / time);
+        globalStatistics->addStdDev("GroupStorage: Successful PUT Requests/s", numPutSuccess / time);
 
-        globalStatistics->addStdDev("GroupStorage: Sent GET Messages", numGetSent);
-		globalStatistics->addStdDev("GroupStorage: Failed GET Requests", numGetError);
-		globalStatistics->addStdDev("GroupStorage: Successful GET Requests", numGetSuccess);
+        globalStatistics->addStdDev("GroupStorage: Sent GET Messages/s", numGetSent / time);
+		globalStatistics->addStdDev("GroupStorage: Failed GET Requests/s", numGetError / time);
+		globalStatistics->addStdDev("GroupStorage: Successful GET Requests/s", numGetSuccess / time);
 
-		globalStatistics->addStdDev("GroupStorage: GET assisted by second request", numGetSecondGood);
-		globalStatistics->addStdDev("GroupStorage: GET not assisted by second request", numGetSecondBad);
+		globalStatistics->addStdDev("GroupStorage: GET assisted by second request/s", numGetSecondGood / time);
+		globalStatistics->addStdDev("GroupStorage: GET not assisted by second request/s", numGetSecondBad / time);
 
-		globalStatistics->addStdDev("GroupStorage: GET error: Missing objects on requesting peer", getErrMissingObjectSamePeer);
-		globalStatistics->addStdDev("GroupStorage: GET error: Missing objects on target peer", getErrMissingObjectOtherPeer);
-		globalStatistics->addStdDev("GroupStorage: GET error: Target of request out of group", getErrRequestOOG);
-		globalStatistics->addStdDev("GroupStorage: PUT error: Target of store out of group", putErrStoreOOG);
+		globalStatistics->addStdDev("GroupStorage: GET error: Missing objects on requesting peer/s", getErrMissingObjectSamePeer / time);
+		globalStatistics->addStdDev("GroupStorage: GET error: Missing objects on target peer/s", getErrMissingObjectOtherPeer / time);
+		globalStatistics->addStdDev("GroupStorage: GET error: Target of request out of group/s", getErrRequestOOG / time);
+		globalStatistics->addStdDev("GroupStorage: PUT error: Target of store out of group/s", putErrStoreOOG / time);
 
 		if (isMalicious)
 			globalStatistics->addStdDev("GroupStorage: Was malicious", 1);
