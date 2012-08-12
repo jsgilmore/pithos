@@ -104,6 +104,8 @@ void GroupStorage::initialize()
 	numGetSuccess = 0;
 	numGetSecondGood = 0;
 	numGetSecondBad = 0;
+	numGetReponses = 0;
+	numPutReponses = 0;
 
 	//Get error reasons
 	getErrMissingObjectOtherPeer = 0;
@@ -127,6 +129,9 @@ void GroupStorage::initialize()
 	WATCH(getErrRequestOOG);
 	WATCH(putErrStoreOOG);
 
+	WATCH(numGetReponses);
+	WATCH(numPutReponses);
+
 	WATCH_MAP(storage_map);
 }
 
@@ -136,23 +141,26 @@ void GroupStorage::finish()
 
     if (time >= GlobalStatistics::MIN_MEASURED) {
         // record scalar data
-        globalStatistics->addStdDev("GroupStorage: Sent Total Messages", numSent);
+        globalStatistics->addStdDev("GroupStorage: Sent Total Messages/s", numSent/time);
 
-        globalStatistics->addStdDev("GroupStorage: Sent PUT Messages", numPutSent);
-        globalStatistics->addStdDev("GroupStorage: Failed PUT Requests", numPutError);
-        globalStatistics->addStdDev("GroupStorage: Successful PUT Requests", numPutSuccess);
+        globalStatistics->addStdDev("GroupStorage: Sent PUT Messages/s", numPutSent/time);
+        globalStatistics->addStdDev("GroupStorage: Failed PUT Requests/s", numPutError/time);
+        globalStatistics->addStdDev("GroupStorage: Successful PUT Requests/s", numPutSuccess/time);
 
-        globalStatistics->addStdDev("GroupStorage: Sent GET Messages", numGetSent);
-		globalStatistics->addStdDev("GroupStorage: Failed GET Requests", numGetError);
-		globalStatistics->addStdDev("GroupStorage: Successful GET Requests", numGetSuccess);
+        globalStatistics->addStdDev("GroupStorage: Sent GET Messages/s", numGetSent/time);
+		globalStatistics->addStdDev("GroupStorage: Failed GET Requests/s", numGetError/time);
+		globalStatistics->addStdDev("GroupStorage: Successful GET Requests/s", numGetSuccess/time);
 
-		globalStatistics->addStdDev("GroupStorage: GET assisted by second request", numGetSecondGood);
-		globalStatistics->addStdDev("GroupStorage: GET not assisted by second request", numGetSecondBad);
+		globalStatistics->addStdDev("GroupStorage: GET responses received/s", numGetReponses/time);
+		globalStatistics->addStdDev("GroupStorage: PUT responses received/s", numPutReponses/time);
 
-		globalStatistics->addStdDev("GroupStorage: GET error: Missing objects on requesting peer", getErrMissingObjectSamePeer);
-		globalStatistics->addStdDev("GroupStorage: GET error: Missing objects on target peer", getErrMissingObjectOtherPeer);
-		globalStatistics->addStdDev("GroupStorage: GET error: Target of request out of group", getErrRequestOOG);
-		globalStatistics->addStdDev("GroupStorage: PUT error: Target of store out of group", putErrStoreOOG);
+		globalStatistics->addStdDev("GroupStorage: GET assisted by second request/s", numGetSecondGood/time);
+		globalStatistics->addStdDev("GroupStorage: GET not assisted by second request/s", numGetSecondBad/time);
+
+		globalStatistics->addStdDev("GroupStorage: GET error: Missing objects on requesting peer/s", getErrMissingObjectSamePeer/time);
+		globalStatistics->addStdDev("GroupStorage: GET error: Missing objects on target peer/s", getErrMissingObjectOtherPeer/time);
+		globalStatistics->addStdDev("GroupStorage: GET error: Target of request out of group/s", getErrRequestOOG/time);
+		globalStatistics->addStdDev("GroupStorage: PUT error: Target of store out of group/s", putErrStoreOOG/time);
 
 		if (isMalicious)
 			globalStatistics->addStdDev("GroupStorage: Was malicious", 1);
@@ -183,7 +191,7 @@ int GroupStorage::getStorageFiles()
 	return storage_map.size();
 }
 
-void GroupStorage::createResponseMsg(ResponsePkt **response, int responseType, unsigned int rpcid, bool isSuccess, const GameObject& object)
+void GroupStorage::createResponseMsg(ResponsePkt **response, int responseType, simtime_t request_time, unsigned int rpcid, bool isSuccess, const GameObject& object)
 {
 	//Create the packet that will house the game object
 	(*response) = new ResponsePkt();
@@ -193,6 +201,7 @@ void GroupStorage::createResponseMsg(ResponsePkt **response, int responseType, u
 	(*response)->setIsSuccess(isSuccess);
 	(*response)->setIsCorrupted(isMalicious);
 	(*response)->setRpcid(rpcid);		//This allows the higher layer to know which RPC call is being acknowledged.
+	(*response)->setTimestamp(request_time);	//This allows modules that prompted this response to measure the time that passed since the request was created.
 
 	if (object != GameObject::UNSPECIFIED_OBJECT)
 	{
@@ -215,11 +224,11 @@ void GroupStorage::createResponseMsg(ResponsePkt **response, int responseType, u
 	}
 }
 
-void GroupStorage::sendUDPResponse(TransportAddress src_adr, TransportAddress dest_adr, int responseType, unsigned int rpcid, bool isSuccess, const GameObject& object)
+void GroupStorage::sendUDPResponse(TransportAddress src_adr, TransportAddress dest_adr, int responseType, simtime_t request_time, unsigned int rpcid, bool isSuccess, const GameObject& object)
 {
 	ResponsePkt *response;
 
-	createResponseMsg(&response, responseType, rpcid, isSuccess, object);
+	createResponseMsg(&response, responseType, request_time, rpcid, isSuccess, object);
 
 	response->setSourceAddress(src_adr);
 	response->setDestinationAddress(dest_adr);
@@ -227,11 +236,11 @@ void GroupStorage::sendUDPResponse(TransportAddress src_adr, TransportAddress de
 	send(response, "comms_gate$o");
 }
 
-void GroupStorage::sendUpperResponse(int responseType, unsigned int rpcid, bool isSuccess, const GameObject& object)
+void GroupStorage::sendUpperResponse(int responseType, simtime_t request_time, unsigned int rpcid, bool isSuccess, const GameObject& object)
 {
 	ResponsePkt *response;
 
-	createResponseMsg(&response, responseType, rpcid, isSuccess, object);
+	createResponseMsg(&response, responseType, request_time, rpcid, isSuccess, object);
 
 	send(response, "read");
 }
@@ -253,9 +262,9 @@ void GroupStorage::forwardRequest(OverlayKeyPkt *retrieve_req)
 	if (retrieve_req->getHops() > 0)
 		error("[GroupStorage]: Object not found on destination node in group.");
 
-	entry.numGetSent = numGetRequests;
 	entry.responseType = GROUP_GET;
 	entry.numGetSent = 0;
+	entry.request_time = retrieve_req->getTimestamp();
 
 	for (int i = 0 ; i < numGetRequests ; i++)
 	{
@@ -315,14 +324,14 @@ bool GroupStorage::handleMissingObject(OverlayKeyPkt *retrieve_req)
 		if (retrieve_req->getSourceAddress() == retrieve_req->getDestinationAddress())
 		{
 			//If the object is not stored in the group, send a failure response to the higher layer
-			sendUpperResponse(GROUP_GET, rpcid, false);
+			sendUpperResponse(GROUP_GET, retrieve_req->getTimestamp(), rpcid, false);
 			RECORD_STATS(getErrMissingObjectSamePeer++);
 			delete(retrieve_req);
 			return true;
 		} else {
 			//If the object is not stored in the group, send a failure response to the higher layer
 			//This situation shouldn't really occur. Make sure there are no packets dropped by the underlay, since it can cause this situation.
-			sendUDPResponse(retrieve_req->getDestinationAddress(), retrieve_req->getSourceAddress(), GROUP_GET, rpcid, false);
+			sendUDPResponse(retrieve_req->getDestinationAddress(), retrieve_req->getSourceAddress(), GROUP_GET, retrieve_req->getTimestamp(), rpcid, false);
 			RECORD_STATS(getErrMissingObjectOtherPeer++);
 			delete(retrieve_req);
 			return true;
@@ -345,12 +354,12 @@ bool GroupStorage::retrieveLocally(OverlayKeyPkt *retrieve_req)
 			//The object is therefore on the requesting peer itself and we can just reply with the object to the higher layer directly
 			RECORD_STATS(numGetSuccess++);
 			//If the object is stored in local storage, send it to the upper layer without requesting from the group
-			sendUpperResponse(GROUP_GET, rpcid, true, storage_map_it->second);
+			sendUpperResponse(GROUP_GET, retrieve_req->getTimestamp(), rpcid, true, storage_map_it->second);
 			delete(retrieve_req);
 			return true;
 		} else {
 			//If the object is stored on this peer, but another peer sent the request, send a UDP response with the object
-			sendUDPResponse(retrieve_req->getDestinationAddress(), retrieve_req->getSourceAddress(), GROUP_GET, rpcid, true, storage_map_it->second);
+			sendUDPResponse(retrieve_req->getDestinationAddress(), retrieve_req->getSourceAddress(), GROUP_GET, retrieve_req->getTimestamp(), rpcid, true, storage_map_it->second);
 			delete(retrieve_req);
 			return true;
 		}
@@ -381,7 +390,7 @@ void GroupStorage::requestRetrieve(OverlayKeyPkt *retrieve_req)
 	{
 		if (retrieve_req->getGroupAddress() != super_peer_address)
 		{
-			sendUDPResponse(retrieve_req->getDestinationAddress(), retrieve_req->getSourceAddress(), GROUP_GET, rpcid, false);
+			sendUDPResponse(retrieve_req->getDestinationAddress(), retrieve_req->getSourceAddress(), GROUP_GET, retrieve_req->getTimestamp(), rpcid, false);
 			RECORD_STATS(getErrRequestOOG++);
 			delete(retrieve_req);
 			return;
@@ -453,13 +462,14 @@ PeerData GroupStorage::selectDestination(std::vector<TransportAddress> send_list
 	return peerData;
 }
 
-void GroupStorage::createWritePkt(ValuePkt **write, unsigned int rpcid)
+void GroupStorage::createWritePkt(ValuePkt **write, simtime_t request_time, unsigned int rpcid)
 {
 	//Create the packet that will house the game object
 	(*write) = new ValuePkt("write");
 	(*write)->setByteLength(VALUE_PKT_SIZE);
 	(*write)->setPayloadType(WRITE);
 	(*write)->setValue(rpcid);
+	(*write)->setTimestamp(request_time);
 	(*write)->setSourceAddress(this_address);
 	(*write)->setGroupAddress(super_peer_address);
 }
@@ -522,7 +532,7 @@ void GroupStorage::send_forstore(ValuePkt *store_req)
 	if (replicas == 0)
 		return;
 
-	createWritePkt(&write, rpcid);
+	createWritePkt(&write, store_req->getTimestamp(), rpcid);
 
 	GameObject *go = (GameObject *)store_req->removeObject("GameObject");
 	if (go == NULL)
@@ -534,6 +544,7 @@ void GroupStorage::send_forstore(ValuePkt *store_req)
 	//Add a new request for which at least one response is required
 	entry.numPutSent = replicas;
 	entry.responseType = GROUP_PUT;
+	entry.request_time = store_req->getTimestamp();		//Store the time when the request was generated, to be able to measure latency later
 
 	for (i = 0 ; i < replicas ; i++)
 	{
@@ -653,6 +664,11 @@ void GroupStorage::respond_toUpper(cMessage *msg)
 	ResponsePkt *response = check_and_cast<ResponsePkt *>(msg);
 	PeerData peerData;
 
+	if (response->getResponseType() == GROUP_GET)
+		RECORD_STATS(numGetReponses++);
+	else if (response->getResponseType() == GROUP_PUT)
+		RECORD_STATS(numPutReponses++);
+
 	PendingRequests::iterator it = pendingRequests.find(response->getRpcid());
 
 	if (it != pendingRequests.end()) // unknown request or request for already erased call
@@ -708,7 +724,7 @@ void GroupStorage::store(Packet *pkt)
 		{
 			//We can also receive a replicate packet, which does not expect a response
 			ValuePkt *value_pkt = check_and_cast<ValuePkt *>(pkt);
-			sendUDPResponse(value_pkt->getDestinationAddress(), value_pkt->getSourceAddress(), GROUP_PUT, value_pkt->getValue(), false);
+			sendUDPResponse(value_pkt->getDestinationAddress(), value_pkt->getSourceAddress(), GROUP_PUT, value_pkt->getTimestamp(), value_pkt->getValue(), false);
 			RECORD_STATS(putErrStoreOOG++);
 			return;
 		} else return;
@@ -744,7 +760,7 @@ void GroupStorage::store(Packet *pkt)
 	{
 		//We can also receive a replicate packet, which does not expect a response
 		ValuePkt *value_pkt = check_and_cast<ValuePkt *>(pkt);
-		sendUDPResponse(value_pkt->getDestinationAddress(), value_pkt->getSourceAddress(), GROUP_PUT, value_pkt->getValue(), true);
+		sendUDPResponse(value_pkt->getDestinationAddress(), value_pkt->getSourceAddress(), GROUP_PUT, value_pkt->getTimestamp(),value_pkt->getValue(), true);
 	}
 
 	updatePeerObjects(*go);
@@ -1086,7 +1102,7 @@ void GroupStorage::handleTimeout(ResponseTimeoutEvent *timeout)
 	PendingRequests::iterator it = pendingRequests.find(timeout->getRpcid());
 
 	// a failure response to the higher layer for the received timeout
-	sendUpperResponse(it->second.responseType, timeout->getRpcid(), false);
+	sendUpperResponse(it->second.responseType, it->second.request_time, timeout->getRpcid(), false);
 
 	/*if (it->second.numGetSent > 0)
 		std::cout << "[" << simTime() << ":" << this_address <<"]: GET timeout received for peer (" << timeout->getPeerData().getAddress() << " with rpcid " << timeout->getRpcid() << endl;

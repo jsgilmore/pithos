@@ -140,8 +140,8 @@ void DHTStorage::handleGetResponse(DHTgetCAPIResponse* msg, DHTStatsContext* con
 		return;
 	}
 
-	RECORD_STATS(globalStatistics->addStdDev("DHTStorage: GET Latency (s)", SIMTIME_DBL(simTime() - context->requestTime)));
-	RECORD_STATS(globalStatistics->recordHistogram("DHTStorage: GET Latency (s)", SIMTIME_DBL(simTime() - context->requestTime)));
+	//RECORD_STATS(globalStatistics->addStdDev("DHTStorage: GET Latency (s)", SIMTIME_DBL(simTime() - context->requestTime)));
+	RECORD_STATS(globalStatistics->recordOutVector("DHTStorage: GET Latency (s)", SIMTIME_DBL(simTime() - context->requestTime)));
 
 	if (!(msg->getIsSuccess())) {
 		//cout << "DHTTestApp: success == false" << endl;
@@ -251,8 +251,8 @@ void DHTStorage::handlePutResponse(DHTputCAPIResponse* msg, DHTStatsContext* con
         EV << "Storing DHT entry: " << context->object->getBinaryValue() << endl;
 
         RECORD_STATS(numPutSuccess++);
-        RECORD_STATS(globalStatistics->addStdDev("DHTTestApp: PUT Latency (s)", SIMTIME_DBL(simTime() - context->requestTime)));
-        RECORD_STATS(globalStatistics->recordHistogram("DHTTestApp: PUT Latency (s)", SIMTIME_DBL(simTime() - context->requestTime)));
+        //RECORD_STATS(globalStatistics->addStdDev("DHTTestApp: PUT Latency (s)", SIMTIME_DBL(simTime() - context->requestTime)));
+        RECORD_STATS(globalStatistics->recordOutVector("DHTTestApp: PUT Latency (s)", SIMTIME_DBL(simTime() - context->requestTime)));
 
         sendResponse(OVERLAY_PUT, context->parent_rpcid, true);
     } else {
