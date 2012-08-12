@@ -165,8 +165,8 @@ void PithosTestApp::handlePutResponse(RootObjectPutCAPIResponse* msg, PithosStat
 		}
 
         RECORD_STATS(numPutSuccess++);
-        RECORD_STATS(globalStatistics->addStdDev("PithosTestApp: PUT Latency (s)", SIMTIME_DBL(simTime() - context->requestTime)));
-        RECORD_STATS(globalStatistics->recordHistogram("PithosTestApp: PUT Latency (s)", SIMTIME_DBL(simTime() - context->requestTime)));
+        //RECORD_STATS(globalStatistics->addStdDev("PithosTestApp: PUT Latency (s)", SIMTIME_DBL(simTime() - context->requestTime)));
+        RECORD_STATS(globalStatistics->recordOutVector("PithosTestApp: PUT Latency (s)", SIMTIME_DBL(simTime() - context->requestTime)));
     } else {
         RECORD_STATS(numPutError++);
     }
@@ -183,8 +183,8 @@ void PithosTestApp::handleGetResponse(RootObjectGetCAPIResponse* msg, PithosStat
         return;
     }
 
-    RECORD_STATS(globalStatistics->addStdDev("PithosTestApp: GET Latency (s)", SIMTIME_DBL(simTime() - context->requestTime)));
-    RECORD_STATS(globalStatistics->recordHistogram("PithosTestApp: GET Latency (s)", SIMTIME_DBL(simTime() - context->requestTime)));
+    //RECORD_STATS(globalStatistics->addStdDev("PithosTestApp: GET Latency (s)", SIMTIME_DBL(simTime() - context->requestTime)));
+    RECORD_STATS(globalStatistics->recordOutVector("PithosTestApp: GET Latency (s)", SIMTIME_DBL(simTime() - context->requestTime)));
 
     if (!(msg->getIsSuccess())) {
         //cout << "PithosTestApp: success == false" << endl;
