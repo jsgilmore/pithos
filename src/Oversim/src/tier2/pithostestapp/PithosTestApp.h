@@ -131,6 +131,7 @@ private:
     int ttl; /**< ttl for stored Pithos records */
     bool activeNetwInitPhase; //!< is app active in network init phase?
     int groupProbability;
+    double migrationTime;
 
     simtime_t writeTime_av;
 	simtime_t wait_time;
