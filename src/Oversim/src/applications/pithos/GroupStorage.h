@@ -203,7 +203,7 @@ class GroupStorage : public cSimpleModule
 
 		void respond_toUpper(cMessage *msg);
 
-		void createResponseMsg(ResponsePkt **response, int responseType, simtime_t request_time, unsigned int rpcid, bool isSuccess, const GameObject& object);
+		void createResponseMsg(ResponsePkt **response, int responseType, simtime_t request_time, unsigned int rpcid, bool isSuccess, const GameObject& object = GameObject::UNSPECIFIED_OBJECT);
 
 		void sendUDPResponse(TransportAddress src_adr, TransportAddress dest_adr, int responseType,  simtime_t request_time, unsigned int rpcid, bool isSuccess, const GameObject& object = GameObject::UNSPECIFIED_OBJECT);
 
@@ -258,7 +258,7 @@ class GroupStorage : public cSimpleModule
 		/**
 		 * @returns the number of required replicas or the number of group peers, if this number is less than the required replicas (this case is also logged).
 		 */
-		int getReplicaNr(unsigned int rpcid);
+		int getReplicaNr(simtime_t request_time, unsigned int rpcid);
 
 		void removePeer(Packet *packet);
 
