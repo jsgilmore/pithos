@@ -35,15 +35,7 @@ void Super_peer_logic::initialize()
 	strcpy(directory_ip, par("directory_ip"));
 	directory_port = par("directory_port");
 
-	//Initialise queue statistics collection
-	OverlayWriteSignal = registerSignal("OverlayWrite");
-	groupSizeSignal = registerSignal("GroupSize");
-	OverlayDeliveredSignal =  registerSignal("OverlayDelivered");
 	joinTimeSignal = registerSignal("JoinTime");
-	storeNumberSignal  = registerSignal("StoreNumber");
-	overlayNumberSignal = registerSignal("OverlayNumber");
-
-	overlaysStoreFailSignal =  registerSignal("overlaysStoreFail");
 
 	cModule *groupLedgerModule = getParentModule()->getSubmodule("sp_group_ledger");
 	group_ledger = check_and_cast<GroupLedger *>(groupLedgerModule);
@@ -83,7 +75,7 @@ void Super_peer_logic::initialize()
 
 void Super_peer_logic::finish()
 {
-	cModule *communicatorModule = getParentModule()->getSubmodule("communicator");
+	/*cModule *communicatorModule = getParentModule()->getSubmodule("communicator");
 	Communicator *communicator = check_and_cast<Communicator *>(communicatorModule);
 
     simtime_t time = globalStatistics->calcMeasuredLifetime(communicator->getCreationTime());
@@ -99,7 +91,7 @@ void Super_peer_logic::finish()
         // record scalar data
     	globalStatistics->addStdDev((group_name.str() + std::string("Number of peer arrivals")).c_str() , numPeerArrivals);
     	globalStatistics->addStdDev((group_name.str() + std::string("Number of peer departures")).c_str() , numPeerDepartures);
-    }
+    }*/
 }
 
 void Super_peer_logic::handleOverlayWrite(cMessage *msg)
@@ -125,8 +117,6 @@ void Super_peer_logic::handleOverlayWrite(cMessage *msg)
 		send(overlay_p, "comms_gate$o"); // send it to the overlay
 	}
 	delete(go);
-
-	emit(OverlayWriteSignal, 1);
 
 	EV << "Packet sent for storage in the overlay\n";
 }
@@ -271,7 +261,7 @@ void Super_peer_logic::addSuperPeer()
 
 	send(boot_p, "comms_gate$o");
 
-	emit(joinTimeSignal, simTime());
+	//emit(joinTimeSignal, simTime());
 
 	//TODO: Add resend or timer that checks whether the join request has been handled by the Directory.
 }
@@ -410,8 +400,6 @@ void Super_peer_logic::handlePeerLeaving(PeerData peer_data)
 
 	//Inform the last peer that joined of the last peer that left, in case the peer that left did not know about the peer that joined.
 	informLastJoinedOfLastLeft();
-
-	emit(groupSizeSignal, group_ledger->getGroupSize());
 }
 
 void Super_peer_logic::handleMessage(cMessage *msg)
@@ -466,8 +454,6 @@ void Super_peer_logic::handleMessage(cMessage *msg)
 		} else if (packet->getPayloadType() == JOIN_REQ)
 		{
 			handleJoinReq(msg);
-
-			emit(groupSizeSignal, group_ledger->getGroupSize());
 		} else error("Super peer received unknown group message from communicator");
 		delete(msg);
 	} else {

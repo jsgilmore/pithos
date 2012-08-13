@@ -66,19 +66,8 @@ class Super_peer_logic : public cSimpleModule
 		int numPeerDepartures;
 		GlobalStatistics* globalStatistics; /**< pointer to GlobalStatistics module in this node*/
 
-		simsignal_t groupSizeSignal; /**< A signal that records the group size over time */
-
-		simsignal_t OverlayWriteSignal; /**< A signal that records the number of overlay writes performed */
-
-		simsignal_t OverlayDeliveredSignal; /**< A signal that records the number of overlay objects successfully delivered */
-
 		simsignal_t joinTimeSignal; /**< A signal that records when this super peer was listed in the directory server */
 
-		simsignal_t storeNumberSignal; /**< A signal that records the number of objects stored in this group */
-
-		simsignal_t overlayNumberSignal; /**< A signal that records the number of overlay objects stored in this group */
-
-		simsignal_t overlaysStoreFailSignal; /**< A signal that records the number of times an overlay object could not be stored */
 	public:
 		Super_peer_logic();
 		virtual ~Super_peer_logic();
