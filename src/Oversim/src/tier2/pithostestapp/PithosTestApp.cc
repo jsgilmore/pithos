@@ -265,7 +265,7 @@ void PithosTestApp::sendPutRequest()
 	capiPutMsg->setIsModifiable(true);
 
 	RECORD_STATS(numSent++; numPutSent++);
-	sendInternalRpcCall(ROOTOBJECTSTORE_COMP, capiPutMsg, new PithosStatsContext(globalStatistics->isMeasuring(), go->getCreationTime(), *go));
+	sendInternalRpcCall(ROOTOBJECTSTORE_COMP, capiPutMsg, new PithosStatsContext(globalStatistics->isMeasuring(), capiPutMsg->getCreationTime(), *go));
 }
 
 void PithosTestApp::handleLowerMessage (cMessage *msg)
@@ -391,7 +391,7 @@ void PithosTestApp::handleTimerEvent(cMessage* msg)
        	capiGetMsg->setKey(key);
         RECORD_STATS(numSent++; numGetSent++);
 
-        sendInternalRpcCall(ROOTOBJECTSTORE_COMP, capiGetMsg, new PithosStatsContext(globalStatistics->isMeasuring(), simTime(), key));
+        sendInternalRpcCall(ROOTOBJECTSTORE_COMP, capiGetMsg, new PithosStatsContext(globalStatistics->isMeasuring(), capiGetMsg->getCreationTime(), key));
     }/* else if (msg->isName("pithostest_mod_timer"))
     {
         scheduleAt(simTime() + truncnormal(mean, deviation), msg);
