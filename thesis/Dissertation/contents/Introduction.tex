@@ -4,7 +4,7 @@
 \section{MMOGs: The cost of doing business}
 Massively Multiplayer Online Games (MMOGs) are characterised by thousands of players interacting in the same virtual environment or game world; socially, cooperatively or competitively. A popular MMOG genre is the MMO role playing game (MMORPG). In an MMORPG, players are represented by avatars that inhabit a virtual world. In this virtual world there are quests that a player may undertake to gain experience in classic RPG style. Gaining experience allows a player to gain levels, which makes the player character more powerful.
 
-Players play the game to become sufficiently powerful to play the end-game content. End-game content requires large groups of players to work together in a highly coordinated way to achieve some set of objectives. This activity is called ``raiding''. Raiding is usually done by groups of players that have decided to play together and form a guild. Guilds have complex social structures, which allows for various social interactions. Usually it is this high degree of social interaction that attracts players to MMOGs. Players are no longer playing by themselves in a lonely world, but rather playing with other players in a large open virtual world. 
+Players play the game to become sufficiently powerful to play the end-game content. End-game content requires large groups of players to work together in a highly coordinated way to achieve some set of objectives. This activity is called ``raiding''. Raiding is usually done by groups of players that have decided to play together and form a guild. Guilds have complex social structures, which allows for various social interactions. Usually it is this high degree of social interaction that attracts players to MMOGs. Players are no longer playing by themselves in a lonely world, but rather playing with other players in a large open virtual world.
 
 Massively Multiplayer Online Games (MMOGs) have seen tremendous growth over the past decade, growing from less than 500,000 active subscribers in 1999 to over 21 million in 2011 \cite{mmo_growth_chart}. In 2011, the MMOG market was a \$2,6 billion industry in the United States alone \cite{newzoo_mmo_report}.
 
@@ -14,15 +14,34 @@ The issue with MMOG development is that, although they cost more to develop than
 
 Because of the large revenues being generated from MMOGs, many competitors are entering the MMOG space. Currently, the rate at which new MMOGs are added to the market is outstripping the growth of the market itself \cite{newzoo_mmo_report}. Furthermore, because of the recession, over the past two or three years, game subscriptions have been shown to stabilise or even decline \cite{mmo_growth_chart}.
 
-The significant initial investment required to develop an MMOG also doesn't present the complete picture. Another factor driving up costs for an MMOG is the money required for server hardware, maintenance and support. An MMOG is not finished when it goes live. A team of developers are required to maintain the game, release patches fixing bugs and to produce more content to keep the player base sufficiently interested to ensure that players will continue to pay \$15 per month to play the game. Development and maintenance costs for World of Warcraft for four years is estimated at \$100 mil. to \$200 mil. \cite{wow_cost}.
+The significant initial investment required to develop an MMOG also doesn't present the complete picture. Another factor driving up costs for an MMOG is the money required for server hardware, maintenance and support. An MMOG is not finished when it goes live. A team of developers is required to maintain the game, release patches fixing bugs and to produce more content to keep the player base sufficiently interested to ensure that players will continue to pay \$15 per month to play the game. Development and maintenance costs for World of Warcraft for four years is estimated at \$100 mil. to \$200 mil. \cite{wow_cost}.
 
 With the costs involved, it is therefore difficult for a new developer to enter into this space. After the large initial investment into the game's development, all server hardware must be acquired and people appointed to maintain the game. This money has to be spent before it is known whether the game will succeed or fail. It has been estimated that during the lifetime of an MMOG, 80\% of the game revenue goes into hardware and maintenance costs \cite{cs_mmog_cost}.
 
 In order to reduce the costs associated with classic MMOGs, peer-to-peer (P2P) MMOGs are being investigated. The challenges of P2P MMOGs provides the basis for this work.
 
-\section{Peer-to-Peer}
+\section{Peer-to-Peer systems}
 
+A P2P system is a distributed network that exists out of many participating nodes to fulfil some objective. In this work, a P2P system is defined as being a distributed network with the following properties
+\cite{Rodrigues_acm_comms_p2p}:
+%
+\begin{itemize}
+\item \emph{High degree of decentralisation}:  No or little centralised control exists. Server functionality is distributed amongst all peers.
+\item \emph{Self-organisation}: Little or no self-organisation is required in the network. Nodes are given an initial IP to allow them to join the network, but thereafter new neighbours are automatically acquired and nodes remain connected to the network, even with other nodes joining and leaving.
+\item \emph{Multiple administrative domains} Peers are not under the control of any single authority. Peers in the network belong to different organisations or individuals and direct administration is impossible.
+\end{itemize}
 
+Peer-to-peer (P2P) systems have been popularised by mainly three systems developed in 1999: the Napster music sharing service, the Freenet data store and the SETI@home volunteer-based distributed computing project. These three projects highlighted the advantages of P2P systems being: low barrier to entry, scalability, resistance to faults and attacks, and an abundance and availability of resources.
+
+\subsection{Advantages}
+
+P2P systems have a low barrier to entry, since little or no centralised infrastructure is required to maintain the system. This makes P2P systems inexpensive to operate and is one of the reasons Napster was able to provide its service for free.
+
+P2P systems are considered scalable. Pure P2P networks can theoretically grow from hundreds to millions of nodes, with the service remaining functional. And this is all possible without the need for the operator to acquire more infrastructure. This is as opposed to the centralised client/server network, which required more powerful server clusters are the network grows to handle the growing number of client requests.
+
+A P2P system is also resistant to faults and attacks, since the failure of a single node has little to no effect on the network. This is because there are usually few nodes that are critical to the correct functionality of the system. To shut down a P2P system, an attacker usually has to shut down a large proportion of the network.
+
+Not only does a P2P operator not require its own infrastructure, but the P2P infrastructure that forms part of the network and consists of peer machines provide abundant and highly available resources, being computation power, long term and short term storage. This means that P2P systems can be designed to run on powerful computers.
 
 \subsection{Structured and unstructured P2P overlay networks}
 \label{overlays}
@@ -65,7 +84,7 @@ architectures. This architecture does, however, still have a few major issues th
 these issues, discussed in Section \ref{key_challenges}, can be solved, a P2P architecture holds some powerful advantages over a C/S system.
 
 The core idea of the P2P model is that each peer contributes sufficient resources to the network to host itself. This also means that all functions
-of the server in the classic C/S model are distributed amongst all peers. 
+of the server in the classic C/S model are distributed amongst all peers.
 
 \subsection{Advantages}
 \label{p2p_advantages}
@@ -91,10 +110,6 @@ The distribution of the load as well as direct communication will further reduce
 \subsection{Key challenges}
 \label{key_challenges}
 Although many advantages can be had from P2P MMVEs, some challenges still remain. The main challenges are state consistency, limited peer bandwidth, cheating mitigation, incentive mechanisms and distributed computation.
-
-\subsubsection{State consistency}
-%State persistency, compared to state consistency
-A key challenge with any networked game is how to maintain state consistency between users in the virtual world. In other words, to ensure that all users perceive a virtual world in the same state. Solving the state consistency problem for P2P MMVEs is one of the major development challenges and forms the focus of this work. The challenge of state consistency will be described in detail in Chapter \ref{chp:CONSISTENCY}.
 
 \subsubsection{Peer bandwidth}
 Another challenge for P2P systems is the required peer bandwidth. In a paper by Miller and Crowcroft, a packet simulator was created to determine the
@@ -162,6 +177,10 @@ physics effects on in-game objects. Some architectures assume that the computati
 \cite{solipsis}, but other schemes exist that allow for the CPU power to be distributed amongst peers. One such scheme makes use of a ``job board''
 like mechanism, where tasks are advertised on specialised super peers. Other peers monitor these super peers and may elect to perform the advertised
 tasks \cite{fan_mediator_paper}.
+
+\subsubsection{State consistency}
+%State persistency, compared to state consistency
+A key challenge with any networked game is how to maintain state consistency between users in the virtual world. In other words, to ensure that all users perceive a virtual world in the same state. Solving the state consistency problem for P2P MMVEs is one of the major development challenges and forms the focus of this work. The challenge of state consistency will be described in detail in Chapter \ref{chp:CONSISTENCY}.
 
 \section{Objectives and contributions}
 \label{objectives}

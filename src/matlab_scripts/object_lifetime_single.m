@@ -5,22 +5,23 @@ close all
 type = 'exponential';
 
 %The maximum number of replicas
-r = 10;
+r = 4;
 
 %The maximum number of nodes in the larger network
 n = 500;
 
-group_size_av = 7;
+group_size_av = 150;
 
 %Repair rate
-mu = 0.7/150;
+%mu = 0.7/150;
+mu = 0.0;
 
 %Parameters of a pareto node lifetime distribution
 % alpha = 0.5239
 % beta = 48.4389
 
 %Parameter of an exponential distribution
-lambda = 500
+lambda = 1800
 
 %Peer departure rate for a pareto distribution with parameters alpha and
 %beta from the referenced research paper. (This formula cannot be verified
