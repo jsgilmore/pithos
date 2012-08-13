@@ -138,9 +138,9 @@ void GroupLedger::handleMessage(cMessage* msg)
 			}
 		}
 
-		//Collect stats for both super peers and peers
-		RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of known group peers")).c_str(), peer_list.size()));
-		RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of unique group objects")).c_str(), object_map.size()));
+		//Have every peer reports its view of the group
+		//RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of known group peers")).c_str(), peer_list.size()));
+		//RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of unique group objects")).c_str(), object_map.size()));
     }
     else if ((ttlTimer = dynamic_cast<ObjectTTLTimer*>(msg)) != NULL)
 	{
