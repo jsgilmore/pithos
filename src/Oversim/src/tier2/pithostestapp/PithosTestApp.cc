@@ -75,6 +75,7 @@ void PithosTestApp::initializeApp(int stage)
     deviation = mean / 10;
 
     ttl = par("testTtl");
+    migrationTime = par("migrationTime");
 
     globalNodeList = GlobalNodeListAccess().get();
     underlayConfigurator = UnderlayConfiguratorAccess().get();
@@ -320,7 +321,7 @@ void PithosTestApp::handleTimerEvent(cMessage* msg)
 			double group_time = 0.0;
 			while(group_time < 1.5)
 			{
-				group_time = exponential(400);
+				group_time = exponential(migrationTime);
 			}
 			scheduleAt(simTime()+group_time, position_update_timer);		//TODO: These parameters should be made configurable
 		}
@@ -429,13 +430,13 @@ void PithosTestApp::finishApp()
 
     if (time >= GlobalStatistics::MIN_MEASURED) {
     	// record scalar data
-    	globalStatistics->addStdDev("PithosTestApp: Sent Total Messages", numSent);
-		globalStatistics->addStdDev("PithosTestApp: Sent GET Messages", numGetSent);
-		globalStatistics->addStdDev("PithosTestApp: Failed GET Requests", numGetError);
-		globalStatistics->addStdDev("PithosTestApp: Successful GET Requests", numGetSuccess);
-		globalStatistics->addStdDev("PithosTestApp: Sent PUT Messages", numPutSent);
-		globalStatistics->addStdDev("PithosTestApp: Failed PUT Requests", numPutError);
-		globalStatistics->addStdDev("PithosTestApp: Successful PUT Requests", numPutSuccess);
+    	globalStatistics->addStdDev("PithosTestApp: Sent Total Messages/s", numSent / time);
+		globalStatistics->addStdDev("PithosTestApp: Sent GET Messages/s", numGetSent / time);
+		globalStatistics->addStdDev("PithosTestApp: Failed GET Requests/s", numGetError / time);
+		globalStatistics->addStdDev("PithosTestApp: Successful GET Requests/s", numGetSuccess / time);
+		globalStatistics->addStdDev("PithosTestApp: Sent PUT Messages/s", numPutSent / time);
+		globalStatistics->addStdDev("PithosTestApp: Failed PUT Requests/s", numPutError / time);
+		globalStatistics->addStdDev("PithosTestApp: Successful PUT Requests/s", numPutSuccess / time);
 
 		if ((numGroupGet + numOverlayGet) > 0)
 		{
