@@ -472,7 +472,7 @@ void GroupStorage::createWritePkt(ValuePkt **write, simtime_t request_time, unsi
 	(*write)->setGroupAddress(super_peer_address);
 }
 
-int GroupStorage::getReplicaNr(unsigned int rpcid)
+int GroupStorage::getReplicaNr(simtime_t request_time, unsigned int rpcid)
 {
 	unsigned int replicas = par("replicas");
 
@@ -480,13 +480,9 @@ int GroupStorage::getReplicaNr(unsigned int rpcid)
 	if (replicas > group_ledger->getGroupSize())
 	{
 		unsigned int i;
-		ResponsePkt *response = new ResponsePkt();
+		ResponsePkt *response;
 
-		response->setResponseType(GROUP_PUT);
-		response->setPayloadType(RESPONSE);
-		response->setIsSuccess(false);
-		response->setRpcid(rpcid);		//This allows the higher layer to know which RPC call is being acknowledged.
-		//This packet is sent internally, so no size is required
+		createResponseMsg(&response, GROUP_PUT, request_time, rpcid, false);
 
 		//Send one failure response packet for each replica that cannot be stored
 		for (i = 0 ; i < replicas - group_ledger->getGroupSize() ; i++)
@@ -526,7 +522,7 @@ void GroupStorage::send_forstore(ValuePkt *store_req)
 
 	int rpcid = store_req->getValue();
 
-	replicas = getReplicaNr(rpcid);
+	replicas = getReplicaNr(store_req->getTimestamp(), rpcid);
 	if (replicas == 0)
 		return;
 

@@ -332,6 +332,8 @@ void Peer_logic::handleResponseMsg(cMessage *msg)
 	//Then process the RPC relating to the response, by checking whether sufficient responses were received, taking action if this was the case
 	if (response->getResponseType() == GROUP_PUT)
 	{
+		if (response->getTimestamp() == 0.0)
+			error("PUT response received recorded a zero time stamp.");
 		RECORD_STATS(globalStatistics->recordOutVector("GroupStorage: PUT Latency (s)", SIMTIME_DBL(simTime() - response->getTimestamp())));
 
 		if (response->getIsSuccess())
@@ -370,6 +372,8 @@ void Peer_logic::handleResponseMsg(cMessage *msg)
 		processGet(&(it->second), response);
 	} else if (response->getResponseType() == GROUP_GET)
 	{
+		if (response->getTimestamp() == 0.0)
+			error("GET response received recorded a zero time stamp.");
 		RECORD_STATS(globalStatistics->recordOutVector("GroupStorage: GET Latency (s)", SIMTIME_DBL(simTime() - response->getTimestamp())));
 
 		if (response->getIsSuccess())
