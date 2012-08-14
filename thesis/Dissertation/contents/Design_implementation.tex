@@ -239,7 +239,7 @@ Pithos is implemented in the root object store layer of the generic consistency 
 
 On a network level, Pithos consists out of three node types: super peers, peers and a directory server.
 
-The single directory server, which is a normal three-tiered Oversim node, places joining peers into groups represented by super peers. The directory server allows peers to join the network (Section \ref{network_join_iplementation}) and be placed into groups (Section \ref{network_join_implementation}).
+The single directory server, which is a normal three-tiered Oversim node, places joining peers into groups represented by super peers. The directory server allows peers to join the network and be placed into groups (Section \ref{network_join_implementation}).
 
 Super peers represent and manage groups. All the functionality of the super peer is implemented by the super peer logic module. Peers handle requests from the higher application layers and consist out of the peer logic, ledgers, DHT storage and group storage modules.
 
@@ -270,7 +270,7 @@ Transparency was achieved by designating certain gates for certain types of traf
 \subsubsection{Super peer logic}
 \label{pithos_module_types_sp_logic}
 
-The super peer logic module implements all the functionality of the super peer node, except for keeping track of group objects. The tasks of the super peer logic include handling joining peers, ensuring group consistency (Section \ref{group_migration_implementation}), initiating object repair (Section \ref{object_implementation_implementation}) and maintaining a list of group objects and on which peers those objects are stored (Section \ref{pithos_module_types_ledgers}).
+The super peer logic module implements all the functionality of the super peer node, except for keeping track of group objects. The tasks of the super peer logic include handling joining peers, facilitating peer migration (Section \ref{group_migration_implementation}), ensuring group consistency (Section \ref{group_consistency_implementation}), initiating object repair (Section \ref{object_repair_implementation}) and maintaining a list of group objects and a list of peers on those objects are stored (Section \ref{pithos_module_types_ledgers}).
 
 \subsubsection{Peer logic}
 
@@ -315,6 +315,11 @@ In the object ledger, each entry in the peer list is a reference to peer informa
 
 \subsection{Key mechanisms}
 \label{key_mechanisms}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% For every mechanisms, reference where the results of that mechanism will
+% be shown.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 While the previous section describes the static structure of the Pithos implementation, this section will describe the key mechanisms present in Pithos to achieve the desired design goals specified in Section \ref{use_cases_goals}. The purpose of each mechanism will be described along with how it has been implemented in Pithos with reference to the modules present.
 
@@ -405,7 +410,7 @@ Because safe storage ensures that most of the replications were successfully sto
     Group migration involves informing the group that the peer is leaving, clearing all statistics and initiating the group join mechanism. Informing the group that the peer is leaving ensures that this peer will not be picked for any storage or retrieval requests, while the group is unaware that the peer has left. If this is not done, the group will only know that a peer has left after a timeout for a request to the peer expires. This reduces request success rates.
 
     \subsubsection{Group consistency}
-    \label{group_migration_implementation}
+    \label{group_consistency_implementation}
 
     With peers constantly joining and leaving the network and transferring between groups, an issue that arises is group consistency. It is important that all peers within a group share the same view of that group. If this is not the case, some peers might never be chosen to store data and this will decrease the fairness in the system. Another reason is that for the sake of scalability, peers do not service requests from peers outside of their groups. Group inconsistencies might also lead to nodes becoming isolated from any group, which basically disconnects that node from the P2P network.
 
@@ -465,7 +470,7 @@ Regular keep alive messages are sent to peers. If a peer does not respond to the
 
     \subsubsection{Object repair}
     \label{object_repair_implementation}
-    
+
 When objects are stored, as described in Section \ref{store_implementation}, multiple replicas of the same object is stored within a group. This form of redundancy extends the lifetime of an object, but with the presence of constant network churn, all objects will eventually cease to exist.
 
 The solution is to use a repair mechanism to ensure that missing object replicas are constantly replaced. Two types of repair mechanisms were implemented: periodic repair and lazy repair.
@@ -482,7 +487,7 @@ A comparison of lazy and lossy repair will be presented in Section \ref{}.
 
     \subsubsection{Object verification}
     \label{object_verification_implementation}
-    
+
 A security mechanism that performs object verification was also implemented. When this mechanism is activated, the objects received from multiple retrieve responses are compared to ensure object correctness.
 
 Object verification is an attempt to make Pithos more resistant to malicious peers that attempt to alter data in a way that is not consistent with the environmental logic. When multiple retrieve responses are received, all objects are compared and the object that occurs the most from all the responses is sent to the higher layer.
@@ -512,7 +517,7 @@ Pithos periodically generates store requests of random sizes. The sizes of these
 
 All store request are sent to Pithos in the lower layer. When a response is received that an object has been successfully stored, the object information is added to a global map, containing all generated objects.
 
-\subsection{Retrieve requests} 
+\subsection{Retrieve requests}
 
 The global object map is not available to Pithos and is only used by PithosTestApp to enable object retrieval and for retrieved objects to be verified. Objects in the global object map are grouped by the group they are stored in.
 
@@ -520,13 +525,13 @@ Pithos periodically generates retrieve requests for random objects. An object is
 
 PithosTestApp can generate in-group object requests with a given probability. This is to test how well Pithos will function if distance-based storage is implemented to store objects. The assumption is that, with distance based storage, a high number of retrieval requests will be for nodes within the same group, as opposed to out-of-group nodes.
 
-When a response is received, statistics are recorded on whether the request was a success or failure as well as the reason. If the retrieval is a success, the returned object is compared with the object in the global object store to determine whether the retrieved object's contents physically matches the object contents in the global object store. Verification is mostly used when malicious peers exist and there is a change that Pithos might send the information of a corrupted object to the higher layer. 
+When a response is received, statistics are recorded on whether the request was a success or failure as well as the reason. If the retrieval is a success, the returned object is compared with the object in the global object store to determine whether the retrieved object's contents physically matches the object contents in the global object store. Verification is mostly used when malicious peers exist and there is a change that Pithos might send the information of a corrupted object to the higher layer.
 
 \subsection{Modify requests}
 
 PithosTestApp periodically generates modify requests. It selects a random object from the global object map, selects a random variable of that object to modify and assigns a new random value to that parameter. The new parameter value is the update request sent to Pithos.
 
-To verify whether an object has been correctly updated, a retrieve request is performed after Pithos reported a successful modification of the object. The object returned is compared with the updated object in the global object map. 
+To verify whether an object has been correctly updated, a retrieve request is performed after Pithos reported a successful modification of the object. The object returned is compared with the updated object in the global object map.
 
 \subsection{Position updates}
 
@@ -536,4 +541,4 @@ When group migration is enabled, PithosTestApp generates regular position update
 
 This section describes the overarching design principles of Pithos in terms of the goals set out in previous chapters. The Oversim network simulation framework is then described, along with a description of its extension, enabling it to support the generic consistency architecture. The Pithos modules implemented in Oversim are introduced, followed by explanations of the key Pithos mechanisms. All Pithos mechanisms are described with reference to the Oversim modules where they are housed.
 
-The key mechanisms section regularly described multiple methods of mechanism implementation. Some methods are theoretically better than their alternatives or provide improvements under certain conditions. 
+The key mechanisms section regularly described multiple methods of mechanism implementation. Some methods are theoretically better than their alternatives or provide improvements under certain conditions.
