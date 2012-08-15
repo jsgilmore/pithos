@@ -448,6 +448,11 @@ void PithosTestApp::finishApp()
         {
             globalStatistics->addStdDev("PithosTestApp: GET Success Ratio", (double) numGetSuccess / (double) (numGetSuccess + numGetError));
         }
+
+        if ((numPutSuccess + numPutError) > 0)
+		{
+			globalStatistics->addStdDev("PithosTestApp: PUT Success Ratio", (double) numPutSuccess / (double) (numPutSuccess + numPutError));
+		}
     }
 }
 

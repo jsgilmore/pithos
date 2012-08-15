@@ -159,6 +159,8 @@ void GroupStorage::finish()
 		globalStatistics->addStdDev("GroupStorage: GET error: Target of request out of group/s", getErrRequestOOG / time);
 		globalStatistics->addStdDev("GroupStorage: PUT error: Target of store out of group/s", putErrStoreOOG / time);
 
+		globalStatistics->addStdDev("GroupStorage: PUT responses received/s", numPutReponses / time);
+		globalStatistics->addStdDev("GroupStorage: GET responses received/s", numGetReponses / time);
 
 		if (isMalicious)
 			globalStatistics->addStdDev("GroupStorage: Was malicious", 1);
