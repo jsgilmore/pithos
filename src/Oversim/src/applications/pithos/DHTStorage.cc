@@ -380,6 +380,10 @@ void DHTStorage::finish()
         if ((numGetSuccess + numGetError) > 0) {
             globalStatistics->addStdDev("DHTStorage: GET Success Ratio", (double) numGetSuccess / (double) (numGetSuccess + numGetError));
         }
+
+        if ((numPutSuccess + numPutError) > 0) {
+			globalStatistics->addStdDev("DHTStorage: PUT Success Ratio", (double) numPutSuccess / (double) (numPutSuccess + numPutError));
+		}
     }
 
 }
