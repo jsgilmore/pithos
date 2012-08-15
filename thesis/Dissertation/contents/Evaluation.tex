@@ -17,6 +17,57 @@ The simulation used a channel bandwidth of 10 Mbps. Pithos has also been success
 
 For testing store and retrieve requests, a time-to-live (TTL) of 300s were chosen.
 
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+Entity & Storage method & Retrieval method & Reliability & Responsiveness (s)\\
+\hline
+Pithos  &   Safe    &   N/A         &   0.970   &   1.576\\
+Pithos  &   Fast    &   N/A         &   1.0     &   0.0488\\
+Pithos  &   Fast    &   Fast        &   0.9970  &   0.196\\
+Pithos  &   Safe    &   Fast        &   0.9977  &   0.198\\
+Pithos  &   Safe    &   Parallel    &           &        \\
+Pithos  &   Fast    &   Parallel    &   0.9998  &   0.0876\\
+\hline
+Overlay &   High    &   N/A         &   0.969   &   1.214  \\
+Overlay &   High    &   High        &   0.9320  &   1.582  \\
+Overlay &   Medium  &   N/A         &           &          \\
+Overlay &   Medium  &   Medium      &           &         \\
+Overlay &   Low     &   N/A         &           &         \\
+Overlay &   Low     &   Low         &           &         \\
+\hline
+\end{tabular}
+\caption{Evaluation of responsiveness and reliability of various Pithos storage and retrieval methods as well as overlay storage and retrieval}
+\label{tab_rel_resp_results}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+Entity & Storage method & Retrieval method & Repair & Inbound bandwidth (bytes/s) & Outbound bandwidth (bytes/s)\\
+\hline
+Group   &   Fast    &   Fast      &   no       &   186  &  182      \\
+Group   &   Safe    &   Fast      &   no       &   183  &  180 \\
+Group   &   Safe    &   Parallel  &   no       &        &       \\
+Group   &   Fast    &   Parallel  &   no       &   784  &  735\\
+\hline
+Overlay &   High    &   High      &  1183  &  1197  \\
+Overlay &   Medium  &   Medium    &        &        \\
+Overlay &   Low     &   Low       &        &       \\
+\hline
+\end{tabular}
+\caption{Evaluation of bandwidth requirements of various Pithos storage and retrieval methods as well as overlay storage and retrieval}
+\label{tab_bandwidth_results}
+\end{table}
+
+%The following need to be compared with varying key parameters
+%Malicious nodes: Group   &   Fast    &   Safe      &   no       &        &       \\
+%Malicious nodes: Group   &   Safe    &   Safe      &   no       &        &       \\
+%Churn:           Group   &   Fast    &   Fast      &   leaving  &        &        \\
+%Churn:           Group   &   Fast    &   Fast      &   periodic &        &        \\
+
     \section{Storage}
             \subsection{Safe}
                 \subsubsection{Responsiveness}
