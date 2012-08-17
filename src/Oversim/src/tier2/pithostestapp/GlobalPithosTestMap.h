@@ -76,6 +76,8 @@ public:
 
     OverlayKey getRandomGroupKey(TransportAddress group_address);
 
+    OverlayKey getRandomNonGroupKey(TransportAddress group_address, int level = 0);
+
     /*
      * Returns the key of a random currently stored Pithos record from the global
      * list of all currently stored Pithos records.
