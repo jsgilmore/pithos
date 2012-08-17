@@ -64,7 +64,7 @@ void PithosTestApp::initializeApp(int stage)
     activeNetwInitPhase = par("activeNetwInitPhase");
     groupMigration = par("groupMigration");
 
-    groupProbability = par("groupProbability");
+    idealGroupProbability = par("groupProbability");
 
     objectSize_av = par("avObjectSize");
 	wait_time = par("wait_time");
@@ -291,23 +291,55 @@ void PithosTestApp::handleLowerMessage (cMessage *msg)
 	else error("Game received unknown message\n");
 }
 
+double PithosTestApp::getGroupProbability()
+{
+	if (numGroupGet + numOverlayGet == 0)
+		return idealGroupProbability;
+
+	double currentGroupProbability = 100*(double)numGroupGet/(double)(numGroupGet + numOverlayGet);
+
+	double realGroupProbability = 2*idealGroupProbability  - currentGroupProbability;
+
+	if (realGroupProbability > 100)
+		return 100.0;
+	else return realGroupProbability;
+}
+
 OverlayKey PithosTestApp::getKey()
 {
-	if (intuniform(0,100) <= groupProbability)
+	OverlayKey key;
+
+	std::cout << getGroupProbability() << endl;
+
+	//Randomly select in or out of group request
+	if (uniform(0,100) <= getGroupProbability())
 	{
-		OverlayKey key = globalPithosTestMap->getRandomGroupKey(super_peer_address);
+		//For an in-group request, get a random key stored in the group
+		key = globalPithosTestMap->getRandomGroupKey(super_peer_address);
+
+		//If there are no keys in the group, return an out-of-group request and record the fact.
 		if (key.isUnspecified())
 		{
-			RECORD_STATS(numOverlayGet++);
-			return globalPithosTestMap->getRandomKey();
+			key = globalPithosTestMap->getRandomKey();
+			if (!(key.isUnspecified()))
+			{
+				RECORD_STATS(numOverlayGet++);
+			}
+			return key;
 		} else {
 			RECORD_STATS(numGroupGet++);
 			return key;
 		}
 	}
 	else {
-		RECORD_STATS(numOverlayGet++);
-		return globalPithosTestMap->getRandomKey();
+		//For an out-of-group request, return a key that is not in the current group.
+		key = globalPithosTestMap->getRandomNonGroupKey(super_peer_address);
+		//If there are no keys anywhere, or no key anywhere but in the current group, return an unspecified key.
+		if (!(key.isUnspecified()))
+		{
+			RECORD_STATS(numOverlayGet++);
+		}
+		return key;
 	}
 }
 
