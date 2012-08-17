@@ -117,6 +117,9 @@ class Peer_logic: public cSimpleModule
 
 		GlobalStatistics* globalStatistics; /**< pointer to GlobalStatistics module in this node*/
 
+		int appBytesSent;
+		int appBytesReceived;
+
 	public:
 		Peer_logic();
 		virtual ~Peer_logic();
@@ -137,7 +140,7 @@ class Peer_logic: public cSimpleModule
 
 	protected:
 		virtual void initialize();
-		void finalize();
+		void finish();
 		virtual void handleMessage(cMessage *msg);
 
 		void processPut(PendingRpcsEntry entry, ResponsePkt *response);

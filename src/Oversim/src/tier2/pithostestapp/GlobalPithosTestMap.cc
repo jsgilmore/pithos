@@ -194,6 +194,24 @@ OverlayKey GlobalPithosTestMap::getRandomGroupKey(TransportAddress group_address
 	return object.getNameHash();
 }
 
+OverlayKey GlobalPithosTestMap::getRandomNonGroupKey(TransportAddress group_address, int level)
+{
+	if (dataMap.size() == 0) {
+		return OverlayKey::UNSPECIFIED_KEY;
+	}
+
+	//This recursive function is getting too deep. There might not be any objects in other groups.
+	if (level == 10) return OverlayKey::UNSPECIFIED_KEY;
+
+	//return uniform random OverlayKey in O(n/2)
+	std::map<OverlayKey, GameObject>::iterator it = dataMap.begin();
+	std::advance(it, intuniform(0, dataMap.size()-1));
+
+	if (it->second.getGroupAddress() == group_address)
+		return getRandomNonGroupKey(group_address, level+1);
+	else return it->first;
+}
+
 const OverlayKey& GlobalPithosTestMap::getRandomKey()
 {
     if (dataMap.size() == 0) {

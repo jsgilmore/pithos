@@ -57,8 +57,8 @@ void Communicator::finishApp()
 
 	if (time >= GlobalStatistics::MIN_MEASURED) {
 
-		globalStatistics->addStdDev("Communicator: Sent packets/s", numSent/time);
-		globalStatistics->addStdDev("Communicator: Received packets/s", numReceived/time);
+		globalStatistics->addStdDev("Pithos: Sent packets/s", numSent/time);
+		globalStatistics->addStdDev("Pithos: Received packets/s", numReceived/time);
 
 		globalStatistics->addStdDev("Pithos: Sent UDP Bytes/s", bytesSent / time);
 		globalStatistics->addStdDev("Pithos: Received UDP Bytes/s", bytesReceived / time);
