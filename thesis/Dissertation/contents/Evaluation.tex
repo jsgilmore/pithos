@@ -38,9 +38,9 @@ It does not make sense to evaluate retrieval performance apart from the storage 
 \hline
 Storage method & Retrieval method & Reliability & Responsiveness (s)\\
 \hline
-Safe    &   N/A         &   0.970   &   1.576  \\
+Safe    &   N/A         &   0.9705  &   1.554  \\
 Safe    &   Fast        &   0.9977  &   0.198  \\
-Safe    &   Parallel    &           &          \\
+Safe    &   Parallel    &   0.9998  &   0.0914 \\
 Fast    &   N/A         &   1.0     &   0.0488 \\
 Fast    &   Fast        &   0.9970  &   0.196  \\
 Fast    &   Parallel    &   0.9998  &   0.0876 \\
@@ -167,7 +167,7 @@ Entity & Storage method & Retrieval method & Bandwidth & Bandwidth\\
 \hline
 Group   &   Fast    &   Fast      &   187  &  183  \\
 Group   &   Safe    &   Fast      &   183  &  180  \\
-Group   &   Safe    &   Parallel  &        &       \\
+Group   &   Safe    &   Parallel  &   798  &  749  \\
 Group   &   Fast    &   Parallel  &   784  &  735  \\
 \hline
 Overlay &   High    &   High      &        &       \\
@@ -342,16 +342,26 @@ In this section some responsiveness distributions were shown. The first reason w
 
 \section{Performance for various group probabilities}
 
+A topic that has not yet been explored is group probability. As described in Section \ref{grouping}, Pithos is designed to function over player groups
+
 \begin{table}[htbp]
 \centering
-\begin{tabular}{|c|c|c|c|c|}
+\begin{tabular}{|c|c|c|c|c|c|}
 \hline
-Group probability &Reliability&Responsiveness&Bandwidth&Bandwidth\\
-         (\%)     &           &     (s)      &in (Bps) &out (Bps)\\
+Entity&Group probability &Reliability&Responsiveness&Bandwidth&Bandwidth\\
+      &   (\%)     &           &     (s)      &in (Bps) &out (Bps)\\
 \hline
-40                &           &              &         &         \\
-60                &           &              &         &         \\
-80                &           &              &         &         \\
+Pithos & 40        &   0.768   &    1.286     &  109    &  110    \\
+Pithos & 60        &   0.838   &    0.947     &  127    &  127    \\
+Pithos & 80        &   0.915   &    0.572     &  154    &  152    \\
+\hline
+Group & 40        &   0.768   &    1.286     &  109    &  110    \\
+Group & 60        &   0.838   &    0.947     &  127    &  127    \\
+Group & 80        &   0.915   &    0.572     &  154    &  152    \\
+\hline
+Overlay & 40        &   0.768   &    1.286     &  109    &  110    \\
+Overlay & 60        &   0.838   &    0.947     &  127    &  127    \\
+Overlay & 80        &   0.915   &    0.572     &  154    &  152    \\
 \hline
 \end{tabular}
 \caption{Table showing the effect of network churn on the reliability and responsiveness of Pithos, for a fixed repair profile, fast storage and fast retrieval.}
