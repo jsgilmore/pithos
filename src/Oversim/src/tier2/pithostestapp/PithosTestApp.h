@@ -117,6 +117,9 @@ private:
     // see RpcListener.h
     void handleRpcResponse(BaseResponseMessage* msg, const RpcState& state, simtime_t rtt);
 
+    //This function adjust the real group probability value, to ensure the ideal group probability in the presence of empty groups.
+    double getGroupProbability();
+
     UnderlayConfigurator* underlayConfigurator; /**< pointer to UnderlayConfigurator in this node */
 
     GlobalNodeList* globalNodeList; /**< pointer to GlobalNodeList in this node*/
@@ -130,7 +133,9 @@ private:
     double deviation; //!< deviation of time interval
     int ttl; /**< ttl for stored Pithos records */
     bool activeNetwInitPhase; //!< is app active in network init phase?
-    int groupProbability;
+
+    double idealGroupProbability; //The ideal group probability as specified in the configuration file
+
     double migrationTime;
 
     simtime_t writeTime_av;

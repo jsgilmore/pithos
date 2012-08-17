@@ -40,6 +40,9 @@ void Peer_logic::initialize()
 {
 	globalStatistics = GlobalStatisticsAccess().get();
 
+	appBytesSent = 0;
+	appBytesReceived = 0;
+
 	replicas = par("replicas");
 	numGetRequests = par("numGetRequests");
 	numGetCompares = par("numGetCompares");
@@ -60,9 +63,22 @@ void Peer_logic::initialize()
 	else error("Unknown get type specified.");
 }
 
-void Peer_logic::finalize()
+void Peer_logic::finish()
 {
+	//Give peer logic a handle to the communicator module, so it may use the communicator's public functions
+	cModule *communicatorModule = getParentModule()->getSubmodule("communicator");
+	Communicator* communicator = check_and_cast<Communicator *>(communicatorModule);
+	if (communicator == NULL) {
+		throw cRuntimeError("GroupStorage::initializeApp(): Communicator module not found!");
+	}
 
+	simtime_t time = globalStatistics->calcMeasuredLifetime(communicator->getCreationTime());
+
+	if (time >= GlobalStatistics::MIN_MEASURED)
+	{
+		globalStatistics->addStdDev("Pithos: Bytes sent to higher layer/s", appBytesSent / time);
+		globalStatistics->addStdDev("Pithos: Bytes received from higher layer/s", appBytesReceived / time);
+	}
 }
 
 void Peer_logic::handleGetCAPIRequest(RootObjectGetCAPICall* capiGetMsg)
@@ -120,9 +136,8 @@ void Peer_logic::handlePutCAPIRequest(RootObjectPutCAPICall* capiPutMsg)
 	if (go == NULL)
 		error("No object was attached to be stored in group storage");
 
-	EV << getParentModule()->getName() << " " << getParentModule()->getIndex() << " received game object to store of size " << go->getSize() << "\n";
-
-	EV << "Object to be sent: " << go->getObjectName() << endl;
+	//Record the application layer data received, to later be able to calculate overhead.
+	RECORD_STATS(appBytesReceived += go->getSize());
 
 	//std::cout << "[Peer_logic] Storing object with key " << go->getHash() << endl;
 
@@ -266,6 +281,9 @@ void Peer_logic::processGet(PendingRpcsEntry *entry, ResponsePkt *response)
 			capiGetRespMsg->setResult(*object);	//The value is copied here and not the actual object
 			communicator->externallySendRpcResponse(entry->getCallMsg, capiGetRespMsg);
 			pendingRpcs.erase(response->getRpcid());
+
+			//Record the application layer data received, to later be able to calculate overhead.
+			RECORD_STATS(appBytesSent += object->getSize());
 		//If both the DHT get and all group gets failed, or DHT is disabled and all group gets failed, a failure occurred
 		} else if (((entry->numDHTGetFailed == 1) || disableDHT) && (entry->numGroupGetFailed == numGetRequests))
 		{
@@ -298,6 +316,9 @@ void Peer_logic::processGet(PendingRpcsEntry *entry, ResponsePkt *response)
 			{
 				capiGetRespMsg->setIsSuccess(true);
 				capiGetRespMsg->setResult(object);	//The value is copied here and not the actual object
+
+				//Record the application layer data received, to later be able to calculate overhead.
+				RECORD_STATS(appBytesSent += object.getSize());
 			}
 			//If it could not be determined which was the correct object, don't send any object
 			else capiGetRespMsg->setIsSuccess(false);
