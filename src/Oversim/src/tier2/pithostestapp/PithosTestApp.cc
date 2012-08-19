@@ -309,8 +309,6 @@ OverlayKey PithosTestApp::getKey()
 {
 	OverlayKey key;
 
-	std::cout << getGroupProbability() << endl;
-
 	//Randomly select in or out of group request
 	if (uniform(0,100) <= getGroupProbability())
 	{
