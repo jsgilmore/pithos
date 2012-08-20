@@ -31,6 +31,7 @@ Although these are two different types of storage, with different storage requir
 This section introduces the classic state management and persistency architectures used in server cluster or client/muli-server based systems \cite{Hu_voronoi_IM}.
 
 \subsection{Sharding}
+\label{sharding}
 
 A storage model where the VE state is duplicated over multiple servers, with players connecting to one of these servers is termed ``sharding''. Clients are not able to interact or communicate with players on other shards, which reduces game immersion. This method does, however, allow for a more scalable system as maximum load is fixed.
 
