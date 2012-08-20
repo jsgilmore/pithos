@@ -36,7 +36,7 @@ Another innovation of Eve was the in-game economy. CCP games appointed Dr. Eyj\'
 
 Second life is classified as a massively multiplayer online social game (MMOSG). It focusses more on social interaction and creatively, as opposed to the usual conflict-based MMORPGs, such as WoW or Eve online. Players in Second Life can create virtual items, such as clothing, furniture and architecture, and sell them them for real money. Players can buy property and build on the property they bought. This can be sold to other users, all for real money.
 
-From a network architecture perspective, user generated content changes adds a lot of extra load to the system. Players no longer only have to be aware of other players in the virtual world, they also have to be made aware of the content that other players generated. Usually, the player's client also know exactly how another player looks, based on her class and equipped items. With user generated content, the complete shape of the object has to be transferred. User generated content, therefore, increases bandwidth requirements.
+From a network architecture perspective, user generated content changes adds a lot of extra load to the system. Players no longer only have to be aware of other players in the virtual world, they also have to be made aware of the content that other players generated. Usually, the player's client also know exactly how another player looks, based on her class and equipped items. With user generated content, the complete shape of the object is transferred. User generated content, therefore, increases bandwidth requirements.
 
 \subsection{Requirements}
 
@@ -44,7 +44,7 @@ The design requirements of an MMOG are the same as the design requirements for a
 
 What is additionally required for an MMOG is a network and state consistency architecture. The network architecture defines how hosts are connected, the roles of different hosts and how information is distributed between hosts. There are many social as well as technical aspects to consider when designing a virtual world \cite{designing_virtual_worlds}, but an essential requirement of all MMVEs, including all the MMOGs presented in Section \ref{modern_mmogs}, is that multitudes of players should be able to interact with each other and the virtual environment. This is called the consistency architecture. The consistency architecture ensures that players share the same view of the virtual environment they inhabit. It is also responsible for relaying player actions to other players and informing other players of any new players or objects in the virtual world.
 
-Player data should also be stored when players log off from the game. In-game object states should also be stored as well as the states of computer characters in the game. 
+Player data should also be stored when players log off from the game. In-game object states should also be stored as well as the states of computer characters in the game.
 
 \subsection{Classic client-server MMVEs}
 
@@ -105,28 +105,22 @@ communicate, significantly increases the latency of the system compared to a sys
 In an effort to address some of the C/S issues, the distributed C/S, also called the Client/Multi-Server (C/MS) model, was introduced, shown in Figure \ref{fig_cms_arch}. In a C/MS model,
 the server functions are distributed amongst multiple machines to distribute the server load.
 
-In general, the issues addressed and improved by the C/MS architecture are robustness, scalability, and peak load handling. The system is more
-robust, because the failure of one server will not necessarily lead to the failure of the whole system for certain system designs. The system is more
-scalable, because many less powerful servers may be used, which allows for the hosting of more players than what is currently possible with single
-server hardware. It also handles transient loads better, because, for cases where loads can be predicted, resources can by moved between servers to
-improve the user experience.
+In general, the issues addressed and improved by the C/MS architecture are robustness, scalability, and peak load handling. The system is more robust, because the failure of one server will not necessarily lead to the failure of the whole system for certain system designs. The system is more scalable, because many less powerful servers may be used, which allows for the hosting of more players than what is currently possible with single server hardware. It also handles transient loads better, because, for cases where loads can be predicted, resources can by moved between servers to improve the user experience.
 
-The disadvantages of this system is that the administration complexity is greatly increased. Such systems, although capable of handling many more
-users than a single server, is also more expensive. These disadvantages are, however, not technical problems and so it is assumed for current games,
-that these systems are what is required if a game is to be hosted for a large number of players.
+The disadvantages of this system is that the administration complexity is greatly increased. Such systems, although capable of handling many more users than a single server, is also more expensive. These disadvantages are, however, not technical problems and so it is assumed for current games, that these systems are what is required if a game is to be hosted for a large number of players.
 
 \subsection{The cost of doing business}
 \label{mmog_cost}
 
-With the fast growing MMOG market, many companies are spending a significant amount of money to produce AAA MMOG titles. Some development cost estimates are: \$18 mil. for Aion, \$20 mil., for Everquest \cite{aion_everquest_cost}, \$63 mil. for World of Warcraft \cite{wow_cost} and \$100 mil. to \$200 mil. for Star Wars: The Old Republic \cite{star_wars_cost_1}, \cite{star_wars_cost_2}. Although these figures are purely estimates, it does show that to develop a AAA MMOG title costs a lot of money.
+With the fast growing MMOG market, many companies are spending a significant amount of money to produce premium MMOG titles. Some development cost estimates are: \$18 mil. for Aion, \$20 mil., for Everquest \cite{aion_everquest_cost}, \$63 mil. for World of Warcraft \cite{wow_cost} and \$100 mil. to \$200 mil. for Star Wars: The Old Republic \cite{star_wars_cost_1}, \cite{star_wars_cost_2}. Although these figures are purely estimates, it does show that to develop a premium MMOG title costs a lot of money.
 
 The issue with MMOG development is that, although they cost more to develop than single player or smaller scale multiplayer games, they are just as likely to fail. Despite this, game publishers are spending a lot of money in an attempt to recreate the success that is World of Warcraft.
 
 Because of the large revenues being generated from MMOGs, many competitors are entering the MMOG space. Currently, the rate at which new MMOGs are added to the market is outstripping the growth of the market itself \cite{newzoo_mmo_report}. Furthermore, because of the recession, over the past two or three years, game subscriptions have been shown to stabilise or even decline \cite{mmo_growth_chart}.
 
-The significant initial investment required to develop an MMOG also doesn't present the complete picture. Another factor driving up costs for an MMOG is the money required for server hardware, maintenance and support. An MMOG is not finished when it goes live. A team of developers is required to maintain the game, release patches fixing bugs and to produce more content to keep the player base sufficiently interested to ensure that players will continue to pay \$15 per month to play the game. Development and maintenance costs for World of Warcraft for four years is estimated at \$100 mil. to \$200 mil. \cite{wow_cost}.
+The significant initial investment required to develop an MMOG also doesn't present the complete picture. Another factor driving up costs for an MMOG is the money required for server hardware, maintenance and support. An MMOG is not finished when it goes live. A team of developers is required to maintain the game, release patches fixing bugs and to produce more content to keep the player base sufficiently interested to ensure that players will continue to pay \$15 per month to play. Development and maintenance costs for World of Warcraft for four years is estimated at \$100 mil. to \$200 mil. \cite{wow_cost}.
 
-With the costs involved, it is therefore difficult for a new developer to enter into this space. After the large initial investment into the game's development, all server hardware must be acquired and people appointed to maintain the game. This money has to be spent before it is known whether the game will succeed or fail. It has been estimated that during the lifetime of an MMOG, 80\% of the game revenue goes into hardware and maintenance costs \cite{cs_mmog_cost}.
+With the costs involved, it is therefore difficult for a new developer to enter into this space. After the large initial investment into the game's development, all server hardware must be acquired and staff appointed to maintain the game. This money is spent before it is known whether the game will succeed or fail. It has been estimated that during the lifetime of an MMOG, 80\% of the game revenue goes into hardware and maintenance costs \cite{cs_mmog_cost}.
 
 \subsection{The peer-to-peer proposal}
 
@@ -139,7 +133,7 @@ but firstly it would be beneficial to acquire a greater understanding of the bas
 
 \subsection{Overview}
 
-A P2P system is a distributed network that exists out of many participating nodes to fulfil some objective. In this work, a P2P system is defined as being a distributed network with the following properties
+A P2P network is a distributed network that exists out of many participating nodes to fulfil some objective. In this work, a P2P network is defined as being a distributed network with the following properties
 \cite{Rodrigues_acm_comms_p2p}:
 %
 \begin{itemize}
@@ -148,57 +142,76 @@ A P2P system is a distributed network that exists out of many participating node
 \item \emph{Multiple administrative domains} Peers are not under the control of any single authority. Peers in the network belong to different organisations or individuals and direct administration is impossible.
 \end{itemize}
 
-Peer-to-peer (P2P) systems have been popularised by mainly three systems developed in 1999: the Napster music sharing service, the Freenet data store and the SETI@home volunteer-based distributed computing project. These three projects highlighted the advantages of P2P systems being: low barrier to entry, scalability, resistance to faults and attacks, and an abundance and availability of resources.
+P2P systems have been popularised by mainly three systems developed in 1999: the Napster music sharing service, the Freenet data store and the SETI@home volunteer-based distributed computing project. These three projects highlighted the advantages of P2P networks being: low barrier to entry, scalability, resistance to faults and attacks, and an abundance and availability of resources.
+
+\subsection{The OSI model}
+
+A basis of computer networking is the layered architecture model, usually called the Open Systems Interconnection (OSI) model \cite{OSI_protocol_stack}. It defines various protocol layers that allow for abstraction of complex operation in the lower layers in the higher layers. The OSI layers are, from bottom to top: the physical layer, the data link layer, the network layer, the transport layer, the session layer, the presentation layer and the application layer. In practice, the session, presentation and applications layers are all folded into the application layer.
+
+The physical layer is the physical transmission medium and carries physical signals. Physical level protocol examples include: IEEE 802.11 (Wi-fi), USB, Bluetooth, etc..
 
 \subsection{Structured and unstructured P2P overlays}
 \label{overlays}
 
-P2P networks are created and maintained in the application layer of the Open Systems Interconnection (OSI) model protocol stack. This application
-layer network is called the P2P overlay. Peers in an overlay network might have neighbours that have no relationship to their physical position in
-the underlying network. Overlays can broadly be classified into structured and unstructured types. The classification is mostly based on the
-differing methods of routing and content retrieval in the network. This section only provides a brief comparison between structured and unstructured overlays. For a detailed comparison between the two types that also deals with many of the myths of structured overlays, please refer to
-\cite{Castro_structured_overlay_myths}.
+A P2P network can be fully characterised by its overlay. P2P networks are created and maintained in the application layer of the Open Systems Interconnection (OSI) model protocol stack. This application layer network is called the P2P overlay.
 
-With unstructured approaches, one is never assured that a data item will be retrieved, even if that data item is present in the network. If many
-duplicates of a data item are contained in the network, this becomes less of a problem, since it is assumed that the request will be routed to some
-set of nodes that do  possess the item.
+An overlay is required so peers may know which other peers are part of the P2P network, since most nodes in the physical network, such as the Internet, will not be part of the network. The overlay is then defined by the routing table information stored on each peer.
 
-An unstructured architecture works well for content sharing and Voice over Internet Protocol (VoIP) networks, for example: P2P TV, BitTorrent,
-Gnutella and Skype. The reason for this is the high level of duplication in these networks, especially for popular content. It is also easier to
-perform keyword searches in unstructured networks and the overlay requires less maintenance.
+Peers in an overlay network might have neighbours that have no relationship to their physical position in the underlying network. Overlays can broadly be classified into structured and unstructured types. The classification is mostly based on the differing methods of routing and content retrieval in the network. This section only provides a brief comparison between structured and unstructured overlays. For a detailed comparison between the two types that also deals with many of the myths of structured overlays, please refer to \cite{Castro_structured_overlay_myths}.
 
-Because there is no assurance that a data item might be retrieved from an unstructured network, especially when that item is scarce, unstructured
-overlays are not considered adequate as a basis for P2P MMVEs, where all data items must be available at all times.
+With unstructured approaches, one is never assured that a data item will be retrieved, even if that data item is present in the network. If many duplicates of a data item are contained in the network, this becomes less of a problem, since it is assumed that the request will be routed to some set of nodes that do  possess the item.
 
-Structured overlays have been proposed that provide for efficient routing and reliable retrieval of data items. Some of these well known overlays
-are: CAN \cite{CAN}, Chord \cite{chord}, Tapestry \cite{tapestry} and Pastry \cite{pastry}.
+An unstructured architecture works well for content sharing and Voice over Internet Protocol (VoIP) networks, for example: P2P TV, BitTorrent, Gnutella and Skype. The reason for this is the high level of duplication in these networks, especially for popular content. It is also easier to perform keyword searches in unstructured networks and the overlay requires less maintenance.
 
-The basic idea of a structured overlay is that all nodes are identified by unique identifiers (IDs). A popular method to create the IDs is to use
-hashes to a circular key space. Any node in the overlay network is then able to efficiently route a query with a given ID, to a node with an ID
-closest to the given ID. An accurate comparison is that unstructured overlays are good at finding ``hay'', while structured overlays are good at
-finding ``needles'' \cite{Rodrigues_acm_comms_p2p}.
+Because there is no assurance that a data item might be retrieved from an unstructured network, especially when that item is scarce, unstructured overlays are not considered adequate as a basis for P2P MMVEs, where all data items must be available at all times.
+
+Structured overlays have been proposed that provide for efficient routing and reliable retrieval of data items. Some of these well known overlays are: CAN \cite{CAN}, Chord \cite{chord}, Tapestry \cite{tapestry} and Pastry \cite{pastry}. The basic idea of a structured overlay is that all nodes are identified by unique identifiers (IDs).
+
+A popular method to create the IDs is to use hashes to a circular key space, using for example, the SHA-1 hash function. Any node in the overlay network is then able to efficiently route a query with a given ID, to a node with an ID closest to the given ID. An accurate comparison is that unstructured overlays are good at finding ``hay'', while structured overlays are good at finding ``needles'' \cite{Rodrigues_acm_comms_p2p}.
 
 \subsection{Features of structured P2P overlays}
 
-Structured P2P overlays have certain key features \cite{p2p_networking_handbook}.
+A structured P2P overlay has certain key features that determines its lookup speed, space consumption and bandwidth requirement \cite{p2p_networking_handbook}. These features are geometries, routing algorithms, join/leave mechanisms, routing table maintenance and bootstrapping.
 
 \subsubsection{Geometries}
+
+An overlay's geometry determines how nodes are structured in the application layer network. The geometry allows for deterministic routing. The geometry determines the number of required lookup hops and how the network will be maintained during times when nodes join and leave the network, called churn.
+
 \subsubsection{Routing algorithms}
-\subsubsection{Join/leave mechanisms}
-\subsubsection{Routing table maintenance}
+
+The routing algorithm is directly related to the specific overlay geometry. The routing algorithm determines which nodes are traversed when a message is sent to a target node. The routing algorithm and the geometry determines the number of expected hops for a message to reach a destination.
+
+\subsubsection{Join mechanism}
+
+P2P networks experience constant churn, where nodes are joining and leaving the network. Mechanisms for a node to join the network should be present. This is usually in the form of a well known directory (boostrap) server. When a node wishes to join the network, the directory server sends a set of nodes that the node may want to join.
+
+\subsubsection{Leave mechanism}
+
+If a node leaves the overlay, its neighbours have to be informed so they may update their routing tables. This is termed \emph{routing table maintenance} and has to happen every time a peer leaves the network. Neighbouring nodes of a node that left the network might also have to inform their neighbours of the change. Two types of routing table maintenance exist: opportunistic and active maintenance.
+
+Opportunistic maintenance attaches routing information to existing request packets. Routing data is essentially ``piggy backed'' onto existing messages. This reduced messages overhead but the rate of routing table maintenance is directly proportional to the message rate. Active maintenance makes use of explicit update messages, which required more bandwidth but is more reliable.
+
+
 \subsubsection{Bootstrapping}
+
+After having been informed of a peer to join, a joining peer may initiate the process of positioning itself in the P2P network, called bootstrapping. This is the process of finding out where the joining node fits into the overlay in terms of the geometry. If the overlay requires that all nodes be connected in a ring organised by ID, then the joining peer must discover the nodes whose IDs are one more and one less than its own and join those two peers.
+
+The process of bootstrapping is complete when a joining peer becomes a functioning member of the P2P overlay.
 
 %TODO: Add something about the effect of the hashing and why it's important
 
 \subsection{Advantages}
 
-P2P systems have a low barrier to entry, since little or no centralised infrastructure is required to maintain the system. This makes P2P systems inexpensive to operate and is one of the reasons Napster was able to provide its service for free.
+\begin{itemize}
+\item P2P networks have a low barrier to entry, since little or no centralised infrastructure is required to maintain the system. This makes P2P networks inexpensive to operate and is one of the reasons Napster was able to provide its service for free.
 
-P2P systems are considered scalable. Pure P2P networks can theoretically grow from hundreds to millions of nodes, with the service remaining functional. And this is all possible without the need for the operator to acquire more infrastructure. This is as opposed to the centralised client/server network, which required more powerful server clusters are the network grows to handle the growing number of client requests.
+\item P2P networks are considered scalable. Pure P2P networks can theoretically grow from hundreds to millions of nodes, with the service remaining functional. This is all possible without the need for the operator to acquire more infrastructure, as opposed to the centralised client/server network, which required more powerful server clusters are the network grows to handle the growing number of client requests.
 
-A P2P system is also resistant to faults and attacks, since the failure of a single node has little to no effect on the network. This is because there are usually few nodes that are critical to the correct functionality of the system. To shut down a P2P system, an attacker usually has to shut down a large proportion of the network.
+\item A P2P network is also resistant to faults and attacks, since the failure of a single node has little to no effect on the network. This is because there are usually few nodes that are critical to the correct functionality of the system. To incapacitate a P2P network, an attacker usually has to shut down a large proportion of the network.
 
-Not only does a P2P operator not require its own infrastructure, but the P2P infrastructure that forms part of the network and consists of peer machines provide abundant and highly available resources, being computation power, long term and short term storage. This means that P2P systems can be designed to run on powerful computers.
+\item Not only does a P2P operator not require its own infrastructure, but the P2P infrastructure that forms part of the network and consists of peer machines provide abundant and highly available resources, being computation power, long term and short term storage. This means that P2P networks can be designed to run on powerful computers.
+\end{itemize}
+
 
 \section{Peer-to-Peer MMVE network architectures}
 \label{p2p_network_architectures}
@@ -218,7 +231,7 @@ of the server in the classic C/S model are distributed amongst all peers.
 \subsection{Advantages}
 \label{p2p_mmve_advantages}
 
-The P2P system is robust, because there is no server that can fail, only individual peers. Individual peers failing will not affect any other peers
+The P2P network is robust, because there is no server that can fail, only individual peers. Individual peers failing will not affect any other peers
 other than the peer that failed. This behaviour makes game down-time extremely unlikely.
 
 Furthermore, because every peer hosts itself, the system is scalable. Another advantage is that no extra costs are incurred from an operator
@@ -239,71 +252,42 @@ is also no single server that has to process user actions (events). User actions
 Although many advantages can be had from P2P MMVEs, some challenges still remain. The main challenges are state consistency, limited peer bandwidth, cheating mitigation, incentive mechanisms and distributed computation.
 
 \subsubsection{Peer bandwidth}
-Another challenge for P2P systems is the required peer bandwidth. In a paper by Miller and Crowcroft, a packet simulator was created to determine the
-required bandwidth and effective latency, if a game such as World of Warcraft were to be implemented using P2P technologies
-\cite{Miller_p2p_infeasability}. Their simulation results indicate that today's networks are not able to host P2P MMVEs, with the required bandwidth
-and latency constraints. Such a significant result requires verification, but at the least, it shows that reducing bandwidth and latencies for P2P
+Another challenge for P2P networks is the required peer bandwidth. In a paper by Miller and Crowcroft, a packet simulator was created to determine the required bandwidth and effective latency, if a game such as World of Warcraft were to be implemented using P2P technologies \cite{Miller_p2p_infeasability}. Their simulation results indicate that today's networks are not able to host P2P MMVEs, with the required bandwidth and latency constraints. Such a significant result requires verification, but at the least, it shows that reducing bandwidth and latencies for P2P
 MMVEs should be a primary design requirement.
 
 \subsubsection{Cheating mitigation}
 \label{key_challenges_cheating}
 
-Cheating mitigation has been identified as a major issue for P2P systems \cite{knutsson_p2p_first}, \cite{challenges_p2p_gaming},
-\cite{cheat_proof_event_ordering}. The challenges reside in the fact that peers are not under the control of the game producer. Since all server data
-are distributed amongst peers, all peers have access to sections of the server data. Peers also have access to the distributed server code. One
-advantage that can be exploited to prevent cheating is that no peer contains all server data and no single peer has more authority than another.
+Cheating mitigation has been identified as a major issue for P2P networks \cite{knutsson_p2p_first}, \cite{challenges_p2p_gaming}, \cite{cheat_proof_event_ordering}. The challenges reside in the fact that peers are not under the control of the game producer. Since all server data are distributed amongst peers, all peers have access to sections of the server data. Peers also have access to the distributed server code. One advantage that can be exploited to prevent cheating is that no peer contains all server data and no single peer has more authority than another.
 
-There are various security issues that are usually classified according to the level in the protocol stack where they occur. The areas identified by
-\cite{cheat_proof_event_ordering} and expanded upon by \cite{cheating_taxonomy} are: game level, application level, protocol level and infrastructure level. This is consistent with the generally used layered security model \cite{distributed_systems_security}.
+There are various security issues that are usually classified according to the level in the protocol stack where they occur. The areas identified by \cite{cheat_proof_event_ordering} and expanded upon by \cite{cheating_taxonomy} are: game level, application level, protocol level and infrastructure level. This is consistent with the generally used layered security model \cite{distributed_systems_security}.
 
 Game level cheats are ways in which a malicious player may gain an unfair advantage over other players, within the confines of the game. These cheats are usually because of software bugs and some examples are duplication and teleport cheats.
 
-Application level cheats are where malicious players alter the game software to gain an unfair advantage. This is usually done by gaining access to
-the game state to which they should not have access at the current time. An example of this is ``map reveal'' cheats in strategy games. Where the
-``fog of war'' is removed and the player can observe all the opponent's movements. Other cheats are sometimes used that augment the player's UI with extra information that allows the player to make more informed decisions. It is debatable whether these additions are cheats. They are, however, considered almost essential for competitive WoW play.
+Application level cheats are where malicious players alter the game software to gain an unfair advantage. This is usually done by gaining access to the game state to which they should not have access at the current time. An example of this is ``map reveal'' cheats in strategy games. Where the ``fog of war'' is removed and the player can observe all the opponent's movements. Other cheats are sometimes used that augment the player's UI with extra information that allows the player to make more informed decisions. It is debatable whether these additions are cheats. They are, however, considered almost essential for competitive WoW play.
 
 Protocol level cheats are cheats based on the different methods of communicating data across the system. These usually concern dropping, delaying of modifying IP packets to achieve certain outcomes in the game. Infrastructure level cheats concern exploiting the underlying infrastructure on which the games are built. These include hacking the hardware or P2P overlay.
 
-As with all taxonomies, all cheats may not cleanly fit into one if these boxes, some cheats may occur over multiple levels or a cheat with a specific outcome can be implemented differently on different levels. The field of P2P security has recently received more attention than in the past and has
-started to bear fruit \cite{survey_p2p_game_cheats}. This is, however, an ongoing research field with many issues still open. For an in-depth review
-of the security issues facing peer-to-peer system in general, refer to \cite{p2p_security_issues}. These issues are the same issues facing P2P MMVEs, with the exception of the game and application layer issues.
+As with all taxonomies, all cheats may not cleanly fit into one if these boxes, some cheats may occur over multiple levels or a cheat with a specific outcome can be implemented differently on different levels. The field of P2P security has recently received more attention than in the past and has started to bear fruit \cite{survey_p2p_game_cheats}. This is, however, an ongoing research field with many issues still open. For an in-depth review of the security issues facing peer-to-peer system in general, refer to \cite{p2p_security_issues}. These issues are the same issues facing P2P MMVEs, with the exception of the game and application layer issues.
 
 \subsubsection{Incentive mechanisms}
 
-P2P schemes require all players to share resources in order to ensure correct functionality. The issue with this is that players might not want to share their resources, but still benefit from the resources of others. This is where incentive mechanisms become important. The function of these
-mechanisms is to ensure that all players contribute resources, by incentivised contribution.
+P2P schemes require all players to share resources in order to ensure correct functionality. The issue with this is that players might not want to share their resources, but still benefit from the resources of others. This is where incentive mechanisms become important. The function of these mechanisms is to ensure that all players contribute resources, by incentivised contribution.
 
-All distributed resource sharing models require incentive mechanisms. For example, Bittorrent systems use the tit-for-tat protocol to ensure that all
-people downloading data are also contributing data \cite{tit_for_tat}. Such mechanisms are also required with P2P MMVEs. One advantage in designing
-an incentive algorithm for a P2P MMVE is that players can be made to contribute resources for the duration of play. The issues with file sharing
-systems are not present where a peer, after downloading a file, has no more incentive to contribute. When a peer plays a game, incentive can be
-created to provide resources for the duration of the game.
+All distributed resource sharing models require incentive mechanisms. For example, Bittorrent systems use the tit-for-tat protocol to ensure that all people downloading data are also contributing data \cite{tit_for_tat}. Such mechanisms are also required with P2P MMVEs. One advantage in designing an incentive algorithm for a P2P MMVE is that players can be made to contribute resources for the duration of play. The issues with file sharing systems are not present where a peer, after downloading a file, has no more incentive to contribute. When a peer plays a game, incentive can be created to provide resources for the duration of the game.
 
-Some incentive schemes proposed increase a player's reputation when resources are provided \cite{classic_p2p_reputation} \cite{proactive_reputation}. This might create a type of meta game, where players try to gain as much reputation as possible. It can however be argued that this scheme does not really enforce the provisioning of resources. A player who does not want to provide resources might not see a higher reputation as sufficient incentive to provide resources.
+Some incentive schemes proposed increase a player's reputation when resources are provided  \cite{classic_p2p_reputation} \cite{proactive_reputation}. This might create a type of meta game, where players try to gain as much reputation as possible. It can however be argued that this scheme does not really enforce the provisioning of resources. A player who does not want to provide resources might not see a higher reputation as sufficient incentive to provide resources.
 
-Other issues with incentive schemes is that sometimes players might have insufficient resources. Such players should be aided by other players with
-sufficient resources and not be disallowed to play the game. When limited resources are taken into account, the issue of reporting a false amount of
-available resources becomes a problem. A peer that has sufficient resources, might report insufficient resources, to not be penalised. It is evident
-that there exists space for more research in this field.
+Other issues with incentive schemes is that sometimes players might have insufficient resources. Such players should be aided by other players with sufficient resources and not be disallowed to play the game. When limited resources are taken into account, the issue of reporting a false amount of available resources becomes a problem. A peer that has sufficient resources, might report insufficient resources, to not be penalised. It is evident that there exists space for more research in this field.
 
 
 \subsubsection{Distributed computation}
 
-Non-Player Characters (NPCs) are characters that are not controlled by any human player, but are rather controlled by some artificial intelligence
-routine or script executing on some host machine. These characters represent the traders and monsters in MMVEs and usually contain sets of rules that
-determine how they should interact with Player Characters (PCs) as well as their own state information. An NPC's state can be how much money and
-items it has to trade or how much health it still has after being attacked by a player.
+Non-Player Characters (NPCs) are characters that are not controlled by any human player, but are rather controlled by some artificial intelligence routine or script executing on some host machine. These characters represent the traders and monsters in MMVEs and usually contain sets of rules that determine how they should interact with Player Characters (PCs) as well as their own state information. An NPC's state can be how much money and items it has to trade or how much health it still has after being attacked by a player.
 
-In the original NPC host allocation classification by Fan, both NPC state and computational routines are combined into a single category
-\cite{Fan_phd}. In the classification presented below, NPC state forms part of normal game state persistency, since NPC objects are game objects like
-any other. The NPC routines requiring computational power are grouped under the heading of distributed computation. This heading is meant to include
-the distribution of all in game computational elements.
+In the original NPC host allocation classification by Fan, both NPC state and computational routines are combined into a single category \cite{Fan_phd}. In the classification presented below, NPC state forms part of normal game state persistency, since NPC objects are game objects like any other. The NPC routines requiring computational power are grouped under the heading of distributed computation. This heading is meant to include the distribution of all in game computational elements.
 
-Some game objects require computational power to function. An example of this is the Artificial Intelligence routines of NPCs or the computation of
-physics effects on in-game objects. Some architectures assume that the computational requirements will be fulfilled where the object state is hosted
-\cite{solipsis}, but other schemes exist that allow for the CPU power to be distributed amongst peers. One such scheme makes use of a ``job board''
-like mechanism, where tasks are advertised on specialised super peers. Other peers monitor these super peers and may elect to perform the advertised
-tasks \cite{fan_mediator_paper}.
+Some game objects require computational power to function. An example of this is the Artificial Intelligence routines of NPCs or the computation of physics effects on in-game objects. Some architectures assume that the computational requirements will be fulfilled where the object state is hosted \cite{solipsis}, but other schemes exist that allow for the CPU power to be distributed amongst peers. One such scheme makes use of a ``job board'' like mechanism, where tasks are advertised on specialised super peers. Other peers monitor these super peers and may elect to perform the advertised tasks \cite{fan_mediator_paper}.
 
 \subsubsection{State consistency}
 %State persistency, compared to state consistency

@@ -408,24 +408,46 @@ Overlay & 80(78.93)     &  0.609     &   2.0642     &   299/311  \\
 
 \section{Performance under network churn with object repair}
 
-%With TTL=300
+%With TTL=1000
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+Repair   &Node lifetime& Data\\
+         &     (s)     &in/out (Bps)\\
+\hline
+None     & 200         &     7/30\\
+None     & 1000        &     5/135\\
+None     & 1800        &     4/157\\
+Leaving  & 200         &     7/49\\
+Leaving  & 1000        &     5/136\\
+Leaving  & 1800        &     4/158\\
+Periodic & 200         &     7/53\\
+Periodic & 1000        &     5/137\\
+Periodic & 1800        &     4/157\\
+\hline
+\end{tabular}
+\caption{Table showing the amount of data received and sent from and to the higher layer, for various repair profiles.}
+\label{tab_repair_data}
+\end{table}
 
 \begin{table}[htbp]
 \centering
 \begin{tabular}{|c|c|c|c|c|c|}
 \hline
-Repair   &Node lifetime&Reliability   &Responsiveness    &Group bandwidth&Overlay bandwidth  \\
-         &     (s)     &store/retrieve&store/retrieve (s)&in/out (Bps)  &  in/out (Bps)      \\
+Repair   &Node lifetime& Reliability  &  Responsiveness  &Group bandwidth&Overlay bandwidth  \\
+         &     (s)     & retrieve     &  retrieve (s)    & in/out (Bps)  &  in/out (Bps)     \\
 \hline
-None     & 200         &1.0/0.9307    & 0.0445/0.565     &  139/106     & 862/878            \\
-None     & 1000        &1.0/0.9972    & 0.0492/0.175     &  181/160     & 1149/1165          \\
-None     & 1800        &1.0/0.9970    & 0.0488/0.196     &  187/183     & 1183/1197          \\
-Leaving  & 200         &              &                  &              &                   \\
-Leaving  & 1000        &              &                  &              &                   \\
-Leaving  & 1800        &              &                  &              &                   \\
-Periodic & 200         &              &                  &              &                   \\
-Periodic & 1000        &              &                  &              &                   \\
-Periodic & 1800        &              &                  &              &                   \\
+None     & 200         &    0.5437    &      1.430       &   133/92      &   876/891         \\
+None     & 1000        &    0.9929    &      0.200       &   198/153     &   1157/1170       \\
+None     & 1800        &    0.9987    &      0.157       &   191/162     &   1182/1195       \\
+Leaving  & 200         &    0.8801    &      0.768       &   455/356     &   633/648         \\
+Leaving  & 1000        &    0.9971    &      0.167       &   240/200     &   1161/1176       \\
+Leaving  & 1800        &    0.9989    &      0.147       &   205/179     &   1182/1195       \\
+Periodic & 200         &    0.9562    &      0.470       &   588/485     &   877/892         \\
+Periodic & 1000        &    0.9971    &      0.167       &   251/209     &   1162/1176       \\
+Periodic & 1800        &    0.9988    &      0.152       &   223/194     &   1182/1194       \\
 \hline
 \end{tabular}
 \caption{Table showing the effect of network churn on the reliability and responsiveness of Pithos, for a fixed repair profile, fast storage and fast retrieval.}
