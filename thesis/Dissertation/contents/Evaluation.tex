@@ -38,9 +38,9 @@ It does not make sense to evaluate retrieval performance apart from the storage 
 \hline
 Storage method & Retrieval method & Reliability & Responsiveness (s)\\
 \hline
-Safe    &   N/A         &   0.970   &   1.576  \\
+Safe    &   N/A         &   0.9705  &   1.554  \\
 Safe    &   Fast        &   0.9977  &   0.198  \\
-Safe    &   Parallel    &           &          \\
+Safe    &   Parallel    &   0.9998  &   0.0914 \\
 Fast    &   N/A         &   1.0     &   0.0488 \\
 Fast    &   Fast        &   0.9970  &   0.196  \\
 Fast    &   Parallel    &   0.9998  &   0.0876 \\
@@ -160,19 +160,33 @@ What is also clear from Table \ref{tab_overlay_rel_resp_results} is that the les
 
 \begin{table}[htbp]
 \centering
-\begin{tabular}{|c|c|c|c|c|}
+\begin{tabular}{|c|c|c|}
 \hline
-Entity & Storage method & Retrieval method & Bandwidth & Bandwidth\\
-       &                &                  & in (Bps)  & out (Bps)\\
+Data sent to Pithos   & Data received from Pithos\\
+ (Bps)                &          (Bps)           \\
 \hline
-Group   &   Fast    &   Fast      &   187  &  183  \\
-Group   &   Safe    &   Fast      &   183  &  180  \\
-Group   &   Safe    &   Parallel  &        &       \\
-Group   &   Fast    &   Parallel  &   784  &  735  \\
+        4             &          157             \\
 \hline
-Overlay &   High    &   High      &        &       \\
-Overlay &   Medium  &   Medium    &  1183  &  1197 \\
-Overlay &   Low     &   Low       &  301   &  314  \\
+\end{tabular}
+\caption{Table showing how many bytes of data are sent to, and received from, Pithos per second for the responsiveness test.}
+\label{tab_higher_data_results_resp}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|c|c|c|c|}
+\hline
+Entity & Storage method & Retrieval method     & Bandwidth\\
+       &                &                      & in/out (Bps)\\
+\hline
+Group   &   Fast        &   Fast               &   187/183\\
+Group   &   Safe        &   Fast               &   183/180\\
+Group   &   Safe        &   Parallel           &   798/749\\
+Group   &   Fast        &   Parallel           &   784/735\\
+\hline
+Overlay &   High        &   High               &           \\
+Overlay &   Medium      &   Medium             &  1183/1197\\
+Overlay &   Low         &   Low                &  301/314  \\
 \hline
 \end{tabular}
 \caption{Evaluation of bandwidth requirements of various group storage and retrieval methods as well as overlay storage and retrieval settings}
@@ -212,7 +226,7 @@ This sections presents all unique responsiveness distributions in the Pithos sim
  \label{fig_overlay_put_sf}
 \end{figure}
 %
-Figure \ref{fig_overlay_put_sf} shows that to store an object in the overlay can take anywhere from 0.1 to 4 seconds. 
+Figure \ref{fig_overlay_put_sf} shows that to store an object in the overlay can take anywhere from 0.1 to 4 seconds.
 
 \begin{figure}[htbp]
  \centering
@@ -334,7 +348,7 @@ Figure \ref{fig_overall_get_ff} shows overall retrieval responsiveness for fast 
  \label{fig_overall_get_fp}
 \end{figure}
 %
-Figure \ref{fig_overall_get_fp} shows the overall retrieval responsiveness for parallel retrieval and safe or fast storage. Overall parallel retrieval mirrors parallel group retrieval, since parallel retrieval is faster than overlay retrieval and the first response is the one sent from the lower Pithos layers to peer logic. 
+Figure \ref{fig_overall_get_fp} shows the overall retrieval responsiveness for parallel retrieval and safe or fast storage. Overall parallel retrieval mirrors parallel group retrieval, since parallel retrieval is faster than overlay retrieval and the first response is the one sent from the lower Pithos layers to peer logic.
 
 \subsection{Conclusion}
 
@@ -342,34 +356,98 @@ In this section some responsiveness distributions were shown. The first reason w
 
 \section{Performance for various group probabilities}
 
+A topic that has not yet been explored is group probability. As described in Section \ref{grouping}, Pithos is designed to function over player groups
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+Group probability& Data sent to Pithos   & Data received from Pithos\\
+ ideal(real)(\%) &  (Bps)                &          (Bps)           \\
+\hline
+   40(39.46)     &       4               &          119             \\
+   60(59.16)     &       4               &          131             \\
+   80(78.93)     &       4               &          145              \\
+\hline
+\end{tabular}
+\caption{Table showing how many bytes of data are sent to, and received from, Pithos per second for the group probability test.}
+\label{tab_higher_data_results}
+\end{table}
+
+%Why does PithosTestApp data increase (increased reliability)
+
 \begin{table}[htbp]
 \centering
 \begin{tabular}{|c|c|c|c|c|}
 \hline
-Group probability &Reliability&Responsiveness&Bandwidth&Bandwidth\\
-         (\%)     &           &     (s)      &in (Bps) &out (Bps)\\
+Entity&Group probability&Reliability&Responsiveness&Bandwidth   \\
+      & ideal(real)(\%) &           &     (s)      &in/out (Bps)\\
 \hline
-40                &           &              &         &         \\
-60                &           &              &         &         \\
-80                &           &              &         &         \\
+Pithos & 40(39.46)      &  0.760    & 1.3318       &   401/416  \\
+Pithos & 60(59.16)      &  0.835    & 0.9480       &   424/438  \\
+Pithos & 80(78.93)      &  0.915    & 0.5661       &   450/461  \\
+\hline
+Group & 40(39.46)       &  0.996    &   0.0623     &   102/104  \\
+Group & 60(59.16)       &  0.997    &   0.0917     &   126/127  \\
+Group & 80(78.93)       &  0.998    &   0.1209     &   151/150  \\
+\hline
+Overlay & 40(39.46)     &  0.608     &   2.0849     &   299/312  \\
+Overlay & 60(59.16)     &  0.604     &   2.0798     &   298/311  \\
+Overlay & 80(78.93)     &  0.609     &   2.0642     &   299/311  \\
 \hline
 \end{tabular}
-\caption{Table showing the effect of network churn on the reliability and responsiveness of Pithos, for a fixed repair profile, fast storage and fast retrieval.}
-\label{tab_repair_results}
+\caption{Table showing the effect of different group probabilities on the reliability, responsiveness and bandwidth requirements of Pithos.}
+\label{tab_group_prob_results}
 \end{table}
+
+%Compare the lineal combinations of these values in the verification section
+
+%Explain why data from group can be higher than UDP data (same peer storage and requests not in the group)
+%Why does the group traffic increase with increase in GP (more requests, more data)
+%Why are probabilities not exact
 
 \section{Performance under network churn with object repair}
 
+%With TTL=1000
+
 \begin{table}[htbp]
 \centering
-\begin{tabular}{|c|c|c|c|c|}
+\begin{tabular}{|c|c|c|}
 \hline
-Node lifetime&Reliability&Responsiveness&Bandwidth&Bandwidth\\
-      (s)    &           &     (s)      &in (Bps) &out (Bps)\\
+Repair   &Node lifetime& Data\\
+         &     (s)     &in/out (Bps)\\
 \hline
-200   &     &    &   & \\
-1000  &     &    &   & \\
-1800  &     &    &   &\\
+None     & 200         &     7/30\\
+None     & 1000        &     5/135\\
+None     & 1800        &     4/157\\
+Leaving  & 200         &     7/49\\
+Leaving  & 1000        &     5/136\\
+Leaving  & 1800        &     4/158\\
+Periodic & 200         &     7/53\\
+Periodic & 1000        &     5/137\\
+Periodic & 1800        &     4/157\\
+\hline
+\end{tabular}
+\caption{Table showing the amount of data received and sent from and to the higher layer, for various repair profiles.}
+\label{tab_repair_data}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+Repair   &Node lifetime& Reliability  &  Responsiveness  &Group bandwidth&Overlay bandwidth  \\
+         &     (s)     & retrieve     &  retrieve (s)    & in/out (Bps)  &  in/out (Bps)     \\
+\hline
+None     & 200         &    0.5437    &      1.430       &   133/92      &   876/891         \\
+None     & 1000        &    0.9929    &      0.200       &   198/153     &   1157/1170       \\
+None     & 1800        &    0.9987    &      0.157       &   191/162     &   1182/1195       \\
+Leaving  & 200         &    0.8801    &      0.768       &   455/356     &   633/648         \\
+Leaving  & 1000        &    0.9971    &      0.167       &   240/200     &   1161/1176       \\
+Leaving  & 1800        &    0.9989    &      0.147       &   205/179     &   1182/1195       \\
+Periodic & 200         &    0.9562    &      0.470       &   588/485     &   877/892         \\
+Periodic & 1000        &    0.9971    &      0.167       &   251/209     &   1162/1176       \\
+Periodic & 1800        &    0.9988    &      0.152       &   223/194     &   1182/1194       \\
 \hline
 \end{tabular}
 \caption{Table showing the effect of network churn on the reliability and responsiveness of Pithos, for a fixed repair profile, fast storage and fast retrieval.}
@@ -380,14 +458,14 @@ Node lifetime&Reliability&Responsiveness&Bandwidth&Bandwidth\\
 
 \begin{table}[htbp]
 \centering
-\begin{tabular}{|c|c|c|c|c|}
+\begin{tabular}{|c|c|c|c|}
 \hline
-Malicious nodes factor&Reliability&Responsiveness&Bandwidth&Bandwidth\\
-                      &           &      (s)     &in (Bps) &out (Bps)\\
+Malicious nodes factor&Reliability&Responsiveness&Bandwidth\\
+                      &           &      (s)     &in/out (Bps)\\
 \hline
-0.25   &     &    &   & \\
-0.5    &     &    &   & \\
-0.75   &     &    &   &\\
+0.25   &     &    &   \\
+0.5    &     &    &   \\
+0.75   &     &    &   \\
 \hline
 \end{tabular}
 \caption{Table showing the effect of malicious users on the reliability and responsiveness of Pithos, for fast storage and fast retrieval.}
