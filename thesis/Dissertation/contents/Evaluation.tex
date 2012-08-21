@@ -458,14 +458,36 @@ Periodic & 1800        &    0.9988    &      0.152       &   223/194     &   118
 
 \begin{table}[htbp]
 \centering
+\begin{tabular}{|c|c|c|}
+\hline
+Retrieval method & Malicious nodes & Data       \\
+                 &                 &in/out (Bps)\\
+\hline
+    fast         & 0.25           &  4/158      \\
+    fast         & 0.5            &  4/157      \\
+    fast         & 0.75           &  4/156      \\
+    safe         & 0.25           &  \\
+    safe         & 0.5            &  \\
+    safe         & 0.75           &  \\
+\hline
+\end{tabular}
+\caption{Table showing the amount of data received and sent from and to the higher layer, for various fractions of malicious nodes for both fast and safe retrieval.}
+\label{tab_malicious_data}
+\end{table}
+
+\begin{table}[htbp]
+\centering
 \begin{tabular}{|c|c|c|c|}
 \hline
-Malicious nodes factor&Reliability&Responsiveness&Bandwidth\\
-                      &           &      (s)     &in/out (Bps)\\
+Retrieval method & Malicious nodes&Reliability&Responsiveness&Group bandwidth&Overlay bandwidth  \\
+                 &                &           &      (s)     & in/out (Bps)  &  in/out (Bps)     \\
 \hline
-0.25   &     &    &   \\
-0.5    &     &    &   \\
-0.75   &     &    &   \\
+    fast         & 0.25           &  0.7482   &    0.198     &  186/182      &    1186/1199      \\
+    fast         & 0.5            &  0.5025   &    0.192     &  177/173      &    1180/1194      \\
+    fast         & 0.75           &  0.2669   &    0.191     &  179/175      &    1179/1192      \\
+    safe         & 0.25           &           &    0.158     &               &              \\
+    safe         & 0.5            &           &    0.157     &               &              \\
+    safe         & 0.75           &           &    0.158     &               &              \\
 \hline
 \end{tabular}
 \caption{Table showing the effect of malicious users on the reliability and responsiveness of Pithos, for fast storage and fast retrieval.}
