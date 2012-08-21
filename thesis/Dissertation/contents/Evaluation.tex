@@ -1,6 +1,5 @@
 \chapter{Pithos Evaluation}
     \label{chp:EVALUATION}
-\section{Introduction}
 
 Following the discussion of the Pithos design and implementation, the performance of Pithos will now be presented, along with a comparison of Pithos against overlay storage.
 
@@ -477,7 +476,7 @@ Retrieval method & Malicious nodes & Data       \\
 
 \begin{table}[htbp]
 \centering
-\begin{tabular}{|c|c|c|c|}
+\begin{tabular}{|c|c|c|c|c|c|}
 \hline
 Retrieval method & Malicious nodes&Reliability&Responsiveness&Group bandwidth&Overlay bandwidth  \\
                  &                &           &      (s)     & in/out (Bps)  &  in/out (Bps)     \\
@@ -485,9 +484,9 @@ Retrieval method & Malicious nodes&Reliability&Responsiveness&Group bandwidth&Ov
     fast         & 0.25           &  0.7482   &    0.198     &  186/182      &    1186/1199      \\
     fast         & 0.5            &  0.5025   &    0.192     &  177/173      &    1180/1194      \\
     fast         & 0.75           &  0.2669   &    0.191     &  179/175      &    1179/1192      \\
-    safe         & 0.25           &           &    0.158     &               &              \\
-    safe         & 0.5            &           &    0.157     &               &              \\
-    safe         & 0.75           &           &    0.158     &               &              \\
+    safe         & 0.25           &  0.9558   &    0.356     &  721/588      &              \\
+    safe         & 0.5            &  0.7134   &    0.346     &  717/587      &              \\
+    safe         & 0.75           &  0.3042   &    0.350     &  715/581      &              \\
 \hline
 \end{tabular}
 \caption{Table showing the effect of malicious users on the reliability and responsiveness of Pithos, for fast storage and fast retrieval.}

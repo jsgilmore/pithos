@@ -1,6 +1,8 @@
 \chapter{State Management Parameter Modelling}
 \label{chp:MODELLING}
 
+%Test required
+
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Reliability}
 \subsection{Background and related work}
@@ -238,7 +240,7 @@ Figure \ref{fig_lifetime_vs_other_model} compares the model presented in this pa
 \subsection{Comparison with Pithos simulation}
 \label{simulation}
 
-To determine practical usability of the theoretical results presented in Section \ref{results}, a comparison was performed against the Pithos simulation \cite{Pithos_mmve_2011}. Pithos is a hierarchical distributed storage system that uses grouping to reduce latencies of store and retrieve requests, as is required by massively multiuser virtual environments (MMVEs) \cite{gilmore_p2p_mmog_state_persistency}.
+To determine practical usability of the theoretical results presented in Section \ref{results}, a comparison was performed against the Pithos simulation \cite{Pithos_mmve_2011}. Pithos is a hierarchical distributed storage system that uses grouping to reduce latencies of store and retrieve requests, as is required by massively multi-user virtual environments (MMVEs) \cite{gilmore_p2p_mmog_state_persistency}.
 
 The Oversim environment contains churn generators that create \emph{peers} with lifetimes sampled from an exponential distribution. A single \emph{super peer} was also created and never destroyed. Super peers allow new nodes to join the group by working with the dedicated \emph{directory server} for network bootstrapping. A single group was used, because multiple groups have different average group sizes during different simulations, which reduces the number of measurements per average group size to below statistical significance.
 
