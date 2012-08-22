@@ -355,23 +355,23 @@ In this section some responsiveness distributions were shown. The first reason w
 
 \section{Performance for various group probabilities}
 
-A topic that has not yet been explored is group probability. As described in Section \ref{grouping}, Pithos is designed to function over player groups
+The design of Pithos makes use of user groups and distance-based storage on a group layer, as stated in Sections \ref{grouping} and \ref{distance_based}. To be able to verify the actual performance of Pithos, it is therefore required to investigate Pithos's performance for various group probabilities. In the final P2P MMVE architecture, because of distance-based storage, it is assumed that the percentage of in-group requests will be much higher than that of out-of-group requests. This assumption is based on the fact that with group-based distance-based storage, the objects that are of interest to the user will be stored in that user's group.
 
-\begin{table}[htbp]
-\centering
-\begin{tabular}{|c|c|c|}
-\hline
-Group probability& Data sent to Pithos   & Data received from Pithos\\
- ideal(real)(\%) &  (Bps)                &          (Bps)           \\
-\hline
-   40(39.46)     &       4               &          119             \\
-   60(59.16)     &       4               &          131             \\
-   80(78.93)     &       4               &          145              \\
-\hline
-\end{tabular}
-\caption{Table showing how many bytes of data are sent to, and received from, Pithos per second for the group probability test.}
-\label{tab_higher_data_results}
-\end{table}
+Because the exact probability that an object request will be for a group object is not yet known, a sweep is done for various group probabilities (the probability that a request is for a in-group object) to investigate the effect of group probability on Pithos's performance. For this experiment, the low overlay was used with fast storage and fast retrieval methods selected. The low overlay was used to give a wider range of results from group storage to overlay storage. Six object replicas are stored. Nodes have mean lifetimes of 1800s and objects have a TTL of 300s.
+
+
+%
+Figure \ref{} shows the effect group probability has on Pithos's overall reliability, compared with the underlying group storage and overlay storage radiabilities. The figure shows that the most reliable storage mechanism is group storage. It shows that group and overlay reliability are independent of the group percentage, which is as expected since the group storage and overlay storage modules are independent. Each request that is received from the higher layer (PithosTestApp) is relayed to both the DHT storage and group storage modules by the peer logic module.
+
+When an object request is sent to group storage, the group storage module reports that there does not exist such a module in the group and the request is not handled. The only possible reply is then from the overly storage module. Figure \ref{} shows that the overall Pithos reliability is a linear combination of group storage and overlay storage, weighted by the group probability, or stated mathematically as:
+%
+\begin{equation}
+R_{\textrm{Pithos}} = P_{\textrm{group}}R_{\textrm{group}} + (1-P_{\textrm{group}})R_{\textrm{overlay}},
+\end{equation}
+%
+where $R_{\textrm{Pithos}}$ is the overall Pithos reliability, $R_{\textrm{group}}$ is the group reliability, $R_{\textrm{overlay}}$ and $P_{\textrm{group}}$ is the group probability.
+
+This result shows that the worst Pithos performance depends on the worst performing of group or overlay storage and the probability that a request is generated within the group of for an object in another group.
 
 %Why does PithosTestApp data increase (increased reliability)
 
@@ -397,6 +397,22 @@ Overlay & 80(78.93)     &  0.609     &   2.0642     &   299/311  \\
 \end{tabular}
 \caption{Table showing the effect of different group probabilities on the reliability, responsiveness and bandwidth requirements of Pithos.}
 \label{tab_group_prob_results}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+Group probability& Data sent to Pithos   & Data received from Pithos\\
+ ideal(real)(\%) &  (Bps)                &          (Bps)           \\
+\hline
+   40(39.46)     &       4               &          119             \\
+   60(59.16)     &       4               &          131             \\
+   80(78.93)     &       4               &          145              \\
+\hline
+\end{tabular}
+\caption{Table showing how many bytes of data are sent to, and received from, Pithos per second for the group probability test.}
+\label{tab_higher_data_results}
 \end{table}
 
 %Compare the lineal combinations of these values in the verification section

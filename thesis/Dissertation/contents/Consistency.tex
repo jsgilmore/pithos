@@ -27,8 +27,6 @@ The existence of multiple object copies necessitates an object consistency model
 \section{Event-logic-update cycle}
 \label{event_logic_update}
 
-\subsection{Overview}
-
 It is however impossible for multiple object states to always be consistent, because it takes time to send a message about an object update that has occurred. It is, therefore, not a good design to allow objects to be locally changed and those changes to then be communicated to other objects, because other objects may also have been locally changed in a way that would not allow for the change in the first object.
 
 An example would be of one player in a virtual game world dealing five damage to another player with five health. When the damage is dealt, the target player is killed. If, however, the player drank a potion that gives it some health, the damage dealt by the first player would not kill him. The state of the player being dead and the player being alive is not possible at the same time.
