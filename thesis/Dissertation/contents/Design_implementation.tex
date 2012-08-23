@@ -128,17 +128,12 @@ component ensures that nodes that require data, which are not stored within thei
 \subsection{Secure storage and node ID assignments}
 \label{secure_ids}
 
-In order to design a secure distributed storage system, one requirement for the P2P overlay is that nodes should not be able to select their own IDs
-or it will not be possible to secure the system against attack. Node IDs should rather be assigned securely by some certification authority
-\cite{secure_overlay_routing}.
+In order to design a secure distributed storage system, one requirement for the P2P overlay is that nodes should not be able to select their own IDs or it will not be possible to secure the system against attack. Node IDs should rather be assigned securely by some certification authority \cite{secure_overlay_routing}.
 
-To meet this requirement, Pithos implements its own certification authority to assign node IDs securely and promote security in the P2P overlay. A
-certification server exists that handle ID requests from nodes. The server assigns IDs to nodes and provides the node with a signed certificate that
-it may use to store data.
+To meet this requirement, Pithos implements its own certification authority to assign node IDs securely and promote security in the P2P overlay. A certification server exists that handle ID requests from nodes. The server assigns IDs to nodes and provides the node with a signed certificate that it may use to store data.
 
-Whenever an object is stored or updated in the storage network, nodes have to sign the object to enable the tracking of object changes throughout the
-life of the object. This system is very different from classic distributed file storage designs that advocate anonymity in storage. The fact that all
-changes can be tracked to a specific node will simplify the task of eliminating user cheating.
+Whenever an object is stored or updated in the storage network, nodes have to sign the object to enable the tracking of object changes throughout the life of the object. This system is very different from classic distributed file storage designs that advocate anonymity in storage. The fact that all changes can be tracked to a specific node will simplify the task of eliminating user cheating.
+
 
 \section{Oversim}
 
