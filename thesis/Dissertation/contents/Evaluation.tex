@@ -31,29 +31,44 @@ Both safe and fast storage and fast and parallel retrieval are compared. Safe re
 
 It does not make sense to evaluate retrieval performance apart from the storage method used, since the storage method will influence the retrieval method results as will be explained. Therefore, for each storage method in table \ref{tab_pithos_rel_resp_results}, it firstly shows the performance of only the specific storage method. This is why the retrieval method is then marked ``N/A''. The retrieval performance is then evaluated, taking into account the storage method used.
 
+\subsubsection{Storage}
 \begin{table}[htbp]
 \centering
-\begin{tabular}{|c|c|c|c|c|}
+\begin{tabular}{|c|c|c|}
+\hline
+Storage method & Reliability & Responsiveness (s)\\
+\hline
+Safe    &  0.9705  &   1.554  \\
+Fast    &  1.0     &   0.0488 \\
+\hline
+\end{tabular}
+\caption{Responsiveness and reliability of Pithos's safe and fast storage.}
+\label{tab_pithos_storage_results}
+\end{table}
+%
+Table \ref{tab_pithos_storage_results} shows that when fast storage is used, a reliability of 1.0 is achieved, which is higher then the 0.970 reliability of sage storage. The real reliability isn't actually higher, but because fast storage only waits for a single successful response before reporting success, it reports more successful storages. Safe storage, on the other hand, ensures that a majority of replicas were successfully stored before reporting success. Fast storage will still report success, even if the majority of files were not stored successfully.
+
+The advantage of fast storage over safe storage is its higher responsiveness of 0.0488 s, compared to safe storage's 1.576 s. This means that data are available for retrieval 32 times faster with fast storage compared to safe storage.
+
+\subsubsection{Retrieval}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|c|c|c|c|}
 \hline
 Storage method & Retrieval method & Reliability & Responsiveness (s)\\
 \hline
-Safe    &   N/A         &   0.9705  &   1.554  \\
 Safe    &   Fast        &   0.9977  &   0.198  \\
 Safe    &   Parallel    &   0.9998  &   0.0914 \\
-Fast    &   N/A         &   1.0     &   0.0488 \\
 Fast    &   Fast        &   0.9970  &   0.196  \\
 Fast    &   Parallel    &   0.9998  &   0.0876 \\
 \hline
 \end{tabular}
-\caption{Evaluation of responsiveness and reliability of various Pithos storage and retrieval methods}
-\label{tab_pithos_rel_resp_results}
+\caption{Responsiveness and reliability of fast and parallel retrieval for safe and fast storage.}
+\label{tab_pithos_retrieval_results}
 \end{table}
-
-Table \ref{tab_pithos_rel_resp_results} shows that when fast storage is used, a reliability of 1.0 is achieved, which is higher then the 0.970 reliability of sage storage. The real reliability isn't actually higher, but because fast storage only waits for a single successful response before reporting success, it reports more successful storages. Safe storage, on the other hand, ensures that a majority of replicas were successfully stored before reporting success. Fast storage will still report success, even if the majority of files were not stored successfully.
-
-The advantage of fast storage over safe storage is its higher responsiveness of 0.0488 s, compared to safe storage's 1.576 s. This means that data are available for retrieval 32 times faster with fast storage compared to safe storage.
-
-Fast retrieval for fast storage performs worse (0.9970) than fast retrieval for safe storage (0.9977), but only marginally so. It performs worse, because objects that were incorrectly reported as successfully stored by fast storage, was in fact not. Network churn has removed the less than ideal number of replicas. When fast retrieval attempts to retrieve an object stored with fewer replicas, there is a good chance that the object has been destroyed and the request is unsuccessful.
+%
+Figure \ref{tab_pithos_retrieval_results} shows the results of fast and parallel retrieval for fast and safe storage respectively. Fast retrieval for fast storage performs worse (0.9970) than fast retrieval for safe storage (0.9977), but only marginally so. It performs worse, because objects that were incorrectly reported as successfully stored by fast storage, was in fact not. Network churn has removed the less than ideal number of replicas. When fast retrieval attempts to retrieve an object stored with fewer replicas, there is a good chance that the object has been destroyed and the request is unsuccessful.
 
 The same is true for parallel retrieval for fast storage, compared to parallel retrieval for safe storage. Safe storage leads to an increase in retrieval reliability at the cost of longer storage times.
 
@@ -74,63 +89,25 @@ Table \ref{tab_overlay_medium} shows the ``medium'' overlay configuration parame
 %
 \begin{table}[htbp]
 \centering
-\begin{tabular}{|r|l|}
+\begin{tabular}{|r|l|l|l|}
 \hline
-Parameter & Value\\
+Parameter                       & Low  & Medium & High  \\
 \hline
-Stabilise retries               & 2\\
-Stabilise delay                 & 5 s\\
-Fix finger table interval       & 10 s\\
-Check predecessor delay         & 5 s\\
-Extended finger table           & yes\\
-Extended finger table candidate & 3\\
+Stabilise retries               & 1    & 2      &  3    \\
+Stabilise delay                 & 10s  & 5s     &  3s   \\
+Fix finger table interval       & 120s & 10s    &  5s   \\
+Check predecessor delay         & 5s   & 5 s    &  3s   \\
+Extended finger table           & no   & yes    &  yes  \\
+Extended finger table candidate & N/A  & 3      &  4    \\
 \hline
 \end{tabular}
 \caption{Overlay storage medium configuration parameters and values.}
-\label{tab_overlay_medium}
+\label{tab_overlay_configs}
 \end{table}
 
-Table \ref{tab_overlay_low} shows the ``low'' overlay configuration parameters and their values:
-%
-\begin{table}[htbp]
-\centering
-\begin{tabular}{|r|l|}
-\hline
-Parameter & Value\\
-\hline
-Stabilise retries               & 1\\
-Stabilise delay                 & 10 s\\
-Fix finger table interval       & 120 s\\
-Check predecessor delay         & 5 s\\
-Extended finger table           & no\\
-Extended finger table candidate & N/A\\
-\hline
-\end{tabular}
-\caption{Overlay storage low configuration parameters and values.}
-\label{tab_overlay_low}
-\end{table}
+Table \ref{tab_overlay_configs} shows the ``low'', ``medium'' and ``high'' overlay configuration parameters and their values. These are the overlay configurations that were used during the testing of Pithos and its comparison with overlay storage.
 
 The purpose of the ``high'' configuration is to match the Pithos reliability performance and to then compare overlay responsiveness and bandwidth usage with that of Pithos. This setup was achieved by itteratively adjusting the Chord parameters until similar reliability to that of Pithos was achieved.
-
-Table \ref{tab_overlay_high} shows the ``high'' overlay configuration parameters and their values:
-%
-\begin{table}[htbp]
-\centering
-\begin{tabular}{|r|l|}
-\hline
-Parameter & Value\\
-\hline
-Stabilise retries               & 2\\
-Stabilise delay                 & 3 s\\
-Fix finger table interval       & 5 s\\
-Check predecessor delay         & 3 s\\
-Extended finger table           & yes\\
-Extended finger table candidate & 4\\
-\hline
-\end{tabular}
-\caption{Overlay storage high configuration parameters and values.}
-\label{tab_overlay_high}
-\end{table}
 
 Table \ref{tab_overlay_rel_resp_results} shows the responsiveness of overlay storage for the various parameter settings as described earlier in this section. Because of how the settings were defined, high has the highest storage reliability of ???, medium has a storage reliability of 0.969 and low has the lowest storage reliablity of 0.7908. High also possesses the higher retrieval reliability of ???, medium has a retrieval reliability of 0.9320 and low has the lowest retrieval reliability of 0.6216.
 %
@@ -140,12 +117,12 @@ Table \ref{tab_overlay_rel_resp_results} shows the responsiveness of overlay sto
 \hline
 Configuration type & Reliability & Responsiveness (s)\\
 \hline
-High storage     &           &          \\
-High retrieval   &           &          \\
-Medium storage   &   0.969   &   1.214  \\
-Medium retrieval &   0.9320  &   1.582  \\
-Low storage      &   0.7908  &   1.245  \\
-Low retrieval    &   0.6216  &   2.071  \\
+High storage     &   0.9831      &   1.217  \\
+High retrieval   &   0.9365      &   1.745  \\
+Medium storage   &   0.969       &   1.214  \\
+Medium retrieval &   0.9320      &   1.582  \\
+Low storage      &   0.7908      &   1.245  \\
+Low retrieval    &   0.6216      &   2.071  \\
 \hline
 \end{tabular}
 \caption{Evaluation of overlay storage responsiveness and reliability for various Chord parameter settings.}
@@ -183,7 +160,7 @@ Group   &   Safe        &   Fast               &   183/180\\
 Group   &   Safe        &   Parallel           &   798/749\\
 Group   &   Fast        &   Parallel           &   784/735\\
 \hline
-Overlay &   High        &   High               &           \\
+Overlay &   High        &   High               &  2175/2189\\
 Overlay &   Medium      &   Medium             &  1183/1197\\
 Overlay &   Low         &   Low                &  301/314  \\
 \hline
@@ -428,7 +405,7 @@ All all sections, what was seen was that for a low group probability, the charac
 
 What was shown in this section is that overlay storage provides mediocre reliability for relatively high bandwidth requirements. This underpins the need for an overlay better suited to environments with network churn and improved lookup reliability. Before overlay efficiency can be improved, it is therefore important to create a grouping algorithm that has the highest possible group probability.
 
-\section{Performance under network churn with object repair}
+\section{Performance under network churn}
 
 %With TTL=1000
 
@@ -476,62 +453,40 @@ Periodic & 1800        &    0.9988    &      0.152       &   223/194     &   118
 \label{tab_repair_results}
 \end{table}
 
-\section{Performance under malicious nodes with safe retrieval}
+\section{Reliability (security) under malicious nodes}
 
-What remains to be shown is Pithos's resistance to malicious peers when safe retrieval is used, as described in Section \ref{retrieve_implementation}. For the experimental setup, fast storage was used. Node lifetimes were set to 1800s with object TTL set to 300s. The percentage of users that are malicious is then varied from 0.0 to 1.0 in steps of 0.125. For the safe retrieval case, six objects are retrieved and the first four received objects are compared. The object that is the same in a majority of responses is sent to the higher layer. If no object has a majority, a failure response is sent to the higher layer.
+What remains to be shown is Pithos's resistance to malicious peers when safe retrieval is used, as described in Section \ref{retrieve_implementation}.
 
 Each object in Pithos has a double value attribute that is set to a random value when an object is created for the simulation. The value of the object is stored in PithosTestApps's global object list. It should be noted that for simulation purposes, an object's size is not related to its content. An object's size is set using a random distribution and this is the value used to compute transmission bandwidth and latency.
 
 Whenever a malicious node receives a retrieval request it replies with a modified version of the requested object. The object is modified by modifying the object value. An object is assigned a uniformly random value by a malicious node. Because of the way objects are altered, we implicitly assume that there exists no collusion in the network. When PithosTestApp receives a requested object, it checks that object against the global object list to determine whether the correct object was received. PithosTestApp then records Pithos's reliability.
 
-Figure \ref{} shows Pithos's reliability as a function of the percentage of malicious users in the network for both the fast retrieval and safe retrieval schemes. The fast retrieval reliability is almost the same as the malicious user percentage. System reliability for fast retrieval is the product of the malicious user factor and the system reliability under no malicious users.
+\subsection{Experimental setup}
+For the experimental setup, fast storage was used. Node lifetimes were set to 1800s with object TTL set to 300s. The percentage of users that are malicious is then varied from 0.0 to 1.0 in steps of 0.125. For the safe retrieval case, six objects are retrieved and the first four received objects are compared. The object that is the same in a majority of responses is sent to the higher layer. If no object has a majority, a failure response is sent to the higher layer.
 
-The probability of an object retrieval being corrupted in the network is equal to the probability of a peer being malicious, since a malicious peer corrupts all objects returned and a non-malicious peer corrupts none of the objects returned. The overall probability is then the probability that an object retrieval would have succeeded if no malicious nodes were present, multiplied by the probability of nodes being malicious.
+\subsection{Reliability}
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=15mm 30mm 270mm 180mm, width=\columnwidth]{malicious_nodes_rel}
+ \caption{Reliability of various Pithos retrieval schemes for varying factors of malicious node probability.}
+ \label{fig_malicious_nodes_rel}
+\end{figure}
+%
+Figure \ref{fig_malicious_nodes_rel} shows Pithos's reliability as a function of the percentage of malicious users in the network for both the fast retrieval and safe retrieval schemes. The fast retrieval reliability is almost the same as the malicious user percentage. System reliability for fast retrieval is the product of the malicious user factor and the system reliability under no malicious users.
 
-Figure \ref{} also shows the improvement received from using safe retrieval. The curve shows that safe retrieval provides greater benefit for smaller factors of malicious nodes. As soon as the majority of objects are corrupted, object reliability drops significantly.
+The reason for this direct relationship is because the probability of an object retrieval being corrupted in the network is equal to the probability of a peer being malicious, since a malicious peer corrupts all objects returned and a non-malicious peer corrupts none of the objects returned. The overall probability is then the probability that an object retrieval would have succeeded if no malicious nodes were present, multiplied by the probability of nodes being malicious.
 
-An interesting situation is where safe retrieval reliability drops below fast retrieval reliability. When a majority can no longer be identified by safe retrieval, a failure response is sent up. This is as opposed to fast retrieval that sends any object received. It is possible the the object that was selected by fast storage was not maliciously altered, but also not in the majority. In this scenario, fast retrieval will sometimes send objects to the higher layer that were correct, where safe storage just responded with failure, because it couldn't be sure. Because in practice, the higher layer will not know whether an object is corrupted or not, it seemed more prudent to only send objects to the higher layer where Pithos was reasonably sure the object was unaltered.
+Figure \ref{fig_malicious_nodes_rel} also shows the improvement received from using safe retrieval. The curve shows that safe retrieval provides greater benefit for smaller factors of malicious nodes. As soon as the majority of objects are corrupted, object reliability drops significantly.
 
-In practice, a high malicious node factor is not expected, since it is assumed that cheaters are in the minority. If the virtual world has a majority of cheaters, it will most likely not be sustainable.
+The figure also shows improved reliability, when more received objects are compared to select a majority. Retrieving more objects for comparison will, however, increase bandwidth requirements. Bandwidth increases in line with that shown in Section \ref{bandwidth_requirements}, because safe retrieval is parallel retrieval, but for an additional compare operation. It should be noted that more retrievals than compares may be performed to increase responsiveness at the cost of additional bandwidth.
 
+An interesting situation arises, where safe retrieval reliability drops below fast retrieval reliability. When a majority can no longer be identified by safe retrieval, a failure response is sent up. This is as opposed to fast retrieval that sends any object received. It is possible the the object that was selected by fast storage was not maliciously altered, but also not in the majority. In this scenario, fast retrieval will sometimes send objects to the higher layer that were correct, where safe storage just responded with failure, because it couldn't be sure. Because in practice, the higher layer will not know whether an object is corrupted or not, it seemed more prudent to only send objects to the higher layer where Pithos was reasonably sure the object was unaltered.
 
-\begin{table}[htbp]
-\centering
-\begin{tabular}{|c|c|c|}
-\hline
-Retrieval method & Malicious nodes & Data       \\
-                 &                 &in/out (Bps)\\
-\hline
-    fast         & 0.25           &  4/158      \\
-    fast         & 0.5            &  4/157      \\
-    fast         & 0.75           &  4/156      \\
-    safe         & 0.25           &  \\
-    safe         & 0.5            &  \\
-    safe         & 0.75           &  \\
-\hline
-\end{tabular}
-\caption{Table showing the amount of data received and sent from and to the higher layer, for various fractions of malicious nodes for both fast and safe retrieval.}
-\label{tab_malicious_data}
-\end{table}
+\subsection{Conclusion}
 
-\begin{table}[htbp]
-\centering
-\begin{tabular}{|c|c|c|c|c|c|}
-\hline
-Retrieval method & Malicious nodes&Reliability&Responsiveness&Group bandwidth&Overlay bandwidth  \\
-                 &                &           &      (s)     & in/out (Bps)  &  in/out (Bps)     \\
-\hline
-    fast         & 0.25           &  0.7482   &    0.198     &  186/182      &    1186/1199      \\
-    fast         & 0.5            &  0.5025   &    0.192     &  177/173      &    1180/1194      \\
-    fast         & 0.75           &  0.2669   &    0.191     &  179/175      &    1179/1192      \\
-    safe         & 0.25           &  0.9558   &    0.356     &  721/588      &              \\
-    safe         & 0.5            &  0.7134   &    0.346     &  717/587      &              \\
-    safe         & 0.75           &  0.3042   &    0.350     &  715/581      &              \\
-\hline
-\end{tabular}
-\caption{Table showing the effect of malicious users on the reliability and responsiveness of Pithos, for fast storage and fast retrieval.}
-\label{tab_malicious_results}
-\end{table}
+The section shows that Pithos's safe retrieval mechanism can be used to increase reliability under malicious users at the cost of responsiveness and bandwidth. With malicious users usually present in a virtual world, this cost is always acceptable. During the lifetime of the virtual world, it is important to monitor that malicious user percentage, to determine how parameters, such as number of retrieve requests and number of compares, should be adjusted to combat the threat while minimising bandwidth and maximising responsiveness.
+
+In practice, a low malicious node factor is expected, since it is assumed that cheaters are in the minority. If the virtual world has a majority of cheaters, it will most likely not be sustainable.
 
 \section{Object distribution (fairness)}
 
@@ -542,14 +497,9 @@ Retrieval method & Malicious nodes&Reliability&Responsiveness&Group bandwidth&Ov
  \label{fig_group_overlay_objects}
 \end{figure}
 %
-To evaluate the fairness, we evaluate the standard deviation of the number of objects stored per peer. Figure \ref{fig_group_overlay_objects} (top)
-shows the distribution of group objects over nodes in the network. The figure shows how many nodes store how many objects. The distribution has a
-mean and standard deviation of 302 and 51 objects per node respectively.
+To evaluate the fairness, we evaluate the standard deviation of the number of objects stored per peer. Figure \ref{fig_group_overlay_objects} (top) shows the distribution of group objects over nodes in the network. The figure shows how many nodes store how many objects. The distribution has a mean and standard deviation of 302 and 51 objects per node respectively.
 
-Figure \ref{fig_group_overlay_objects} (bottom) shows the distribution of overlay objects in Pithos with a mean and standard deviation of 153 and 189
-objects per node respectively. Comparing the standard deviations of group storage to overlay storage, it appears that group storage is much fairer
-than overlay storage. This shows that by designing a hybrid system which prefers group storage to overlay storage, one is also designing a fairer
-system than overlay storage.
+Figure \ref{fig_group_overlay_objects} (bottom) shows the distribution of overlay objects in Pithos with a mean and standard deviation of 153 and 189 objects per node respectively. Comparing the standard deviations of group storage to overlay storage, it appears that group storage is much fairer than overlay storage. This shows that by designing a hybrid system which prefers group storage to overlay storage, one is also designing a fairer system than overlay storage.
 
 \begin{figure}[htbp]
  \centering
@@ -558,7 +508,6 @@ system than overlay storage.
  \label{fig_objects}
 \end{figure}
 %
-Figure \ref{fig_objects} shows the combined object distribution of Pithos, with a mean and standard deviation of 453 and 200 objects per node
-respectively. This shows that the fairness of Pithos is currently dominated by the fairness of Pastry and that Pithos is as fair as overlay storage.
+Figure \ref{fig_objects} shows the combined object distribution of Pithos, with a mean and standard deviation of 453 and 200 objects per node respectively. This shows that the fairness of Pithos is currently dominated by the fairness of Pastry and that Pithos is as fair as overlay storage.
 
 \section{Conclusion}
