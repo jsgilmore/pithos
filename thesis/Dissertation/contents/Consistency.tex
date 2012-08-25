@@ -1,20 +1,9 @@
 \chapter{State Consistency}
 \label{chp:CONSISTENCY}
 
-A recent article has identified six key challenges of P2P networks: Interest Management, Game Event Dissemination, Non-player Character (NPC) Host
-Allocation, Game State Persistency, Cheating Mitigation and Incentive Mechanisms \cite{Fan_deisgn_issues_p2p}. A brief overview of these challenges
-will be introduced below.
+In order to design a state management and persistency architecture for P2P MMVEs, the requirements of such an architecture should first be understood. State management and persistency form part of the state consistency architecture of an MMVE. The requirements of the state management and persistency architecture, therefore, depends on what the state consistency architecture requires of it.
 
-\begin{figure}[htbp]
- \centering
- \includegraphics[clip=true, viewport=0cm 0cm 10cm 3cm, width=0.5\columnwidth]{Component_VEN}
- \caption{VEN diagram showing the relationship between different characteristics}
- \label{fig_component_ven}
-\end{figure}
-%
-As shown in Figure \ref{fig_component_ven}, of the six challenges mentioned, Interest Management, Game Event Dissemination and Game State Persistency
-all form part of State Consistency, with some aspects of Cheating Mitigation also a part of State Consistency. Also part of state consistency is
-event ordering, which deals with how to ensure that the system remains causal \cite{GauthierDickey_low_latency_event_ordering}.
+
 
 Key to designing an MMVE is to design its state consistency architecture. On a physical level, each computer that executes a virtual environment (VE) is executing a copy of the virtual environment. This is because a computer can only operate on what is stored in its primary memory. Because computers cannot access each other's primary memory banks, the necessity of multiple object copies is created.
 
@@ -299,17 +288,14 @@ for every region, whose function it is to inform slave nodes of new neighbours. 
 Slave nodes send direction and velocity updates to their masters. Masters communicate directly with other masters if a node is about to enter their
 region. Masters inform their slaves of a new neighbour. Slaves communicate directly with each other, once identified by a master.
 
-\subsection{Root object store}
+\subsection{Authoritative object store}
 
 
 In a recently completed PhD on the subject of P2P MMVEs, Lu Fan had this to say about state persistency: ``Game state persistency is a major challenge for P2P MMVEs as existing P2P storage infrastructures are designed to support file sharing, and seldom fulfil the performance and security requirements of a MMVE. \ldots the persistency area is still immature with many problems waiting to be investigated.'' \cite{Fan_phd}.
 
-State persistency is treated as a sub domain of state consistency, in that state persistency models define where and how the root or authoritive
+State persistency is treated as a sub domain of state consistency, in that state persistency models define where and how the root or authoritative
 objects are stored. It is assumed that replica objects are always stored in the primary memory of the clients that immediately require the
 information contained in the root object.
-
-The issue of game state persistency in P2P MMVEs is the focus of this paper and the remainder of the paper will deal exclusively with this subject.
-However, before the different storage types are reviewed, some classic C/S models are presented for comparison with the fully distributed model.
 
 \section{Conclusion}
 

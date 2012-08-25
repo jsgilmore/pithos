@@ -405,7 +405,7 @@ All all sections, what was seen was that for a low group probability, the charac
 
 What was shown in this section is that overlay storage provides mediocre reliability for relatively high bandwidth requirements. This underpins the need for an overlay better suited to environments with network churn and improved lookup reliability. Before overlay efficiency can be improved, it is therefore important to create a grouping algorithm that has the highest possible group probability.
 
-\section{Performance under network churn}
+\section{Performance under object repair}
 
 %With TTL=1000
 
@@ -453,7 +453,7 @@ Periodic & 1800        &    0.9988    &      0.152       &   223/194     &   118
 \label{tab_repair_results}
 \end{table}
 
-\section{Reliability (security) under malicious nodes}
+\section{Reliability under malicious nodes}
 
 What remains to be shown is Pithos's resistance to malicious peers when safe retrieval is used, as described in Section \ref{retrieve_implementation}.
 
@@ -467,7 +467,7 @@ For the experimental setup, fast storage was used. Node lifetimes were set to 18
 \subsection{Reliability}
 \begin{figure}[htbp]
  \centering
- \includegraphics[clip=true, viewport=15mm 30mm 270mm 180mm, width=\columnwidth]{malicious_nodes_rel}
+ \includegraphics[clip=true, viewport=20mm 30mm 270mm 175mm, width=\columnwidth]{malicious_nodes_rel}
  \caption{Reliability of various Pithos retrieval schemes for varying factors of malicious node probability.}
  \label{fig_malicious_nodes_rel}
 \end{figure}

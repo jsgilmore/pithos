@@ -1,16 +1,15 @@
-\chapter{State Management Parameter Modelling}
+\chapter{Modelling object lifetimes in finite networks under churn}
 \label{chp:MODELLING}
 
 %Test required
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Reliability}
-\subsection{Background and related work}
+\section{Background and related work}
 \label{related_work}
 
 To increase the time an object is available within the distributed storage system, two techniques are used: redundancy and repair. In storage systems using replication as redundancy technique, $R$ replicas of every object are stored. The number of required replicas $R$ is a design decision, the effect of which will be shown in Section \ref{results}. When all nodes containing an object's replicas have left the network, the object is no longer available. Periodic repair, which occurs at a rate of $\mu = 1/T_{\textrm{repair}}$, replaces all missing replicas.
 
-This paper mainly extends and improves upon the work by Wu, Tian and Ng \cite{replication_article}. The related work models three characteristics of distributed hash table (DHT) lookups under churn: expected lookup latency of various routing schemes, expected lookup overhead of various routing schemes and expected object lifetime. Our paper focuses on the object lifetime characteristic. Wu, Tian and Ng develop two models for object lifetime when exponentially distributed node lifetimes are assumed. One for the case without object repair and one for the case with object repair. Node residual lifetimes are used when calculating expected object lifetimes without repair. In this case object lifetimes are equal to the maximum residual lifetime of the nodes the objects were replicated on.
+This chapter mainly extends and improves upon the work by Wu, Tian and Ng \cite{replication_article}. The related work models three characteristics of distributed hash table (DHT) lookups under churn: expected lookup latency of various routing schemes, expected lookup overhead of various routing schemes and expected object lifetime. We focus on the object lifetime characteristic. Wu, Tian and Ng develop two models for object lifetime when exponentially distributed node lifetimes are assumed. One for the case without object repair and one for the case with object repair. Node residual lifetimes are used when calculating expected object lifetimes without repair. In this case object lifetimes are equal to the maximum residual lifetime of the nodes the objects were replicated on.
 
 %What about Pareto lifetimes?
 
@@ -25,13 +24,13 @@ A continuous time Markov chain, shown in Figure \ref{fig_other_markov_chain}, is
 %
 The model has $R+1$ states and is in state $k$ when $R+1-k$ replicas are alive in the network. The system is, therefore, in state $1$ when all replicas are present and in state $R+1$ when no replicas are present. The authors assume that all objects are inserted into the network with $R$ replicas, i.e. enter the network in state 1. This initial state is colored white in Figure \ref{fig_other_markov_chain}. If the node departure rate under steady state is $\theta$ and there are $r$ replicas present in the network, the replica departure rate under steady state is $r\theta$. When all replicas are lost, the chain enters state $R+1$ (coloured dark) and is said to be ``absorbed''.
 
-Our paper improves on the work by Wu, Tian and Ng \cite{replication_article} in two ways: firstly, the model is extended to take into account a finite network size. The fact that there might not be sufficient nodes to replicate the data on when objects are stored or when the repair mechanism activates. Secondly, our model unifies the cases with and without repair, to produce a single model where the effects of both might be evaluated. When our model is used with larger average network sizes, expected object lifetimes converge to those shown in the work by Wu, Tian and Ng, using their two separate models.
+In this chapter, we improve on the work by Wu, Tian and Ng \cite{replication_article} in two ways: firstly, the model is extended to take into account a finite network size. The fact that there might not be sufficient nodes to replicate the data on when objects are stored or when the repair mechanism activates. Secondly, our model unifies the cases with and without repair, to produce a single model where the effects of both might be evaluated. When our model is used with larger average network sizes, expected object lifetimes converge to those shown in the work by Wu, Tian and Ng, using their two separate models.
 
 Predicting object lifetimes in a distributed storage system is grounded in reliability engineering theory. When network size is ignored, it is similar to predicting the mean time to failure (MTTF) of a set of parallel components with repair. Chun et al. \cite{Chun:2006_replica_maintenance} also uses a Markov chain to model object replicas with network churn and repair. They use a birth-death process similar to the model by Wu, Tian and Ng, but using incremental, instead of complete repair.
 
 No literature could be found in general reliability engineering or distributed systems reliability research that deals with object lifetimes with finite network sizes.
 
-\subsection{The model}
+\section{The model}
 \label{model}
 
 In order to model the effects of a finite network size on the lifetime of an object, the continuous time Markov chain model introduced in Section \ref{related_work} is expanded by adding a second parameter to every state, namely the network size. This effectively adds another dimension to the Markov chain. The resulting Markov chain is shown in Figure \ref{fig_markov_chain}.
@@ -49,7 +48,7 @@ The dual parameter states can be seen in the Markov chain in Figure \ref{fig_mar
 
 If there are no more replicas in the network, an object cannot be repaired and the Markov chains remains in the set of states ($0,n$). These are said to be the absorbing states of the Markov chain and there exists $N - R + 1$ absorbing states in the model presented here. All other states out of which transition is possible are said to be transient states. It can be shown that if sets of transient and absorbing states exist, the system will always end up in the absorbing states \cite{grinstead1997introduction_probability}. The time to absorbtion can be calculated, which in the case of object storage means the time when no more objects exist in the network.
 
-\subsubsection{State transition rates}
+\subsection{State transition rates}
 
 There are four types of state transitions possible in the Markov model presented here:
 %
@@ -131,15 +130,15 @@ The number of replicas in the next state is either equal to the required number 
 
 No transitions other than the ones described above can occur in the presented Markov model, therefore $p(i k,j l) = 0$ for all other state transitions.
 
-\subsubsection{Node departure rate}
+\subsection{Node departure rate}
 
 The node departure rate $\theta$ can be calculated from the lifetime distributions of the nodes in the network. As in the related work discussed in Section \ref{related_work}, all node lifetimes are assumed to be statistically independent and exponentially distributed. The exponential distribution is characterised by the single ``rate'' parameter $\lambda$.
 
 The departure rate of nodes correspond to the failure rate (also called the hazard rate) of the node lifetime distribution \cite{rausand2004systemreliability}. An advantage of the exponential distribution is its ``memoryless'' property, which has a constant failure rate $h = \lambda$. For nodes with exponential lifetime distributions, the node departure rate is therefore $\theta = \lambda$.
 
-\subsubsection{Number of states}
+\subsection{Number of states}
 
-The Markov model presented in this paper possesses a large number of states. To calculate the total number of states, two cases are identified. The first case is where the number of nodes in the network is greater or equal to the required number of replicas $k \geq R$. For every possible network size in this group, there are $R$ states and $N - R + 1$ possible network sizes. From this it is evident that there are $(N - R + 1)R$ of these states.
+The Markov model presented, possesses a large number of states. To calculate the total number of states, two cases are identified. The first case is where the number of nodes in the network is greater or equal to the required number of replicas $k \geq R$. For every possible network size in this group, there are $R$ states and $N - R + 1$ possible network sizes. From this it is evident that there are $(N - R + 1)R$ of these states.
 
 The second case is where the number of nodes in the network is fewer than the required number of replicas. For every possible network size in this case, the number of states are equal to the number of nodes in the network, going from $R-1$ to 1.
 
@@ -153,7 +152,7 @@ The total number of states is the sum the two cases and given by
 
 If a small network of 500 nodes with objects each having 10 replicas is modeled, the resulting Markov chain contains 4955 states. The large number of states makes a closed form solution to the object lifetime problem intractable. Fortunately, numerical methods can be used to calculate object lifetimes for given numbers of replicas and maximum node sizes.
 
-\subsubsection{Calculating object lifetimes}
+\subsection{Calculating object lifetimes}
 
 Since each element in the transitional rates matrix is a rate, the sum of all the elements in a single row of the rates matrix gives the rate of moving from that state to any other state. The inverse of this rate is the expected time $t_i$ the Markov chain spends in state $i$, given by
 %
@@ -203,7 +202,7 @@ The expected time to absorbtion is then the product of the time spent in each st
 %
 where \textbf{t} is the vector consisting of the times $t_i$ for all $i$.
 
-\subsection{Model results}
+\section{Model results}
 \label{results}
 
 For all results presented in this section, the following parameter values are used: a maximum network size of $N=120$, a required number of replicas of $R = 10$ and exponential node lifetime distributions with $\lambda = \theta = 1/1800$, which gives expected \emph{node} lifetimes of $1/\lambda = 1800$ seconds.
@@ -217,7 +216,7 @@ For all results presented in this section, the following parameter values are us
  \label{fig_lifetime_average_vs_initial}
 \end{figure}
 %
-Figure \ref{fig_lifetime_average_vs_initial} shows surface plots of expected object lifetimes against initial and average network sizes for a repair rate of $\mu = 1/180$ (or $T_{\textrm{repair}}$ $10\%$ of the expected node lifetime) and no repair rate. It is evident that object lifetimes decrease greatly for average network sizes smaller than 20 nodes for the case with repair, but that average network size has no effect when repair is not used. The model presented in this paper shows a significant decrease in expected lifetime every time the average network size is comparable to the required number of replicas, for the case with repair. The figure also shows that expected object lifetimes decrease when the initial network size is smaller than the required number of replicas. From the figure it can also be seen that initial network size has a more pronounced effect on the expected object lifetime, when no repair is used than when repair is used.
+Figure \ref{fig_lifetime_average_vs_initial} shows surface plots of expected object lifetimes against initial and average network sizes for a repair rate of $\mu = 1/180$ (or $T_{\textrm{repair}}$ $10\%$ of the expected node lifetime) and no repair rate. It is evident that object lifetimes decrease greatly for average network sizes smaller than 20 nodes for the case with repair, but that average network size has no effect when repair is not used. The model presented in this chapter shows a significant decrease in expected lifetime every time the average network size is comparable to the required number of replicas, for the case with repair. The figure also shows that expected object lifetimes decrease when the initial network size is smaller than the required number of replicas. From the figure it can also be seen that initial network size has a more pronounced effect on the expected object lifetime, when no repair is used than when repair is used.
 
 \begin{figure}[htbp]
  \centering
@@ -235,9 +234,9 @@ Figure \ref{fig_lifetime_average_vs_replicas} depicts the expected object lifeti
  \label{fig_lifetime_vs_other_model}
 \end{figure}
 
-Figure \ref{fig_lifetime_vs_other_model} compares the model presented in this paper with the model of Wu, Tian and Ng that assumes object repair \cite{replication_article}. For this figure, a repair rate of $\mu = 1/180$ and a required number of replicas of $R = 10$ were used. As shown, because the model by Wu, Tian and Ng does not take average network size into account (or initial network size for that matter) it cannot predict the object lifetimes correctly for average network sizes comparable to the required number of replicas. On the other hand, a reliability test of the model presented in this paper is that for sufficiently large network sizes, the model converges to the model that assumes an infinite network size.
+Figure \ref{fig_lifetime_vs_other_model} compares the model presented in this chapter with the model of Wu, Tian and Ng that assumes object repair \cite{replication_article}. For this figure, a repair rate of $\mu = 1/180$ and a required number of replicas of $R = 10$ were used. As shown, because the model by Wu, Tian and Ng does not take average network size into account (or initial network size for that matter) it cannot predict the object lifetimes correctly for average network sizes comparable to the required number of replicas. On the other hand, a reliability test of the model presented in this chapter is that for sufficiently large network sizes, the model converges to the model that assumes an infinite network size.
 
-\subsection{Comparison with Pithos simulation}
+\section{Comparison with Pithos simulation}
 \label{simulation}
 
 To determine practical usability of the theoretical results presented in Section \ref{results}, a comparison was performed against the Pithos simulation \cite{Pithos_mmve_2011}. Pithos is a hierarchical distributed storage system that uses grouping to reduce latencies of store and retrieve requests, as is required by massively multi-user virtual environments (MMVEs) \cite{gilmore_p2p_mmog_state_persistency}.
@@ -270,88 +269,11 @@ Figure \ref{fig_lifetime_simulation_model_20_100} shows simulation data and theo
 
 One issue that was encountered when comparing simulation data to model data was the imperfect repair scheme used in simulation. In the simulation, every $T_{\textrm{repair}}$ time, a repair of all objects in the system is initiated. In simulation, there is, however, a chance that the node that was chosen to repair an object leaves the network before the repair can complete. This reduces the effectiveness of the repair mechanism, reducing the effective repair rate. The percentage repair successes was measured during simulation and found to be $70 \%$. All repair rates in the simulation were adjusted with this number, which successfully aligned the simulation data means with the model data means.
 
-\subsection{Conclusion}
+\section{Conclusion}
 \label{conclusion}
 
-A Markov chain that takes network size into account when predicting object lifetimes was presented in this paper. Results show that when the average network size is comparable to the required number of replicas, object lifetimes are significantly decreased. The theoretical model was shown to be equivalent to a model that ignores network size, when the average network size is large, compared to the required number of replicas. The model was also shown to compare well to simulation, with values being nearly equal.
+A Markov chain that takes network size into account when predicting object lifetimes was presented. Results show that when the average network size is comparable to the required number of replicas, object lifetimes are significantly decreased. The theoretical model was shown to be equivalent to a model that ignores network size, when the average network size is large, compared to the required number of replicas. The model was also shown to compare well to simulation, with values being nearly equal.
 
-This paper shows how to reliably predict expected object lifetimes. When it is known that the average network size is comparable to the required number of replicas, the network size should be taken into account when modelling object lifetimes in a situation with repair. The theoretical model presented here allows for the design of a distributed storage system when the various average network sizes and node lifetime distributions are known.
+We show how to reliably predict expected object lifetimes. When it is known that the average network size is comparable to the required number of replicas, the network size should be taken into account when modelling object lifetimes in a situation with repair. The theoretical model presented here allows for the design of a distributed storage system when the various average network sizes and node lifetime distributions are known.
 
 Future work includes comparing object lifetimes using replication, with object lifetimes using erasure coding as redundancy technique. Modelling object lifetimes using heavy-tailed node lifetime distributions, such as the Pareto distribution, is also required. The variable failure rate of the Pareto distribution complicates modelling it as a Markov chain.
-
-\section{Bandwidth}
-
-
-\section{Fairness}
-
-
-
-\section{Responsiveness}
-To exactly compare Pithos with overlay storage, the probability that a message is routed within a group ($P(g)$) should first be known. It is
-expected that $P(g)$ will be different for MMVEs with different defining mechanics. It should be possible to determine $P(g)$ experimentally for a
-specific type of game, but this will require access to the game client of an already implemented P2P MMVE. The exact measurement of $P(g)$ is left
-for future work, but the responsiveness can be calculated as a function of $P(g)$. Working with a function in $P(g)$ also allows for the
-implementation of various dynamic strategies that can adapt to various values of $P(g)$.
-
-We define $P(o) = 1 - P(g)$ as the probability that a message is routed within the overlay. We define $T_{\textrm{group}}$ as the root and replica
-message distribution and $T_{\textrm{overlay}}$ as the overlay message distribution, both shown in Figure \ref{fig_pithos_response}. The expected
-value of the overall system response time ($E[T_{\textrm{resp}}]$) can then be presented as a weighted average of the expected values of both the
-group and overlay storage distributions, as follows:
-%
-\begin{align}
-    E[T_{\textrm{resp}}] &= P(g)\left(E\left[T_{\textrm{group}}\right]\right) + P(o)\left(E\left[T_{\textrm{overlay}}\right]\right)\notag\\
-                         &= P(g)\left(E\left[T_{\textrm{group}}\right]\right) + \left[1 - P(g)\right]\left(E\left[T_{\textrm{overlay}}\right]\right).\label{expected_response_time}
-\end{align}
-
-The responsiveness of Pithos will depend on the responsiveness of the Overlay, where the expected number of overlay hops (for Chord and Pastry) are given by \cite{storage_and_chaching_PAST}:
-%
-\begin{equation}\label{pastry_hops}
-    E[H_{\textrm{pastry}}] = \log_{2^b}\left(N\right),
-\end{equation}
-%
-where $b$ is a network parameter that is usually chosen as $b = 4$. From this, it is possible to calculate a theoretical performance for Pithos and
-compare that with a theoretical performance of overlay storage.
-
-When using a weighted hop average, as with Equation \eqref{expected_response_time}, the expected number of Pithos hops is given by:
-%
-\begin{equation}\label{expected_response_time}
-    E[H_{\textrm{pithos}}] = P(g)\left(E\left[H_{\textrm{group}}\right]\right) + P(o)\left(E\left[H_{\textrm{overlay}}\right]\right),
-\end{equation}
-%
-where $E\left[H_{\textrm{group}}\right]$ is the expected number of group hops and $E\left[H_{\textrm{overlay}}\right]$ is the expected number of
-overly hops. In Pithos, $E\left[H_{\textrm{group}}\right] = 1$, because in a fully connected group any node is always one hop away from any other
-node.
-
-To find the value of $E\left[H_{\textrm{overlay}}\right]$, one has to consider how many hops an overlay message requires in Pithos. One hop is
-required to send a store request from a group peer to its super peer. The super peer then forwards the message to another super peer in
-$\log_{16}(M)$ hops, from Equation \eqref{pastry_hops}, where $M$ is the number of super peers in the network. From the destination super peer,
-another hop is required to send the message to the destination group peer. This gives:
-%
-\begin{equation}\label{group_hops}
-    E\left[H_{\textrm{overlay}}\right] = 1 + \log_{2^b}(M) + 1.
-\end{equation}
-%
-Equation \eqref{expected_response_time} then becomes:
-%
-\begin{align}
-E[H_{\textrm{pithos}}] &= P(g) + \left[1 - P(g)\right]\left[2 + \log_{16}\left(M\right)\right]\notag\\
-                       &= 1 + \left[1 - P(g)\right] + \left[1 - P(g)\right]\left[\log_{16}(M)\right]\notag\\
-                       &= 1 + \left[1 - P(g)\right]\left[1 + \log_{16}(M)\right]\notag\\
-                       &= 1 + P(o)\left[1 + \log_{16}(M)\right].\label{expected_response_time_exp}
-\end{align}
-
-\begin{figure}[htbp]
- \centering
- \includegraphics[clip=true, viewport=0cm 5cm 27cm 14.5cm, width=\columnwidth]{Hops_vsGroupFrac_4n}
- \caption{Expected number of Pithos hops, compared to the expected number of overlay hops, as a function of $P(g)$ for various values of $N$}
- \label{fig_hop_compare}
-\end{figure}
-%
-Figure \ref{fig_hop_compare} compares the expected number of Pithos hops with the expected number of overlay hops as a function of intra-group
-probability ($P(g)$) for various numbers of nodes ($N$). The overlay hops were calculated from Equation \eqref{pastry_hops}, while the Pithos hops
-were calculated from Equation \eqref{expected_response_time_exp}. For the Pithos graphs, an average number of 50 peers per group was used to
-determine the number of super peers.
-
-Figure \ref{fig_hop_compare} shows that for a low value of $P(g)$, overlay storage performs better than Pithos because of the additional two hops
-present in Pithos. High values for $P(g)$ are expected, because of the distance-based design of Pithos that attempts to maximise the value of $P(g)$.
-This should have Pithos perform better than overlay storage.
