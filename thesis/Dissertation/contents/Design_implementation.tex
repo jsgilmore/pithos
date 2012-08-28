@@ -158,7 +158,8 @@ Because of these reasons, it was decided to first implement Pithos in simulation
 Pithos is intended for future real world implementation, however, so all modules created were written in such a manner to allow for easy porting. No tasks that are performed in Pithos make use of any simulation ``short cuts'', such as accessing the global peer list. Only statistics gathering modules are allowed to make use of these simulation features.
 
 
-    \subsection{Underlay network}
+\subsection{Underlay network}
+\label{oversim_underlay}
 
 At the base of an Oversim simulation is the underlay network. The underlay network determines the types of nodes in the Oversim simulation. Three underlay types exist: the ``simple'', ``INET'' and ``SingleHost'' underlays \cite{oversim_applications}.
 
@@ -350,7 +351,7 @@ A storage request is sent to every selected node, containing the object. The req
 
 The question arises as to what constitutes a sufficient number of messages. Two types of storage mechanisms have been implemented in Pithos: ``safe'' and ``fast''. Safe storage waits for all responses to be received at the peer logic module. Only after all responses are received is a decision made whether the store was successful or not. If more than half of the group stores as well as the overlay store was successful is it considered a successful store. The PithosTestApp is informed of the status of the store request at this time. Fast storage has the peer logic module wait for the first successful response, before informing the PithosTestApp of a success. If all responses were failures, it informs PithosTestApp of a failure.
 
-Because safe storage ensures that most of the replications were successfully stored, there is a smaller chance of it reporting a false positive than for fast storage. The disadvantage is that from the point of view of PithosTestApp, and by extension any system that uses Pithos, safe puts take a lot longer to perform. Fast storage on the other hand is no less reliable than safe storage, but the chances of a false positive being reported to the higher layer is greater. The advantage of fast storage is that the from the perspective of the module using Pithos, it is performed faster than safe storage. The higher layer can, therefore, start using the stored object faster. Results of the two storage methods are presented in Section \ref{responsiveness_compare_storage}
+Because safe storage ensures that most of the replications were successfully stored, there is a smaller chance of it reporting a false positive than for fast storage. The disadvantage is that from the point of view of PithosTestApp, and by extension any system that uses Pithos, safe puts take a lot longer to perform. Fast storage on the other hand is no less reliable than safe storage, but the chances of a false positive being reported to the higher layer is greater. The advantage of fast storage is that the from the perspective of the module using Pithos, it is performed faster than safe storage. The higher layer can, therefore, start using the stored object faster.
 
     \subsubsection{Retrieving data}
     \label{retrieve_implementation}

@@ -270,7 +270,6 @@ Figure \ref{fig_lifetime_simulation_model_20_100} shows simulation data and theo
 One issue that was encountered when comparing simulation data to model data was the imperfect repair scheme used in simulation. In the simulation, every $T_{\textrm{repair}}$ time, a repair of all objects in the system is initiated. In simulation, there is, however, a chance that the node that was chosen to repair an object leaves the network before the repair can complete. This reduces the effectiveness of the repair mechanism, reducing the effective repair rate. The percentage repair successes was measured during simulation and found to be $70 \%$. All repair rates in the simulation were adjusted with this number, which successfully aligned the simulation data means with the model data means.
 
 \section{Conclusion}
-\label{conclusion}
 
 A Markov chain that takes network size into account when predicting object lifetimes was presented. Results show that when the average network size is comparable to the required number of replicas, object lifetimes are significantly decreased. The theoretical model was shown to be equivalent to a model that ignores network size, when the average network size is large, compared to the required number of replicas. The model was also shown to compare well to simulation, with values being nearly equal.
 

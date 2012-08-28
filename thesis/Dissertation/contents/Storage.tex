@@ -94,6 +94,8 @@ system. This is the number of peak concurrent users (PCUs) currently supported b
 For systems that will support the MMVEs of the future, it is believed that a target of 1 million peers should be used. This number is sixteen times that of a truly scalable system and the peak concurrent player count of World of Warcraft in China in 2008 \cite{WoW_china_pcu}. Systems that will support these numbers can be classified as \emph{highly scalable}. It is important to note that no current systems support such a large PCU count on a single server cluster. The PCU count presented for WoW is the PCU count over all server clusters hosting WoW in China.
 
 \subsection{Fairness}
+\label{fairness_requirement}
+
 Ensuring fairness in the system means distributing load evenly according to the abilities of individual nodes. This ensures that not only a small number of nodes provide all system resources required for the system to function, but that all nodes contribute what they can, in order to support the system.
 
 Fairness does not exclude heterogeneity of nodes. It is accepted that nodes have different amounts of available resources. It also does not exclude node specialisation. It is accepted that some P2P architecture require specialised nodes or require a set of different types of super peers to function. Fairness merely states that when all node contributions have been counted, the sum of node contributions should be equal.
@@ -407,7 +409,6 @@ That said, no existing implementations could be found that implement this type o
 Distance based storage is still fairly immature, but shows a lot of promise. No publicly available implementation could be found for this type of storage. Where this type of storage was used, it was explained as distance based storage, but most of the details were left out. This storage is, therefore, not a candidate as a storage technique for developers that are merely looking for a storage system to use presently. This type of storage does, however, provide a lot of opportunities for research.
 
 \section{Conclusion}
-\label{conclusion}
 
 After providing an overview of the classic C/S and C/MS state persistency techniques, the chapter classified P2P MMVE state persistency techniques into super peer based, overlay based, distance based and hybrid storage. The advantages and disadvantages of each method were discussed after identifying key challenges that state persistency techniques have to solve. These challenges are: Reliability, Security, Fairness and Responsiveness.
 
