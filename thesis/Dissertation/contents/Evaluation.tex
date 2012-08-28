@@ -1,5 +1,5 @@
 \chapter{Pithos Evaluation}
-    \label{chp:EVALUATION}
+\label{chp:EVALUATION}
 
 Following the discussion of the Pithos design and implementation, the performance of Pithos will now be presented, along with a comparison of Pithos against overlay storage.
 
@@ -15,7 +15,7 @@ In the results shown, Chord was used as the P2P overlay, mainly due to its faste
 After a node has joined the network, PithosTestApp starts to generate store and retrieve requests at a rate of one objects every 5 seconds for a total of 20s and a size of 1024 bytes. The size of 1024 byte objects was chosen to be much larger than Quake 3 game objects without delta encoding, used in \cite{Bharambe_Donnybrook}. Pithos is designed for the low latency storage of small game objects. The limit of 20s generation time for every new peer joining the network is to reduce the memory required to store all objects. With the current setup, every simulation run requires 6 gigabytes of memory.
 
 %The node lifetime should still be justified
-For the results shown, 2500 peers, 100 super peers and a single directory server are created at the start of the simulation. The simulation runs for 10,000 seconds. Exponential node lifetimes are used when testing the store and retrieve requests. The applicability of this lifetime distribution will be explored in Section \ref{}. The Pithos simulation has also been successfully evaluated using Pareto lifetime distributions, another common distribution in reliability engineering. For the results presented here, the exponential distribution was used, due to its constant hazard rate \cite{}.
+For the results shown, 2500 peers, 100 super peers and a single directory server are created at the start of the simulation. The simulation runs for 10,000 seconds. Exponential node lifetimes are used when testing the store and retrieve requests. The applicability of this lifetime distribution will be explored in Section \ref{node_departure_rate}. The Pithos simulation has also been successfully evaluated using Pareto lifetime distributions, another common distribution in reliability engineering. For the results presented here, the exponential distribution was used, due to its constant hazard rate \cite{rausand2004systemreliability}.
 
 The overlay storage module stores 4 object replicas and always requests 4 replicas in parallel, similar to Pithos's parallel retrieval. Overlay storage expects the majority of requests to be identical, before success is reported. The remaining overlay setup parameters are discussed in Section \ref{overlay_resp_rel_results}.
 
@@ -345,17 +345,17 @@ The design of Pithos makes use of user groups and distance-based storage on a gr
 
 \begin{itemize}
 \item Because the exact probability that an object request will be for a group object is not yet known, a sweep is done for various group probabilities (the probability that a request is for a in-group object) to investigate the effect of group probability on Pithos's performance.
-    
+
 \item The ``low'' overlay is used for overlay storage. The low overlay was used to give a wider range of results from group storage to overlay storage.
- 
- \item Fast  group storage is used. 
- 
+
+ \item Fast  group storage is used.
+
  \item Fast group retrieval is used.
- 
+
  \item Six object replicas are stored.
- 
+
  \item Nodes have mean lifetimes of 1800s.
- 
+
  \item Objects have a TTL of 300s.
 \end{itemize}
 
@@ -492,15 +492,15 @@ Pithos selects the object that is the same in a majority of responses and sends 
 
 \begin{itemize}
 \item The percentage of users that are malicious is varied from 0.0 to 1.0 in steps of 0.125.
- 
+
 \item Fast group storage is used.
 
 \item Fast and safe group retrieval are compared.
 
 \item For the safe retrieval case, six objects are retrieved.
-  
+
 \item A comparison of safe retrieval is performed by first retrieving four of the six stored replicas and then retrieving six.
-    
+
 \item Node lifetimes are set to 1800s mean.
 
 \item Object TTL is set to 300s.
