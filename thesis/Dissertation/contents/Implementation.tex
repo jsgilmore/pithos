@@ -1,0 +1,320 @@
+\chapter{Implementation Issues}
+\label{chp:IMPLEMENTATION}
+
+\section{Oversim}
+
+Pithos has been implemented in Oversim \cite{OverSim_2007}, a P2P simulation environment based in Omnet++, which allows for the measurement of identified requirements. Furthermore, it allows for the comparison of the current model with other state persistency models.
+
+Oversim is a peer-to-peer and overlay network framework for the Omnet++ simulator. Oversim allows for the simulation of many well known structured or unstructured overlay protocols. It also allows for the development of applications that can use the already implemented overlays in a well defined architecture.
+
+%Discuss the lack of documentation
+
+\subsection{Motivation}
+
+To allow for greater control of the environment, as well as greater scale, it was decided to implement the first version of Pithos as a large scale network simulation. A simulation allows for careful selection of the environment parameters and tight control of the parameter values. This in turns allows one to keep all but one parameters constant and evaluate the effect of a design decision on the system for varying values of the free parameter.
+
+The underlying Omnet++ simulation environment is a powerful network simulator in its own right. It allows for robust message and module definitions and contains many tools to assist with simulation measurement and monitoring.
+
+Simulation also allows for greater scalability and simulating on a network with global Internet characteristics. Greater scalability is achieved, because thousands of nodes can easily be created, where all the nodes have global scale latency characteristics.
+
+Implementing a large scale network application in the real-world would require thousands of computers spread across the globe. Such an environment will contain many variables out of the designer's control. Issues such as router congestion for example varies from day to day, which will produce varying latency results.
+
+Because of these reasons, it was decided to first implement Pithos in simulation. This allows for the perfection of the design, under laboratory conditions, before the real world implementation is completed.
+
+Pithos is intended for future real world implementation, however, so all modules created were written in such a manner to allow for easy porting. No tasks that are performed in Pithos make use of any simulation ``short cuts'', such as accessing the global peer list. Only statistics gathering modules are allowed to make use of these simulation features.
+
+
+\subsection{Underlay network}
+\label{oversim_underlay}
+
+At the base of an Oversim simulation is the underlay network. The underlay network determines the types of nodes in the Oversim simulation. Three underlay types exist: the ``simple'', ``INET'' and ``SingleHost'' underlays \cite{oversim_applications}.
+
+In the simple underlay, node latencies are determined by the distance between nodes placed in an $n$-dimensional Euclidean space. The positions of the nodes are chosen to match the latencies of the CAIDA/Skitter project. Different nodes are also assigned different bandwidth and jitter parameters to simulate a heterogenous network. The simple underlay, therefore, captures the delay characteristics of a global scale network in an abstract way. The simple underlay network is ideal for simulating large scale overlay networks because of its simplicity and high accuracy.
+
+The INET underlay is based on the Omnet++ INET underlay and allows for the simulation of the complete IP level stack. This includes backbone routers and gateways. It also contains many implemented MAC layer protocols. The INET underlay is well suited to simulating lower level communication protocols or wireless protocols such as IEEE 802.11 (Wi-Fi).
+
+The SingleHost underlay allows for interaction with a physical network. It allows for the implementation of physical nodes, running on networks computers. These physical nodes can then connect to a simulated network and receive packets with bandwidth and delay characteristics as if they were situated on a network with the simulation's specific characteristics.
+
+To be able to simulate Pithos for the large numbers of nodes required, as discussed in Section \ref{scalability_req}, it runs on the simple underlay. Pithos is dependant on the delay characteristics of the lower level protocols, but the CAIDA and Skitter measurements capture these quantities in their measurements. The reasons for different delay characteristics in the network is not required.
+
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=49mm 48mm 245mm 173mm, width=0.5\columnwidth]{Oversim_terminals}
+ \caption{The Oversim simple underlay network with the three Pithos terminal types}
+ \label{fig_oversim_terminals}
+\end{figure}
+
+Figure \ref{fig_oversim_terminals} shows the Pithos simple underlay network after the first five nodes have been generated. Each overlay terminal is an Oversim node containing its own protocol stack. The underlay configurator is responsible for setting up the network. The global observer contains the global node list, global statistics and parameters modules. It is used to generate global statistics and by the lower levels to keep track of all nodes.
+
+Three churn generators also exist, one for generating each of the three Pithos node types. Churn generators model users joining and leaving the network. There are three types of churn generators: ``no churn'', ``lifetime churn'' and ``Pareto churn''. The ``no churn'' churn generator creates nodes every specified number of seconds until a specified number of nodes are reached and does nothing further. This generator can be used to test simple networks, where churn is not an issue, or for initial testing of the first prototype.
+
+Lifetime churn creates nodes with specified average lifetimes, sampled from an exponential distribution. This is a distribution regularly used to model lifetimes in reliability engineering. Pareto churn samples node lifetimes from a Pareto distribution, instead of an exponential distribution. This churn generator type requires mean node lifetime as well as mean node dead time to be specified.
+
+A node type is determined by the protocols executing on every layer of the Oversim architecture. The Pithos node types will be explained in Section \ref{pithos_node_types}.
+
+    \subsection{Node architecture}
+
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=57mm 260mm 100mm 287mm, width=0.5\columnwidth]{Oversim_layers}
+ \caption{Oversim node architecture layers}
+ \label{fig_oversim_layers}
+\end{figure}
+
+%Also show the Oversim picture
+
+Every node in Oversim contains a layered architecture, as shown in Figure \ref{fig_oversim_layers}. The Oversim node architecture contains the layers: TCP, UDP, Overlay, Tier 1, Tier 2 and Tier 3.
+
+The transport control protocol (TCP) and user datagram protocol (UDP) are both transport level protocols, according to the OSI protocol stack specification. These two layers are the lowest communications layers in Oversim and allows message passing to other nodes.
+
+The overlay layer is where the P2P overlay is housed. This can be any of the well known structured or unstructured overlays, such as Pastry, Chord or Gia. The three tiers above the overlay layer are the application level layers and is where application that use an overlay may be implemented. Three application layers are allowed.
+
+Tier 1 can communicate with the Tier 2, overlay, TCP and UDP layers. Tier 2 can communicate with the Tier 1, Tier 3, TCP and UDP layers. Tier 3 can communicate with the Tier 2, TCP and UDP layers. Internal communications are usually between tiers and TCP and UDP communication occurs when a layer wishes to send a message to the same layer on a different node.
+
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=33mm 27mm 262mm 197mm, width=\columnwidth]{Oversim_architecture}
+ \caption{The components of an Oversim terminal, including the tiered node architecture.}
+ \label{fig_oversim_architecture}
+\end{figure}
+
+Figure \ref{fig_oversim_architecture} shows the complete Oversim node architecture. The tiers, udp, tcp and overlay are connected as explained earlier. UDP is also connected to a bootstrap list module, which assists nodes with joining the UDP network. The neighbourhood cache, interface table, crypto module and notification board modules are also present, but these modules are unused in Pithos.
+
+    \subsection{Generic consistency extension}
+    \label{generic_consistency_extension}
+
+%Show the generic consistency architecture in Oversim
+
+To allow Oversim to simulate a complete consistency architecture, the Oversim framework itself was extended. The three tiers were replaced with all the elements identified in the generic consistency model in Section \ref{generic_event_update_model}. Practically, this required the implementation of a new type of overlay terminal type, replacing the tiers with the following layers: agent, event layer IM, event dissemination, event ordering, game logic, root object updater, root object store, update layer IM, update dissemination, object merger, local object updater, local object store, display updater, overlay Storage.
+
+Every new layer can communicate with the layer above and below it, and can also communicate with its version on another node using UDP or TCP. This allows for the consistency model to be distributed amongst any number of nodes. A module can either send its information to the layer below it within the same node, or it can send it to the layer below it on another node.
+
+Every module can contain a collection of sub-modules which implements the layer itself. It the layer is not implemented, a dummy layer may be specified. The Pithos implementation is located within the root object store module. An application that provides Pithos with test inputs called ``PithosTestApp'' is situated within the root object updater layer. Pithos also makes use of overlay storage, which is implemented in the overlay storage module. Overlay storage requires a P2P overlay for routing purposes, which is why it is connected to the overlay layer.
+
+\section{Pithos implementation}
+
+Pithos is implemented in the root object store layer of the generic consistency model in the extended Oversim architecture.
+
+\subsection{Node types}
+\label{pithos_node_types}
+
+
+\subsection{Module types}
+\label{pithos_module_types}
+
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=64mm 39mm 227mm 186mm, width=0.5\columnwidth]{Oversim_root_object_store}
+ \caption{Pithos super peer and peer modules in Oversim}
+ \label{fig_oversim_root_object_store}
+\end{figure}
+%
+Figure \ref{fig_oversim_root_object_store} shows the Pithos modules related to the super peer and peer module types. The figure is divided into three sections: Super peer, peer and communicator.
+
+\subsubsection{Communicator}
+
+A simple module in Omnet++ is a module that implements a C++ class. All modules in Figure \ref{fig_oversim_root_object_store} are simple modules. Compound modules also exist that are combinations of simple modules, where the simple modules are connected to each other and external gates in some way.
+
+Oversim requires a single simple module to be of type: ``BaseApp''. Oversim delivers messages from the layers above and below a layer to the module extending the BaseApp module. This means that because of Oversim's architecture, all message must go through a single module. When Pithos was designed, it was decided that placing all functionality in a single module would be a bad design decision. A single module would not allow for a modular implementation and would make future extensions more difficult.
+
+The communicator module was then created, which received and sent all communications to the upper and lower layers. All message received or sent are, therefore, routed through the communicator module. The design of the communicator module was done to make it as transparent as possible. Another function of the communicator module was outbound message verification. The communicator module ensures that all messages sent contains a destination IP address, source IP address and type.
+
+Transparency was achieved by designating certain gates for certain types of traffic. If a message is received on a gate with a specific purpose, that message is processed in a way consistent with that purpose and then transmitted. This design allows other modules to be expanded with new message types. Those message then only have to be sent to the correct gate to ensure correct handling of the message. The addition of a new message type, therefore, rarely required alterations to the communicator module.
+
+\subsubsection{Super peer logic}
+\label{pithos_module_types_sp_logic}
+
+The super peer logic module implements all the functionality of the super peer node, except for keeping track of group objects. The tasks of the super peer logic include handling joining peers, facilitating peer migration (Section \ref{group_migration_implementation}), ensuring group consistency (Section \ref{group_consistency_implementation}), initiating object repair (Section \ref{object_repair_implementation}) and maintaining a list of group objects and a list of peers on those objects are stored (Section \ref{pithos_module_types_ledgers}).
+
+\subsubsection{Peer logic}
+
+Peer logic
+\begin{enumerate}
+  \item  receives all store (Section \ref{store_implementation}), retrieve (Section \ref{retrieve_implementation}) and modify (Section \ref{modify_implementation}) requests from the higher application layer,
+  \item forwards those requests to the required modules,
+  \item forwards responses received from modules to the higher layer,
+  \item keeps track of all outstanding requests (Section \ref{pending_rpcs_implementation}), and
+  \item verifies received data from multiple sources for added security (Section \ref{object_verification_implementation}).
+\end{enumerate}
+
+\subsubsection{DHT storage}
+
+The DHT storage module forms part of the peer node. The DHT storage modules interfaces with the overlay storage module on behalf of the peer. The DHT storage module received requests from the peer logic modules for overlay storage services. The DHT storage module also keeps track of all outstanding overlay storage requests.
+
+In the Oversim simulation, the DHT storage module interfaces with Oversim's DHT implementation, written by Gregoire Menuel and Ingmar Baumgart. The DHT implementation itself is located in the overlay storage module of the extended Oversim node architecture that represents the generic consistency model, as described in Section \ref{generic_consistency_extension}.
+
+The Oversim DHT implementation contains data structures to store data, route requests via the overlay to other DHT modules and allows peers to join a network wide overlay. It supports put, get and modify requests. The Oversim DHT implementation meets all Pithos's overlay storage requirements and is able to run on any of the overlay implemented in Pithos.
+
+\subsubsection{Group storage}
+
+The group storage module forms part of the peer node. It receives requests from the peer logic module for group storage services. The group storage module
+\begin{enumerate}
+  \item handles group store, retrieve and modify requests from the peer logic,
+  \item maintains a view of all peers currently in the group,
+  \item maintains an object store where it stores some subset of the group objects,
+  \item is responsible for the administration of group membership on behalf of the peer,
+  \item monitors the availability of group peers and informs the the super peer of peers that left the group,
+  \item informs the group of new object stored, and
+  \item repairs objects if requested to do so by the super peer.
+\end{enumerate}
+
+\subsubsection{Ledgers}
+\label{pithos_module_types_ledgers}
+
+
+
+\subsection{Key mechanisms}
+\label{key_mechanisms}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% For every mechanisms, reference where the results of that mechanism will
+% be shown.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+While the previous section describes the static structure of the Pithos implementation, this section will describe the key mechanisms present in Pithos to achieve the desired design goals specified in Section \ref{use_cases_goals}. The purpose of each mechanism will be described along with how it has been implemented in Pithos with reference to the modules present.
+
+    \subsubsection{Joining the network and grouping}
+
+For simulation purposes, each super peer is assigned a random location created by sampling both an x and a y coordinate from a uniform random distribution. Joining peers are assigned positions in the same uniform random manner when they are initialised.
+
+    \subsubsection{Storing data}
+
+
+
+    \subsubsection{Retrieving data}
+
+
+
+    \subsubsection{Modifying data}
+
+
+
+    \subsubsection{Tracking requests}
+    \label{pending_rpcs_implementation}
+
+    When sending a request to a destination peer, the destination peer might leave the group before it can receive the request or respond to it. No response will, therefore, be sent to the source peer, which might cause come requests to remain unresolved. For example, if safe storage is used and the system waits for all responses before informing the higher layer of the request status, the higher layer will never be informed if a destination node has left. A mechanism is required to handle nodes leaving the group.
+
+    The solution is for super peer logic, peer logic and DHT modules track all requests sent and link every outstanding request with a timeout. Every one of those modules contains a pending requests list. Each pending request is uniquely identified by the RPC ID received from PithosTestApp. Each pending request from the higher layer usually generates multiple messages to DHT storage, and multiple nodes in the group via group storage.
+
+    Every request sent out by the DHT storage or group storage modules contain the RPC ID of the original request from PithosTestApp. The RPC ID is copied into the response at the destination location. This allows every response to be linked to the original request that generated it. When a response is received from a peer, the pending request for the RPC ID for that peer is removed from the pending requests list.
+
+    Every pending request is also linked to a timeout. If the timeout expires, the pending request is removed and a failure response is generated and sent to the higher layer. This mechanisms ensures that all requests will always receive all expected responses. It also handled peers leaving groups.
+
+    It is accepted that this mechanism may cause false negatives if there is a delay due to congestion in the network. This situation can be avoided by making the timeout sufficiently long.
+
+    \subsubsection{Group migration}
+    \label{group_migration_implementation}
+
+
+
+    \subsubsection{Group consistency}
+    \label{group_consistency_implementation}
+
+    With peers constantly joining and leaving the network and transferring between groups, an issue that arises is group consistency. It is important that all peers within a group share the same view of that group. If this is not the case, some peers might never be chosen to store data and this will decrease the fairness in the system. Another reason is that for the sake of scalability, peers do not service requests from peers outside of their groups. Group inconsistencies might also lead to nodes becoming isolated from any group, which basically disconnects that node from the P2P network.
+
+The initial approach to achieve group consistency was to have every peer inform all other peers when it was moving from one group to another. If a peer is removed from the network due to churn, another peer has to discover that the peer has left, which is done with timeouts. If a request times out, the peer making the request informs the group of the peer that left.
+
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=0mm 0mm 460mm 212mm, width=\columnwidth]{gc_first}
+ \caption{Group consistency before any improvements}
+ \label{fig_gc_first}
+\end{figure}
+%
+Figure \ref{fig_gc_first} shows the perceived group size of every node in the group for the initial group consistency scheme. The lines running across the graph is due to nodes leaving the network and joining again at a later time.
+
+From approximately 2925 s, a new peer joins the group and reports the group size as eight, when all other peers report the group size as seven. Multiple variations of these inconsistencies occurred during testing. A primary source of inconsistencies was the fact that it takes time to inform all group peers of a peer that left and that it takes time to inform all group peers of a peer that joined.
+Issues also occurred because of newly stored objects are handled. When a new peer joins the group, it starts to generate objects. The group super peer sends a joining peer a list of group peers. After this occurs, the group peers are informed of the new peer. A peer joining a group can immediately start to store objects on the request other peers. This can happen before some peers are yet aware of the joining peer. Those peers will then get a message saying that an object has been stored on the new peer, before they are aware of the new peer.
+
+The solution was to assume that an object was generated by a valid peer and to add any unknown peer information contained in an object add message to the peers list in the group ledger.
+
+Group inconsistency can arise because there might be some latent object add messages still enroute to peers, after the peer has already left the network and informed other peers of its leaving. This means that a peer has already left, but after it informed the group peers of its leaving and all group peers have removed the peer from memory, the group peers receive a message for an object that is supposedly now stored on the peer that just left. The mechanism mentioned above is initiated and the, now unknown peer, is again added to the peer list.
+
+Many of these transient group states that led to inconsistencies were solved by the super peer storing the information of the last peer that left and the last peer that joined. Every time a new peer joins, the super peer also informs the joining peer of the last peer that left. This allows the joining peer to ignore any latent object add messages received from the leaving peer.
+
+Peers also store the information of the last peer that left. Every time a peer leaves, this information is updated. Any messages received from the last peer that left are ignored. This prevents latent messages from peers that left to affect the group view of peers.
+
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=0mm 0mm 455mm 212mm, width=\columnwidth]{gc_middle}
+ \caption{Group consistency with starvation}
+ \label{fig_gc_middle}
+\end{figure}
+%
+These improvements created the issue shown in Figure \ref{fig_gc_middle}, where a peer will believe that another peer has left. The group will be informed of the peer that supposedly left, but is actually still present in the group. Because all peers will now ignore messages from that peer, including the super peer, all requests sent by that peer will be ignored. The requests will then timeout on the ignored peer and the peer will remove all group peers. This isolates the peer and prevents any requests from being serviced.
+
+The starvation was caused by peers not responding to requests. A scenario could occur where a peer did not contain a requested object or where the network bandwidth was limited, which prevented a response from arriving at a peer before the request timeout expired. In either of these two situation, the peer making the request was under the impression that the target peer had left the network. It then informed all other peers of this.
+
+The solution to this issue was to adjust the timeout as a function of the available network bandwidth and to make sure every node always responded to a request, whether as a success or failure.
+
+Other issues were caused when group migration was enabled. A node might leave a group to move to another, but as the node leaves some peer that has not been informed of the peer leaving would make a request form the leaving peer. The leaving peer would respond to that request, which would have the requesting peer add the peer back into the group. This could cause the situation where peers existed in multiple groups.
+
+The solution to this was to include the group membership information in every request message. A peer's membership can be uniquely identified by the IP address and port of the group's super peer. If a peer receives a message with a different group address than its own, it ensures that that peer is not part of its group.
+
+This also solved the case where Peer A requested an object from Peer B, just as Peer B was leaving the group. Peer B will already be in its new group when receiving the request from Peer A. Peer B will see that the request originated from outside its group, so will not add the new peer to its group. If it contains the requested object, it will however still respond with the object. When Peer A receives the object, it will detect that it was sent from another group and remove Peer B from its group ledger. In this way, the request was successfully handled and group consistency is maintained.
+
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=0mm 0mm 430mm 180mm, width=\columnwidth]{gc_final}
+ \caption{Group consistency after all improvements}
+ \label{fig_gc_final}
+\end{figure}
+
+Figure \ref{fig_gc_final} shows the group consistency after all improvements were added for a larger group than the previous two. Even with this larger group, complete consistency has been achieved.
+
+When object lifetime was tested, all requests were stopped after a certain period of time to speed up the simulation. This created an issue where group peers did not become aware of peers leaving the group, because no peers sent requests that could timeout. This prompted the addition of keep-alive messages.
+
+Regular keep alive messages are sent to peers. If a peer does not respond to the message, that peer is removed from the group. The time between keep alive messages can be adjusted as a function of network churn. In order to reduce the load on the super peer, each peer randomly chooses a target peer and sends a keep-alive message. It is assumed that not all peers will be queried every time, but they will be queried most of the time or the next time a message is sent.
+
+
+    \subsubsection{Quorum}
+    \label{object_verification_implementation}
+
+
+
+\section{PithosTestApp implementation}
+\label{pithostestapp}
+
+Some application was required that would generate requests for Pithos and collect statistics on how well Pithos services those request. The application that was implemented to perform this duty is PithosTestApp.
+
+PithosTestApp is located one layer above Pithos in the generic consistency architecture, called the object updated. It should be noted that PithosTestApp has no purpose other than to test Pithos. It is therefore supposed to present an aggregation of all the higher layer modules to Pithos.
+
+PithosTestApp has four functions:
+\begin{enumerate}
+\item Generate store, retrieve and modify requests.
+\item Correctly handle all responses received form Pithos.
+\item Generate position updates.
+\item Collect statistics to determine how successfully Pithos performed the requests.
+\end{enumerate}
+
+\subsection{Store requests}
+
+Pithos periodically generates store requests of random sizes. The sizes of these requests are based on the literature on how large game objects usually are. This includes an evaluation that was performed on the size of game objects in Ultima Online and the measurements acquired from the Donnybrook architecture \cite{Bharambe_Donnybrook}.
+
+All store request are sent to Pithos in the lower layer. When a response is received that an object has been successfully stored, the object information is added to a global map, containing all generated objects.
+
+\subsection{Retrieve requests}
+
+The global object map is not available to Pithos and is only used by PithosTestApp to enable object retrieval and for retrieved objects to be verified. Objects in the global object map are grouped by the group they are stored in.
+
+Pithos periodically generates retrieve requests for random objects. An object is selected from the global object map and a request for this object is made to Pithos. The object itself is never supplied to Pithos, other than when it was stored.
+
+PithosTestApp can generate in-group object requests with a given probability. This is to test how well Pithos will function if distance-based storage is implemented to store objects. The assumption is that, with distance based storage, a high number of retrieval requests will be for nodes within the same group, as opposed to out-of-group nodes.
+
+When a response is received, statistics are recorded on whether the request was a success or failure as well as the reason. If the retrieval is a success, the returned object is compared with the object in the global object store to determine whether the retrieved object's contents physically matches the object contents in the global object store. Verification is mostly used when malicious peers exist and there is a change that Pithos might send the information of a corrupted object to the higher layer.
+
+\subsection{Modify requests}
+
+PithosTestApp periodically generates modify requests. It selects a random object from the global object map, selects a random variable of that object to modify and assigns a new random value to that parameter. The new parameter value is the update request sent to Pithos.
+
+To verify whether an object has been correctly updated, a retrieve request is performed after Pithos reported a successful modification of the object. The object returned is compared with the updated object in the global object map.
+
+\subsection{Position updates}
+
+When group migration is enabled, PithosTestApp generates regular position updates to allow Pithos to test group migration.
+
+\section{Conclusion}
+
+This section describes the overarching design principles of Pithos in terms of the goals set out in previous chapters. The Oversim network simulation framework is then described, along with a description of its extension, enabling it to support the generic consistency architecture. The Pithos modules implemented in Oversim are introduced, followed by explanations of the key Pithos mechanisms. All Pithos mechanisms are described with reference to the Oversim modules where they are housed.
+
+The key mechanisms section regularly described multiple methods of mechanism implementation. Some methods are theoretically better than their alternatives or provide improvements under certain conditions.
