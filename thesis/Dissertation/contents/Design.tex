@@ -33,7 +33,7 @@ Object retrieval will be required every time an event is received. The VE logic 
 
 Object modification occurs every time an object update is generated. An object update, by definition, required a modification of the object state. Object removal might also be required to save storage space, although this is not essential to the correct functioning of the storage system.
 
-\section{Designing for storage requirements}
+\section{Designing for the storage requirements}
 
 Pithos is designed to fulfill all use case requirements as well as the storage requirements for P2P MMVE storage architectures as set out in Section \ref{key_challenges_cm}. To achieve both these goals, an architecture was first designed to fulfill all the storage requirements and the use case requirements were then implemented on the designed network.
 
@@ -160,28 +160,41 @@ If the super peer accepts the joining peer, it sends that peer a list of all pee
 
 \subsubsection{Leave mechanism}
 
+If a peer leaves the network unexpectedly, it will not have the opportunity to inform its group. With no mechanism to detect a peer unexpectedly leaving, group inconsistency will occur. The peer that left might be selected to store an object or might be required to provide an object from storage. These requests will all fail.
 
+In Pithos, two methods were implemented to ensure group consistency and handle peers leaving the group. The first method uses periodic keep-alive messages. At regular intervals, each group peer uniformly randomly selects another peer in the group to send a keep-alive message to. If a peer received a keep-alive message, it responds with an acknowledge message. A peer that does not respond with an acknowledge message within a sufficiently large amount of time is considered to have left the network.
+
+The originating peer of the keep alive message informs the super peer that the target of the keep-alive message is thought to have left the group. The super peer then also sends a keep-alive message to the target peer, to ensure that there isn't some communications issue between the two group peers and the target peer has actually left the network. If the target peer does not respond to the super peer, the super peer informs all group peers that the target peer has left the group.
+
+The super peer verifies that the peer has left, because by design the super peer is selected to be the most available peer in the group on the network. The super peer does not transmit all keep-alive messages in order to prevent overloading of the super peer.
+
+It is accepted that not all group peers might receive keep-alive messages every round, because of the random selection mechanisms, but this is not required. Only that in a sufficiently few number of keep-alive intervals, the peer is found to have left.
+
+The second mechanism uses requests to identify peers that have left the group. Whenever a request is sent to another peer, a timeout is also started. If a peer does not respond to a request within a given amount of time, the same leave mechanism will be activated has the target peer not responded to a keep-alive message.
+
+It should be noted that either of these methods are sufficient to ensure group consistency over some time period, but using both minimises the time it takes to detect a peer leaving the group.
+
+For graceful group leaves, the same leave mechanisms as used in group migration is employed.
 
 \subsubsection{Migration}
 
-Users will constantly being moving in the virtual environment, leading to changes in position. These position changes may lead to users moving from one group to another. It imperative that all objects stored in Pithos remain available even with users traversing groups. To simulate the effect that user movement will have on objects stored in Pithos, PithosTestApp is designed to generate position updates.
+Users will constantly being moving in the virtual environment, leading to changes in position. These position changes may lead to users moving from one group to another. It is imperative that all objects stored in Pithos remain available even with users traversing groups.
 
-PithosTestApp simulates a user moving around in a virtual world. This is done by having PithosTestApp generate a new random position chosen in the same way as when a node joined a group: by selected x and y coordinates in a uniformly random fashion. A position update timer determines when a node's position should change. It is accepted that the movement this scheme will generate will not match the way users move in a virtual world. Modelling accurate user movement is, however, not important for the Pithos simulation. Storing and retrieving objects in Pithos only depends on which group a user occupies and how Pithos handles a user that moves to another group. The order in which a user might enter groups or, in fact, the specific group that a user moves to, is not important. All that is important is how objects are handled when any group migration occurs.
+As users move around in the virtual world, Pithos queries the directory server with the new positions, using the same mechanism described for joining a group in Section \ref{network_join_implementation}. The peer then receives a new super peer address from the directory server, if this address is different from the address of the currently known super peer. When a new address is received, Pithos initiates group migration.
 
-When a new position is generated by PithosTestApp, this is sent to the group storage module. The group storage module queries the directory server with the new position, using the same mechanism described for joining a group in Section \ref{network_join_implementation}. Group storage receives a super peer address from the directory server, if this address is different from the address of the currently known super peer, group storage initiates group migration.
+Group migration involves informing the group that the peer is leaving, clearing all statistics and initiating the group join mechanism. Informing the group that the peer is leaving ensures that this peer will not be picked for any storage or retrieval requests, while the group is unaware that the peer has left. If this is not done, the group will only know that a peer has left after a timeout for a request to the peer expires, which reduces request success rates.
 
-Group migration involves informing the group that the peer is leaving, clearing all statistics and initiating the group join mechanism. Informing the group that the peer is leaving ensures that this peer will not be picked for any storage or retrieval requests, while the group is unaware that the peer has left. If this is not done, the group will only know that a peer has left after a timeout for a request to the peer expires. This reduces request success rates.
+\subsubsection{Ledgers and object stores}
 
-\subsubsection{Ledgers}
-Each peer and super peer in the network contains a group ledger. The group ledger is an abstract data type that maintains lists of all objects stored in the group, as well as all peers that are part of the group. The group ledger is used by the group logic and super peer logic modules to keep track of all group objects and peers. The group ledger is required whenever an object is retrieved within the group.
+The previous sections discussing groups storage has focussed on group storage, purely as an $O(1)$ structured overlay. To enable the storage of objects within the group, an objects store is also required, as well as a way to track which objects are stored on which peers and conversely, which peers contain which objects.
 
-The group ledger was designed for efficient storage, while still allowing high speed access to data. In order for the ledger to be efficient, it implements a map of object ledgers, where each object ledger contains object information and a list of peers where that object is stored on. The group ledger also contains a peer ledger list, where each peer ledger contains a list of objects that are housed on that peer.
+Each peer in the group contains a local authoritative object store, containing all objects stored on the peer by group storage.
 
-In the object ledger, each entry in the peer list is a reference to peer information contained in the peer ledger. In the peer ledger, each entry in the object list is a reference to peer information contained in the object ledger. This means that peer and object information are only stored once, and always referred to by references. This dually linked structure allows for searching in any direction. Objects are stored in a map, since there might be thousands of objects in a group, compared to tens of peers. Efficient object lookup is, therefore, a priority, whereas sequential peer search is sufficient.
+Each peer and super peer in the network contain a group ledger to keep track of which objects are stored on which peers. The group ledger is required whenever an object is retrieved within the group to know from which peer an object can be requested. The ledger is also used by the super peer, to determine which objects should be repaired.
 
 \subsubsection{Grouping}
-At the core of the architecture is the peer clustering mechanism. Two approaches are being evaluated: distributed clustering techniques (for example affinity propagation \cite{affinity_propagation}) and dynamic regioning techniques (for example self-organising spatial publish subscribe (SOSPS)
-\cite{self_organising_sps_post}).
+
+In order for Pithos to build group, a clustering mechanism is required. Two approaches are being evaluated: distributed clustering techniques (for example affinity propagation \cite{affinity_propagation}) and dynamic regioning techniques (for example self-organising spatial publish subscribe (SOSPS) \cite{self_organising_sps_post}).
 
 \emph{Distributed peer clustering techniques}: make use of the flocking behaviour of players to dynamically group players into flocks or clusters \cite{flocking}. The main idea of flocking is that players move around in groups, rather than randomly on their own. It is desirable that user density within groups should remain constant, because a fully distributed architecture is not scalable. This means that groups should merge or split as the user density within them change.
 
