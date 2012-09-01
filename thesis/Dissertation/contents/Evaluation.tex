@@ -69,10 +69,10 @@ The advantage of fast storage over safe storage is its higher responsiveness of 
 \hline
 Storage method & Retrieval method & Reliability & Responsiveness (s)\\
 \hline
-Safe    &   Fast        &   0.9977  &   0.189  \\
-Safe    &   Parallel    &   0.9998  &   0.0859 \\
-Fast    &   Fast        &   0.9970  &   0.192  \\
-Fast    &   Parallel    &   0.9998  &   0.0846 \\
+Safe           &   Fast           &   0.9977    &   0.189  \\
+Safe           &   Parallel       &   0.9998    &   0.0859 \\
+Fast           &   Fast           &   0.9970    &   0.192  \\
+Fast           &   Parallel       &   0.9998    &   0.0846 \\
 \hline
 \end{tabular}
 \caption{Responsiveness and reliability of fast and parallel retrieval for safe and fast storage.}
@@ -222,6 +222,7 @@ Overlay storage and retrieval has a high standard deviation when compared to gro
 
 
 \subsection{Group storage}
+\label{group_storage_eval}
 
 \subsubsection{Fast storage and fast or parallel retrieval}
 \label{group_put_f_fp}
@@ -421,6 +422,7 @@ An apparent anomaly is the group storage responsiveness that decreases with an i
 The lower the group probability, the more failure responses are returned by group storage, which are returned instantly. It is these responses that decrease the mean group storage responsiveness for low group probabilities. When failure responses are ignored, group responsiveness remain constant at the value of 100\% group probability.
 
 \subsection{Bandwidth}
+\label{group_probability_bandwidth}
 
 \begin{figure}[htbp]
  \centering
@@ -447,61 +449,6 @@ All all sections, what was seen was that for a low group probability, the charac
 
 What was shown in this section is that overlay storage provides mediocre reliability for relatively high bandwidth requirements. This underpins the need for an overlay better suited to environments with network churn and improved lookup reliability. Before overlay efficiency can be improved, it is therefore important to create a grouping algorithm that has the highest possible group probability.
 
-\section{Performance under object repair}
-\label{repair_results}
-
-%With TTL=1000
-
-\subsection{Experimental setup}
-\subsection{Reliability}
-\subsection{Responsiveness}
-\subsection{Bandwidth}
-\subsection{Conclusion}
-
-\begin{table}[htbp]
-\centering
-\begin{tabular}{|c|c|c|}
-\hline
-Repair   &Node lifetime& Data\\
-         &     (s)     &in/out (Bps)\\
-\hline
-None     & 200         &     7/30\\
-None     & 1000        &     5/135\\
-None     & 1800        &     4/157\\
-Leaving  & 200         &     7/49\\
-Leaving  & 1000        &     5/136\\
-Leaving  & 1800        &     4/158\\
-Periodic & 200         &     7/53\\
-Periodic & 1000        &     5/137\\
-Periodic & 1800        &     4/157\\
-\hline
-\end{tabular}
-\caption{Table showing the amount of data received and sent from and to the higher layer, for various repair profiles.}
-\label{tab_repair_data}
-\end{table}
-
-\begin{table}[htbp]
-\centering
-\begin{tabular}{|c|c|c|c|c|c|}
-\hline
-Repair   &Node lifetime& Reliability  &  Responsiveness  &Group bandwidth&Overlay bandwidth  \\
-         &     (s)     & retrieve     &  retrieve (s)    & in/out (Bps)  &  in/out (Bps)     \\
-\hline
-None     & 200         &    0.5437    &      1.430       &   133/92      &   876/891         \\
-None     & 1000        &    0.9929    &      0.200       &   198/153     &   1157/1170       \\
-None     & 1800        &    0.9987    &      0.157       &   191/162     &   1182/1195       \\
-Leaving  & 200         &    0.8801    &      0.768       &   455/356     &   633/648         \\
-Leaving  & 1000        &    0.9971    &      0.167       &   240/200     &   1161/1176       \\
-Leaving  & 1800        &    0.9989    &      0.147       &   205/179     &   1182/1195       \\
-Periodic & 200         &    0.9562    &      0.470       &   588/485     &   877/892         \\
-Periodic & 1000        &    0.9971    &      0.167       &   251/209     &   1162/1176       \\
-Periodic & 1800        &    0.9988    &      0.152       &   223/194     &   1182/1194       \\
-\hline
-\end{tabular}
-\caption{Table showing the effect of network churn on the reliability and responsiveness of Pithos, for a fixed repair profile, fast storage and fast retrieval.}
-\label{tab_repair_results}
-\end{table}
-
 \section{Reliability under malicious nodes}
 \label{malicious_results}
 
@@ -521,6 +468,8 @@ Pithos selects the object that is the same in a majority of responses and sends 
 \item Fast group storage is used.
 
 \item Fast and safe group retrieval are compared.
+
+\item Six object replicas are stored.
 
 \item For the safe retrieval case, six objects are retrieved.
 
@@ -581,6 +530,73 @@ Figure \ref{fig_objects} shows the combined object distribution of Pithos, with 
 
 What should be concluded from this section is that there does no exist a minority of peers in Pithos that store the majority of the data. All peers are required to contribute to the P2P network.
 
+\section{Performance under object repair}
+\label{repair_results}
+
+Object replicas inserted into Pithos will all eventually disappear due to network churn. The rate at which replicas are removed from the network can be reduced by employing object repair. This enables Pithos to trade storage space for network bandwidth, by using fewer replicas with a higher repair rate. Network bandwidth can also be saved by having more replicas and a lower repair rate.
+
+The effect of node replicas on the reliability and bandwidth efficiency of Pithos will be explored in this section. Reliability is tightly coupled to the lifetime of nodes, since nodes that live longer will store objects longer, meaning objects stored on nodes with longer expected lifetimes will have longer expected lifetimes. The main reason for being unable to retrieve an object from Pithos is because a peer has left the network. It is, therefore, expected that if nodes life longer the system reliability increases.
+
+\subsection{Experimental setup}
+
+\begin{itemize}
+\item Node lifetimes are varied from 100s to 1800s in irregular steps that are closer together for lower peer lifetimes.
+
+\item Fast group storage is used.
+
+\item Fast group retrieval is used for the no repair, leaving repair and periodic repair cases.
+
+\item Parallel retrieve with no repair is also compared.
+
+\item Six object replicas are stored.
+
+\item Object TTL is set to 1000s.
+\end{itemize}
+
+\subsection{Reliability}
+
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=15mm 30mm 275mm 180mm, width=\columnwidth]{repair_rel}
+ \caption{Reliability of Pithos for various node lifetimes, comparing no repair, no repair with parallel retrieval, leaving repair and periodic repair with 100s periods.}
+ \label{fig_repair_rel}
+\end{figure}
+%
+Figure \ref{fig_repair_rel} shows request reliability for various node lifetimes for no repair, no repair using parallel retrieve, leaving repair and periodic repair.
+
+As expected, doing no repair does not cope well with short node lifetimes compared to an object TTL of 1000s. The object TTL is important when evaluating performance, since a network that requires objects to be stored for longer has to maintain the object replicas for a longer amount of time. When the expected node lifetime is equal to the object TTL at 1000s, the reliability of the system when not using repair is similar to the the system reliability when repair is used.
+
+This observation is helpful when designing a P2P MMVE. Objects might be classified according to how long their should remain in the system. Objects that should only remain in the system for approximately the same amount of time as the expected user session time need not use repair mechanisms, if a sufficient number of replicas are used.
+
+When node lifetimes are the same as the periodic repair interval, leaving repair copes better than periodic repair. The periodic repair mechanism might be adjusted to less than the minimum expected node lifetime in the system, but this will increase the load on the super peer, which has to perform the periodic checks. From the data is seems that leaving repair might be able to better handle a situation where node lifetimes have a high dynamic range, since the rate at which nodes leave the network is directly tied to how often leaving repair performs repairs.
+
+Except for the case where the periodic repair timer is equal to the expected node lifetime, leaving and periodic repair appear to perform similarly in terms of reliability.
+
+Parallel retrieval, employing no repair mechanism, is most reliable and consistently reliable for all node lifetimes.
+
+\subsection{Bandwidth efficiency}
+
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=15mm 30mm 275mm 180mm, width=\columnwidth]{repair_bw_eff}
+ \caption{Bandwidth efficiency of Pithos for various node lifetimes, comparing no repair, no repair with parallel retrieval, leaving repair and periodic repair with 100s periods.}
+ \label{fig_repair_bw_eff}
+\end{figure}
+%
+Figure \ref{fig_repair_bw_eff} compares the bandwidth efficiency of the various repair techniques. Bandwidth efficiency is defined to be the factor of usable data that would have been transferred to the higher layer, had the system been 100\% reliable, compared to the total bandwidth used by Pithos. 100\% reliability is used, otherwise bandwidth efficiency is also a function of reliability, since less data is transferred if fewer requests are successful. It should be noted that the largest part of Pithos's bandwidth usage is contributed by overlay storage, as shown in Sections \ref{overlay_resp_rel_results} and \ref{group_probability_bandwidth}.
+
+Although parallel retrieval was shown to be the most reliable retrieval mechanisms for various node lifetimes, Figure \ref{fig_repair_bw_eff} shows that it is also the most bandwidth inefficient, with only between 1.5\% to 8\% usable data transferred. The bandwidth efficiency of leaving and periodic repair are similar for long peer lifetimes, compared to the periodic repair timer.
+
+Bandwidth efficiency is monotonously increasing, because as peers remain in the network for longer periods of time, less bandwidth is required to repair missing replicas. Bandwidth efficiency also increases, since there is more usable data transferred when peers are alive for longer periods of time. Peers that live longer have less time to generate usable data. The increase in usable data for longer node lifetimes, than the object TTL does not lead to a significant increase in Pithos bandwidth.
+
+Although doing no repair is less reliable, it is more bandwidth efficient, because no object repairs have to be performed.
+
+\subsection{Conclusion}
+
+The leaving and periodic repair mechanisms were found to posses similar reliability and bandwidth performances. It seemed that leaving repair does, however, cope better with dynamic node lifetimes. A periodic timer also has to be designed for specific network parameters, including expected node lifetime and object TTL. If, during the lifetime of the network, the parameters change, the system will not be able to dynamically adapt.
+
+As expected, doing no repair is less reliable than doing repair, but uses less bandwidth. Parallel retrieval is highly reliable, but requires a large amount of bandwidth.
+
 \section{Conclusion}
 
 This section initially showed the storage and retrieval performance of Pithos, without taking into account group probability, object repair or malicious nodes. Fast storage was found to be sufficiently reliable for the large responsiveness gain it added. It was found that parallel storage are both more responsive and reliable than fast storage at the cost of additional bandwidth.
@@ -591,6 +607,10 @@ The responsiveness distributions for Pithos were also presented, along with a di
 
 It was discussed that it is important to take group probability into account when evaluating Pithos performance. By varying the group probability, it was shown that the overall performance is a weighted average of the underlying group and overlay performances.
 
+Tt was shown that all peers in Pithos are required to contribute storage space to the network.
+
 The effect of repair was shown by evaluating Pithos for various repair methods with varying node lifetimes. It was found that repair significantly increases reliability when the expected node lifetimes are small, compared to the object TTL. Repair is not required, if node lifetimes are large, compared to the object TTL.
 
-Finally, it was shown that all peers in Pithos are required to contribute storage space to the network.
+From the evaluation of object repair, it was found that there are many factors that influence how retrieval reliability. On a basic level, retrieval reliability is directly proportional to object lifetime. From the results shown, it was found that object lifetime is, therefore, related to node lifetimes, repair rates and object TTL.
+
+It should be possible to design a storage system with predictable levels of reliability, to ensure correct functionality of the larger system that uses the storage system. It is, therefore, of benefit to be able to predict objects lifetimes in a distributed storage system. Of greater benefit is to be able to design a storage system to ensure required levels of expected object lifetimes. This is the focus of the next chapter. Predicting object lifetimes in finite network under churn.

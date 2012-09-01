@@ -116,6 +116,7 @@ Overlay storage maps objects and peers to the same uniform key space and stores 
 
 
 \section{Key modules and mechanisms}
+\label{key_modules_mechs}
 
 \begin{figure}[htbp]
  \centering
@@ -147,6 +148,7 @@ In group storage, peers handle requests from the higher application layers. Peer
 Super peers are responsible for representing a group and managing group membership. Super peers also implement object repair.
 
 \subsubsection{Join mechanism and bootstrapping}
+\label{join_mechanism}
 
 The directory server places joining peers into groups represented by super peers. The directory server allows peers to join the network and be placed into groups.
 
@@ -159,6 +161,7 @@ The joining peer then sends the same type of join request to the supplied super 
 If the super peer accepts the joining peer, it sends that peer a list of all peers currently in the group, as well as a list of objects currently available in the group. The super peer also informs all other group peers of the newly joined peer.
 
 \subsubsection{Leave mechanism}
+\label{leave_design}
 
 If a peer leaves the network unexpectedly, it will not have the opportunity to inform its group. With no mechanism to detect a peer unexpectedly leaving, group inconsistency will occur. The peer that left might be selected to store an object or might be required to provide an object from storage. These requests will all fail.
 
@@ -177,6 +180,7 @@ It should be noted that either of these methods are sufficient to ensure group c
 For graceful group leaves, the same leave mechanisms as used in group migration is employed.
 
 \subsubsection{Migration}
+\label{migration_design}
 
 Users will constantly being moving in the virtual environment, leading to changes in position. These position changes may lead to users moving from one group to another. It is imperative that all objects stored in Pithos remain available even with users traversing groups.
 
@@ -186,62 +190,78 @@ Group migration involves informing the group that the peer is leaving, clearing 
 
 \subsubsection{Ledgers and object stores}
 
-The previous sections discussing groups storage has focussed on group storage, purely as an $O(1)$ structured overlay. To enable the storage of objects within the group, an objects store is also required, as well as a way to track which objects are stored on which peers and conversely, which peers contain which objects.
+The previous sections have focussed on group storage, purely as an $O(1)$ structured overlay. To enable the storage of objects within the group, an objects store is also required, as well as a way to track which objects are stored on which peers and conversely, which peers contain which objects.
 
 Each peer in the group contains a local authoritative object store, containing all objects stored on the peer by group storage.
 
 Each peer and super peer in the network contain a group ledger to keep track of which objects are stored on which peers. The group ledger is required whenever an object is retrieved within the group to know from which peer an object can be requested. The ledger is also used by the super peer, to determine which objects should be repaired.
 
 \subsubsection{Grouping}
+\label{grouping_design}
 
-In order for Pithos to build group, a clustering mechanism is required. Two approaches are being evaluated: distributed clustering techniques (for example affinity propagation \cite{affinity_propagation}) and dynamic regioning techniques (for example self-organising spatial publish subscribe (SOSPS) \cite{self_organising_sps_post}).
+In order for Pithos to build group, a clustering mechanism is required. There already exists a wealth of clustering algorithms in literature and a few will be reviewed here.
 
-\emph{Distributed peer clustering techniques}: make use of the flocking behaviour of players to dynamically group players into flocks or clusters \cite{flocking}. The main idea of flocking is that players move around in groups, rather than randomly on their own. It is desirable that user density within groups should remain constant, because a fully distributed architecture is not scalable. This means that groups should merge or split as the user density within them change.
+\emph{Distributed peer clustering techniques}: use the distance between users in the virtual environment to dynamically group players. The main idea of flocking is that players move around in groups, rather than randomly on their own. It is desirable that user density within groups should remain constant, because a fully distributed architecture is not scalable. This means that groups should merge or split as the user density within them change. It might also be required to have mobile groups, where a group has a velocity as well as a position, to be able to uniquely identify groups, even with players joining and leaving and the group moving through the virtual world.
 
-Affinity propagation clusters nodes using a similarity matrix to find similar nodes. The similarity matrix may contain user positions. In this case, affinity propagation will group nodes depending on their location in a virtual world. This algorithm is ideally suited to P2P applications, since it is a distributed clustering algorithm based on message passing.
+Affinity propagation clusters nodes using a similarity matrix to find similar nodes \cite{affinity_propagation}. The similarity matrix may contain user positions. In this case, affinity propagation will group nodes depending on their location in a virtual world. This algorithm might be well suited to P2P applications, since it is a distributed clustering algorithm based on message passing.
 
-\emph{Dynamic regioning}: divides the virtual world into regions that can be resized or further divided to maintain constant player densities across regions. SOSPS creates dynamic regions based on a Voronoi overlay network \cite{voronoi_diagrams_survey}. Near constant user density is achieved by increasing and decreasing the area sizes. This system is based on VON, a distributed Voronoi overlay network designed for MMVEs \cite{VON_VAST}.
+\emph{Dynamic regioning}: divides the virtual world into regions that can be resized or further divided to maintain constant player densities across regions. SOSPS \cite{self_organising_sps_post} creates dynamic regions based on a Voronoi overlay network \cite{voronoi_diagrams_survey}. Near constant user density is achieved by increasing and decreasing the area sizes. This system is based on VON, a distributed Voronoi overlay network designed for MMVEs \cite{VON_VAST}.
+
+Clustering is also used in mobile ad-hoc networks (MANETs) for routing purposes. Mobile-aware clustering algorithms used in MANETs, might also be applicable to P2P MMVEs \cite{clustering_survey}. Mobile-aware clustering uses relative velocities of mobile nodes to define clusters containing nodes with low relative velocity to each other.
+
+Any of the above mentioned techniques might be used to achieve distributed clustering in P2P MMVEs. The focus of this work is, however, not on developing a novel clustering algorithm for P2P MMVEs.
 
 \subsection{Overlay storage (DHT)}
 
-Overlay storage is generally slower than group storage, since it is implemented by an $O(\log (N))$ overlay, as described in Section \ref{overlay_storage}.
+The function of overlay storage is similar to that of group storage. It provides storage capabilities as a backup to group storage to improve reliability. Various overlay storage architectures exist, as discussed in Section \ref{overlay_storage}. Any existing overlay storage architecture can be used in Pithos.
+
+The requirements of overlay storage is that is should be reliable, bandwidth efficient and able to handle network churn. It is assumed that a $O(\log(N))$ overlay is used. For the overlay storage, responsiveness is unimportant, since group storage ensures responsiveness. Reliability is the most important aspect of overlay storage.
+
+An example of an overly storage that might be used in Pithos is PAST \cite{PAST_storage}, based on the Partry overlay \cite{pastry}.
 
 \subsection{Certification}
-In order to design a secure distributed storage system, one requirement for the P2P overlay is that nodes should not be able to select their own IDs or it will not be possible to secure the system against attack. Node IDs should rather be assigned securely by some certification authority \cite{secure_overlay_routing}.
 
-To meet this requirement, Pithos implements its own certification authority to assign node IDs securely and promote security in the P2P overlay. A certification server exists that handle ID requests from nodes. The server assigns IDs to nodes and provides the node with a signed certificate that it may use to store data.
+In order to design a secure distributed storage system, one requirement for the P2P overlay is that peers should not be able to select their own IDs or it will not be possible to secure the system against attack. Peer IDs should rather be assigned securely by some certification authority \cite{secure_overlay_routing}.
 
-Whenever an object is stored or updated in the storage network, nodes have to sign the object to enable the tracking of object changes throughout the life of the object. This system is very different from classic distributed file storage designs that advocate anonymity in storage. The fact that all changes can be tracked to a specific node will simplify the task of eliminating user cheating.
+To meet this requirement, Pithos implements its own certification authority to assign peer IDs securely and promote security in the P2P overlay. A certification server exists that handle ID requests from peers. This functionality is integrated into the directory server. The server assigns IDs to peers and provides the peer with a signed certificate that it may use to store data.
+
+Whenever an object is stored or updated in the storage network, peers have to sign the object to enable the tracking of object changes throughout the life of the object. This system is very different from classic distributed file storage designs that advocate anonymity in storage. The fact that all changes can be tracked to a specific peer will simplify the task of eliminating user cheating.
 
 \subsection{Quorum}
-A security mechanism that performs object verification was also implemented. When this mechanism is activated, the objects received from multiple retrieve responses are compared to ensure object correctness.
+\ref{quorum}
+
+A security mechanism that performs object verification is also used. When this mechanism is activated, the objects received from multiple retrieve responses are compared to ensure object correctness.
 
 Object verification is an attempt to make Pithos more resistant to malicious peers that attempt to alter data in a way that is not consistent with the environmental logic. When multiple retrieve responses are received, all objects are compared and the object that occurs the most from all the responses is sent to the higher layer.
 
-To test this, the idea of malicious nodes was added to Pithos. When a node starts, there is some percentage change that it will be designated as a malicious node. Whenever a malicious node receives a retrieve request, it retrieves the requested object, but alters it in some random way. This altered object is then sent to the requesting peer. A flag saying that the object has been altered is also sent, for statistics gathering.
-
 \subsection{Replication}
-When storing objects in Pithos, replication is used to increase object availability under network churn and for security in the presence of malicious nodes \cite{storage_and_chaching_PAST}. For every object that is stored in Pithos, $k$ object replicas are also stored. The number of replicas ($k$) depends on the degree of network churn as well as the number of expected malicious users in the network. If the network churn is high, more replicas are required to avoid the situation where all $k$ peers hosting an object leaves the network before any object migration can be done.
 
-If a node leaves the network and stops to transmit ``keep alive'' messages, the migration mechanism will detect this and replicate the file on another node. Replication exists intra- as well as inter-group and is useful in ensuring that if a nodes leaves the network, the data are not lost. All object requests are routed to the peer with the next closest ID if the root peer leaves, because of how overly routing functions. The new destination peers will possess the stored files, since Pithos stores overlay replicas at overlay neighbours.
+When storing objects in Pithos, replication is used to increase object availability under network churn and for security in the presence of malicious peers \cite{storage_and_chaching_PAST}. For every object that is stored in Pithos, $R$ object replicas are also stored. The number of replicas ($R$) depends on the degree of network churn as well as the number of expected malicious users in the network. If the network churn is high, more replicas are required to avoid the situation where all $R$ peers hosting an object leaves the network before any object migration can be done.
 
-Another reason to replicate game objects is to make the system more secure. If it is known that a certain percentage of users are malicious, it is advantages to have more replicas than malicious users. This will allow for a secure system where object hashes can be compared to determine which nodes are malicious and what version of an object is accurate.
+If a peer leaves the network and stops to transmit ``keep alive'' messages, the repair mechanism will detect this and replicate the file on another peer. Replication exists on group as well as overlay storage and is required for ensuring that if a peers leaves the network, the objects that it stores are not lost.
+
+In overlay storage, when the target of a retrieval request leaves the network, the request is routed to the peer with the next closest ID, because of the distance-based routing scheme used in overlay storage. This feature of overlay routing can be exploited by storing object replicas at peers with IDs that are close to the main peer selected to store the object. If a peer leaves the overlay, the new destination peers will possess the stored files, since overlay storage stores overlay replicas at overlay neighbours.
+
+Group replication will be described in detail when the storage mechanism is described in Section \ref{pithos_store}.
+
+Another reason to replicate objects is to make the system more secure. If it is known that a certain percentage of users are malicious, it is advantages to have more replicas than malicious users. This will allow for a secure system where object hashes can be compared to determine which peers are malicious and what version of an object is accurate.
 
 \subsection{Repair}
 
 When objects are stored, as described in Section \ref{store_implementation}, multiple replicas of the same object is stored within a group. This form of redundancy extends the lifetime of an object, but with the presence of constant network churn, all objects will eventually cease to exist.
 
-The solution is to use a repair mechanism to ensure that missing object replicas are constantly replaced. Two types of repair mechanisms were implemented: periodic repair and lazy repair.
+The solution is to use a repair mechanism to ensure that missing object replicas are constantly replaced. Two types of repair mechanisms were implemented: periodic repair and leaving repair.
 
-With periodic repair, the super peer periodically checks the number of available replicas of every object in its group ledger. If an object contains less than the required number of replicas and there are nodes in the group that do not already store the object, that object is replicated. Because the super peer itself contains no objects, it requests that an object be replicas from a peer that does contain the object. That peer will receive a replicas request for a specific object, select a group peer in a uniformly random fashion that does not already contain the object and initiate a store request to that peer.
+With periodic repair, the super peer periodically checks the number of available replicas of every object in its group ledger. If an object contains less than the required number of replicas and there are peers in the group that do not already store the object, that object is replicated. Because the super peer itself contains no objects, it requests that an object be replicas from a peer that does contain the object. That peer will receive a replicas request for a specific object, select a group peer in a uniformly random fashion that does not already contain the object and initiate a store request to that peer.
 
 Object repair is not loss-less. A peer can be selected to store a new object replica and that peer can leave the group before it stores the object. Because many object replicas exist and the loss of a single object will, therefore, not endanger the life of an object, the extra bandwidth and maintenance requirements could not be justified.
 
 Lossy repair does create the issue that sometime there are more than one object replicas missing. This is solved by having the super peer request multiple object repairs when more than a single object are missing.
 
-Lazy repair attempts to save on bandwidth and super peer load, by only repairing objects when a node leaves the network. With lazy repair, every peer that is informed that a node is leaving the network, removes the peer reference of all objects contained by that peer in the group ledger. When the super peer removes objects, because a peer left the network, it immediately initiates repair requests for all objects contained on the leaving peer. Because repair is lossy, the super peer initiates more than one object repair for a specific object, if more than one object replicas are missing.
+Leaving repair attempts to save on bandwidth and super peer load, by only repairing objects when a node leaves the network. With leaving repair, every peer that is informed that a node is leaving the network, removes the peer reference of all objects contained by that peer in the group ledger. When the super peer removes objects, because a peer left the network, it immediately initiates repair requests for all objects contained on the leaving peer. Because repair is lossy, the super peer initiates more than one object repair for a specific object, if more than one object replicas are missing.
 
 \subsection{Distance-based storage}
+
 For Pithos to succeed as an MMVE storage architecture, intra-group data requests should be preferred to inter-group data requests. This requirement, combined with the fact that the grouping algorithm geographically groups players in the virtual world, lends Pithos to a storage system based on distance-based storage. Similar to interest management, the assumption is that players have a limited area of interest and require interaction with a limited number of objects within range.
 
 Therefore, distance-based storage is implemented on a group level rather than an individual level. This means that objects are stored on the nearest group of players, rather than the nearest user. It is assumed that such an approach will alleviate the security and reliability challenges present in distance-based storage \cite{gilmore_p2p_mmog_state_persistency}.
@@ -249,51 +269,48 @@ Therefore, distance-based storage is implemented on a group level rather than an
 With group-based distance-based storage, it is assumed that because peers now store objects closest to the group, the objects that they are interested in will most likely be stored within their own group. Therefore, most data requests should be intra-group requests. The overlay storage component ensures that nodes that require data, which are not stored within their group, are still able to access requested data.
 
 \section{Satisfying the use cases}
+All Pithos modules and mechanisms that ensure adherence to the storage requirements have now been described. What remains to be described is how the use cases presented in Section \ref{use_cases_goals} are designed on the architecture that adheres to the storage requirements.
+
+It is assumed that some higher layer exists above Pithos, which generates requests. According to our generic consistency model, these requests will arrive from the game logic or object updater. It should be noted that a request can be a storage, retrieval, modification or removal request and does not only imply a request for data, i.e. a retrieval request.
+
 \subsection{Store}
-    Store requests are received from the higher level PithosTestApp, described in Section \ref{pithostestapp}. Figure \ref{fig_pithos_msg_flow_store} shows the message flow between all Pithos modules for an object store request.
+\label{pithos_store}
 
-\begin{figure}[htbp]
- \centering
- \includegraphics[clip=true, viewport=2mm 143mm 185mm 289mm, width=\columnwidth]{Pithos_msg_flows_store}
- \caption{Pithos message flow as a response to a store request}
- \label{fig_pithos_msg_flow_store}
-\end{figure}
+The higher layer is expected to send a storage request to Pithos, containing the object to be stored. Pithos contains logic that relays the storage request to both the group storage as well as the overlay storage. Overlay storage implements an existing DHT and it is assumed that overlay storage correctly handles the storage request. Overlay storage informs the Pithos logic of the success or failure of the request.
 
-Within the same node, the PithosTestApp sends a remote procedure call (RPC) to the Pithos communicator module, containing the object to be stored. The communicator forwards all requests from PithosTestApp to the peer logic module. The peer logic module creates a store request message which it sends to both the DHT storage and group storage modules. This is the request from peer logic to the two modules to store the object in both the DHT and group storage. The DHT storage module translates the storage request message into another RPC, which is understood by the DHT module. The internal RPC call is sent to the DHT module via the communicator. The DHT module further handles overlay storage and returns an internal RPC response indicating success or failure. The RPC response is sent via DHT storage, where statistics are gathered, to the peer logic module.
+Group storage receives the storage request and selects a number of nodes from the group ledger relating to the number of required object replicas. Nodes are selected in a uniformly random fashion, making sure to never select the same node more than once. If a node is selected more than once, it reduced the effective number of replicas in the network, which reduces the expected object lifetime. A detailed discussion of object lifetime is presented in Chapter \ref{chp:MODELLING}.
 
-The group storage module receives the write request. The group storage module reads the required number of replicas from a configuration parameter. The group storage module uses its group ledger to select the required number of nodes. It selects nodes in a uniformly random fashion, making sure to never select the same node more than once. If a node is selected more than once, it reduced the effective number of replicas in the network, which reduces the expected object lifetime, as shown when expected object lifetime is modelled in Section \ref{results}.
+A storage request is sent to every selected node, containing the object. The group storage module will store the object in its local authoritative object store. The group storage module will acknowledge the reception of the object by sending a response message to the source node. Pithos monitors all responses and records the success or failure of each request. When a sufficient number of responses have been recorded, Pithos informs the higher layer of either a successful or failed store.
 
-A storage request is sent to every selected node, containing the object. The requests will arrive at the communicators of the destination nodes and be sent up to the group storage modules. The group storage module will store the object in its object store. The group storage module will acknowledge the reception of the object by sending a response message to the source node. The response message will travel via the communicator to the group storage module, where the module will log failure and success statistics. Every received response is then forwarded to the peer logic module. The peer logic module will monitor all responses and record successes or failures. When a sufficient number of success or failures have been recorded, peer logic informs the PithosTestApp module of either a successful or failed store.
+The question arises as to what constitutes a sufficient number of responses. Two types of storage mechanisms have been implemented in Pithos: ``safe'' and ``fast''. With safe storage, Pithos waits for all responses to be received. Only after all responses are received is a decision made whether the store was successful or not. If more than half of the group stores as well as the overlay store was successful is it considered a successful store. The higher layer is informed of the status of the store request at this time. Fast storage has Pithos wait for the first successful response, before informing the higher layer of success. If all responses are failures, it informs the higher layer of a failure.
 
-The question arises as to what constitutes a sufficient number of messages. Two types of storage mechanisms have been implemented in Pithos: ``safe'' and ``fast''. Safe storage waits for all responses to be received at the peer logic module. Only after all responses are received is a decision made whether the store was successful or not. If more than half of the group stores as well as the overlay store was successful is it considered a successful store. The PithosTestApp is informed of the status of the store request at this time. Fast storage has the peer logic module wait for the first successful response, before informing the PithosTestApp of a success. If all responses were failures, it informs PithosTestApp of a failure.
+Because safe storage ensures that most of the replications are successfully stored, there is a smaller chance of it reporting a false positive than for fast storage. The disadvantage is that from the point of view of the higher layer, and by extension any system that uses Pithos, safe put requests have a lower responsiveness. Fast storage on the other hand is no less reliable than safe storage, but the chances of a false positive being reported to the higher layer is greater. The advantage of fast storage is that the from the perspective of the module using Pithos, it is performed faster than safe storage. The higher layer can, therefore, start using the stored object faster. A comparison of fast and safe storage is performed in Chapter \ref{chp:EVALUATION}.
 
-Because safe storage ensures that most of the replications were successfully stored, there is a smaller chance of it reporting a false positive than for fast storage. The disadvantage is that from the point of view of PithosTestApp, and by extension any system that uses Pithos, safe puts take a lot longer to perform. Fast storage on the other hand is no less reliable than safe storage, but the chances of a false positive being reported to the higher layer is greater. The advantage of fast storage is that the from the perspective of the module using Pithos, it is performed faster than safe storage. The higher layer can, therefore, start using the stored object faster.
 \subsection{Retrieve}
-   The process of retrieving data is very similar to that of storing it, as shown in Figure \ref{fig_pithos_msg_flow_retrieve}. The retrieve request, received from the PithosTestApp, contains the hash of the object name which the PithosTestApp requires. This 128 bit hash is sent to the peer logic. The peer logic then requests that object from both DHT storage and group storage. DHT storage requests the object from the DHT module, using an internal RPC request.
 
-\begin{figure}[htbp]
- \centering
- \includegraphics[clip=true, viewport=3mm 73mm 189mm 219mm, width=\columnwidth]{Pithos_msg_flows_retrieve}
- \caption{Pithos message flow as a response to a retrieve request}
- \label{fig_pithos_msg_flow_retrieve}
-\end{figure}
+The process of retrieving data is very similar to that of storing it. The retrieve request, received from the higher layer, contains the hash of the object name which the higher layer requires. Pithos request the object from both overlay and group storage.
 
-    Group storage first checks whether the object that was requested exists within the group by checking its group ledger. This is required, because the PithosTestApp might require an object that is stored in another group. The out of group request will then only fulfilled by the DHT storage module. If the object is housed in the group storage's local store, the object is sent up to the peer logic module. If the object is found in the group ledger, but not on the peer where the requests originated from, a peer has to be selected to retrieve the object from. The number of peers selected depends on a parameter in the configuration file. More requests sent in parallel will improve the probability of the request succeeding as well as reduce the time it takes to serve the request.
+Group storage first checks whether the object that was requested exists within the group by checking its group ledger. This is required, because the higher layer might require an object that is stored in another group. Out-of-group requests are only serviced by overlay storage. If the object is housed in the group storage's local store, the object is sent to the higher layer.
 
-    Retrieve requests mainly fail because of nodes leaving a group. If a node leaves before it can serve an object, the object request fails. If multiple requests are sent, it improves the chances of contacting a node that is not about to leave, which improves the probability of retrieval success. More requests also improve lookup times, since some peers might be geographically closer to the requesting peer, thereby possessing a lower latency. Sending multiple requests improves the chances of contacting a peer that is closer, which improves the responsiveness of the systems. The disadvantage of multiple requests is the extra bandwidth required, both in sending the requests and in the duplicate objects that will be returned. The effect of multiple requests on system reliability, responsiveness and overhead will be evaluated in Chapter \ref{chp:EVALUATION}.
+If the object is found in the group ledger, but not on the peer where the request originated from, a group peer has to be selected to retrieve the object from. The number of peers selected depends on the retrieval type. Three retrieval types exist: fast, parallel and safe retrieval. Fast retrieval selects a single peer for object retrieval. Parallel retrieval selects multiple peer to retrieve an object from and requests the object from all selected peers concurrently. More requests sent in parallel will improve the probability of the request succeeding as well as reduce the time it takes to serve the request.
 
-    A request is delivered to the destination peer, which forwards the request to the group storage module. The group storage module retrieves the object from its local storage, attaches it to a response message and sends that response to the source peer. The response is forwarded to the group storage module, which collects statistics before passing it on to the peer logic module. After the peer logic module has received a sufficient number of responses, it informs the higher layer of either a successful or failed retrieval. The object itself is attached to a successful request response.
+Retrieve requests mainly fail because of nodes leaving a group. If a node leaves before it can serve an object, the object request fails. If multiple requests are sent, it improves the chances of contacting a node that is not about to leave, which improves the probability of retrieval success. More requests also improve lookup times, since some peers might be geographically closer to the requesting peer, thereby possessing a lower latency. Sending multiple requests improves the chances of contacting a peer that is closer, which improves the responsiveness of the systems. The disadvantage of multiple requests is the extra bandwidth required, both in sending the requests and in the duplicate objects that will be returned. The effect of multiple requests on system reliability, responsiveness and overhead will be evaluated in Chapter \ref{chp:EVALUATION}.
 
-    Again, two types of retrieval have been implemented: ``fast'' and ``safe''. A fast retrieval sends the first successful response, and therefore, the first successful object, to the higher layer. It replies with failure if all requests failed. The safe retrieval request is more resistent to malicious nodes. For safe retrieval, the peer logic waits for a specified number of responses. It then compares all objects received from successful responses and sends an object to the higher layer that had the most matches when compared. This is to counter a malicious peer that might have altered some of the objects before sending them. The reliability benefit with this scheme in the presence of malicious nodes will be shown in Section \ref{reliability_compare_retrieval}.
+A request is delivered to the destination peer, which forwards the request to the group storage module. The group storage module retrieves the object from its local storage, attaches it to a response message and sends that response to the source peer. After Pithos has received a sufficient number of responses, it informs the higher layer of either a successful or failed retrieval. The object itself is attached to a successful request response. Fast and parallel retrieval sends the first successful response, and therefore, the first successful object, to the higher layer. It replies with failure if all requests failed.
+
+The safe retrieval request is more resistent to malicious nodes. For safe retrieval, Pithos waits for a specified number of responses. It then compares all objects received from successful responses and sends an object to the higher layer that had the most matches when compared. This is to counter a malicious peer that might have altered some of the objects before sending them. Safe retrieval implements the quorum mechanism, described in Section \ref{quorum}.
+The reliability benefit with safe retrieval in the presence of malicious nodes is explored in Section \ref{malicious_results}.
+
 \subsection{Modify}
-   Modifying data is similar to storing data. A request to modify a specific object is received from the PithosTestApp. The request specifies the object ID, the parameter that has to be modified and the new value of the parameter. The update is delivered to the peer logic, where the modify request is sent to DHT and group storage. The Oversim DHT handles the modify request and responds with success or failure. Group storage received the modify request and checks the group ledger whether the object exists within the group. If the object does not exist in the group, it is only modified in the overlay. To keep track of modified objects, each object has a version number that is incremented every time an object is modified. This allows retrieve requests to select the object with the latest version number to be sent to the higher layer.
 
-    If the object exists within the group, all peers that contain the object are identified from the group ledger and modify requests are sent to them. The modify request will be sent to the destination group storage module where the object in the local store is updated and its version number incremented. If a retrieve request receives objects with multiple version numbers, it selects the set of objects with the latest version number for ``fast'' or ``safe'' comparison.
+Modifying data is similar to storing data. A request to modify a specific object is received from the higher layer. The request specifies the object ID, the parameter that has to be modified and the new value of the parameter. The update is delivered to Pithos, which forwards the request to both group and overlay storage. The Oversim DHT handles the modify request and responds with success or failure. Group storage received the modify request and checks the group ledger whether the object exists within the group. If the object does not exist in the group, it is only modified in the overlay. To keep track of modified objects, each object has a version number that is incremented every time an object is modified. This allows retrieve requests to select the object with the latest version number to be sent to the higher layer.
+
+If the object exists within the group, all peers that contain the object are identified from the group ledger and modify requests are sent to them. The modify request is sent to the destination peer, where the object in the local store is updated and its version number incremented. If a retrieve request receives objects with multiple version numbers, it selects the set of objects with the latest version number for ``fast'' or ``safe'' comparison.
+
 \subsection{Remove}
 
+Removal is handled by the object TTL. It is not possible to define an explicit remove operation for overlay storage, since a peer may be off-line when the removal request is sent. If the peer rejoins the network, the object becomes available again. Object TTL ensures that the storage space requirements does not increase indefinitely during the lifetime of the storage system.
 
 \section{Conclusion}
 
-This section describes the overarching design principles of Pithos in terms of the goals set out in previous chapters. The Oversim network simulation framework is then described, along with a description of its extension, enabling it to support the generic consistency architecture. The Pithos modules implemented in Oversim are introduced, followed by explanations of the key Pithos mechanisms. All Pithos mechanisms are described with reference to the Oversim modules where they are housed.
-
-The key mechanisms section regularly described multiple methods of mechanism implementation. Some methods are theoretically better than their alternatives or provide improvements under certain conditions.
+This section describes the Pithos conceptual design. The use cases are defined from the perspective of the higher layer that wishes to make use of Pithos's services. The conceptual design is first described in terms of how it ensures the storage requirements are met. The design the use cases are then described in terms of the designed architecture.

@@ -2,27 +2,30 @@
 \label{p2p_MMVE_state_persistency}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-While the previous chapter broadly introduced all the concepts of state consistency, this chapter will focus solely on state management and state persistency in P2P MMVEs. The implementation of state management and persistency in P2P MMVEs allows for the storage of game data. The fact that game data must now be distributed amongst various peers in the network creates challenges not usually present in classic C/S MMVEs.
+While the previous chapter broadly introduced all the concepts of state consistency, this chapter will focus solely on state management and state persistency in P2P MMVEs. State management and persistency in P2P MMVEs respectively allow for the short- and long term storage of game data. The fact that game data are now distributed amongst various peers in the network creates challenges not usually present in classic C/S MMVEs.
 
-This chapter classifies the techniques used in documented P2P MMVE architectures and discusses the advantages and disadvantages of the different types of storage. The chapter also shows that no current storage type is well suited to P2P MMVEs. As the field of P2P MMVEs is a growing one, it is believed that a comprehensive survey of storage techniques is required to act as a basis for further research into the field. To the best of our knowledge, such a classification, where a focus is placed specifically on state management and persistency in P2P MMVEs, has not been undertaken in the literature.
+This chapter classifies the techniques used in documented P2P MMVE architectures and discusses the advantages and disadvantages of the different types of storage. The chapter also shows that no current storage type is well suited to P2P MMVEs.
 
-This chapter identifies storage techniques used in P2P MMVEs. To achieve state management and persistency in P2P MMVEs, a type of distributed storage is required. Two classic distributed storage architectures are the Network File System (NFS) \cite{NFS4_protocol} and Coda  \cite{Kistler_Coda_disconnected}. There are, however, some major differences between the requirements of a P2P storage model and the classic distributed file storage model.
+\section{A definition of state management and state persistency}
 
-Firstly, NFS and Coda still require servers. One of the main advantages of P2P MMVEs is that servers are, for the most part, not required. The other requirement is low latency file storage and retrieval, discussed in Section \ref{char_responsiveness}, which NFS and Coda also do not address. Conflicts are also an issue with the Coda system, which allows multiple nodes to modify the same object. Despite the many differences, the divergent applications share some of the same requirements, namely: scalability, reliability, security and responsiveness.
+A discussion of state storage requires an understanding of the difference between state management and state persistency. These terms are regularly confused in the literature and sometimes one is used where the other is more appropriate. Authors describe both mechanisms as if it is all part of the same model.
 
-The requirement of disconnected operation is generally not applicable to most interactive online games, where a player has to stay connected to the world, to be able to interact with it. One area where disconnected operation is of interest to game state management and persistency is in the area of mobile gaming. A major challenge for mobile games is the large variances in network latency. Such networks require games that are resistent to network jitter.
+Storing authoritative data requires state management and state persistency. State management is the storage of objects in primary storage, while state persistency is the storage of the VE on secondary storage. State persistency does not have such rigorous responsiveness requirements as state management, as described in Section \ref{char_responsiveness}.
 
-One approach has been proposed in \cite{Chandler_disconnected_games}, where every game client serialises its game state and distributes this game state to all other clients. Each client then creates some target game state from all received game states as well as its own state. The game client then attempts to manipulate all NPCs in the game in order to achieve the target game state. The target game state is constantly updated and thus remains a moving target. This is a new type of consistency model with many research opportunities.
+In this work, state persistency is defined to mean long term data storage. This means that if a server or client goes off-line, the state persistency mechanism will ensure the safe storage of the state for when the server or client starts up again. State persistency is, therefore, storage in secondary persistent memory. All servers require state persistency to back-up the VE state in case of some outage or in case a server restart is required. This storage type does not require low latency, but needs to be reliable. State persistency in P2P MMVEs is therefore taken to mean the same. It does not have to be fast, but when a client logs out of the VE and logs back in again, the stored state should remain.
 
-\section{State management and state persistency}
+State management is defined to mean the storage of the VE state in primary memory. This is the state with which the server and clients will interact. It is the state that will be displayed to the agent on the client and it is the state that will require fast retrieval and storage as a result of received events or updates. State management is used to:
+\begin{enumerate}
+\item apply generated or received object updates to authoritative objects on the authoritative node,
+\item to non-authoritative objects on non-authoritative nodes and to
+\item supply information of other objects needed by the environment logic, to generate authoritative object updates for a received event.
+\end{enumerate}
 
-A discussion of state storage requires an understanding of the difference between state management and state persistency. These terms are regularly confused in the literature and sometimes one is used where the other is more appropriate. Other times, authors describe both mechanisms as if it is all part of the same model. Storing authoritative data requires state management and state persistency. State management is the storage of objects in primary storage, while state persistency is the storage of the VE on secondary storage. State persistency does not have such rigorous responsiveness requirements as state management, as described in Section \ref{char_responsiveness}.
+Although state management and state persistency are two different types of storage, with different storage requirements, there are also similar aspects between state management and persistency. Since state management and persistency are very similar (as discussed in Section \ref{key_challenges_cm}), the term ``storage'' will be used when referring to both.
 
-In this work, state persistency is defined to mean long term data storage. Meaning that if a server or client goes off-line, the state persistency mechanism will ensure the safe storage of the state for when the server or client starts up again. State persistency is, therefore, storage in secondary persistent memory. All servers require state persistency to back-up the VE state in case of some outage or in case a server restart is required. This storage type does not have to be fast, but it has to be reliable. State persistency in P2P MMVEs is therefore taken to mean the same. It does not have to be fast, but when a client logs out of the VE and logs back in again, the stored state should remain.
+Many ``storage types'', which can be used for either state management or persistency are discussed in this chapter. The reference of the storage type to state management and/or persistency will be discussed where applicable.
 
-State management on the other hand is defined to mean the storage of the VE state in primary memory. This is the state with which the server and clients will interact. It is the state that will be displayed to the agent on the client and it is the state that will require fast reads and writes as consequences of received events or updates. Every time an object update is generated, it will be applied to the objects by state management. Every time the game logic requires the information of other objects to determine which update to generate on account of a received event, it will make use of state management.
-
-Although these are two different types of storage, with different storage requirements, there are also aspects of state management and persistency that are the same. The similarities and differences will be reviewed in Section \ref{key_challenges_cm}. The similarities between state management and state persistency are explained in this chapter by using the generic term ``storage''. There are many ``storage types'' that will be introduced in this chapter. These storage types can either be state management or state persistency. The relevance of difference storage types to state management and consistency will, however, be discussed.
+Before discussing storage techniques that have been developed for P2P networks, a review of classic state management and persistency architectures used in C/S based systems will be reviewed.
 
 \section{Client/Multi-Server state management and persistency models}
 \label{cms_models}
@@ -32,51 +35,67 @@ This section introduces the classic state management and persistency architectur
 \subsection{Sharding}
 \label{sharding}
 
-A storage model where the VE state is duplicated over multiple servers, with players connecting to one of these servers is termed ``sharding''. Clients are not able to interact or communicate with players on other shards, which reduces game immersion. This method does, however, allow for a more scalable system as maximum load is fixed.
+A storage model where the VE state is duplicated over multiple servers, with players connecting to one of these servers is termed ``sharding''. For all practical purposes, this approach is still merely a C/S approach, with players forced into a specific C/S environment. Each shard hosts the global authoritative state and thus state management and persistency is performed centrally by the shard server, where all objects are stored.
 
-Players are not able to enter a shard if that shard has reached its capacity. In the past, this has caused unhappiness amongst players, since popular
-shards could be difficult to log in to. Players are also reluctant to move to a new shard, because a lot of time is invested in their characters in
-their ``home'' shard. Sharding doesn't allocate resources efficiently, as one shard may be overpopulated while another is underpopulated. For all
-practical purposes, this approach is still merely a C/S approach, with players forced into a specific C/S environment.
+\subsubsection{Advantages}
 
-The benefit of sharding is its ease of implementation and the reduction of content designer load. Because no inter-server communication is required
-and no server migration is supported, this method greatly simplifies the server design process. Another benefit of sharding is that it allows for a
-relatively small game world to support many players because of the duplication of the worlds. This reduces the load on level designers and content
-designers, who now have to populate a much smaller world with content.
+Sharding has the following advatages:
+\begin{itemize}
+
+\item It allows for greater scalability than the single server approach, since the maximum load is fixed and more shards can be added as the environment becomes popular.
+
+\item It is relatively simple to implement, because no inter-server communication is required and no server migration is supported.
+    
+\item It allows for a relatively small environment to support many players because of the duplication of the worlds. This reduces the load on level designers and content designers, who now have to populate a much smaller world with content.
+\end{itemize}
+
+\subsubsection{Disadvantages}
+
+Sharding has the following disadvantages:
+\begin{itemize}
+\item Clients are not able to interact or communicate with players on other shards, which reduces game immersion.
+
+\item Players are not able to enter a shard if that shard has reached its capacity. In the past, this has caused unhappiness amongst players, since popular shards could be difficult to log in to. Players are also reluctant to move to a new shard, because a lot of time is invested in their characters in their ``home'' shard.
+
+\item Inefficient resource allocation occurs, as one shard may be overpopulated while another is underpopulated.
+\end{itemize}
 
 \subsection{Replication-based}
 %Redundant
-The replication-based model is similar to sharding, with the difference that all servers share the same duplicated game state. Each server contains
-the global game state and clients connect to any one of these servers (mirror-servers \cite{mirrored_server}) or through a load distribution
-algorithm to a server (proxy-servers \cite{proxy_server_dist}). Each server handles all actions from clients and updates its own database. The
-servers in turn send updates to each other over a high quality link, such as fibre, to maintain database consistency at high speeds.
+The replication-based model is similar to sharding, with the difference that all servers share the same duplicated game state. Each server contains the global game state and clients connect to any one of these servers (mirror-servers \cite{mirrored_server}) or through a load distribution algorithm to a server (proxy-servers \cite{proxy_server_dist}). 
+Each server handles all actions from clients and updates its own database. The servers in turn send updates to each other over a high quality link, such as fibre, to maintain database consistency at high speeds.
 
-The problem with this system is that the world is never truly consistent and that there are no optimally chosen inconsistency obfuscation boundaries.
-In other words, two players standing next to each other in the virtual world, might be on different servers and, therefore, experience two slightly
-different worlds.
+\subsubsection{Advantages}
 
-\subsection{Object-based}
-%Object based
-The object-based storage model equally distributes all in-game objects amongst the servers \cite{object_based_consistency1}, \cite{object_based_consistency2}, \cite{object_based_consistency3}. For an MMVE, most of these objects are expected to be player objects. The advantage of this method is that the system load is fixed for a certain player population and that the load is equally distributed amongst all servers. This allows for more accurate prediction and provisioning of resources, but still does not handle transient loads
-well.
+The replication-based scheme improved upon sharding in that users are now part of the same virtual world. In order to enable the virtual world to host more players, more servers may be added.
 
-Another issue is inter-server communications for this architecture. The inter-server communications are random and also more than the inter-server
-communications for a region based system. The reason for this is that the number of player interactions increase with a decrease in the distance
-between the players. Players playing together move together, chat and interact with NPCs together. For a region based model, all player-neighbour
-interactions remain local to the server.
+\subsubsection{Disadvantages}
+
+The problem with this system is that two users standing next to each other in the virtual world, might be on different servers and, therefore, experience two slightly different worlds. Players are more likely to interact with other player who are close to them, than players who are far away. For this interaction to occur, the messages might now have to traverse servers. Sending a message to another server is a much more expensive operation than transferring information between two users within the same server. This required a message to be sent to another server, as opposed to an internal signal within the same server.
+
+The single shared database still limits the number of concurrent players that can connect to the world.
 
 \subsection{Zone/Region-based}
 %Zone-based
 The zone-based storage model divides the virtual world into zones or regions, which are hosted on different
-servers \cite{zone_based_stat}, \cite{zone_based_dyn}. A well known example of this model is Eve Online. Busy regions are hosted on their own
-servers, while multiple quiet regions are hosted on a single server. This is termed the static region approach \cite{zone_based_stat}.
+servers \cite{zone_based_stat}, \cite{zone_based_dyn}. A well known example of this model is Eve Online. Busy regions are hosted on their own servers, while multiple quiet regions are hosted on a single server. This is termed the static region approach \cite{zone_based_stat}.
 
-The issue of the static region approach is that it does not scale well when one region is suddenly populated with players. This type of behaviour
-happens quite regularly and is known as flocking \cite{flocking}. When players find something of interest in a region, many players will flock to
-that region. The solution to flocking has been over provisioning of resources to handle peak loads, which suffers from the disadvantages discussed above. Also, if the load changes, the server has to be brought off-line in order to balance the regions.
+The issue of the static region approach is that it does not scale well when one region is suddenly populated with users. This type of behaviour happens quite regularly and is known as flocking \cite{flocking}. When players find something of interest in a region, many players will flock to that region. The solution to flocking has been over provisioning of resources to handle peak loads, which suffers from the disadvantages discussed above. Also, if the load changes, the server has to be brought off-line in order to balance the regions.
 
-Dynamic regions are being investigated, where regions can be dynamically shifted from one server to another, in order to balance load
-\cite{zone_based_dyn}. This approach adds overhead and significant complexity with regards to the migration of the data and the handling of player actions while the data are in transit.
+Dynamic regions are being investigated, where regions can be dynamically shifted from one server to another, in order to balance load \cite{zone_based_dyn}. This approach adds overhead and significant complexity with regards to the migration of the data and the handling of player actions while the data are in transit.
+
+\subsection{Object-based}
+
+The object-based storage model equally distributes all in-game objects amongst the servers \cite{object_based_consistency1}, \cite{object_based_consistency2}, \cite{object_based_consistency3}. For an MMVE, most of these objects are expected to be player objects.
+
+\subsubsection{Advantages}
+
+The advantage of this method is that the system load is fixed for a certain player population and that the load is equally distributed amongst all servers. This allows for more accurate prediction and provisioning of resources, but still does not handle transient loads well.
+
+\subsubsection{Disadvantages}
+
+The inter-server communications are random and also more than the inter-server communications for a region based system. The reason for this is that the number of player interactions increase with a decrease in the distance
+between the players. Players playing together move together, chat and interact with NPCs together. For a region based model, all player-neighbour interactions remain local to the server.
 
 \section{P2P MMVE storage requirements}
 \label{key_challenges_cm}
