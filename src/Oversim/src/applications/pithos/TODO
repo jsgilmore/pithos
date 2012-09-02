@@ -26,19 +26,32 @@ A maximum distance needs to be defined for the directory server
 Ensure correctness for pithos under 32bit systems. This includes testing long variable sizes and making them 32bit safe.
 
 Dissertation:
-Make sure the dissertation never talks about "this paper".
+Add a discussion of how Pithos attempts to address both state management and persistency.
 Make sure the state management and persistency chapter uses the terms state management and persistency correctly.
 Remove the term "game" where it is not required and replace with environment and VE.
-Replance "player" with "user".
+Replace "player" with "user".
 Add bandwidth (overhead) as a required metric of a storage system.
-Explain Pithos design as a hybrid overlay, using two overlay, a O(log(N)) overlay over everyone and an O(1) overlay over groups. Specifically mention its group and overlay storage components in design.
-Perhaps also describe the Pithos design in terms of the features of a structured overlay.
 Ensure that all applicable experimental setup parameters are given in the relevant evaluation sections.
-
-
-Make sure all introductions are relevant.
-Make sure all conclusions are relevant.
 Complete theoretical section, which derives expected values for all the relevant Pithos metrics.
-Complete the chapter that compares theoretical results with the actual Pithos results.
 Conclude
 Receive PhD
+
+Abstract:
+Complete
+
+Introduction:
+Read the PhD on P2P Second life.
+Complete related section by adding discussion on P2P Second Life.
+A discussion of the PhD by Fan can also be be added, since it formed the basis of this work.
+
+Storage:
+Add discussion of P2P Second Life to overlay storage.
+
+Modelling:
+Add sections back into the chapter that were removed when the paper was shortened.
+Add more results, comparing variations in more parameters.
+
+Ensure all symbols and abbreviations are present.
+
+Conclusion:
+Complete

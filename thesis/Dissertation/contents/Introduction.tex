@@ -337,7 +337,11 @@ The state of the art of state consistency techniques will be reviewed in detail 
 
 \section{Research objectives}
 
+The objective of this work is to design and develop a novel state management and persistency architecture, specifically designed for P2P MMVEs, that satisfies all P2P MMVE storage requirements and takes into account the requirements of the consistency architecture in which it will operate.
+
 \section{Related work}
+
+
 
 \section{Contributions}
 \label{objectives}
@@ -347,46 +351,45 @@ The state of the art of state consistency techniques will be reviewed in detail 
 
 \item A review of various state management and state persistency systems is performed.
     \begin{itemize}
-    \item The state management survey identifies some key metrics by which state management systems may be compared.
+    \item The state management survey identifies some key metrics by which state management systems may be compared, namely: fairness, reliability, responsiveness, scalability and security.
+    \item Storage types described in the literature are found to be classifiable as super peer storage, overlay storage, hybrid region-based storage and distance-based storage.
+    \item A journal survey paper has been published on this work, appearing in the IEEE Transactions on Parallel and Distributed Systems \cite{gilmore_p2p_mmog_state_persistency}.
     \end{itemize}
 
 \item A novel state management and persistency architecture, called Pithos, is proposed and implemented in simulation, which increases reliability and responsiveness compared to classic state persistency methods.
     \begin{itemize}
     \item Multiple methods of implementation are described that provide different benefits, depending on the situation.
     \item The various implementation methods are evaluated and recommendations are made on which methods work better in which situations.
+    \item The initial design and implementation of Pithos has been published at the International Workshop on Massively Multiuser Virtual Environments (MMVE) at the IEEE International Symposium on Audio-Visual Environments and Games (HAVE) \cite{Pithos_mmve_2011}.
     \end{itemize}
 
 \item A statistical model for expected object lifetimes is developed and used to verify the Pithos results.
 \end{itemize}
 
-\begin{itemize}
-\item Early in the literature study phase, it was discovered that no research projects that deal with P2P MMVEs present the complete picture of the field. A significant amount of research has been done in the field of state consistency (reviewed in Chapter \ref{chp:CONSISTENCY}), but in this field, no model has been provided which shows what is required to build a complete state consistency architecture. The first contribution of this work is to provide such an architecture at the start of Chapter \ref{chp:CONSISTENCY}.
-
-\item The generic consistency model that is developed is not only applicable to P2P MMVEs, but to any networked virtual environment that required state consistency. The generic consistency model is also compared with well known client/server and P2P consistency models, to show how the existing models can be seen as more specialised versions of the generic consistency model.
-
-\item After developing a generic consistency model, this work then focusses on an area of state consistency that has received little attention from the research community, namely: state management and state persistency. This area is concerned with managing object states as they are updated by events occurring in the virtual environment. Also during a literature review of this field, it was found that no thorough review of this field has been done to compare the different types of storage systems present in P2P MMVEs and presented in the literature. We then preceded to perform such a review, presented in Chapter \ref{p2p_MMVE_state_persistency}. The results of this survey has also been published in the IEEE Transactions of Parallel and Distributed Systems \cite{gilmore_p2p_mmog_state_persistency}.
-
-\item During the survey, some key metrics were identified by which state management and state persistency systems may be described. A proposal was also made as to how these metrics may be measured. What was found upon completion of the survey is that no storage system has thus far been created to satisfy all identified metrics. Work was then undertaken to develop a novel state management and persistency architecture that satisfies all identified requirements.
-
-\item The state management and persistency architecture has been developed and called ``Pithos''. Pithos has been implemented in a network simulation framework, called Oversim, which runs on the Omnet++ simulation environment. The Oversim framework itself has also been extended to implement our novel generic consistency architecture. Pithos has been implemented in the root object store section of this architecture.
-
-\item Many of the key mechanisms in Pithos, such as object retrieval, have been implemented using multiple methods. These methods are then compared to determine the advantages and disadvantages of each. Pithos is also compared to the storage systems identified. Pithos always shows similar or improved performance over classic storage systems in all identified areas.
-
-\item In order to verify the correct functioning of Pithos, mathematical models are also developed to describe Pithos's performance in the various identified metrics. Amongst these is a novel Mathematical model that makes use of an embedded continuous time Markov chain to determine expected object lifetime for varying amounts of network churn, various network sizes and replication rate. The mathematical model is compared with actual Pithos results and appears to match almost exactly.
-\end{itemize}
-
 \section{Summary of this work}
 
-Chapter \ref{chp:CONSISTENCY} presents an overview of state consistency models. Initially, it describes the general process by which state consistency is achieved. Some classic consistency models are then presented in terms of the generic model. Consistency models for P2P MMVEs are then presented, with an overview of work that has been done in each of the various sections required to implement a complete consistency model.
+In order to design a state management and persistency architecture for P2P MMVEs, the environment in which such an architecture will function first has to be understood. This environment was found to be the consistency model of the P2P MMVE. In Chapter \ref{chp:CONSISTENCY}, a study is undertaken to determine all the required parts of a consistency model. From studying the literature on classic consistency architectures, as well as the literature on modern P2P MMVE consistency architectures, a generic consistency architecture was developed. Both P2P MMVE state consistency or C/S state consistency are all specialised cases of the generic model.
 
-Chapter \ref{p2p_MMVE_state_persistency} focuses on the state management and state persistency aspect of P2P MMVE state consistency. Initially, some metrics are defined according to which different storage architecture may be compared. A literature review is then presented, where papers that deal with various storage techniques are grouped and the advantages and disadvantages of each group is then discussed. This chapter also identifies a need for a novel state management and persistency architecture.
+Chapter \ref{chp:CONSISTENCY} starts by developing the generic consistency model, describing generally what tasks have to be performed to achieve state consistency. The complete generic model is then presented and the classic consistency and P2P MMVE consistency models are then presented. It is shown how the presented models relate to the generic consistency model.
 
-Chapter \ref{chp:DESIGN} describes the design and implementation of Pithos, the novel state management and persistency architecture. Initially, the overarching Pithos design is described, including the perceived use case and design goals. The Oversim simulation environment is then described, along with the extensions that were made to model the generic consistency model. The Pithos implementation is then described in terms of Oversim modules. Key mechanisms that implement that Pithos design are then presented with reference to the Pithos Oversim modules. Various methods to implement some mechanisms are descried.
+All modules that form part of the generic consistency model are described, and a summary of research into the various fields are presented. During the investigation of the consistency model, state management and state persistency are found to form part of state consistency in the authoritative storage module.
 
-Chapter \ref{chp:EVALUATION} evaluates the Pithos implementation. The performance of the key mechanisms are presented and the various implementation methods are compared. Pithos is also compared with other storage implementations.
+Knowing that state management and state persistency will be required by the consistency model, the other modules that interface with the authoritative storage module are investigated. These are found to be the environment logic module and object updated module.
 
-Chapter \ref{chp:MODELLING} models Pithos's performance with reference to the identified metrics for P2P MMVE storage systems. A focus is placed on expected object lifetime and a novel model is developed, based on an embedded continuous time Markov chain.
+Chapter \ref{p2p_MMVE_state_persistency} explores the various state management and persistency schemes described in the literature. It firstly defines key requirements that state management and persistency architectures should possess, based on what was learned in Chapter \ref{chp:CONSISTENCY}. Key requirements are found to be: fairness, reliability, responsiveness, scalability and security. The storage types reviewed were found to be broadly characterisable into: super peer storage, overlay storage, hybrid region-based storage and distance-based storage. A discussion of each storage type is presented in terms of the requirements identified earlier.
 
-Chapter \ref{chp:VERIFICATION} compares model results with Pithos simulation results. The purpose of this chapter is to verify the correct functionality of Pithos, according to mathematical models. The chapter also explores how to design storage systems with desired object lifetimes.
+It is found that none of the storage types currently available in the literature satisfy all the identified requirements. Chapter \ref{chp:DESIGN} presents the design of a novel state management and persistency architecture, called ``Pithos'', to satisfy all identified requirements. Pithos is designed as a hybrid storage, containing slower, but scalable overlay storage and faster but non-scalable group storage.
 
-Chapter \ref{chp:CONC} concludes the work. It presents a summary of the work, lists contributions made and discusses some future areas of research.
+The design firstly describes which modules and mechanisms are used to satisfy the P2P MMVE state management and persistency requirements identified in Chapter \ref{p2p_MMVE_state_persistency}. Chapter \ref{chp:DESIGN} also presents the Pithos design from a use case perspective, showing how the other modules, identified in Chapter \ref{chp:CONSISTENCY}, are allowed to interact with Pithos. The design of each module and mechanism is described on a conceptual level, without referring to any specific implementation environment.
+
+Chapter \ref{chp:IMPLEMENTATION} describes how Pithos is implemented in the simulation environment, called Oversim. The chapter first provides a motivation for selecting simulation and Oversim as the implementation environment. It also describes how Oversim is expanded to allow for the complete generic state consistency model developed in Chapter \ref{chp:CONSISTENCY} to be integrated into it. Pithos nodes are then described in terms of their Oversim module implementations. The chapter also presents some of the major implementation specific issues encountered during the implementation of Pithos, along with the chosen solutions. Specific attention is paid on how group consistency was ensured. The implementation of the application driving Pithos, called PithosTestApp, is also presented.
+
+Chapter \ref{chp:EVALUATION} provides an evaluation of Pithos in terms of the requirements identified in Chapter \ref{p2p_MMVE_state_persistency}. Pithos is found to have high reliability, while having a responsiveness of 1.6 hops in the best case. Responsiveness is found to heavily depend on the underlying network architecture, as well as the probability of inter-group, compared to intra-group requests.
+
+The bandwidth requirements of Pithos are also presented and found to be in the order of tens of kilo bits per second, but depending on the size of the object stored in the system. It is found that the group storage section of Pithos requires only 12\% overhead, but that the overlay storage section, which is based on a third-party implementation, requires 86\% overhead. The fairness of Pithos is evaluated and found to compare well with that of overlay storage.
+
+The Pithos implementation is evaluated for various percentages of malicious peers present in the network, that modify all objects requested from them. The quorum mechanism implemented in Pithos is shown to improve retrieval reliability for relatively large percentages of malicious nodes present in the network.
+
+Finally, the results of the object repair mechanism, by which Pithos ensures long-term object survival is shown. It is found that object survival, which is of high importance when designing a distributed storage system, depends heavily on the repair rate, number of initial replicas and expected object lifetime.
+
+Chapter \ref{chp:MODELLING} expands on available literature, to improve the accuracy of object lifetime predictions in networks, such as Pithos, where group size is limited. This is done using an expanded Markov chain model, which allows for the theoretical predictions of object lifetimes. The theoretical predictions are verified using the Pithos implementations and found to closely match. 

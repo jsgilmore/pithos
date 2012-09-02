@@ -82,9 +82,25 @@ Figure \ref{fig_oversim_architecture} shows the complete Oversim node architectu
 
 %Show the generic consistency architecture in Oversim
 
-To allow Oversim to simulate a complete consistency architecture, we extended the Oversim framework itself. The three tiers were replaced with all the elements identified in the generic consistency model in Section \ref{generic_event_update_model}. Practically, this required the implementation of a new type of overlay terminal type, replacing the tiers with the following layers: agent, event layer IM, event dissemination, event ordering, game logic, root object updater, root object store, update layer IM, update dissemination, object merger, local object updater, local object store, display updater, overlay Storage.
+To allow Oversim to simulate a complete consistency architecture, we extended the Oversim framework itself. The three tiers were replaced with all the elements identified in the generic consistency model in Section \ref{generic_event_update_model}. Practically, this required the implementation of a new type of overlay terminal type, replacing the tiers with the following layers:
+\begin{itemize}
+\item agent,
+\item event layer IM,
+\item event dissemination,
+\item event ordering,
+\item game logic,
+\item authoritative object updater,
+\item authoritative object store,
+\item update layer IM,
+\item update dissemination,
+\item object merger,
+\item non-authoritative object updater,
+\item non-authoritative object store,
+\item display updater,
+\item overlay Storage.
+\end{itemize}
 
-Every new layer can communicate with the layer above and below it, and can also communicate with its version on another node using UDP or TCP. This allows for the consistency model to be distributed amongst any number of nodes. A module can either send its information to the layer below it within the same node, or it can send it to the layer below it on another node.
+Every new layer can communicate with the layer above and below it, and can also communicate with its counterpart on another node using UDP or TCP. This allows for the consistency model to be distributed amongst any number of nodes. A module can either send its information to the layer below it within the same node, or it can send it to the layer below it on another node.
 
 Every module can contain a collection of sub-modules which implements the layer itself. It the layer is not implemented, a dummy layer may be specified. The Pithos implementation is located within the authoritative object store module. An application that provides Pithos with test inputs called ``PithosTestApp'' is situated within the authoritative object updater layer. Pithos also makes use of overlay storage, which is implemented in the overlay storage module. Overlay storage requires a P2P overlay for routing purposes, which is why it is connected to the overlay layer.
 
@@ -309,4 +325,4 @@ When group migration is enabled, PithosTestApp generates regular position update
 
 \section{Conclusion}
 
-An overview of the Oversim simulation framework was presented and it was also explained how Oversim was extended to support the generic consistency architecture. Some implementation issues encountered during the Pithos implementation were also discussed. The main purpose of this chapter is to link the conceptual design with the Oversim simulation implementation of Pithos; to provide concrete explanations on how some of the key mechanisms were implemented. 
+An overview of the Oversim simulation framework was presented and it was also explained how Oversim was extended to support the generic consistency architecture. Some implementation issues encountered during the Pithos implementation were also discussed. The main purpose of this chapter is to link the conceptual design with the Oversim simulation implementation of Pithos; to provide concrete explanations on how some of the key mechanisms were implemented.

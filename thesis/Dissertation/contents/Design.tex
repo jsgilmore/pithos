@@ -1,16 +1,14 @@
 \chapter{Pithos Design}
 \label{chp:DESIGN}
 
-The generic state consistency model was presented in Section \ref{generic_event_update_model}. One of the key challenges that still remain was determined to be designing an authoritative storage module specifically tailored to P2P MMVEs. The root storage model identifies in Section \ref{generic_event_update_model} includes the processes of state management and state persistency for the authoritative objects.
+The generic state consistency model was presented in Section \ref{generic_event_update_model}. One of the key challenges that still remain was determined to be designing an authoritative storage module specifically tailored to P2P MMVEs. The authoritative storage module identifies in Section \ref{generic_event_update_model} includes the processes of state management and state persistency for the authoritative objects.
 
-We've identified the main requirements of P2P MMVE state management and persistency in Section \ref{key_challenges_cm} as: scalability, reliability, fairness, responsiveness and security. In Chapter \ref{p2p_MMVE_state_persistency} it is argued that none of the current approaches to state persistency satisfy all identified requirements,
+We've identified the main requirements of P2P MMVE state management and persistency in Section \ref{key_challenges_cm} as: scalability, reliability, fairness, responsiveness and security. In Chapter \ref{p2p_MMVE_state_persistency} it is argued that none of the current approaches to state persistency satisfy all identified requirements. The focus of this work is on state management and persistency in P2P MMVEs. This chapter proposes a novel design, called Pithos, that satisfies all the identified requirements.
 
-The focus of this thesis is, therefore on state management and persistency in P2P MMVEs. This chapter presents a design that satisfies all the identified requirements, along with implementation details and results.
-
-Pithos, a novel hybrid multi-tiered state persistency architecture is proposed. The novelty of Pithos lies in its support for both a responsive and a fair storage system, while also taking into account security aspects
+The novelty of Pithos lies in its support for both a responsive and a fair storage system, while also taking into account security aspects
 of distributed storage. There are some storage systems that provide responsive or fair storage, but none that provide both. No storage system, designed specifically for P2P MMVEs, have taken security into account.
 
-If Pithos is incorporated into an existing P2P MMVE consistency architecture, it will add the ability to handle both state management and state persistency. The addition of a robust state persistency mechanism, specifically designed for P2P MMVEs, will bring us one step closer to the creation of a complete P2P MMVE architecture.
+If Pithos is incorporated into an existing P2P MMVE consistency architecture, it will add the ability to handle both state management and state persistency. The addition of a robust state management and persistency mechanism, specifically designed for P2P MMVEs, will bring us one step closer to the creation of a complete P2P MMVE architecture.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Use cases}
@@ -27,11 +25,18 @@ The purpose of Pithos is to allow for efficient object storage and retrieval tha
 
 As shown in the use case diagram in Figure \ref{fig_pithos_use_case}, the VE logic should be able to use Pithos in four ways: store, retrieve, modify and remove. These are the use cases generally required of any storage system.
 
+\subsection{Store}
+
 The VE logic will store data when a new object is added to the VE state. This can happen as a consequence of an event leading to the generation of a new object. An example of this is a rocket firing at a target. This event might generate a missile object to be sent towards the target.
 
+\subsection{Retrieve}
 Object retrieval will be required every time an event is received. The VE logic will retrieve the object state from memory, which is part of state management. Object states, other than the one being altered, might also be required by the logic to determine the effect an event will have, as discussed in Section \ref{event_logic_update}.
 
-Object modification occurs every time an object update is generated. An object update, by definition, required a modification of the object state. Object removal might also be required to save storage space, although this is not essential to the correct functioning of the storage system.
+\subsection{Modify}
+Object modification occurs every time an object update is generated. An object update, by definition, required a modification of the object state.
+
+\subsection{Remove}
+Object removal might also be required to save storage space, although this is not essential to the correct functioning of the storage system.
 
 \section{Designing for the storage requirements}
 
@@ -150,24 +155,60 @@ Super peers are responsible for representing a group and managing group membersh
 \subsubsection{Join mechanism and bootstrapping}
 \label{join_mechanism}
 
-The directory server places joining peers into groups represented by super peers. The directory server allows peers to join the network and be placed into groups.
+The directory server places joining peers into groups represented by super peers. The first task of a Pithos peer is to join the network and a group. This is done using the directory server, which possesses a static IP address and port that is known to every new peer and super peer.
 
-The first task of a Pithos peer is to join the network and a group. This is done using the directory server, which possesses a static IP address and port that is known to every new peer and super peer. Whenever a super peer is created or potentially selected, it advertises its information with the directory server. This information includes its IP address, port and location of the super peer.
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=15mm 105mm 115mm 199mm, width=0.7\columnwidth]{Pithos_mechanisms}
+ \caption{Pithos group join mechanism}
+ \label{fig_pithos_join}
+\end{figure}
+%
+With reference to Figure \ref{fig_pithos_join}, the join and bootstrapping mechanism works as follows:
+%
+\begin{enumerate}
+\item Whenever a super peer is created or potentially selected, it advertises its information with the directory server. This information includes its IP address, port and location of the super peer.
+    
+\item When a peer wishes to join the network, it sends its current location to the directory server.
+    
+\item  The directory server then responds with the address of a super peer, representing an initial group which the peer can join.
+    
+\item The joining peer then sends the same type of join request to the supplied super peer address.
+    
+\item If the super peer accepts the joining peer, it sends that peer a list of all peers currently in the group, as well as a list of objects currently available in the group.
+    
+\item The super peer also informs all other group peers of the newly joined peer.
+\end{enumerate}
 
-When a peer wishes to join the network, it sends its current location to the directory server. The directory server then responds with the address of a super peer, representing an initial group which the peer can join.
-
-The joining peer then sends the same type of join request to the supplied super peer address. The super peer can then elect to accept or reject the joining peer. This extra step is intended to prevent groups from becoming overloaded. The super peer can supply an alternative address for the joining peer to contact. This extra step is also intended to compensate for the movement of super peers. If super peers move and by the time a joining peer contacts a super peer there is another super peer in closer range, the super peer receiving the join request can supply the joining peer with the address of the closer super peer.
-
-If the super peer accepts the joining peer, it sends that peer a list of all peers currently in the group, as well as a list of objects currently available in the group. The super peer also informs all other group peers of the newly joined peer.
+The super peer can elect to accept or reject the joining peer. This extra step is intended to prevent groups from becoming overloaded. The super peer can supply an alternative address for the joining peer to contact. This extra step is also intended to compensate for the movement of super peers. If a super peer moves, and by the time a joining peer contacts a super peer there is another super peer in closer range, the super peer receiving the join request can supply the joining peer with the address of the closer super peer.
 
 \subsubsection{Leave mechanism}
 \label{leave_design}
 
 If a peer leaves the network unexpectedly, it will not have the opportunity to inform its group. With no mechanism to detect a peer unexpectedly leaving, group inconsistency will occur. The peer that left might be selected to store an object or might be required to provide an object from storage. These requests will all fail.
 
-In Pithos, two methods were implemented to ensure group consistency and handle peers leaving the group. The first method uses periodic keep-alive messages. At regular intervals, each group peer uniformly randomly selects another peer in the group to send a keep-alive message to. If a peer received a keep-alive message, it responds with an acknowledge message. A peer that does not respond with an acknowledge message within a sufficiently large amount of time is considered to have left the network.
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=135mm 110mm 242mm 196mm, width=0.7\columnwidth]{Pithos_mechanisms}
+ \caption{Pithos group leave mechanism}
+ \label{fig_pithos_leave}
+\end{figure}
 
-The originating peer of the keep alive message informs the super peer that the target of the keep-alive message is thought to have left the group. The super peer then also sends a keep-alive message to the target peer, to ensure that there isn't some communications issue between the two group peers and the target peer has actually left the network. If the target peer does not respond to the super peer, the super peer informs all group peers that the target peer has left the group.
+In Pithos, two methods exist to ensure group consistency and handle peers leaving the group. The first method, shown in Figure \ref{fig_pithos_leave}, uses periodic keep-alive messages as follows:
+%
+\begin{enumerate}
+\item At regular intervals, each group peer uniformly randomly selects another peer in the group to send a keep-alive (Ping) message to.
+    
+\item If a peer received a keep-alive message, it responds with an acknowledge (Pong) message.
+
+\item A peer that does not respond with an acknowledge message within a sufficiently large amount of time is considered to have left the network.
+    
+\item The originating peer of the keep alive message informs the super peer that the target of the keep-alive message is thought to have left the group.
+    
+\item The super peer then also sends a keep-alive message to the target peer, to ensure that there isn't some communications issue between the two group peers and the target peer has actually left the network.
+    
+\item If the target peer does not respond to the super peer, the super peer informs all group peers that the target peer has left the group.
+\end{enumerate}
 
 The super peer verifies that the peer has left, because by design the super peer is selected to be the most available peer in the group on the network. The super peer does not transmit all keep-alive messages in order to prevent overloading of the super peer.
 
@@ -228,7 +269,7 @@ To meet this requirement, Pithos implements its own certification authority to a
 Whenever an object is stored or updated in the storage network, peers have to sign the object to enable the tracking of object changes throughout the life of the object. This system is very different from classic distributed file storage designs that advocate anonymity in storage. The fact that all changes can be tracked to a specific peer will simplify the task of eliminating user cheating.
 
 \subsection{Quorum}
-\ref{quorum}
+\label{quorum}
 
 A security mechanism that performs object verification is also used. When this mechanism is activated, the objects received from multiple retrieve responses are compared to ensure object correctness.
 
@@ -250,15 +291,29 @@ Another reason to replicate objects is to make the system more secure. If it is 
 
 When objects are stored, as described in Section \ref{store_implementation}, multiple replicas of the same object is stored within a group. This form of redundancy extends the lifetime of an object, but with the presence of constant network churn, all objects will eventually cease to exist.
 
-The solution is to use a repair mechanism to ensure that missing object replicas are constantly replaced. Two types of repair mechanisms were implemented: periodic repair and leaving repair.
+The solution is to use a repair mechanism to ensure that missing object replicas are constantly replaced. Two types of repair mechanisms were implemented: periodic repair and leaving repair. 
 
-With periodic repair, the super peer periodically checks the number of available replicas of every object in its group ledger. If an object contains less than the required number of replicas and there are peers in the group that do not already store the object, that object is replicated. Because the super peer itself contains no objects, it requests that an object be replicas from a peer that does contain the object. That peer will receive a replicas request for a specific object, select a group peer in a uniformly random fashion that does not already contain the object and initiate a store request to that peer.
+With periodic repair, the super peer periodically checks the number of available replicas of every object in its group ledger. If an object contains less than the required number of replicas and there are peers in the group that do not already store the object, that object is replicated. Because the super peer itself contains no objects, it requests that an object be replicated from a peer that does contain the object. That peer will receive a repair request for a specific object, select a group peer in a uniformly random fashion, that does not already contain the object, and initiate a store request to that peer.
 
-Object repair is not loss-less. A peer can be selected to store a new object replica and that peer can leave the group before it stores the object. Because many object replicas exist and the loss of a single object will, therefore, not endanger the life of an object, the extra bandwidth and maintenance requirements could not be justified.
+Object repair is not loss-less. A peer can be selected to store a new object replica and that peer can leave the group before it stores the object. Because many object replicas exist and the loss of a single object will, therefore, not endanger the life of an object, the extra bandwidth and maintenance requirements could not be justified. Sometimes there are multiple object replicas missing, which is solved by having the super peer request multiple object repairs.
 
-Lossy repair does create the issue that sometime there are more than one object replicas missing. This is solved by having the super peer request multiple object repairs when more than a single object are missing.
+Since objects are only destroyed when a peer leaves the group, with leaving repair, the super peer repairs all objects of a peer that leaves the group. This mechanism can be seen as an extension of the group leave mechanism, depicted in Figure \ref{fig_pithos_leave}. Figure \ref{fig_pithos_repair} shows how this mechanisms is extended to include repair.
 
-Leaving repair attempts to save on bandwidth and super peer load, by only repairing objects when a node leaves the network. With leaving repair, every peer that is informed that a node is leaving the network, removes the peer reference of all objects contained by that peer in the group ledger. When the super peer removes objects, because a peer left the network, it immediately initiates repair requests for all objects contained on the leaving peer. Because repair is lossy, the super peer initiates more than one object repair for a specific object, if more than one object replicas are missing.
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=110mm 15mm 225mm 100mm, width=0.7\columnwidth]{Pithos_mechanisms}
+ \caption{Pithos repair mechanism}
+ \label{fig_pithos_repair}
+\end{figure}
+%
+\begin{enumerate}
+\setcounter{enumi}{6}
+\item After a the super peer has detected that a peer has left and has informed all other peers, the super peer selects a peer that contains an object that was destroyed by the leaving peer and requests that that object be replicated.
+    
+\item The peer receiving the replication request from the super peer selects another peer in the group that does not already contain the object and replicates the object on the selected peer.
+\end{enumerate}
+
+Leaving repair attempts to minimise the super peer load by only repairing objects when a node leaves the network. This is as opposed to periodic repair, where the super peer has to constantly cycle though its list of object replicas and verify the number of replicas currently stored in the system.
 
 \subsection{Distance-based storage}
 
@@ -276,11 +331,32 @@ It is assumed that some higher layer exists above Pithos, which generates reques
 \subsection{Store}
 \label{pithos_store}
 
-The higher layer is expected to send a storage request to Pithos, containing the object to be stored. Pithos contains logic that relays the storage request to both the group storage as well as the overlay storage. Overlay storage implements an existing DHT and it is assumed that overlay storage correctly handles the storage request. Overlay storage informs the Pithos logic of the success or failure of the request.
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=67mm 55mm 228mm 165mm, width=0.7\columnwidth]{Pithos_use_case_store}
+ \caption{Pithos storage}
+ \label{fig_pithos_storage}
+\end{figure}
+%
+Referring to Figure \ref{fig_pithos_storage}, Pithos storage works as follows:
+%
+\begin{enumerate}
+\item The higher layer is expected to send a storage request to Pithos, containing the object to be stored.
+    
+\item Pithos contains logic that relays the storage request to both peers in group storage as well as overlay storage.
+    
+\item The group storage module will store the object in its local authoritative object store and acknowledge the reception of the object by sending a response message to the source node.
+    
+\item Each peer successfully storing a received object will inform all group peers, as well as the super peer, of the new object stored. The peers and super peer can add this information to their group ledger, used to serve retrieval requests.
+    
+\item Sometime after group storage has completed, overlay storage will also complete. Overlay storage informs Pithos logic of the success or failure of the request.
+    
+\item Pithos monitors all responses and records the success or failure of each request. When a sufficient number of responses have been recorded, Pithos informs the higher layer of either a successful or failed store.
+\end{enumerate}
 
-Group storage receives the storage request and selects a number of nodes from the group ledger relating to the number of required object replicas. Nodes are selected in a uniformly random fashion, making sure to never select the same node more than once. If a node is selected more than once, it reduced the effective number of replicas in the network, which reduces the expected object lifetime. A detailed discussion of object lifetime is presented in Chapter \ref{chp:MODELLING}.
+Overlay storage implements an existing DHT and it is assumed that overlay storage correctly handles the storage request.
 
-A storage request is sent to every selected node, containing the object. The group storage module will store the object in its local authoritative object store. The group storage module will acknowledge the reception of the object by sending a response message to the source node. Pithos monitors all responses and records the success or failure of each request. When a sufficient number of responses have been recorded, Pithos informs the higher layer of either a successful or failed store.
+The number of nodes selected from the group ledger relates to the number of required object replicas. Nodes are selected in a uniformly random fashion, making sure to never select the same node more than once. If a node is selected more than once, it reduced the effective number of replicas in the network, which reduces the expected object lifetime. A detailed discussion of object lifetime is presented in Chapter \ref{chp:MODELLING}.
 
 The question arises as to what constitutes a sufficient number of responses. Two types of storage mechanisms have been implemented in Pithos: ``safe'' and ``fast''. With safe storage, Pithos waits for all responses to be received. Only after all responses are received is a decision made whether the store was successful or not. If more than half of the group stores as well as the overlay store was successful is it considered a successful store. The higher layer is informed of the status of the store request at this time. Fast storage has Pithos wait for the first successful response, before informing the higher layer of success. If all responses are failures, it informs the higher layer of a failure.
 
@@ -288,18 +364,36 @@ Because safe storage ensures that most of the replications are successfully stor
 
 \subsection{Retrieve}
 
-The process of retrieving data is very similar to that of storing it. The retrieve request, received from the higher layer, contains the hash of the object name which the higher layer requires. Pithos request the object from both overlay and group storage.
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=67mm 55mm 228mm 165mm, width=0.7\columnwidth]{Pithos_use_case_retrieve}
+ \caption{Pithos retrieval}
+ \label{fig_pithos_retrieval}
+\end{figure}
+%
+The process of retrieving data is very similar to that of storing it. With reference to Figure \ref{fig_pithos_retrieval}, retrieval works as follows:
+%
+\begin{enumerate}
+\item The retrieve request, received from the higher layer, contains the hash of the object name which the higher layer requires.
+    
+\item Pithos first checks whether the object that was requested exists within the group by checking its group ledger. This is required, because the higher layer might have requested an object that is stored in another group. Out-of-group requests are only serviced by overlay storage. If the object is housed in the Pithos peer's local store, the object is sent to the higher layer. If the object is not housed locally, Pithos requests the object from both overlay and group storage.
+    
+    The group ledger is used to determine which group peers contain which objects. The number of peers selected depends on the retrieval type. Three retrieval types exist: fast, parallel and safe retrieval. Fast retrieval selects a single peer for object retrieval. Parallel and safe retrieval select multiple peers to concurrently retrieve an object from. More requests sent in parallel improves the probability of the request succeeding as well as reduce the time it takes to serve the request.
 
-Group storage first checks whether the object that was requested exists within the group by checking its group ledger. This is required, because the higher layer might require an object that is stored in another group. Out-of-group requests are only serviced by overlay storage. If the object is housed in the group storage's local store, the object is sent to the higher layer.
+\item When the retrieval request is received at the destination peer, the object is retrieved from local storage, attached to a response message and sent to the requesting peer.
+    
+\item Sometime after group retrieval has completed, overlay retrieval will also complete and send the object, stored in the overlay, to Pithos.
+    
+\item After Pithos has received a sufficient number of responses, it informs the higher layer of either a successful or failed retrieval. The object itself is attached to a successful request response.
+\end{enumerate}
 
-If the object is found in the group ledger, but not on the peer where the request originated from, a group peer has to be selected to retrieve the object from. The number of peers selected depends on the retrieval type. Three retrieval types exist: fast, parallel and safe retrieval. Fast retrieval selects a single peer for object retrieval. Parallel retrieval selects multiple peer to retrieve an object from and requests the object from all selected peers concurrently. More requests sent in parallel will improve the probability of the request succeeding as well as reduce the time it takes to serve the request.
+Retrieve requests mainly fail because of nodes leaving a group. If a node leaves before it can serve an object, the object request fails. If multiple requests are sent with parallel retrieval, it improves the chances of contacting a node that is not about to leave, which improves the probability of retrieval success. More requests also improve lookup times, since some peers might be geographically closer to the requesting peer, thereby possessing a lower latency.
 
-Retrieve requests mainly fail because of nodes leaving a group. If a node leaves before it can serve an object, the object request fails. If multiple requests are sent, it improves the chances of contacting a node that is not about to leave, which improves the probability of retrieval success. More requests also improve lookup times, since some peers might be geographically closer to the requesting peer, thereby possessing a lower latency. Sending multiple requests improves the chances of contacting a peer that is closer, which improves the responsiveness of the systems. The disadvantage of multiple requests is the extra bandwidth required, both in sending the requests and in the duplicate objects that will be returned. The effect of multiple requests on system reliability, responsiveness and overhead will be evaluated in Chapter \ref{chp:EVALUATION}.
-
-A request is delivered to the destination peer, which forwards the request to the group storage module. The group storage module retrieves the object from its local storage, attaches it to a response message and sends that response to the source peer. After Pithos has received a sufficient number of responses, it informs the higher layer of either a successful or failed retrieval. The object itself is attached to a successful request response. Fast and parallel retrieval sends the first successful response, and therefore, the first successful object, to the higher layer. It replies with failure if all requests failed.
+Sending multiple requests improves the chances of contacting a peer that is closer, which improves the responsiveness of the systems. Fast and parallel retrieval sends the first successful  response, and therefore, the first successful object, to the higher layer. It replies with failure if all requests failed.
 
 The safe retrieval request is more resistent to malicious nodes. For safe retrieval, Pithos waits for a specified number of responses. It then compares all objects received from successful responses and sends an object to the higher layer that had the most matches when compared. This is to counter a malicious peer that might have altered some of the objects before sending them. Safe retrieval implements the quorum mechanism, described in Section \ref{quorum}.
-The reliability benefit with safe retrieval in the presence of malicious nodes is explored in Section \ref{malicious_results}.
+
+As shown in Figure \ref{fig_pithos_retrieval}, the super peer is not used for retrieval requests. This is not necessary, since all peers contain lists of all objects. The super peer should, however, still contain it own group ledger, to inform peers joining the group of the peers and objects already in the group. Not requiring the super peer to manage object requests prevents the super peer from becoming overloaded.
 
 \subsection{Modify}
 

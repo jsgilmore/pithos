@@ -116,13 +116,13 @@ Extended finger table           & no   & yes    &  yes  \\
 Extended finger table candidate & N/A  & 3      &  4    \\
 \hline
 \end{tabular}
-\caption{Overlay storage medium configuration parameters and values.}
+\caption{Overlay storage configuration types, parameters and values.}
 \label{tab_overlay_configs}
 \end{table}
 
 Table \ref{tab_overlay_configs} shows the ``low'', ``medium'' and ``high'' overlay configuration parameters and their values. These are the overlay configurations that were used during the testing of Pithos and its comparison with overlay storage.
 
-The purpose of the ``high'' configuration is to match the Pithos reliability performance and to then compare overlay responsiveness and bandwidth usage with that of Pithos. This setup was achieved by itteratively adjusting the Chord parameters until similar reliability to that of Pithos was achieved.
+The purpose of the ``high'' configuration is to match the Pithos reliability performance and to then compare overlay responsiveness and bandwidth usage with that of Pithos.
 
 Table \ref{tab_overlay_rel_resp_results} shows the responsiveness of overlay storage for the various parameter settings as described earlier in this section. Because of how the settings were defined, high has the highest storage reliability of 0.9831, medium has a storage reliability of 0.969 and low has the lowest storage reliablity of 0.7908. High also possesses the higher retrieval reliability of 0.9365, medium has a retrieval reliability of 0.9320 and low has the lowest retrieval reliability of 0.6216.
 %
@@ -144,7 +144,7 @@ Low retrieval    &   0.6216      &   2.071  \\
 \label{tab_overlay_rel_resp_results}
 \end{table}
 
-What is also clear from Table \ref{tab_overlay_rel_resp_results} is that the less reliable the storage, the longer it takes to retrieve an item, which further amplifies the importance of high overlay reliability.
+What is also clear from Table \ref{tab_overlay_rel_resp_results} is that the less reliable the storage, the longer it takes to retrieve an item, which further amplifies the importance of high overlay reliability. It can be seen that ``high'' overlay storage still has a lower reliability than group storage, but for higher radiabilities, overlay storage requires prohibitively large amounts of bandwidth, as shown in Section \ref{bandwidth_requirements}.
 
 \subsection{Bandwidth requirements}
 \label{bandwidth_requirements}
