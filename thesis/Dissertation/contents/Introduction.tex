@@ -121,10 +121,9 @@ With the costs involved, it is therefore difficult for a new developer to enter 
 
 \subsection{The peer-to-peer proposal}
 
-In 2004, an architecture using the peer-to-peer networking model to host MMVEs was proposed by Knutsson et al. \cite{knutsson_p2p_first}. This
-revealed a new research field, which attempts to establish the peer-to-peer (P2P) model as a viable alternative to the classic C/S and C/MS
-architectures. P2P MMVE forms the focus of this work. There are various advantages to moving from C/S to P2P in MMVEs. These include: increased robustness, improved scalability, lower operator costs, improved handling of transient player load and lower latencies. The advantages are described in Section \ref{p2p_mmve_advantages} in detail,
-but firstly it would be beneficial to acquire a greater understanding of the basics of the P2P network model.
+To our knowledge, the first distributed multi-user virtual environment was MiMaze, developed in 1998 by Gautier and Diot \cite{mimaze}. This revealed a new research field, which attempted to establish the peer-to-peer (P2P) model as a viable alternative to the classic C/S and C/MS architectures. In 2004, Knutsson et al. proposed the first scalable architecture to host massively multiuser virtual environments  \cite{knutsson_p2p_first}.
+
+P2P MMVEs form the focus of this work. There are various advantages to moving from C/S to P2P in MMVEs. These include: increased robustness, improved scalability, lower operator costs, improved handling of transient player load and lower latencies. The advantages are described in Section \ref{p2p_mmve_advantages} in detail, but firstly it would be beneficial to acquire a greater understanding of the basics of the P2P network model.
 
 \section{Peer-to-Peer networks}
 
@@ -341,7 +340,39 @@ The objective of this work is to design and develop a novel state management and
 
 \section{Related work}
 
+%Varvello
+%Also looks at object management for objects in SL.
+%Recognises the need for responsiveness.
+%Need for consistency
+%Scalability
+%Security
+%Walkad overlay storage
+%Does not look at security
+%Does not look at reliability (This is maybe called persistency)
 
+%Recognise difference between local and non-local queries
+%Local queries used to for state display
+%150ms latency for local queries
+%200ms for non-local queries
+%Does not evaluate underlying network architecture
+%Kademlia also requires O(log(N)) routing time
+%Also uses TTL of 24 hours
+
+%State that their contribution isn't the design of the storage architecture, but rather how they adapted KAD to handle object storage and retrieval is.
+
+%Use R cell coordinators, where R replicas of an object are stored on each of the R cell coordinators.
+
+%Discuss consistency for various replicas, but this is not qualified with a discussion of node lifetime characteristics of the underlying KAD.
+
+%Does not address dynamic object creation and removal. In Pithos peers constantly generate objects and other peers have to be made aware of the new objects.
+
+%Their system showed 0.7 persistency during the time which objects were begin dynamically created.
+
+%They say they can support very high churn, but never provide node lifetime results.
+
+%simulate for maximum of 586 objects, we do millions and millions
+
+%Coordinators seem static
 
 \section{Contributions}
 \label{objectives}
@@ -392,4 +423,4 @@ The Pithos implementation is evaluated for various percentages of malicious peer
 
 Finally, the results of the object repair mechanism, by which Pithos ensures long-term object survival is shown. It is found that object survival, which is of high importance when designing a distributed storage system, depends heavily on the repair rate, number of initial replicas and expected object lifetime.
 
-Chapter \ref{chp:MODELLING} expands on available literature, to improve the accuracy of object lifetime predictions in networks, such as Pithos, where group size is limited. This is done using an expanded Markov chain model, which allows for the theoretical predictions of object lifetimes. The theoretical predictions are verified using the Pithos implementations and found to closely match. 
+Chapter \ref{chp:MODELLING} expands on available literature, to improve the accuracy of object lifetime predictions in networks, such as Pithos, where group size is limited. This is done using an expanded Markov chain model, which allows for the theoretical predictions of object lifetimes. The theoretical predictions are verified using the Pithos implementations and found to closely match.

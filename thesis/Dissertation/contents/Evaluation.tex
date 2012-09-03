@@ -28,7 +28,9 @@ Firstly, the storage and retrieval performance of Pithos and overlay storage are
 \subsection{Experimental setup}
 \label{store_retrieve_exp_setup}
 
-To evaluate storage and retrieval performance, nodes with 1800s mean lifetimes are used. This is much less than 615 min (36900s) mean playing time measured in WoW \cite{wow_gameplay}, but if the systems performs acceptably under the higher churn rate, it can only perform better for lower churn rates. The effect of churn on the network will be evaluated in Section \ref{repair_results}.
+To evaluate storage and retrieval performance, nodes with 1800s mean lifetimes are used. Node lifetimes represent how long players spend in the VE. It has been found that these times vary greatly between the type of VE. Mean playing time in WoW, for example, has been measured as 615 min (36900s) \cite{wow_gameplay}, while in Second life, 50\% of users stay connected for less than 10 min (600s), 15\% stay connected for 100 min or more and 5\% of users stay connected for more than 10 hours \cite{Varvello_life_in_second_life}.
+
+The 1800s mean was chosen to be somewhere in the mid range of the two extremes. If the systems performs acceptably under the higher churn rates, it can only perform better for lower churn rates. The effect of network churn with varying node lifetimes will be evaluated in Section \ref{repair_results}.
 
 The results presented in Tables \ref{tab_pithos_storage_results} and \ref{tab_pithos_retrieval_results} are for a medium overlay storage configuration as described in Section \ref{overlay_resp_rel_results} and for 100\% group probability, as described in Section \ref{group_probability_results}.
 
@@ -37,10 +39,9 @@ Every object is stored with a TTL of 300s. The low TTL, compared to the expected
 \subsection{Pithos reliability and responsiveness}
 \label{pithos_resp_rel_results}
 
-Tables \ref{tab_pithos_storage_results} and \ref{tab_pithos_retrieval_results} present the reliability and responsiveness results for the various Pithos storage and retrieval methods discussed in Sections \ref{store_implementation} and \ref{retrieve_implementation}.
-Both safe and fast storage and fast and parallel retrieval are compared. Safe retrieval will be evaluated in Section \ref{malicious_results}. It should be noted that because Pithos is a group/overlay hybrid storage, its performance depends on the underlying group and overlay performance.
+Tables \ref{tab_pithos_storage_results} and \ref{tab_pithos_retrieval_results} present the reliability and responsiveness results for the various Pithos storage and retrieval methods discussed in Sections \ref{pithos_store} and \ref{pithos_retrieve}. Both safe and fast storage and fast and parallel retrieval are compared. Safe retrieval will be evaluated in Section \ref{malicious_results}. It should be noted that because Pithos is a group/overlay hybrid storage, its performance depends on the underlying group and overlay performance.
 
-It does not make sense to evaluate retrieval performance apart from the storage method used, since the storage method will influence the retrieval method results as will be explained. Therefore, for each storage method in table \ref{tab_pithos_rel_resp_results}, it firstly shows the performance of only the specific storage method. The retrieval performance is then evaluated, taking into account the storage method used.
+It does not make sense to evaluate retrieval performance apart from the storage method used, since the storage method will influence the retrieval method results as will be explained. Therefore, for each storage method in table \ref{tab_pithos_storage_results}, it firstly shows the performance of only the specific storage method. The retrieval performance is then evaluated, taking into account the storage method used.
 
 \subsubsection{Storage}
 \begin{table}[htbp]
@@ -100,8 +101,6 @@ The question whether fast or parallel retrieval is preferred depends on the impl
 
 For overlay storage, the three configurations represent high, medium and low levels of reliability and bandwidth requirements respectively. The main parameter modified to achieve these varying levels of responsiveness and reliability is the Chord finger table update time. The update time determines how up-to-date the Chord finger tables are and by extension, how up to date Chord's view of the network is.
 
-Table \ref{tab_overlay_medium} shows the ``medium'' overlay configuration parameters and their values:
-%
 \begin{table}[htbp]
 \centering
 \begin{tabular}{|r|l|l|l|}
@@ -365,7 +364,7 @@ In this section some responsiveness distributions were shown. The first reason w
 \section{Performance for various group probabilities}
 \label{group_probability_results}
 
-The design of Pithos makes use of user groups and distance-based storage on a group layer, as stated in Sections \ref{grouping} and \ref{distance_based}. To be able to verify the actual performance of Pithos, it is therefore required to investigate Pithos's performance for various group probabilities. In the final P2P MMVE architecture, because of distance-based storage, it is assumed that the percentage of in-group requests will be much higher than that of out-of-group requests. This assumption is based on the fact that with group-based distance-based storage, the objects that are frequently of interest to the user will be stored in that user's group.
+The design of Pithos makes use of user groups and distance-based storage on a group layer, as stated in Sections \ref{grouping_design} and \ref{distance_based_design}. To be able to verify the actual performance of Pithos, it is therefore required to investigate Pithos's performance for various group probabilities. In the final P2P MMVE architecture, because of distance-based storage, it is assumed that the percentage of in-group requests will be much higher than that of out-of-group requests. This assumption is based on the fact that with group-based distance-based storage, the objects that are frequently of interest to the user will be stored in that user's group.
 
 \subsection{Experimental setup}
 
@@ -452,7 +451,7 @@ What was shown in this section is that overlay storage provides mediocre reliabi
 \section{Reliability under malicious nodes}
 \label{malicious_results}
 
-What remains to be shown is Pithos's resistance to malicious peers when safe retrieval is used, as described in Section \ref{retrieve_implementation}.
+What remains to be shown is Pithos's resistance to malicious peers when safe retrieval is used, as described in Section \ref{pithos_retrieve}.
 
 Each object in Pithos has a double value attribute that is set to a random value when an object is created for the simulation. The value of the object is stored in PithosTestApps's global object list. It should be noted that for simulation purposes, an object's size is not related to its content. An object's size is set using a random distribution and this is the value used to compute transmission bandwidth and latency.
 

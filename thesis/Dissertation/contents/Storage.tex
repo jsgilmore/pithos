@@ -110,7 +110,7 @@ Looking at the disadvantages and advantages of each classic storage method, the 
 
 Because of the advantages of region-based storage, it has become a popular storage architecture to employ for online worlds. Most worlds can be divided into regions and the game world can be designed in such a way that region boundaries are difficult to cross and that users can only cross these boundaries when moving from one distinct area into the next. This can be done by placing high mountain ranges on region boundaries, with a single pass through the range. This prevents users from switching between regions if they stand on a region boundary. It also ensures that most users that interact, do so within the same server, which decreases inter-server communication.
 
-An issue with the region-based approach, compared to the object-based approach is that each region contains many users and, therefore, requires a large server to host a region. Some region-based servers are themselves server clusters to handle the client load. An object-based server on the other has a fixed load, which can be determined based on the number of objects each server stores. 
+An issue with the region-based approach, compared to the object-based approach is that each region contains many users and, therefore, requires a large server to host a region. Some region-based servers are themselves server clusters to handle the client load. An object-based server on the other has a fixed load, which can be determined based on the number of objects each server stores.
 Because of the success of the object-based and region-based storage schemes, P2P storage schemes are also based on either of the two. Because peers are less powerful than servers, the object-based approach seems to have gained more traction, since server load is fixed. If a region-based approach is used, peers are required to host large regions, which might overload them. If a the region is made too small, the amount of inter-peer communication might become prohibitive.
 
 \section{P2P MMVE storage requirements}
@@ -191,11 +191,7 @@ Distance-based & Medium      & High           & Low      & Medium   & High\\
 \caption{Differences between storage mechanisms} \label{tab_storage}
 \end{table}
 %
-Table \ref{tab_storage} presents a characterisation of current storage systems according to the characteristics defined in Section
-\ref{key_challenges_cm}. Table \ref{tab_storage} also provides some references that act as examples of the different storage types mentioned. These
-example architectures will be discussed in detail in the sections to follow. The purpose of the complexity category in Table \ref{tab_storage} is to
-provide a measure of how difficult it will be for an application developer to use any of the storage types and is discussed in Section
-\ref{recommendations}.
+Table \ref{tab_storage} presents a characterisation of current storage systems according to the characteristics defined in Section \ref{key_challenges_cm}.
 
 \subsection{Super peer storage}
 \label{super_peer_storage}
@@ -207,7 +203,7 @@ A mechanism is required for selecting a super peer for the region as well as mig
 
 \subsubsection{Fairness}
 %Super peer storage - issues
-The super peer storage model has many potential issues, of which overloading of the super peer is one. A super peer could be relatively easily overloaded if a region becomes too crowded, since a super peer is usually a personal computer of some player in the game and not a specialised server. 
+The super peer storage model has many potential issues, of which overloading of the super peer is one. A super peer could be relatively easily overloaded if a region becomes too crowded, since a super peer is usually a personal computer of some player in the game and not a specialised server.
 Super peer storage is not fair, since a peer with extra resources is expected to act as super peer to the region whilst other users do no contribute storage. This is contrary to the principle of P2P, where all peers contribute resources.
 
 \subsubsection{Reliability}

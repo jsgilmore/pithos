@@ -129,7 +129,7 @@ Transparency was achieved by designating certain gates for certain types of traf
 \subsection{Super peer logic}
 \label{pithos_module_types_sp_logic}
 
-The super peer logic module implements all the functionality of the super peer node, except for keeping track of group objects. The tasks of the super peer logic include handling joining peers, facilitating peer migration, ensuring group consistency (Section \ref{group_consistency_implementation}), initiating object repair (Section \ref{object_repair_implementation}) and maintaining a list of group objects and a list of peers on which those objects are stored (Section \ref{pithos_module_types_ledgers}).
+The super peer logic module implements all the functionality of the super peer node, except for keeping track of group objects. The tasks of the super peer logic include handling joining peers, facilitating peer migration, ensuring group consistency (Section \ref{group_consistency_implementation}), initiating object repair and maintaining a list of group objects and a list of peers on which those objects are stored (Section \ref{pithos_module_types_ledgers}).
 
 \subsection{Peer logic}
 
@@ -186,7 +186,7 @@ While the previous chapter describes all key mechanisms, some adjustments had to
 
 \subsection{Joining the network and grouping}
 
-As described in Section \ref{join_mechanism}, in order to join the network, a super peer should supply its location in the virtual environment (VE) to the directory server. A joining peer should also supply its location to the directory server, so the directory server may supply the joining peer with a super peer's address to join.
+As described in Section \ref{join_mechanism_design}, in order to join the network, a super peer should supply its location in the virtual environment (VE) to the directory server. A joining peer should also supply its location to the directory server, so the directory server may supply the joining peer with a super peer's address to join.
 
 Because Pithos is not functioning in an actual VE, peers have no locations. For simulation purposes, each super peer is assigned a random location created by sampling both an x and a y coordinate from a uniform random distribution in a fixed range (0 to 100). Joining peers are assigned positions in the same uniform random manner when they are initialised.
 
