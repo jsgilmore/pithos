@@ -340,75 +340,89 @@ The objective of this work is to design and develop a novel state management and
 
 \section{Related work}
 
+
+
 %=======================================
 % Varvello
 %=======================================
-% Object management
+% Similarities
 %=======================================
-%Also looks at object management for objects in SL.
+%Similar requiremens than what we observed:
 %Recognises the need for responsiveness.
 %Need for consistency
 %Scalability
-%Security
-%Walkad overlay storage
-%Does not look at security
-%Does not look at reliability (This is maybe called persistency)
-
+%Persistency (Reliability)
+%Does not look at reliability per se, but measures how long objects remain alive. (Object lifetime measurements)
+%Security is mentioned as important, but that it will not be addressed.
 %Recognise difference between local and non-local queries
-%Local queries used to for state display
-%150ms latency for local queries
-%200ms for non-local queries
-%Does not evaluate underlying network architecture
-%Kademlia also requires O(log(N)) routing time
-%Also uses TTL of 24 hours
+%Also looks at object management for objects in SL.
 
-%State that their contribution isn't the design of the storage architecture, but rather how they adapted KAD to handle object storage and retrieval is.
-
-%Use R cell coordinators, where R replicas of an object are stored on each of the R cell coordinators.
-
-%Discuss consistency for various replicas, but this is not qualified with a discussion of node lifetime characteristics of the underlying KAD.
+%=======================================
+% Object management
+%=======================================
+%===============================================
+% Main disadvantages, compared to Pithos design
+%===============================================
 
 %Does not address dynamic object creation and removal. In Pithos peers constantly generate objects and other peers have to be made aware of the new objects.
 
+%Bandwidth usage is not discussed
+
+%simulate for maximum of 586 objects, we do hundreds of thousands per group
+%Limited number of nodes (max 1024), we simulate from 2500 to 10,000
+
+%Dynamic regioning is performed during the initialisation phase, and never afterwards. It unsure how the system will be impacted with dynamic object creation.
+
+%Naive approach has lower theoretical responsiveness. Walkad also has lower theoretical responsiveness.
+%Little chance of cells being all on the same level, that would require equally spaced objects throughout the virtual world. Note: This is stronger than uniform spacing.
+
+%Queries require a single routing hop per cell in the range query for direct neighbours and O(log(N)) outside.
+
+%Does not deal with security (no quorum mechanisms)
+
+%===============================================
+% Other observations
+%===============================================
+%Local queries used to for state display (while walking and running)
+%150ms latency for local queries
+%200ms for non-local queries
+
+%Does not evaluate underlying network architecture
+%Look at reference 90 for KAD user session characteristics
+%Kademlia also requires O(log(N)) routing time
+%Also uses TTL of 24 hours
+
+%State that their contribution isn't the design of the storage architecture, but rather how they adapted KAD to handle object storage and retrieval is (For the naive implementation).
+
+%Use R cell coordinators, where R replicas of an object are stored on each of the R cell coordinators.
+%So many peers are chosen as coordinators that all peers equally share the load i.t.o. cell IDs manageed.
+%This is stated as the main method of load balancing.
+%Nothing is stated about the actual amount of data shared.
+
 %Their system showed 0.7 persistency during the time which objects were begin dynamically created.
 
-%They say they can support very high churn, but never provide node lifetime results.
-
-%simulate for maximum of 586 objects, we do millions and millions
-
-%Coordinators seem static
-
-%When node balancing is tied to the management of cell-IDs, are active and control cells regarded as equal?
-
 %Walkad doesn't deal with avatars, because avatars move around constantly and that required constant updates to the objects. Avatars moving require constant repartitioning of the world (which would drastically decrease consistency).
+
+%Walkad can be integrated into Pithos's overlay storage to further improve performance.
+
+%Dynamic regioning
+
+%No distinction is made between state management and state persistency
+
+%Focus on consistency, while we focus on the authoratitive store itself.
+
+%=======================================
+% Questions
+%=======================================
+%How is a cell coordinator chosen? If there are between 10 and 20, how is one selected?
+%Do coordinators experience churn?
+%What are those 30\% statistics and why are they so low?
+%What are KAD node lifetime statistics?
+%When node balancing is tied to the management of cell-IDs, are active and control cells regarded as equal?
 
 %=======================================
 % Avatar management
 %=======================================
-
-%Walkad can be integrated into Pithos's overlay storage to further improve performance.
-
-%Bandwidth usage is not discussed
-
-%Dynamic regioning
-
-%Not FAIR!
-
-%Limited number of objects (586)
-
-%No distinction is made between state management and state persistency
-
-%Dynamic regioning is performed during the initialisation phase, and never afterwards. It unsure how the system will be impacted with dynamic object creation.
-
-%Focus on consistency, while we focus on the authoratitive store itself.
-
-%Can coordinators leave?
-
-%Look at reference 90 for KAD user session characteristics
-
-%Little chance of cells being all on the same level, that would require equally spaced objects throughout the virtual world. Note: This is stronger than uniform spacing.
-
-%Queries require a single routing hop per cell in the range query for direct neighbours and O(log(N)) outside.
 
 \section{Contributions}
 \label{objectives}
