@@ -67,28 +67,58 @@ When the update is delivered to Agent 2, the local object state is updated and t
 \subsection{Generic event-update model}
 \label{generic_event_update_model}
 
-Many of the papers reviewed claimed to be dealing with P2P state consistency \cite{}, but only dealt with specific aspects of state consistency. Since an overarching framework for state consistency was lacking in the literature, we developed the generic state consistency architecture, shown in Figure \ref{fig_event_update_flowdiagram}. This architecture allows us to put the literature regarding state consistency in its proper context.
+To our knowledge, no papers exist that present a comprehensive picture of a state consistency architecture. In this chapter, papers will be discussed that individually implement all modules of the consistency architecture, but none were found to provide an overview of a state consistency model.
+
+Since an overarching framework for state consistency was lacking in the literature, we developed the generic state consistency architecture, shown in Figure \ref{fig_event_update_flowdiagram}. This architecture allows us to put the literature regarding state consistency into context and allows us to identify requirements of the authoritative object store from a consistency perspective.
 
 \begin{figure}[htbp]
  \centering
- \includegraphics[clip=true, viewport=49mm 82mm 156mm 288mm, width=0.6\textwidth]{generic_consistency_flowdiagram}
+ \includegraphics[clip=true, viewport=46mm 84mm 196mm 287mm, width=0.6\textwidth]{generic_consistency_flowdiagram}
  \caption{Flow diagram describing the event-update flow cycle and all steps required, from generating an event to delivering an update, to ensure object consistency.}
  \label{fig_event_update_flowdiagram}
 \end{figure}
 
-Figure \ref{fig_event_update_flowdiagram} shows the generic consistency flow diagram to ensure object state consistency. The interactions of the agent with the virtual environment generates events.
+Figure \ref{fig_event_update_flowdiagram} shows the generic consistency flow diagram that ensures object state consistency.
 
-Event layer interest management determines which objects will be affected and on which nodes these objects are housed. Event dissemination deals with how information is sent to nodes after interest management determines which information should be sent (and to which nodes).
+\subsubsection{Agents and generators}
 
-After received events are ordered, environment logic is applied to each received event and a corresponding update is generated. Generating the update state might also require the state of other objects.
+Agents generate three streams of requests, using a respective generator, that are sent to the authoritative object hosts: objects, events and queries.
 
-After the combination of event, object states and environment logic, an update is generated. Update layer interest management determines which nodes require this update, which typically will be the nodes whose agents can perceive the object in the virtual environment, keeping local copies of the object.
+Agents may be able to build structures, make clothes or construct a variety of mechanisms in the virtual world. The objects that the agent creates in this way should be stored on an authoritative peer.
 
-Update dissemination delivers the update to all local copies of the object. Multiple object updates may be generated for a single event. Any generated update may be delivered to multiple nodes that contain local copies of the object.
+Agents can also interact with the virtual environment and other agents, which are objects themselves. Agents interacting with objects generate events, which have to be sent to the authoritative peer.
+
+Lastly, as agents more around in the virtual world, they might query an authoritative peer for any new objects that have entered their AoI. This is referred to as a range query and requires the retrieval of all objects within a certain area.
+
+\subsubsection{Interest management and dissemination}
+
+Interest management deals with finding a set of nodes that might have an interest in a request being generated. Events, objects and queries require some form of interest management.
+
+Event interest management determines which objects will be affected by a generated event and on which authoritative nodes these objects are housed. Object interest management determines on which authoritative node the generated object should be stored. Query interest management has to discover which authoritative nodes contain objects that exist within the specified range.
+
+Event, object and query dissemination deal with how information is sent to nodes after interest management determines which information should be sent (and to which nodes).
+
+\subsubsection{Authoritative node}
+
+All requests generated at non-authoritative nodes are sent to authoritative nodes for processing. Objects received are stored in the authoritative object store.
+
+Multiple nodes, controlling different areas, may receive the same range query and be expected to supply the objects in their respective authoritative object stores that have positions that intersect with the range of the range query.
+
+After receiving events, they are ordered to maintain causality. Object updates are generated from received events. An object update can be considered as some change that should be applied to a known object. Generating an object update, might also require the state of other objects, retrieved from the authoritative object store. Therefore, after the combination of event, object states and environment logic, an update is generated.
+
+The authoritative node, therefore, can create two reply streams: objects and updates. Objects are created in response to queries and sent to the node requesting the objects. Updates are created in response to received events and these updates have to be applied to the object in the authoritative object store, as well to all non-authoritative copies of the updated object.
+
+Update interest management determines which nodes require the generated update, which typically are the nodes whose agents can perceive the object in the virtual environment, and therefore posses non-authoritative copies of the object. Object interest management has to determine which node received a generated object. With a range query, this will merely be the node that sent the query, but other situation might occur where one node requests objects on behalf of another.
+
+Update dissemination delivers a generated update to all nodes that contain local copies of the object. Multiple object updates may be generated for a single event. Any generated update may be delivered to multiple nodes that contain local copies of the object. Object dissemination delivers generated objects to the nodes that requested them.
+
+\subsubsection{Discussion}
 
 The flow diagram in Figure \ref{fig_event_update_flowdiagram} shows all steps that should be taken to ensure object consistency. We shall now demonstrate that the flow diagram of Figure \ref{fig_event_update_flowdiagram} is applicable to all known state consistency models of C/S as well as P2P MMVE architectures.
 
-The differences between  the various architectures is where the authoritative object is housed, and how the hosts of the authoritative objects are distributed. In a C/S system, all authoritative objects are housed in the server. In a P2P architecture, authoritative objects can be distributed on a number of peers, depending on the specific architecture. The various state consistency schemes for both C/S and P2P networks will be reviewed in the next sections.
+It should be noted that the generic consistency model is developed to fit all consistency architectures. To this end, some modules might be trivial in some consistency architectures, but become non-trivial with others. This is especially true for the C/S consistency model, where only a single server or server cluster exists, as will be described in Section \ref{classic_models}.
+
+The differences between  the various architectures is where the authoritative objects are  housed, and how the authoritative peers are distributed. In a C/S system, all authoritative objects are housed in the server. In a P2P architecture, authoritative objects can be distributed on a number of peers, depending on the specific architecture. The various state consistency schemes for both C/S and P2P networks will be reviewed in the next sections.
 
 \section{Classic consistency models}
 \label{classic_models}
@@ -207,8 +237,11 @@ All disadvantages of the C/S architecture, as discussed in Section \ref{classic_
 \section{P2P MMVE state consistency models}
 \label{p2p_mmve_state_consistency}
 
-Various schemes have been proposed to address the various challenges of P2P MMVE state consistency, but these have mostly occurred in isolation, each approach focussing on a few of the requirements, but not addressing all requirements as identified in Section \ref{generic_event_update_model}. Some of the proposed schemes will be reviewed. 
+Various schemes have been proposed to address the various challenges of P2P MMVE state consistency, but these have mostly occurred in isolation, each approach focussing on a few of the requirements, but not addressing all requirements as identified in Section \ref{generic_event_update_model}. Some of the proposed schemes will be reviewed.
+
 What should be noted is that the various areas of state consistency, e.g. interest management, event ordering, state management, and the other areas discussed in Section \ref{generic_event_update_model}, are quite modular, which might allow for the integration of the best schemes in each area into a comprehensive P2P MMVE state consistency model.
+
+The most complete P2P MMVE state consistency model found was P2P Second Life.
 
 P2P MMVE schemes are based on one of the two classic consistency models described in Section \ref{classic_models}. Although it might seem that the fully distributed model is a better fit for P2P MMVE state consistency, this model has received less attention than the C/S model. The reason for this is partly because of the difficulties in getting the fully distributed model to scale. Usually the fully distributed model makes use of rounds, where users submit events and all user events are executed at the end of a round. In an MMVE with tens of thousands to millions of users, designing the round mechanism to remain scalable is a challenge. Rounds are required, because of the event ordering mechanism that ensures state consistency.
 
@@ -288,7 +321,10 @@ Interest management is a mature area of research, with many proposed schemes. It
 
 In a recently completed PhD on the subject of P2P MMVEs, Lu Fan had this to say about state persistency: ``Game state persistency is a major challenge for P2P MMVEs as existing P2P storage infrastructures are designed to support file sharing, and seldom fulfil the performance and security requirements of a MMVE. \ldots the persistency area is still immature with many problems waiting to be investigated.'' \cite{Fan_phd}.
 
-State persistency is treated as a sub domain of state consistency, in that state persistency models define where and how the authoritative objects are stored. It is assumed that non-authoritative objects are always stored in the primary memory of the clients that immediately require the information contained in the authoritative object.
+State persistency is treated as a sub domain of state consistency and is similar to state management, as discussed in Section \ref{management_persistency_def}. State models define where and how the authoritative objects are stored. It is assumed that non-authoritative objects are always stored in the primary memory of the clients that immediately require the information contained in the authoritative object.
+
+The most mature state management model reviewed is that of P2P Second Life.
+%Describe P2P Second Life.
 
 \section{Conclusion}
 

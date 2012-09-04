@@ -178,7 +178,7 @@ It was found that there is no interaction of group bandwidth requirements with o
 \subsubsection{Group storage}
 Table \ref{tab_bandwidth_results} shows that the bandwidth requirements in bytes per second (Bps) for fast and safe storage are similar and that bandwidth usage largely depends on whether fast of parallel retrieval is used. The reason being that parallel retrieval requires multiple retrieve requests be sent out, which has multiple returned object as an effect. In the results shown, six parallel requests were used to request all six replicas stored.
 
-Six parallel requests, leads to a factor four increase in required bandwidth. What is interesting is that it does not lead to a factor six increase in bandwidth as perhaps expected. This is thought to be as a consequence of some get request not be responded to, due to network churn.
+Six parallel requests lead to a factor four increase in required bandwidth. What is interesting is that it does not lead to a factor six increase in bandwidth as expected. This is thought to be because of a combination of the fact that a peer might retrieve an object locally and therefore require no bandwidth for that retrieval and because some peers do not respond to requests, because of having left the network.
 
 \subsubsection{Overlay storage}
 Table \ref{tab_bandwidth_results} also shows the large bandwidth requirement of overlay storage, compared to group storage, requiring 1183 Bps inbound and 1197 Bps outbound to function correctly. The low setting required a lot less bandwidth, but also only has a reliability of 0.6216 and a responsiveness of 2.071 s as shown in Section \ref{overlay_resp_rel_results}.
