@@ -161,7 +161,7 @@ With unstructured approaches, one is never assured that a data item will be retr
 
 An unstructured architecture is well suited to content sharing and Voice over Internet Protocol (VoIP) networks, for example: P2P TV, BitTorrent, Gnutella and Skype. The reason for this is the high level of duplication in these networks, especially for popular content. It is also easier to perform keyword searches in unstructured networks and the overlay requires less maintenance.
 
-Structured overlays have been proposed that provide for efficient routing and reliable retrieval of data items. Some of these well known overlays are: CAN \cite{CAN}, Chord \cite{chord}, Tapestry \cite{tapestry}, Pastry \cite{pastry} and Kademlia \cite{Kademlia_Maymounkov}. The basic principle of a structured overlay is that all nodes are identified by unique identifiers (IDs).
+Structured overlays have been proposed that provide for efficient routing and reliable retrieval of data items. Some well known structured overlays are: CAN \cite{CAN}, Chord \cite{chord}, Tapestry \cite{tapestry}, Pastry \cite{pastry} and Kademlia \cite{Kademlia_Maymounkov}. The basic principle of a structured overlay is that all nodes are identified by unique identifiers (IDs).
 
 A popular method to create the IDs is to use hashes to a circular key space, using for example, the SHA-1 hash function. Any node in the overlay network is then able to efficiently route a query with a given ID, to a node with an ID closest to the given ID. An accurate comparison is that unstructured overlays are good at finding ``hay'', while structured overlays are good at finding ``needles'' \cite{Rodrigues_acm_comms_p2p}.
 
