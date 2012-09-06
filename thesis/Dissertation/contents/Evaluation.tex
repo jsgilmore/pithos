@@ -536,6 +536,51 @@ Object replicas inserted into Pithos will all eventually disappear due to networ
 
 The effect of node replicas on the reliability and bandwidth efficiency of Pithos will be explored in this section. Reliability is tightly coupled to the lifetime of nodes, since nodes that live longer will store objects longer, meaning objects stored on nodes with longer expected lifetimes will have longer expected lifetimes. The main reason for being unable to retrieve an object from Pithos is because a peer has left the network. It is, therefore, expected that if nodes life longer the system reliability increases.
 
+\section{Scalability}
+
+As identified in Section \ref{scalability_req}, a key requirement of P2P MMVEs is that they should be scalable. It was argued that scalability is achieved when all other requirements are met, for a large numbers of nodes. The results shown thus far have been for a \emph{sufficiently scalable} system of 2500 nodes.
+
+To show the scalability of the Pithos design and implementation, Pithos is simulated for 10,000 peers and 400 super peer, four times more peers and super peers than previously simulated.
+
+\subsection{Simulation setup}
+
+The fast storage and fast retrieval setup was used, with the same configuration parameters as in Section \ref{store_retrieve_exp_setup}:
+%
+\begin{itemize}
+\item Nodes lifetimes of 1800s,
+\item 98.3\% group probability,
+\item medium overlay configuration,
+\item 300s object TTL and
+\item no repair.
+\end{itemize}
+
+
+The 10,400 peer simulation setup was not shown during the previous sections, because of the resources required to complete it. The simulation requires 19 hours of run time and 14 GB of RAM on an Intel Core i7, 3 GHz, quad core processor. A simulation on this scale would not have been possible using anything other than Oversim's simple underlay. The efficiency of the C++ language also provides great gains in terms of both processer and memory efficiency.
+
+Although lengthy, a 19 hour simulation time is still a feasible time to performs simulations in. 
+
+\subsection{Results}
+
+For both cases, the data from the higher layer was still measured as 4 Bps sent to Pithos and 157 Bps received from Pithos.
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|c|c|c|c|}
+\hline
+Number of peers & Module & Reliability & Responsiveness (s)  & Bandwidth \\
+\hline
+2600            & Overall&  0.9970     &   0.192             & 1370/1380 \\
+2600            & Group  &             &                     & 187/183   \\
+2600            & Overlay&             &                     & 1183/1197 \\
+10,400          & Overall&  0.9971     &   0.191             & 1647/1657 \\
+10,400          & Group  &  0.9819     &   0.134             & 180/177   \\
+10,400          & Overlay&  0.9006     &   1.96              & 1467/1480 \\
+\hline
+\end{tabular}
+\caption{Responsiveness and reliability of fast and parallel retrieval for safe and fast storage.}
+\label{tab_pithos_retrieval_results}
+\end{table}
+
 \subsection{Experimental setup}
 
 \begin{itemize}
