@@ -10,7 +10,7 @@ The purpose of this chapter is twofold. To compare the various methods of mechan
 \section{Simulation setup}
 \label{simulation_setup}
 
-In the results shown, Chord was used as the P2P overlay, mainly due to its faster simulation time, compared to Pastry. Pithos has, however, also been tested with Pastry and results are similar.
+In the results shown, Chord was used as the P2P overlay, mainly due to its faster simulation time, compared to Pastry. On a quad core Intel i5 2.66 GHz processor, Pithos using Chord takes 4 hours to simulate and Pithos using Pastry takes 60 hours to simulate. Pithos has, however, also been tested with Pastry and results are similar.
 
 After a node has joined the network, PithosTestApp starts to generate store and retrieve requests at a rate of one objects every 5 seconds for a total of 20s and a size of 1024 bytes. The size of 1024 byte objects was chosen to be much larger than Quake 3 game objects without delta encoding, used in \cite{Bharambe_Donnybrook}. Pithos is designed for the low latency storage of small game objects. The limit of 20s generation time for every new peer joining the network is to reduce the memory required to store all objects. With the current setup, every simulation run requires 6 gigabytes of memory.
 
@@ -565,7 +565,7 @@ For both cases, the data from the higher layer was still measured as 4 Bps sent 
 
 \begin{table}[htbp]
 \centering
-\begin{tabular}{|c|c|c|c|}
+\begin{tabular}{|c|c|c|c|c|}
 \hline
 Number of peers & Module & Reliability & Responsiveness (s)  & Bandwidth \\
 \hline
@@ -581,8 +581,13 @@ Number of peers & Module & Reliability & Responsiveness (s)  & Bandwidth \\
 \label{tab_pithos_scalability_results}
 \end{table}
 %
-Table \ref{tab_pithos_scalability_results} shows the scalability of Pithos for large numbers of peers. Comparing group storage, it is evident that the reliability and responsiveness of the 2600 peer case is the same as that of the 10,400 peer case. Also of note is that group storage requires no more bandwidth for larger numbers of nodes. The results show group storage to be very scalable. 
-Overlay storage, however, fares worse, using 
+Table \ref{tab_pithos_scalability_results} shows the scalability of Pithos for large numbers of peers. Comparing group storage, it is evident that the reliability and responsiveness of the 2600 peer case is the same as that of the 10,400 peer case. Also of note is that group storage requires no more bandwidth for larger numbers of nodes. The results show group storage to be very scalable.
+
+Overlay storage, however, fares worse both in responsiveness as well as required bandwidth.
+
+Overall, Pithos is as reliable and responsive for 2600 peers as it is for 10,400 peers, with the exception that it uses somewhat more bandwidth, which has been shown to be as a consequence of the overlay storage not scaling as well as group storage.
+
+This section shows that Pithos is scalable for large numbers of nodes in terms of responsiveness, reliability as well as bandwidth requirements.
 
 \subsection{Experimental setup}
 

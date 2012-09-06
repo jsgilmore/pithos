@@ -1,16 +1,24 @@
 \chapter{Conclusions and Recommendations}
 \label{chp:CONC}
 
+This work focussed on developing a state management architecture for P2P MMVEs. In order to do this, an understanding was required of P2P networks, MMVEs and what the main challenges of P2P MMVEs are.  It was found that state management and persistency is used by the consistency architecture and, therefore, that the consistency architecture implicitly specifies the storage requirements.
+
+After having identified the requirements of a state management and persistency architecture, related work was reviewed and compared against the identified requirements. This allowed us to identify areas where improvements might be made.
+
+The design of Pithos was presented in order to satisfy all identified requirements, presenting every aspect of Pithos in terms of the requirement identified. The Pithos use case was reviewed and presented as a distributed storage system and the mechanisms to implement the use cases were discussed.
+
+With the conceptual design finalised, the implementation specifics were reviewed. Pithos has been implemented as an Oversim simulation that allows for large scale simulations. Some implementation issues that were reviewed were maintaining group consistency as well as persistency in group storage. An evaluation was performed in order to verify that Pithos satisfies all the requirements originally identified.
+
+When Pithos was evaluated for various churn levels and repair rates, it was seen that many factors influence reliability. The factors influencing reliability were found to be directly related to expected object lifetime. A Markov chain model was developed to allow for the prediction of expected object lifetimes. It was found that the literature reviewed assumed an infinite network size and does not take limited network sizes into account. Comparing our model with simulation results, it was found that finite group sizes does affect object lifetimes when the average group size is small, compared to the required number of replicas.
+
+\section{State consistency}
+
+The generic consistency model developed provides a framework for the design and development of MMVEs in general. Because many aspects of the generic consistency model are trivial in C/S models, the model is perhaps more applicable to a P2P MMVE
+
 \section{State management}
 
+\section{Pithos}
 
-\section{Contributions}
-\label{contributions}
-
-The main contributions of this work, are:
-\begin{enumerate}
-\item List them all.
-\end{enumerate}
 
 \section{Further work}
 \label{further_work}
