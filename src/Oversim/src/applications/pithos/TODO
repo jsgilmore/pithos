@@ -34,6 +34,7 @@ Add bandwidth (overhead) as a required metric of a storage system.
 Ensure that all applicable experimental setup parameters are given in the relevant evaluation sections.
 Complete theoretical section, which derives expected values for all the relevant Pithos metrics.
 Conclude
+Add discussion of how Pithos satisfies both state management and state persistency
 Receive PhD
 
 Abstract:
