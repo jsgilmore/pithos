@@ -161,7 +161,7 @@ With unstructured approaches, one is never assured that a data item will be retr
 
 An unstructured architecture is well suited to content sharing and Voice over Internet Protocol (VoIP) networks, for example: P2P TV, BitTorrent, Gnutella and Skype. The reason for this is the high level of duplication in these networks, especially for popular content. It is also easier to perform keyword searches in unstructured networks and the overlay requires less maintenance.
 
-Structured overlays have been proposed that provide for efficient routing and reliable retrieval of data items. Some of these well known overlays are: CAN \cite{CAN}, Chord \cite{chord}, Tapestry \cite{tapestry} and Pastry \cite{pastry}. The basic principle of a structured overlay is that all nodes are identified by unique identifiers (IDs).
+Structured overlays have been proposed that provide for efficient routing and reliable retrieval of data items. Some of these well known overlays are: CAN \cite{CAN}, Chord \cite{chord}, Tapestry \cite{tapestry}, Pastry \cite{pastry} and Kademlia \cite{Kademlia_Maymounkov}. The basic principle of a structured overlay is that all nodes are identified by unique identifiers (IDs).
 
 A popular method to create the IDs is to use hashes to a circular key space, using for example, the SHA-1 hash function. Any node in the overlay network is then able to efficiently route a query with a given ID, to a node with an ID closest to the given ID. An accurate comparison is that unstructured overlays are good at finding ``hay'', while structured overlays are good at finding ``needles'' \cite{Rodrigues_acm_comms_p2p}.
 
@@ -298,6 +298,7 @@ A P2P MMVE architecture requires a structured P2P overlay in the broad sense. In
 Using P2P MMVEs has many advantages, some challenges still remain. The main challenges are state consistency, limited peer bandwidth, cheating mitigation, incentive mechanisms and distributed computation. This section will present some information on work that has been done in the different areas and talk about the maturity of the various solutions. In general though, most solutions are still research projects and none have yet been implemented as commercial products.
 
 \subsubsection{Peer bandwidth}
+\label{peer_bandwidth_usage}
 
 In a paper by Miller and Crowcroft, a packet simulator was created to determine the required bandwidth and effective latency, if a game such as World of Warcraft were to be implemented using P2P technologies \cite{Miller_p2p_infeasability}. Their simulation results indicate that today's networks are not able to host P2P MMVEs, with the required bandwidth and latency constraints. Such a significant result requires verification, but at the least, it shows that reducing bandwidth and latencies for P2P MMVEs should be a primary design requirement.
 
@@ -327,6 +328,7 @@ Some proposed incentive schemes increase a player's reputation when resources ar
 Other issues with incentive schemes is that sometimes players might have insufficient resources. Such players should be aided by other players with sufficient resources and not be disallowed from playing the game. When limited resources are taken into account, the issue of reporting a false amount of available resources becomes a problem. A peer that has sufficient resources, might report insufficient resources, to avoid being penalised. It is evident that there is a need for more research in this field.
 
 \subsubsection{Distributed computation}
+\label{distributed_computing_challenge}
 
 Some architectures assume that the computational requirements will be fulfilled where the object state is hosted \cite{solipsis}, but other schemes exist that allow for the CPU power to be distributed amongst peers. One such scheme makes use of a ``job board'' like mechanism, where tasks are advertised on specialised peers. All peers monitor these specialised peers and may elect to perform the advertised tasks \cite{fan_mediator_paper}.
 
@@ -340,7 +342,29 @@ The objective of this work is to design and develop a novel state management and
 
 \section{Related work}
 
+The basis for this dissertation is the work done by Lu Fan, in his dissertation entitled: ``Solving Key Design Issues for Massively Multiplayer Online Games on Peer-to-Peer Architectures'' \cite{Fan_phd} as well as the paper by Fan et al.: ``Design Issues for Peer-to-Peer Massively Multiplayer Online Games'' \cite{Fan_deisgn_issues_p2p}.
 
+In the works by Fan, a survey is performed as to the main challenges that are still present with P2P MMVEs at that time (2009). The main challenges are identified as interest management, event dissemination, cheating mitigation, task sharing, incentive mechanisms and state persistency.
+
+Fan states that: ``Game state persistency is a major challenge for P2P MMVEs as existing P2P storage infrastructures are designed to support file sharing, and seldom fulfil the performance and security requirements of a MMVE. \ldots the persistency area is still immature with many problems waiting to be investigated.'' \cite{Fan_phd}.
+
+Fan, however, does not focus on solving state persistency issues of P2P MMVEs. A focus is instead placed on self-organisation in the P2P network, super peer selection, fault tolerance mechanisms, membership management mechanisms, heterogenous task mapping and an accounting scheme for interest management \cite{Fan_phd}. The mediator framework is designed and the novelty is reported to be the task mapping infrastructure that allows processing jobs to be advertised on a job-board system for other peers to perform, thereby sharing the processor load of all peers in the network \cite{fan_mediator_paper}. A brief overview of this work is presented in Section \ref{distributed_computing_challenge}.
+
+Recent work that is most similar to ours is the dissertation by Varvello entitled : ``A Peer-to-Peer Architecture for Networked Virtual Environments'' \cite{varvello_phd}. They develop P2P Second Life by altering the Second Life implementation to run over an existing P2P file sharing network, called KAD \cite{KAD_Steiner}, which runs on the Kademlia P2P routing overlay \cite{Kademlia_Maymounkov}. Their focus is thus on a practical implementation, taking an already implemented MMVE and running that as a P2P system over an already implemented P2P network. They also design and simulate a responsive distributed storage system for P2P MMVEs, called Walkad \cite{Walkad_Varvello}. Walkad is deployed to a cluster and ModelInet \cite{ModelInet_Vahdat} is used to emulate wide-area latencies in the cluster underlay. A synthetic Internet topology is generated to model the wide-area latencies, using Inet \cite{Inet_warwick_jamin}.
+
+There are some similarities between Pithos and P2P Second Life. Both provide the design and implementation of a storage system for P2P MMVEs, although the designs are very different as will be explained shortly. Some of the requirements for P2P MMVE state management and persistency were also identified by P2P Second Life, these are: scalability, security and responsiveness. Additionally we identify reliability and fairness as key to designing the P2P MMVEs of the future. We argue for the various identified requirements from the perspective of the generic consistency model that we design. Both our systems also make a distinction between local and non-local storage requests, since it is recognised that users have a finite Area of Interest (AoI).
+
+The KAD P2P network is, however, a file sharing network where user profiles, such as session time, do not necessarily model user lifetimes in P2P MMVEs. It is also not possible to control the parameters of the peers in the network, such as churn. The practical implementation is also on a relatively small scale, running on 1024 peers with less than 600 objects in the virtual environment.
+
+Our design philosophy was to design a P2P storage architecture from the ground up, for the P2P MMVEs of the future, supporting thousands of peers and able to store millions of objects. In order to evaluate our design, we elected to implement it in the form of a large scale network simulation based on the Omnet++ network simulator. This allows for thousands of nodes and hundreds of thousands of objects to be simulated, with realistic latency characteristics in the underlying network based on real-world Internet measurements. In our simulation, most results are shown for a smaller network of 2500 nodes, but in order to show the scalability of our system we also simulate it for 10,000 nodes and millions of objects.
+
+The design philosophy of our storage system compared to that by Varvello is also different. They use a cell-based storage system, where each cell has multiple coordinators. Each cell coordinator replicates all the objects of the cell it coordinates. Our storage system is a group based system, where users are dynamically grouped and objects are stored in groups, rather than cells. Our system also attempts to distribute the load to all peers in the group, by having all group peers store objects. In P2P Second Life, only cell coordinators store objects in the cell. Avatars in the cells do not store objects for that cell.
+
+In terms of performance, there is also some difference between Pithos and P2P Second Life. The responsiveness of Walkad, the improved storage systems developed for P2P Second Life, varies from $O(1)$ in the best case, for local queries to $O(N_c)$, also for local queries, where $N_c$ is the number of cells in the virtual world. The actual performance depends on how equally all regions of the virtual environment are partitioned. If all environments are partitioned exactly the same number of times, requests to neighbouring cells have $O(1)$ responsiveness. Our storage system has a fixed performance of $O(1)$ for local (group) queries. For non-local queries, both our storage systems have order $O(\log (N))$ performance, but again using different implementations.
+
+For our design, the bandwidth requirements of the different methods are also evaluated, since bandwidth usage of P2P systems is of great importance as discussed in Section \ref{peer_bandwidth_usage}. Bandwidth usage is not something that is evaluated in P2P Second Life.
+
+Pithos is also evaluated from a security perspective. Some designs that improve security are presented and evaluated for various percentages of malicious users in the network. In the work on P2P Second Life, security is stated as being of high importance, but the system is not designed for security or evaluated in an environment containing malicious peers.
 
 %=======================================
 % Varvello
@@ -355,7 +379,6 @@ The objective of this work is to design and develop a novel state management and
 %Does not look at reliability per se, but measures how long objects remain alive. (Object lifetime measurements)
 %Security is mentioned as important, but that it will not be addressed.
 %Recognise difference between local and non-local queries
-%Also looks at object management for objects in SL.
 
 %=======================================
 % Object management
