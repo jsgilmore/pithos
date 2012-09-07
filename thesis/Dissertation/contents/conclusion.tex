@@ -13,12 +13,48 @@ When Pithos was evaluated for various churn levels and repair rates, it was seen
 
 \section{State consistency}
 
-The generic consistency model developed provides a framework for the design and development of MMVEs in general. Because many aspects of the generic consistency model are trivial in C/S models, the model is perhaps more applicable to a P2P MMVE
+The generic consistency model we developed, identified requirements that all MMVEs should possess in order to remain consistent. It was seen that multiple data streams exists: events, updates, objects and queries. For every stream, a request is generated, interest management determines where the stream should go and dissemination ensures that the request is delivered to its intended set of recipients. The recipient processes the stream in some way, e.g. applying environment logic to an event, which creates updates. The task of processing can in itself generate new requests.
 
-\section{State management}
+All requests received at the authoritative peer, interface with the authoritative object store. The authoritative object store is, therefore, required to process all requests sent to it in a timely manner. The authoritative object store is composes of both state management and state persistency. State management determines how objects in primary memory are stored and required a highly responsive system, while state persistency determines how objects will be stored on persistent storage as backup. State persistency, therefore, does not require as responsive a storage system.
+
+The generic consistency model developed provides a framework for the design and development of MMVEs in general. Because many aspects of the generic consistency model are trivial in C/S models, the model is perhaps more applicable to a P2P MMVE environment. This is not to say that the generic model is not able to describe the classic C/S case, just that it might contain additional complexity not required to fully describe the classic C/S model.
+
+Two classic consistency models were evaluated, the update-based (C/S) and event-based (fully distributed) models. It was discussed how, although the event-based model seems more applicable to the P2P architecture, it is not scalable. The update-based model has rather been adapted for P2P, by segmenting the game state into multiple authoritative objects and distributing those authoritative objects throughout the network. This maintains scalability and also allows for greater control object consistency, because of the presence of a single authoritative object store.
+
+It is recommended that future systems implementing a P2P MMVE consistency architecture use the generic consistency model as a reference to exactly describe what it is that is being implemented. Too often it was the case that a paper stated it was describing a consistency architecture, when only, for example, an interest management scheme was presented. Designers reviewing the generic consistency architecture might find ways to simplify the model or to integrate certain sections. This might be possible, but care should be taken not to lose generality.
+
+Likewise, designers might see aspects of consistency management that is not covered by any component in the generic consistency model. It would then be of great value if the designers find ways to expand the generic model to make it even more generic.
+
+\section{State management and persistency}
+
+After a review of what is required of a state management and persistency architecture, from the perspective of a state consistency architecture, five main requirements were identified: fairness, reliability, responsiveness, scalability and security. A thorough literature review was then performed and the reviewed storage architectures were categorised into super peer storage, overlay storage, hybrid region-based storage and distance-based storage.
+
+The advantages and disadvantages of each storage type was reviewed using the identified requirements. It was found that none of the storage types satisfied all identified requirements.
+
+An issue that was also encountered was the lack of a thorough comparison of the different storage types in the literature, as well as a lack of common tests that might be used to classify multiple storage types. This made it difficult to empirically compare different storage types and further work into such an area might showcase some advantages of different storage types that have not been found using theoretical comparison alone.
+
+Of the storage types reviewed, it seemed that great benefits may be derived from hybridisation of different types of storage.
+
+It is also believed that a greater focus should be placed on whether the storage type is meant for state management or state persistency. As we discussed, it seems logical that some requirements, such as responsiveness are not applicable to both, which might allow for very different design choices. The interaction between state management and state persistency has also not been explored in detail. When to back-up state to become persistency state has not been dealt with. Also what types of state to back up and what types of state to leave might be investigated.
+
+Furthermore, a categorisation of different types of state might be helpful. Especially in terms of the differences in requirements. Distinctions such as ephemeral as opposed to permanent state might be investigated. The storage parameters, such as object TTL, for ephemeral state, compared to permanent state will be very different.
+
+It might be of benefit to develop a generic state categorisation, where a study is made as to all the types of states in P2P MMVEs, along with the characteristics of how the different types of states are altered. Similarities might be investigated and used to define a finite set of state types and how there is interacted with them. This would allow for further optimisation to distributed storage systems for P2P MMVEs.
 
 \section{Pithos}
 
+The design of Pithos focussed on meeting all identified requirements. The Pithos use case was also discussed, i.e. how an entity is expected to use Pithos. This was done by viewing Pithos as a storage system with classical storage, retrieval, modification and removal use cases.
 
-\section{Further work}
-\label{further_work}
+The implementation of Pithos as an Oversim simulation allowed for it to be simulated on a large scale (ten thousand peers), while still using an underlay network with latencies modelled on actual Internet latency measurements.
+
+The next step in the Pithos implementation will be to add libraries to allow for physical network operation and then to deploy Pithos on a global scale network, such as PlanetLab. Although PlanetLab will not be able to show Pithos for larger numbers of nodes than one or two thousand, it will show real-world performance.  It will also enable the measurement of resource requirements on a per-node basis, such as processor and memory requirements. Quantities that cannot easily be measured in simulation.
+
+To reduce the load on the directory server, a distributed grouping algorithm should also be implemented. In the evaluation of Pithos, it was seen that the best performance is achieved when more requests remain local to the group. A grouping algorithm should therefore be evaluated in terms of how well it can localise requests when actual player and objet traces are used for a variety of virtual environments. The more group request, the better the overall performance will be.
+
+Many enhancements can be made to the quorum mechanism. When a parallel request is performed, a single object can be requested and multiple hashes of the object can be requested from other nodes. The has of the received object can be compared with the hashes received. If the received object has matches a majority of received hashes, the retrieval was successful. If not, another node that did contain the correct object might be queried. This approach will reduce responsiveness but decrease bandwidth usage. 
+
+\section{Final thoughts on P2P MMVEs}
+
+The main issue with commercial P2P MMVEs is the risk involved in deploying an untested network architecture. Developers of MMOGs see the networking architecture as part of their core business. They are loath to out source such an important part of the game to a piece of middleware.
+
+

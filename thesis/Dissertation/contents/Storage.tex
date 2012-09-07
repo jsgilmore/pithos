@@ -205,7 +205,8 @@ A mechanism is required for selecting a super peer for the region as well as mig
 \subsubsection{Fairness}
 %Super peer storage - issues
 The super peer storage model has many potential issues, of which overloading of the super peer is one. A super peer could be relatively easily overloaded if a region becomes too crowded, since a super peer is usually a personal computer of some player in the game and not a specialised server.
-Super peer storage is not fair, since a peer with extra resources is expected to act as super peer to the region whilst other users do no contribute storage. This is contrary to the principle of P2P, where all peers contribute resources.
+
+Super peer storage is not fair, since a peer with extra resources is expected to act as super peer to the region whilst other users do not contribute storage. This is contrary to the principle of P2P, where all peers contribute resources.
 
 \subsubsection{Reliability}
 \label{super_peer_storage_reliability}
@@ -231,6 +232,12 @@ Knuttson et al. \cite{knutsson_p2p_first} employ regional super peers called ``c
 Coordinator hand-offs also occur less than if the coordinator was an elected member of the region. If this is the case, a new coordinator has to be chosen every time the current coordinator leaves the region. In this scheme, hand-offs only occur as a result of network churn, which is far lower than the number of players moving from one region to another.
 
 Reliability is achieved by maintaining backup coordinators as the Distributed Hash Table (DHT) neighbours of each region coordinator. One method by which redundant region coordinators are maintained in \cite{knutsson_p2p_first}, is to create backup coordinators on peers with IDs closest to the current coordinator. This means that if the main coordinator fails, all data will automatically be routed to the backup, because of the feature of DHTs. This method is similar to how reliability is achieved in overlay storage as described in Section \ref{overlay_storage_reliability}.
+
+The most mature form of super peer storage is found in P2P Second Life \cite{varvello_phd} in the form of Walkad \cite{Walkad_Varvello}. Walkad assigns multiple coordinators to a single cell. For every object stored in a cell, a copy of the object is stored on every communicator. A peer requiring an object selects a single communicator from the set of available coordinators to retrieve the object from. Walkad also employs dynamic regioning, which means that there exists some threshold of objects per cell which aids in scalability and prevents overloading of the super peer.
+
+Increasing the number of replicas maintained per cell, increases the number of nodes that participate in the storage system, thereby increasing the fairness of the storage system. There will, theoretically, be some limit where increasing the number of replicas further will have a negligible effect on overall reliability. The question then becomes, for this situation, what is the percentage of peers that contribute to the storage system. Another issue that might occur is excessive bandwidth usage by the system when 20 and up replicas are maintained per object per cell.
+
+It should also be noted that the required number of replicas will be a function of network churn to maintain a specific reliability. The number of users present should not affect reliability. The question then arises: how is the fairness and bandwidth requirements of the system influenced when tens of thousands of users enter the virtual environment.
 
 \subsection{Overlay storage}
 \label{overlay_storage}
