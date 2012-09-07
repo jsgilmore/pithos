@@ -119,7 +119,6 @@ Objects are uniformly distributed on group peers, ensuring that all group peers 
 
 Overlay storage maps objects and peers to the same uniform key space and stores an object on a peer that is the closest match for the object's key. This uniformly random mapping ensures a uniform distribution of objects in the overlay.
 
-
 \section{Key modules and mechanisms}
 \label{key_modules_mechs}
 
@@ -135,6 +134,8 @@ Figure \ref{fig_pithos} shows the Pithos architecture. The figure shows groups o
 Pithos groups peers to form a two tiered storage model. The first tier is a storage model at group level (group storage) and the second is a storage model over all groups (overlay storage).
 
 Pithos can be considered as a multi-tiered structured overlay, with group storage an implementation of an $O(1)$ overlay and overlay storage an implementation of an $O(\log (N))$ overlay.
+
+When referring to state management and persistency as defined in Section \ref{management_persistency_def}, Pithos is designed to serve both requirements. Group storage is designed for state management and overlay storage for state persistency. Since state persistency does not require responsive storage, the overlay section of Pithos is well suited to this task, while group storage, with its high responsiveness is well suited to state management.
 
 \subsection{Group storage}
 

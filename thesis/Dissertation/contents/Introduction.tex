@@ -243,7 +243,7 @@ The distribution of the load as well as direct communication will further reduce
 
 \subsection{Requirements}
 
-Key requirements have been identified for the creation of a P2P MMVE. What follows is an expansion and reinterpretation of the requirements identified by Schiele et al. \cite{Schiele_p2p_requirements}.
+Key requirements have been identified for the creation of a P2P MMVE. What follows is an expansion and reinterpretation of the requirements identified by Schiele et al. \cite{Schiele_p2p_requirements}. Some of those key requirements, that are specific to P2P MMVEs, are briefly highlighted in this section.
 
 \subsubsection{Distributed computation}
 \label{distributed_computation_requirement}
@@ -257,17 +257,17 @@ A key challenge with any networked game is how to maintain state consistency bet
 
 \subsubsection{Persistency and state management}
 
-\subsubsection{Self-organisation}\
-Handling of user churn
+P2P MMVEs require persistent state, which means that the information of users in the virtual world should be maintained. The items that a user possesses in the virtual world should remain on his virtual avatar, even if she logs out and later back on to the virtual environment.
 
-\subsubsection{Availability}
-Game must always be online (P2P requirement)
+Persistency is different to state management. Persistency is the long term storage of data, usually on secondary storage. State management deals with managing the state of objects in the virtual world. This includes handling all requests for that object from peers who do not yet possess the object, or processes changes that players have made to the objects in the virtual world.
 
 \subsubsection{Interactivity}
-Low latency interaction and masking latency with dead reckoning
+
+P2P MMVE should be interactive and responsive. This means that they should support low latency interactions and possibly mask high latency operations, using techniques such as dead reckoning \cite{cheat_proof_playout}, so as not to break immersion. Interactivity means that all players actions should be handled as soon as possible.
 
 \subsubsection{Scalability}
-Server and peer bandwidth requirements
+
+MMVE are by definition massive, supporting thousands to tens of thousands of players in the same virtual environment, as discussed in Section \ref{scalability_req}. A P2P MMVE should support as many users as a classic MMVE, preferably more.
 
 \subsubsection{Security}
 
@@ -276,9 +276,10 @@ Security, which includes cheating mitigation, has been identified as a major iss
 One advantage that can be exploited to prevent cheating is that no peer contains all authoritative environment state and no single peer has more authority than another.
 
 \subsubsection{Efficiency}
-The peer must efficiently implement the server, since it still has to be a client as well
 
-\subsubsection{Maintainability}
+The network architecture of a P2P MMVE should be efficient. This usually goes without saying, but the reason why it is specifically stated is because the P2P network architecture basically implements the functionality of the server in the classic server model.
+
+The server functionality has to be distributed accross all users of the P2P system. In addition to server functionality, a peer still requires the functionality of a classic client as well. This means the rendering of intricate graphics and calculation of complex physics. The P2P MMVE network architecture should, therefore, require as little as possible resources, of the resource that would ordinarily have been used for graphics and physics.
 
 \subsubsection{Incentives}
 
@@ -286,16 +287,10 @@ P2P schemes require all players to share resources in order to ensure correct fu
 
 All distributed resource sharing models require incentive mechanisms. For example, Bittorrent systems use the tit-for-tat protocol to ensure that all people downloading data are also contributing data \cite{tit_for_tat}. Such mechanisms are also required with P2P MMVEs. One advantage in designing an incentive mechanism for a P2P MMVE is that players can be made to contribute resources for the duration of play. The issues with file sharing systems are not present where a peer, after downloading a file, has no more incentive to contribute.
 
-\subsubsection{Structured P2P overlay}
-
-Because there is no assurance that a data item might be retrieved from an unstructured network, especially when that item is scarce, unstructured overlays are not considered adequate as a basis for P2P MMVEs, where all data items must be available at all times.
-
-A P2P MMVE architecture requires a structured P2P overlay in the broad sense. In P2P MMVEs, peers have to be connected in some geometry and it should be possible to route messages between peers. P2P MMVEs require a bootstrapping server to enable peers to join the network and be placed in it. A P2P MMVE architecture should handle churn with a minor impact on system operation. Most importantly, all objects stored in the P2P MMVE should be available at all times.
-
 \subsection{Key challenges}
 \label{key_challenges}
 
-Using P2P MMVEs has many advantages, some challenges still remain. The main challenges are state consistency, limited peer bandwidth, cheating mitigation, incentive mechanisms and distributed computation. This section will present some information on work that has been done in the different areas and talk about the maturity of the various solutions. In general though, most solutions are still research projects and none have yet been implemented as commercial products.
+Using P2P MMVEs has many advantages, but some challenges still remain. The main challenges are state consistency, limited peer bandwidth, cheating mitigation, incentive mechanisms and distributed computation. This section will present some information on work that has been done in the different areas and talk about the maturity of the various solutions. In general though, most solutions are still research projects and none have yet been implemented as commercial products.
 
 \subsubsection{Peer bandwidth}
 \label{peer_bandwidth_usage}
