@@ -32,9 +32,9 @@ Remove the term "game" where it is not required and replace with environment and
 Replace "player" with "user".
 Add bandwidth (overhead) as a required metric of a storage system.
 Ensure that all applicable experimental setup parameters are given in the relevant evaluation sections.
-Complete theoretical section, which derives expected values for all the relevant Pithos metrics.
-Conclude
 Add discussion of how Pithos satisfies both state management and state persistency
+Add figure displaying the expanded Oversim terminal.
+Add figure displaying the structure of an object ledger.
 Receive PhD
 
 Abstract:
