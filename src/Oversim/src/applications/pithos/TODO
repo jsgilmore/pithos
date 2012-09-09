@@ -56,3 +56,16 @@ Ensure all symbols and abbreviations are present.
 
 Conclusion:
 Complete
+
+Evalutaion:
+Simulate for Pareto lifetime distribution
+Simulate Pithos using Pastry
+Perform a run that counts the total number of storage and retrieval requests made and the total number of objects stored during the run.
+Compute the standard deviations of the quantities measured (reliability and responsiveness).
+Simulate the effect of group size on reliability, responsiveness and bandwidth usage.
+Check the responsiveness of overlay storage in the LAN setup.
+
+Add comparison of Chord, Pastry and Kademlia to appendix. This is likely not required, so might still decide to just site one of the millions of comparisons out there.
+Find paper that validates my overlay storage and reliability results for Chord.
+Present responsiveness distribution for the "low" and "high" cases.
+Add percentile talk to all distributions.
