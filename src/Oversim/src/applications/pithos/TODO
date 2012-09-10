@@ -26,27 +26,19 @@ A maximum distance needs to be defined for the directory server
 Ensure correctness for pithos under 32bit systems. This includes testing long variable sizes and making them 32bit safe.
 
 Dissertation:
-Add a discussion of how Pithos attempts to address both state management and persistency.
 Make sure the state management and persistency chapter uses the terms state management and persistency correctly.
 Remove the term "game" where it is not required and replace with environment and VE.
 Replace "player" with "user".
+Replace "node" with "peer", where applicable.
 Add bandwidth (overhead) as a required metric of a storage system.
 Ensure that all applicable experimental setup parameters are given in the relevant evaluation sections.
-Add discussion of how Pithos satisfies both state management and state persistency
 Add figure displaying the expanded Oversim terminal.
 Add figure displaying the structure of an object ledger.
-Receive PhD
 
 Abstract:
 Complete
 
 Introduction:
-Read the PhD on P2P Second life.
-Complete related section by adding discussion on P2P Second Life.
-A discussion of the PhD by Fan can also be be added, since it formed the basis of this work.
-
-Storage:
-Add discussion of P2P Second Life to overlay storage.
 
 Modelling:
 Add sections back into the chapter that were removed when the paper was shortened.
@@ -64,8 +56,17 @@ Perform a run that counts the total number of storage and retrieval requests mad
 Compute the standard deviations of the quantities measured (reliability and responsiveness).
 Simulate the effect of group size on reliability, responsiveness and bandwidth usage.
 Check the responsiveness of overlay storage in the LAN setup.
+Record success responsiveness for the group probability case.
 
 Add comparison of Chord, Pastry and Kademlia to appendix. This is likely not required, so might still decide to just site one of the millions of comparisons out there.
 Find paper that validates my overlay storage and reliability results for Chord.
 Present responsiveness distribution for the "low" and "high" cases.
 Add percentile talk to all distributions.
+Remove tags in the LAN responsiveness graph.
+When talking about another distributions that's the same, create a subplot showing that distribution.
+Replace "responsiveness" y-labels with "latency".
+Describe what we expect to see at the start of every new experiment, before we perform the experiment.
+
+Hand-in PhD
+Pass defence
+Receive PhD
