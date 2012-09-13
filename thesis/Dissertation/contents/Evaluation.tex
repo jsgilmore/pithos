@@ -88,100 +88,7 @@ For the Chord overlay, the three configurations represent high, medium and low l
 
 \subsubsection{Configuration parameters}
 
-Tables \ref{tab_chord_configs}, \ref{tab_pastry_configs} and \ref{tab_kademlia_configs} show the configuration parameters of the Chord, Pastry and Kademlia overlays used. For Chord medium, Pastry and Kademlia, the Oversim default values were used.
-
-\begin{table}[htbp]
-\centering
-\begin{tabular}{|r|l|l|l|}
-\hline
-Parameter                       & Low  & Medium & High  \\
-\hline
-Stabilise retries               & 1    & 2      &  3    \\
-Stabilise delay                 & 10s  & 5s     &  3s   \\
-Fix finger table interval       & 120s & 10s    &  5s   \\
-Check predecessor delay         & 5s   & 5 s    &  3s   \\
-Extended finger table           & no   & yes    &  yes  \\
-Extended finger table candidate & N/A  & 3      &  4    \\
-\hline
-Join retries                    & 2    & 2      & 2     \\
-Join delay                      & 10s  & 10s    & 10s   \\
-Routing type                    & iterative & iterative & iterative \\
-Successor list size             & 8    & 8      & 8     \\
-Use aggressive join             & yes  & yes    & yes   \\
-Proximity routing               & no   & no     & no    \\
-\hline
-\end{tabular}
-\caption{Chord configuration parameters for the various test cases.}
-\label{tab_chord_configs}
-\end{table}
-
-\begin{table}[htbp]
-\centering
-\begin{tabular}{|l|l|}
-\hline
-Parameter                       & Value\\
-\hline
-Bits Per Digit                  & 4\\
-Number of Leaves                & 16\\
-Number of Neighbors             & 0\\
-Join Timeout                    & 20s\\
-Ready Wait                      & 5s\\
-Second Stage Wait               & 2s\\
-Repair Timeout                  & 60s\\
-Enable New Leafs                & no\\
-Optimize Lookup                 & no\\
-Partial Join Path               & no\\
-Use Regular Next Hop            & yes\\
-Always Send Update              & no\\
-Use Discovery                   & no\\
-Ping Before Second Stage        & yes\\
-Discovery Timeout Amount        & 1s\\
-Routing Table Maintenance Interval & 0s\\
-Send State at Leafset Repair    & yes\\
-Override Old Pastry             & no\\
-Override New Pastry             & no\\
-Route Msg Acks                  & yes\\
-Routing Type                    & semi-recursive\\
-Minimal Join State              & no\\
-Proximity Neighbor Selection    & yes\\
-\hline
-\end{tabular}
-\caption{Pastry configuration parameters.}
-\label{tab_pastry_configs}
-\end{table}
-
-\begin{table}[htbp]
-\centering
-\begin{tabular}{|l|l|}
-\hline
-Parameter                       & Value\\
-\hline
-Lookup Redundant Nodes          & 8\\
-Lookup Parallel Paths           & 1\\
-Lookup Parallel Rpcs            & 3\\
-Lookup Merge                    & true\\
-Routing Type                    & iterative\\
-Secure Maintenance              & false\\
-MinSibling Table Refresh Interval & 1000s\\
-Min Bucket Refresh Interval     & 1000s\\
-Sibling Ping Interval           & 0s\\
-Max Stale Count                 & 0\\
-k                               & 8\\
-s                               & 8\\
-b                               & 1\\
-Exhaustive Refresh              & yes\\
-Ping New Siblings               & no\\
-Enable Replacement Cache        & yes\\
-Replacement Cache Ping          & yes\\
-Replacement Candidates          & 8\\
-Sibling Refresh Nodes           & 0\\
-Bucket Refresh Nodes            & 0\\
-New Maintenance                 & no\\
-\hline
-\end{tabular}
-\caption{Pastry configuration parameters.}
-\label{tab_kademlia_configs}
-\end{table}
+The configuration parameters of the Chord, Pastry and Kademlia overlays used, are given in Appendix \ref{chp:OVERLAY_CONFIG}. For Chord medium, Pastry and Kademlia, the Oversim default values were used.
 
 \subsubsection{Performance}
 
@@ -232,7 +139,7 @@ Storage method & Reliability & Responsiveness \\
                &             & mean (var.) (s) \\
 \hline
 Safe    &  0.9705  &   1.554 (3.178)  \\
-Fast    &  1.0     &   0.0488 (0.0046) \\
+Fast    &  1.0     &   0.0665 (0.00593) \\
 \hline
 \end{tabular}
 \caption{Responsiveness and reliability of Pithos's safe and fast storage.}
@@ -312,7 +219,7 @@ To evaluate responsiveness, it is not sufficient to only evaluate mean responsiv
 
 To calculate the responsiveness, the Oversim SimpleUnderlayNetwork was used for the physical network for all experiment but one.
 
-This sections presents all responsiveness distributions in the Pithos simulation. With the exception of the LAN experiment, the experimental setup is as in Section \ref{store_retrieve_exp_setup}:
+This sections presents all responsiveness distributions in the Pithos simulation. With the exception of the LAN experiment, the experimental setup is as in Section \ref{simulation_setup}:
 %
 \begin{itemize}
 \item Network of 2500 peers and 100 super peers.
@@ -334,7 +241,7 @@ This sections presents all responsiveness distributions in the Pithos simulation
  \label{fig_overlay_put_sf}
 \end{figure}
 %
-Figure \ref{fig_overlay_put_sf} shows that to store an object in the overlay can take anywhere from 0.1 to 4 seconds.
+Figure \ref{fig_overlay_put_sf} shows that to store an object in the overlay can take anywhere from 0.1 to 4 seconds, but 80\% of storage requests are less than 1.569s.
 
 \begin{figure}[htbp]
  \centering
@@ -343,10 +250,7 @@ Figure \ref{fig_overlay_put_sf} shows that to store an object in the overlay can
  \label{fig_overlay_get_sf}
 \end{figure}
 %
-Figure \ref{fig_overlay_get_sf} shows that to retrieve an object from the overlay can take anywhere from 0.1 to 6 seconds. Figure \ref{fig_overlay_get_sf} also shows a spike at 3 seconds, when overlay retrieval is performed. This means that a large number of requests take 3 seconds to complete. This is thought to be an artifact of Chord lookup performance due to timeouts as set up in the Oversim simulation.
-
-Overlay storage and retrieval has a high standard deviation when compared to group storage and retrieval as will be shown in the next sections.
-
+Figure \ref{fig_overlay_get_sf} shows that to retrieve an object from the overlay can take anywhere from 0.1 to 6 seconds, but 80\% of requests are less than 2.322s. Figure \ref{fig_overlay_get_sf} also shows a spike at 3 seconds, when overlay retrieval is performed. 0.55\% of requests take 3 seconds to complete. This is thought to be an artifact of Chord lookup performance due to timeouts as set up in the Oversim simulation.
 
 \subsection{Group storage}
 \label{group_storage_eval}
@@ -354,7 +258,7 @@ Overlay storage and retrieval has a high standard deviation when compared to gro
 \subsubsection{Fast storage}
 \label{group_put_f_fp}
 
-Figure \ref{fig_group_put_fp} shows the distribution of group storage for fast storage.
+Figure \ref{fig_group_put_ff} shows the distribution of group storage for fast storage.
 
 \begin{figure}[htbp]
  \centering
@@ -363,9 +267,7 @@ Figure \ref{fig_group_put_fp} shows the distribution of group storage for fast s
  \label{fig_group_put_ff}
 \end{figure}
 %
-Figure \ref{fig_group_put_fp} shows a high peak at close to zero seconds. 26\% of group storage requests have zero network latency. These requests are the requests where the node generating the object is chosen to store the object. If the required number of replicas is high, compared to the group size, there is a high likelihood that the node originating the request will be chosen as a host node to the object. This is why there is such a large spike at close to zero.
-
-Apart from the spike, Figure \ref{fig_group_put_fp} also shows that the responsiveness is distributed over a small range: from zero to 0.1 seconds.
+Figure \ref{fig_group_put_ff} shows a spike at zero seconds, with 1.82\% of group storage requests having zero network latency. These are group requests that were made when no objects were available in a group and the request immediately returned a failure response. Apart from the spike, Figure \ref{fig_group_put_ff} also shows that the responsiveness is distributed over a small range: with 86\% of requests taking less than 0.1s.
 
 \subsubsection{Safe storage}
 \begin{figure}[htbp]
@@ -375,22 +277,12 @@ Apart from the spike, Figure \ref{fig_group_put_fp} also shows that the responsi
  \label{fig_group_put_sf}
 \end{figure}
 %
-Figure \ref{fig_group_put_sf} shows the responsiveness distribution for safe storage. Because safe storage is slower than fast storage, the mean response time is longer. The maximum and minimum responsiveness values are also greater than for fast storage: from zero to 0.8 seconds. This is still smaller than the range of overlay storage values.
+Figure \ref{fig_group_put_sf} shows the responsiveness distribution for safe storage. Because safe storage is slower than fast storage, the mean response time is longer. The maximum and minimum responsiveness values are also greater than for fast storage: from zero to 0.8 seconds, with 35\% of requests taking less than 0.1s. This is still smaller than the range of overlay storage values.
 
-Figure \ref{fig_group_put_sf} also contains a spike at 10s. This is due to the storage timeout being set to 10s. What should be noted is that these responsiveness graphs shows both success and failure responsiveness. In other words, it shows how quickly a response is received, even if that response is a failure. The responses received from 10 s are all failures, where no response was received from the destination node and an internal timeout occurred.
+Figure \ref{fig_group_put_sf} also contains a spike at 10s. 0.68\% of requests take 10s, which is due to the storage timeout being set to 10s. What should be noted is that these responsiveness graphs show both success and failure responsiveness. In other words, it shows how quickly a response is received, even if that response is a failure. The responses received from 10s are all failure responses, where no response was received from the destination node and an internal timeout occurred.
 
 \subsection{Group retrieval}
 \subsubsection{Fast retrieval}
-\begin{figure}[htbp]
- \centering
- \includegraphics[clip=true, viewport=20mm 30mm 265mm 180mm, width=\columnwidth]{group_get_sf}
- \caption{Group retrieval responsiveness for fast retrieval}
- \label{fig_group_get_sf}
-\end{figure}
-%
-Figure \ref{fig_group_get_sf} shows group retrieval responsiveness for fast retrieval. This type of retrieval has 24\% of requests with zero second latency, due to nodes requesting objects from the network and those objects being found in the locally stored root object store. Because of the high number of replicas compared to the average group size used in the simulation, many of the requests can be locally served, which greatly increases responsiveness.
-
-It should be noted that the node that originally stored the object does not have local access to the object. Only other nodes that did not originally store the object may have access to local copies. That is the reason why no such spike is present in fast storage.
 
 \begin{figure}[htbp]
  \centering
@@ -399,7 +291,11 @@ It should be noted that the node that originally stored the object does not have
  \label{fig_group_get_zoom_sf}
 \end{figure}
 %
-Figure \ref{fig_group_get_zoom_sf} is an enlarged view of Figure \ref{fig_group_get_sf}, to more clearly show the multimodal responsiveness. This figure also shows multiple peaks, which is shown to be an artifact of the underlying physical layer in Section \ref{lan_retrieval}.
+Figure \ref{group_get_zoom_sf} shows group retrieval responsiveness for fast retrieval, without showing the full extent of the zero time responses. This type of retrieval has 24\% of requests with zero second latency. These requests are the requests where the node generating the object is chosen to store the object. If the required number of replicas is high, compared to the group size, there is a high likelihood that the node originating the request will be chosen as a host node to the object.
+
+It should be noted that the node that originally stored the object does not have local access to the object. Only other nodes that did not originally store the object may have access to local copies. This is the reason why such a significant spike is not present in fast storage.
+
+Figure \ref{group_get_zoom_sf} also shows multiple peaks, which is shown to be an artifact of the underlying physical layer in Section \ref{lan_retrieval}.
 
 For fast group retrieval 95\% of requests as serviced within 0.195s, compared to overlay retrieval where only 0.13\% of requests are serviced within 0.195s.
 
