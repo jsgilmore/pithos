@@ -3,12 +3,12 @@ close all
 % 
 % folder = '../results/2500_norep_10sfinger_fp/';
 % 
-% eval(['load ' folder 'group_get.csv']);
-% eval(['load ' folder 'group_put.csv']);
-% eval(['load ' folder 'overlay_get.csv']);
-% eval(['load ' folder 'overlay_put.csv']);
-% eval(['load ' folder 'overall_get.csv']);
-% eval(['load ' folder 'overall_put.csv']);
+% eval(['load ' folder 'group_get_sf.csv']);
+% eval(['load ' folder 'group_put_sf.csv']);
+% eval(['load ' folder 'overlay_get_sf.csv']);
+% eval(['load ' folder 'overlay_put_sf.csv']);
+% eval(['load ' folder 'overall_get_sf.csv']);
+% eval(['load ' folder 'overall_put_sf.csv']);
 
 figure('Name','group get')
 set(gca, 'FontSize', 24) 
