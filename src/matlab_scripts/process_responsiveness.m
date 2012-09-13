@@ -1,7 +1,7 @@
 close all
 % clear all
 % 
-% folder = '../results/2500_norep_10sfinger_ff/';
+% folder = '../results/2500_norep_10sfinger_fp/';
 % 
 % eval(['load ' folder 'group_get.csv']);
 % eval(['load ' folder 'group_put.csv']);
@@ -12,7 +12,7 @@ close all
 
 figure('Name','group get')
 set(gca, 'FontSize', 24) 
-hist(group_get(:,2), 50000);
+hist(group_get(:,2), 5000);
 h = findobj(gca,'Type','patch');
 set(h,'FaceColor','k','EdgeColor','k')
 ylabel('Number of messages');
@@ -44,7 +44,7 @@ xlabel('time (s)');
 
 figure('Name','overall get')
 set(gca, 'FontSize', 24) 
-hist(overall_get(:,2), 10000);
+hist(overall_get(:,2), 1000);
 h = findobj(gca,'Type','patch');
 set(h,'FaceColor','k','EdgeColor','k')
 ylabel('Number of messages');
