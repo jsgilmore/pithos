@@ -65,6 +65,8 @@ Describe what we expect to see at the start of every new experiment, before we p
 Add responsiveness and bandwidth to security.
 Rewrite performance under repair section for just bandwidth, not efficiency
 Fix borders of all figures.
+Correct all fast storage response times, to take the more secure version into account.
+Figure out why there is a 3s spike at overlay storage and retrieval
 
 Hand-in PhD
 Pass defence
