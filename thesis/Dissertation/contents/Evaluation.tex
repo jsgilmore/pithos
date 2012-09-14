@@ -135,7 +135,7 @@ It does not make sense to evaluate retrieval performance apart from the storage 
 \centering
 \begin{tabular}{|c|l|l|}
 \hline
-Storage method & Reliability & Responsiveness \\
+\multirow{2}{*}{Storage method} & \multirow{2}{*}{Reliability} & Responsiveness \\
                &             & mean (var.) (s) \\
 \hline
 Safe    &  0.9705  &   1.554 (3.178)  \\
@@ -236,7 +236,7 @@ This sections presents all responsiveness distributions in the Pithos simulation
 
 \begin{figure}[htbp]
  \centering
- \includegraphics[clip=true, viewport=5mm 65mm 265mm 205mm, width=\columnwidth]{overlay_put_sf}
+ \includegraphics[clip=true, viewport=10mm 30mm 270mm 170mm, width=\columnwidth]{overlay_put_sf}
  \caption{Overlay storage responsiveness}
  \label{fig_overlay_put_sf}
 \end{figure}
@@ -245,7 +245,7 @@ Figure \ref{fig_overlay_put_sf} shows that to store an object in the overlay can
 
 \begin{figure}[htbp]
  \centering
- \includegraphics[clip=true, viewport=20mm 30mm 270mm 190mm, width=\columnwidth]{overlay_get_sf}
+ \includegraphics[clip=true, viewport=20mm 30mm 270mm 175mm, width=\columnwidth]{overlay_get_sf}
  \caption{Overlay retrieval responsiveness}
  \label{fig_overlay_get_sf}
 \end{figure}
@@ -262,7 +262,7 @@ Figure \ref{fig_group_put_ff} shows the distribution of group storage for fast s
 
 \begin{figure}[htbp]
  \centering
- \includegraphics[clip=true, viewport=10mm 30mm 270mm 185mm, width=\columnwidth]{group_put_ff}
+ \includegraphics[clip=true, viewport=5mm 45mm 265mm 210mm, width=\columnwidth]{group_put_ff}
  \caption{Group storage responsiveness for fast storage}
  \label{fig_group_put_ff}
 \end{figure}
@@ -272,7 +272,7 @@ Figure \ref{fig_group_put_ff} shows a spike at zero seconds, with 1.82\% of grou
 \subsubsection{Safe storage}
 \begin{figure}[htbp]
  \centering
- \includegraphics[clip=true, viewport=10mm 30mm 270mm 180mm, width=\columnwidth]{group_put_sf}
+ \includegraphics[clip=true, viewport=10mm 20mm 270mm 170mm, width=\columnwidth]{group_put_sf}
  \caption{Group storage responsiveness for safe storage}
  \label{fig_group_put_sf}
 \end{figure}
@@ -286,7 +286,7 @@ Figure \ref{fig_group_put_sf} also contains a spike at 10s. 0.68\% of requests t
 
 \begin{figure}[htbp]
  \centering
- \includegraphics[clip=true, viewport=20mm 30mm 265mm 180mm, width=\columnwidth]{group_get_zoom_sf}
+ \includegraphics[clip=true, viewport=20mm 35mm 265mm 175mm, width=\columnwidth]{group_get_zoom_sf}
  \caption{Enlarged view of the group retrieval responsiveness for fast retrieval}
  \label{fig_group_get_zoom_sf}
 \end{figure}
@@ -302,14 +302,14 @@ For fast group retrieval 95\% of requests as serviced within 0.195s, compared to
 \subsubsection{Parallel retrieval}
 \begin{figure}[htbp]
  \centering
- \includegraphics[clip=true, viewport=20mm 30mm 265mm 180mm, width=\columnwidth]{group_get_fp}
+ \includegraphics[clip=true, viewport=20mm 20mm 265mm 180mm, width=\columnwidth]{group_get_fp}
  \caption{Group retrieval responsiveness for parallel retrieval}
  \label{fig_group_get_fp}
 \end{figure}
 
 \begin{figure}[htbp]
  \centering
- \includegraphics[clip=true, viewport=20mm 30mm 265mm 180mm, width=\columnwidth]{group_get_zoom_fp}
+ \includegraphics[clip=true, viewport=20mm 35mm 265mm 175mm, width=\columnwidth]{group_get_zoom_fp}
  \caption{Enlarged view of the group retrieval responsiveness for parallel retrieval}
  \label{fig_group_get_zoom_fp}
 \end{figure}
@@ -341,14 +341,14 @@ No additional spikes are perceived, as opposed to the peaks seen earlier. The me
 
 \begin{figure}[htbp]
  \centering
- \includegraphics[clip=true, viewport=20mm 30mm 265mm 180mm, width=\columnwidth]{overlay_get_lan}
+ \includegraphics[clip=true, viewport=25mm 30mm 275mm 175mm, width=\columnwidth]{overlay_get_lan}
  \caption{Overlay retrieval responsiveness for fast storage and fast retrieval, running on a 1ms underlay network.}
  \label{fig_overlay_get_lan}
 \end{figure}
 
 \begin{figure}[htbp]
  \centering
- \includegraphics[clip=true, viewport=20mm 30mm 265mm 180mm, width=\columnwidth]{overlay_get_lan_wide}
+ \includegraphics[clip=true, viewport=20mm 30mm 270mm 175mm, width=\columnwidth]{overlay_get_lan_wide}
  \caption{Overlay retrieval responsiveness for fast storage and fast retrieval, running on a 1ms underlay network and showing the compete x-axis.}
  \label{fig_overlay_get_lan_wide}
 \end{figure}
@@ -360,7 +360,7 @@ After having presented the separate responsiveness profiles for overlay and grou
 
 \begin{figure}[htbp]
  \centering
- \includegraphics[clip=true, viewport=5mm 35mm 265mm 190mm, width=\columnwidth]{overall_put_ff}
+ \includegraphics[clip=true, viewport=5mm 50mm 265mm 205mm, width=\columnwidth]{overall_put_ff}
  \caption{Overall storage responsiveness for fast storage}
  \label{fig_overall_put_ff}
 \end{figure}
@@ -372,7 +372,7 @@ Figure \ref{fig_overall_put_ff} shows the overall storage responsiveness for fas
 \subsubsection{Safe storage}
 \begin{figure}[htbp]
  \centering
- \includegraphics[clip=true, viewport=5mm 60mm 265mm 205mm, width=\columnwidth]{overall_put_sf}
+ \includegraphics[clip=true, viewport=5mm 35mm 270mm 170mm, width=\columnwidth]{overall_put_sf}
  \caption{Overall storage responsiveness for safe storage}
  \label{fig_overall_put_sf}
 \end{figure}
@@ -441,7 +441,7 @@ As with the previous experiments, the following configuration parameters are cho
 
 \begin{figure}[htbp]
  \centering
- \includegraphics[clip=true, viewport=20mm 30mm 265mm 180mm, width=\columnwidth]{group_prob_rel}
+ \includegraphics[clip=true, viewport=20mm 30mm 270mm 180mm, width=\columnwidth]{group_prob_rel}
  \caption{Reliability of Pithos, group storage and overlay storage for various group probabilities.}
  \label{fig_group_prob_rel}
 \end{figure}
@@ -468,7 +468,7 @@ This result shows that the reliability of Pithos varies linearly between overlay
 
 \begin{figure}[htbp]
  \centering
- \includegraphics[clip=true, viewport=20mm 30mm 275mm 180mm, width=\columnwidth]{group_prob_resp}
+ \includegraphics[clip=true, viewport=20mm 30mm 275mm 170mm, width=\columnwidth]{group_prob_resp}
  \caption{Responsiveness of Pithos, group storage and overlay storage for various group probabilities.}
  \label{fig_group_prob_resp}
 \end{figure}
@@ -484,7 +484,7 @@ The lower the group probability, the more failure responses are returned by grou
 
 \begin{figure}[htbp]
  \centering
- \includegraphics[clip=true, viewport=15mm 30mm 270mm 180mm, width=\columnwidth]{group_prob_bw}
+ \includegraphics[clip=true, viewport=15mm 35mm 270mm 170mm, width=\columnwidth]{group_prob_bw}
  \caption{Bandwidth usage of Pithos, group storage and overlay storage for various group probabilities, as well as the bandwidth sent to, and received from Pithos.}
  \label{fig_group_prob_bw}
 \end{figure}
@@ -630,7 +630,7 @@ As was stated earlier, the object TTL will also influence the reliability, since
 
 \begin{figure}[htbp]
  \centering
- \includegraphics[clip=true, viewport=15mm 30mm 275mm 180mm, width=\columnwidth]{repair_rel}
+ \includegraphics[clip=true, viewport=15mm 35mm 275mm 170mm, width=\columnwidth]{repair_rel}
  \caption{Reliability of Pithos for various node lifetimes, comparing no repair, no repair with parallel retrieval, no repair using Pareto node lifetimes, leaving repair and periodic repair with 100s periods.}
  \label{fig_repair_rel}
 \end{figure}
@@ -651,7 +651,7 @@ Parallel retrieval, employing no repair mechanism, is most reliable and consiste
 
 \begin{figure}[htbp]
  \centering
- \includegraphics[clip=true, viewport=10mm 45mm 275mm 150mm, width=\columnwidth]{repair_bw}
+ \includegraphics[clip=true, viewport=10mm 45mm 275mm 160mm, width=\columnwidth]{repair_bw}
  \caption{Bandwidth usage of Pithos and the higher layer for various node lifetimes for the the case with no repair, no repair using parallel retrieval, no repair using Pareto node lifetimes, leaving repair and periodic repair.}
  \label{fig_repair_bw_eff}
 \end{figure}
