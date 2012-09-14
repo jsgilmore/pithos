@@ -50,23 +50,30 @@ Conclusion:
 Complete
 
 Evalutaion:
-Simulate for Pareto lifetime distribution
-Simulate Pithos using Pastry
-Compute the standard deviations of the quantities measured (reliability and responsiveness).
+Simulation todo:
 Simulate the effect of group size on reliability, responsiveness and bandwidth usage.
-Check the responsiveness of overlay storage in the LAN setup.
-Record success responsiveness for the group probability case.
 
+Lit study todo:
 Find paper that validates my overlay storage and reliability results for Chord.
-Present responsiveness distribution for the "low" and "high" cases.
-Add percentile talk to all distributions.
+
+Figures to generate:
 When talking about another distributions that's the same, create a subplot showing that distribution.
-Describe what we expect to see at the start of every new experiment, before we perform the experiment.
-Add responsiveness and bandwidth to security.
-Rewrite performance under repair section for just bandwidth, not efficiency
-Fix borders of all figures.
-Correct all fast storage response times, to take the more secure version into account.
+Present responsiveness distribution for the "low" and "high" cases.
+
+Coding todo:
 Figure out why there is a 3s spike at overlay storage and retrieval
+
+Writing todo:
+Describe what we expect to see at the start of every new experiment, before we perform the experiment.
+Write about the responsiveness of overlay storage in the LAN setup.
+Write about the performance of the Pareto distribution.
+Write about success responsiveness for the group probability case.
+Add time label to group storage responsiveness for safe storage.
+Add time label to group retrieval responsiveness for parallel retrieval.
+Rewrite performance under repair section for just bandwidth, not efficiency
+
+Writing and data mining todo:
+Add responsiveness and bandwidth to security.
 
 Hand-in PhD
 Pass defence
