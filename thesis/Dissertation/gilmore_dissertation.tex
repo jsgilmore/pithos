@@ -21,7 +21,8 @@
  \usepackage{amssymb}%............................ AMS Symbol fonts
 
 %==== Font setup (default is Computer Modern) =======================
- \usepackage[T1]{fontenc}%........................ Type 1 fonts
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}%........................ Type 1 fonts
  \usepackage{textcomp}%........................... Additional text character
  \usepackage{bm}%................................. Bold math symbols (after fonts)
 
@@ -66,6 +67,8 @@
 % use this for printing only (no color, print version):
 %\usepackage[a4paper,plainpages=false,colorlinks=false,linktocpage,bookmarks=true,bookmarksopen=false]{hyperref}
 
+\usepackage{multirow}
+
 %\renewcommand{\lstlistlistingname}{List of Listings}
 
 \hyphenation{MATLAB}
@@ -76,9 +79,9 @@
 \title{\AorE{%-- Afrikaans ------------------------------------------
              'n Toestandsbestuur en Stoor Argitektuur vir Eweknie Grootskaalse Multigebruiker Virtuele Omgewings \\[1ex]
              \normalfont\small\itshape
-             (``A State Management and Persistency Architecture for Peer-to-Peer Massively Multiuser Virtual Environments'')
+             (``A State Management and Persistency Architecture for Peer-to-Peer Massively Multi-user Virtual Environments'')
             }{%-- English -------------------------------------------
-             A State Management and Persistency Architecture for Peer-to-Peer Massively Multiuser Virtual Environments
+             A State Management and Persistency Architecture for Peer-to-Peer Massively Multi-user Virtual Environments
             }}
 
 \author{J.S.\ Gilmore}{John Sebastian Gilmore}
@@ -146,17 +149,18 @@ qualifications.]
 \include{contents/Introduction}
 \include{contents/Consistency}
 \include{contents/Storage}
-\include{contents/Design_implementation}
+\include{contents/Design}
+\include{contents/Implementation}
 \include{contents/Evaluation}
 \include{contents/Modelling}
-\include{contents/Verification}
+%\include{contents/Verification}
 \include{contents/conclusion}
 
 %==== Appendices ====================================================
-%\appendix
-%\appendixpage\relax
+\appendix
+\appendixpage\relax
 
-%\include{contents/App-1}
+\include{contents/App-1}
 
 %==== Bibliography acro's & Index ===================================
 %\backmatter

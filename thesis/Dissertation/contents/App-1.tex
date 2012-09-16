@@ -1,0 +1,95 @@
+\chapter{Overlay storage configuration parameters}
+\label{chp:OVERLAY_CONFIG}
+
+\begin{table}[phtb]
+\centering
+\begin{tabular}{|r|l|l|l|}
+\hline
+Parameter                       & Low  & Medium & High  \\
+\hline
+Stabilise retries               & 1    & 2      &  3    \\
+Stabilise delay                 & 10s  & 5s     &  3s   \\
+Fix finger table interval       & 120s & 10s    &  5s   \\
+Check predecessor delay         & 5s   & 5 s    &  3s   \\
+Extended finger table           & no   & yes    &  yes  \\
+Extended finger table candidate & N/A  & 3      &  4    \\
+\hline
+Join retries                    & 2    & 2      & 2     \\
+Join delay                      & 10s  & 10s    & 10s   \\
+Routing type                    & iterative & iterative & iterative \\
+Successor list size             & 8    & 8      & 8     \\
+Use aggressive join             & yes  & yes    & yes   \\
+Proximity routing               & no   & no     & no    \\
+\hline
+\end{tabular}
+\caption{Chord configuration parameters for the various test cases.}
+\label{tab_chord_configs}
+\end{table}
+
+\begin{table}[phtb]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+Parameter                       & Value\\
+\hline
+Bits Per Digit                  & 4\\
+Number of Leaves                & 16\\
+Number of Neighbors             & 0\\
+Join Timeout                    & 20s\\
+Ready Wait                      & 5s\\
+Second Stage Wait               & 2s\\
+Repair Timeout                  & 60s\\
+Enable New Leafs                & no\\
+Optimize Lookup                 & no\\
+Partial Join Path               & no\\
+Use Regular Next Hop            & yes\\
+Always Send Update              & no\\
+Use Discovery                   & no\\
+Ping Before Second Stage        & yes\\
+Discovery Timeout Amount        & 1s\\
+Routing Table Maintenance Interval & 0s\\
+Send State at Leafset Repair    & yes\\
+Override Old Pastry             & no\\
+Override New Pastry             & no\\
+Route Msg Acks                  & yes\\
+Routing Type                    & semi-recursive\\
+Minimal Join State              & no\\
+Proximity Neighbor Selection    & yes\\
+\hline
+\end{tabular}
+\caption{Pastry configuration parameters.}
+\label{tab_pastry_configs}
+\end{table}
+
+\begin{table}[phtb]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+Parameter                       & Value\\
+\hline
+Lookup Redundant Nodes          & 8\\
+Lookup Parallel Paths           & 1\\
+Lookup Parallel Rpcs            & 3\\
+Lookup Merge                    & true\\
+Routing Type                    & iterative\\
+Secure Maintenance              & false\\
+MinSibling Table Refresh Interval & 1000s\\
+Min Bucket Refresh Interval     & 1000s\\
+Sibling Ping Interval           & 0s\\
+Max Stale Count                 & 0\\
+k                               & 8\\
+s                               & 8\\
+b                               & 1\\
+Exhaustive Refresh              & yes\\
+Ping New Siblings               & no\\
+Enable Replacement Cache        & yes\\
+Replacement Cache Ping          & yes\\
+Replacement Candidates          & 8\\
+Sibling Refresh Nodes           & 0\\
+Bucket Refresh Nodes            & 0\\
+New Maintenance                 & no\\
+\hline
+\end{tabular}
+\caption{Pastry configuration parameters.}
+\label{tab_kademlia_configs}
+\end{table}

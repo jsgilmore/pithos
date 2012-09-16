@@ -1,11 +1,13 @@
 \chapter{Introduction}
 \label{chp:INTRO}
 
-\section{Massively Multiuser Virtual Environments}
 
-\subsection{Overview}
 
-Massively multiuser virtual environments (MMVEs) are characterised by thousands of users interacting in the same virtual environment or game world; socially, cooperatively or competitively. MMVEs can be serious, such as air traffic control simulations and military war games or casual, such as computer games. MMVEs as computer games are referred to as massively multiplayer online games (MMOGs) and can themselves be hardcore, where significant investments of time and money are required, or casual, where little time and money are required.
+\section{Massively Multi-user Virtual Environments}
+
+Massively multi-user virtual environments (MMVEs) are characterised by thousands of users interacting in the same virtual environment or game world; socially, cooperatively or competitively. MMVEs can be serious, such as air traffic control simulations and military war games or casual, such as computer games. MMVEs as computer games are referred to as massively multiplayer online games (MMOGs) and can themselves be hardcore, where significant investments of time and money are required, or casual, where little time and money are required. Hardcore games usually also have better graphics, and require large amounts of computing power, storage space and Internet bandwidth, compared with their casual counterparts.
+
+In this work, a focus is placed on hardcore MMOGs, or MMVEs that classically require large server clusters to host the virtual environment and consume significant amounts of Internet bandwidth.
 
 With the advent of broadband Internet, MMOGs have seen tremendous growth over the past decade, growing from less than 500,000 active subscribers in 1999 to over 21 million in 2011 \cite{mmo_growth_chart}. In 2011, the MMOG market was a \$2,6 billion industry in the United States alone \cite{newzoo_mmo_report}. MMOGs are characterised by expansive worlds, where a large number of players interact online with each other and the virtual environment to achieve certain goals through collaboration and teamwork.
 
@@ -13,6 +15,12 @@ From an academic perspective, MMOGs also hold great value. An MMOG is a complex 
 
 \subsection{Modern MMOG implementations}
 \label{modern_mmogs}
+
+Some examples of modern hardcore MMOGs are: World of Warcraft, Eve Online and Second Life. These games are presented here to familiarise the reader with the classic MMOG tropes. World of Warcraft presents a fantasy MMORPG that occurs in some tolkienesque imagined world, where players are heros trying to save the world from some great evil.
+
+Eve Inline is situated in space, where a player travels from one solar system to the next. Players can partake in mining, trading or pirating activities. The game is based around trade and space exploration.
+
+What distinguishes Second Life from the first two games mentioned is its focus on player generated content. This is as opposed to the first games that are more focused on consuming the available game content.
 
 \subsubsection{World of Warcraft (Fantasy MMORPG)}
 
@@ -24,34 +32,36 @@ There are different reasons why players play the game. Some players play the gam
 
 When a character is created in WoW, the creator must first choose a server on which the character will be stored. Characters on different servers cannot interact in the virtual world and cannot easily move between virtual worlds. Every server, which itself is a server cluster, hosts a complete copy of the virtual world. From a character perspective, the fact that there exists multiple copies of the game world is not know. This is termed sharding and will be discussed in detail in Section \ref{sharding}.
 
-After eight years of operation, WoW still has 10,2 million subscribers, each paying \$15 per month subscription \cite{wow_firstq_fin_results_2012}.
+After eight years of operation, WoW still has 10,2 million subscribers, each paying \$15 per month \cite{wow_firstq_fin_results_2012}.
 
 \subsubsection{Eve online (Space MMORPG)}
 
-Eve Online, developed by CCP Games, brought many new innovations to the MMORPG. It was the first successful MMORPG to feature a science fiction theme. It was the first MMOG to have a single distributed server architecture. In 2006, CCP Games launched the largest supercomputer in the gaming industry to upgrade their existing infrastructure and enable Eve to support more than 50,000 concurrent users \cite{eve_launces_supcom}. This number was surpassed in 2010 with 60,453 concurrent users in-game \cite{eve_pcu}.
+Eve Online, developed by CCP Games, brought many new innovations to the MMORPG. It was the first successful MMORPG to feature a science fiction theme and it was the first MMOG to have a single distributed server architecture. In 2006, CCP Games launched the largest supercomputer in the gaming industry to upgrade their existing infrastructure and enable Eve to support more than 50,000 concurrent users \cite{eve_launces_supcom}. This number was surpassed in 2010 with 60,453 concurrent users in-game \cite{eve_pcu}.
 
 Another innovation of Eve was the in-game economy. CCP games appointed Dr. Eyj\'{o}lfur Gu\~{o}mundsson as chief economist of Eve online in 2006 \cite{eve_economist}. His duties were to monitor and predict market trends in the game world and produce detailed quarterly economic reports \cite{eve_econ_rep}.  The economy is based on an open market system, ruled by supply and demand. No other game has implemented an in-game economy in such a rigourous fashion.
 
 \subsubsection{Second life (MMOSG)}
 
-Second life is classified as a massively multiplayer online social game (MMOSG). It focusses more on social interaction and creatively, as opposed to the usual conflict-based MMORPGs, such as WoW or Eve online. Players in Second Life can create virtual items, such as clothing, furniture and architecture, and sell them them for real money. Players can buy property and build on the property they bought. This can be sold to other users, all for real money.
+Second life is classified as a massively multiplayer online social game (MMOSG). It focusses more on social interaction and creatively, as opposed to the usual conflict-based MMORPGs, such as WoW or Eve online. Players in Second Life can create virtual items, such as clothing, furniture and architecture, and sell them for real money. Players can buy property and build on the property they bought. This can be sold to other users, also for real money.
 
-From a network architecture perspective, user generated content changes adds a lot of extra load to the system. Players no longer only have to be aware of other players in the virtual world, they also have to be made aware of the content that other players generated. Usually, the player's client also know exactly how another player looks, based on her class and equipped items. With user generated content, the complete shape of the object is transferred. User generated content, therefore, increases bandwidth requirements.
+From a network architecture perspective, user generated content changes adds a lot of extra load to the system. Players no longer only have to be aware of other players in the virtual world, they also have to be made aware of the content that other players generate. Usually, the player's client also know exactly how another player looks, based on her class and equipped items. With user generated content, the complete shape of the object is transferred. User generated content, therefore, increases bandwidth requirements.
 
 \subsection{Requirements}
+\label{mmve_requirements}
 
 The design requirements of an MMOG are the same as the design requirements for a classic single player game, with the added requirements of networking capability and scalability. Classic game design requirements include: a graphics engine, a physics engine, handling user input, game mechanics and logic, artificial intelligence, level design and the creation of art assets, sounds and music.
 
-What is additionally required for an MMOG is a network and state consistency architecture. The network architecture defines how hosts are connected, the roles of different hosts and how information is distributed between hosts. There are many social as well as technical aspects to consider when designing a virtual world \cite{designing_virtual_worlds}, but an essential requirement of all MMVEs, including all the MMOGs presented in Section \ref{modern_mmogs}, is that multitudes of players should be able to interact with each other and the virtual environment. This is called the consistency architecture. The consistency architecture ensures that players share the same view of the virtual environment they inhabit. It is also responsible for relaying player actions to other players and informing other players of any new players or objects in the virtual world.
+What is additionally required for an MMOG is a network and state consistency architecture. The network architecture defines how hosts are connected, the roles of different hosts and how information is distributed between hosts.
+
+There are many social as well as technical aspects to consider when designing a virtual world \cite{designing_virtual_worlds}, but an essential requirement of all MMVEs, including all the MMOGs presented in Section \ref{modern_mmogs}, is that multitudes of players should be able to interact with each other and the virtual environment. This is called the consistency architecture. The consistency architecture ensures that players share the same view of the virtual environment they inhabit. It is also responsible for relaying player actions to other players and informing other players of any new players or objects in the virtual world.
 
 Player data should also be stored when players log off from the game. In-game object states should also be stored as well as the states of computer characters in the game.
+
+A separation between authoritative and non-authoritative state is also required in MMVEs. If two players do not agree on the state of the game, due to latency or cheating, is must be possible to return the game to a state on which both players can agree. This ``true'' state is called the authoritative state, with players usually possessing non-authoritative states. When two entities do not agree on the environment state, authoritative state is used as a state on which both can agree upon and revert to.
 
 \subsection{Classic client-server MMVEs}
 
 A classic network architecture, used in the design of all MMVEs presented in Section \ref{modern_mmogs} and in all commercially successful MMOGs to date is the client-server (C/S) network architecture.
-
-\subsubsection{Client/Server}
-\label{client_server_network_model}
 
 \begin{figure}[htbp]
 \centering
@@ -62,43 +72,30 @@ A classic network architecture, used in the design of all MMVEs presented in Sec
 \caption{Network architectures}
 \end{figure}
 
-Figure \ref{fig_cs_arch} shows the C/S model. The server is the entity on which the MMOG is hosted and is controlled by the game operator.
-Clients are computers operated by players, that connect to the server to play the game. The server is responsible for handling all queries from
-clients. Clients never communicate with other clients; they send their actions to the server and receive the updated states of other players from the
-server.
+Figure \ref{fig_cs_arch} shows the C/S model. The server is the entity on which the MMOG is hosted and is controlled by the game operator. The server contains the authoritative environment state, to which clients must revert if their states deviate from the authoritative state. Clients are computers operated by players, that connect to the server to play the game. The server is responsible for handling all queries from clients. Clients never communicate with other clients; they send their actions to the server and receive the updated states of other players from the server. All client environment states are non-authoritative.
 
-The C/S architecture has two main advantages that has made it the architecture of choice for all MMOG developers. Because of the centralised approach
-of the architecture, both administration and security are greatly simplified. Administration is simplified, because the game operator has full
-control over the server, server data and code. Efficient logging is also supported, because the server is able to not only log all server actions,
-but also all client actions.
+\subsubsection{Advantages}
 
-Security is a significant issue in MMOGs, since some players sell in-game currency for real-world currency \cite{chinese_gold_farmer}. This makes the
-MMOG a platform that is capable of producing income, which increases the incentive of players to gain an unfair advantage over others. The more
-popular an MMOG, the greater the security threat. Because the operator has full control over the server code and is never required to furnish the
-client with the server code, a potential attacker never has any knowledge of the server architecture and code. Because clients are never allowed to
-communicate, all malicious users can be filtered out of the network by the server when detected and even banned from the network.
+The C/S architecture has two main advantages that has made it the architecture of choice for all MMOG developers. Because of the centralised approach of the architecture, both administration and security are greatly simplified. Administration is simplified, because the game operator has full control over the server, server data and code. Efficient logging is also supported, because the server is able to not only log all server actions, but also all client actions.
 
-Operators are able to ban players, since these games usually require a game account, which is linked to a copy of the game as well as some payment
-method. This introduces a large cost to players whose accounts are banned. The server or cluster is also housed in a secured location, where access
-can be controlled. These factors simplify the security of the C/S model by allowing the developers to place all intelligence in the server.
+Security is a significant issue in MMOGs, since some players sell in-game currency for real-world currency \cite{chinese_gold_farmer}. This makes the MMOG a platform that is capable of producing income, which increases the incentive of players to gain an unfair advantage over others. The more popular an MMOG, the greater the security threat. Because the operator has full control over the server code and is never required to furnish the
+client with the server code, a potential attacker never has any knowledge of the server architecture and code. Because clients are never allowed to communicate directly, all malicious users can be filtered out of the network by the server when detected and even banned from the network.
 
-The C/S architecture, however, does have some disadvantages. These are: weak robustness, weak scalability, high cost to the operator, high
-latency, high amount of required server bandwidth and weak handling of transient loads. The robustness of the system is weak because it is
-a single point of failure. If the server fails or goes down for maintenance, the game is off-line
-and players are unable to play.
+Operators are able to ban players, since these games usually require a game account, which is linked to a copy of the game as well as some payment method. This introduces a large cost to players whose accounts are banned. The server or cluster is also housed in a secured location, where access can be controlled. These factors simplify the security of the C/S model by allowing the developers to place all intelligence in the server.
 
-The system is also not scalable, since a single server cannot easily be extended with more resources. Even if an off-line approach is used, where
-hardware is upgraded after the system is taken down for maintenance, the hardware required to support a game hosting more than 3000 players, become
-prohibitively expensive, as described in Section \ref{mmog_cost}.
+\subsubsection{Disadvantageous}
+\label{classic_cs_disadvantages}
 
-The server hardware should be able to support peak system loads, which means that sufficient resources should always be provisioned to support these
-peak load. This is not an economically viable solution, because resources to handle peak loads are not used most of the time. This translates to
-operators paying for the provisioning of resources, without having active players that pay for these resources.
+The C/S architecture has the following disadvantages: weak robustness, weak scalability, high cost to the operator, high latency, high amount of required server bandwidth and weak handling of transient loads.
+\begin{itemize}
+\item The robustness of the system is weak because it is a single point of failure. If the server fails or goes down for maintenance, the game is off-line and players are unable to play.
 
-Because no clients are allowed to communicate with other clients, every change that is made to the game world by a client, first had to be
-communicated to the server, which in turns relays this message to all clients after applying game logic and artificial intelligence (AI) algorithms.
-This two hop path, with the additional time for computation added by the server as well as possible buffering at the server when many clients
-communicate, significantly increases the latency of the system compared to a system where direct communication is used.
+\item The system is also weakly scalable, since a single server cannot easily be extended with more resources. Even if an off-line approach is used, where hardware is upgraded after the system is taken down for maintenance, the hardware required to support a game hosting more than 3000 players, become prohibitively expensive, as described in Section \ref{mmog_cost}.
+
+The server hardware should be able to support peak system loads, which means that sufficient resources should always be provisioned to support these peak load. This is not an economically viable solution, because resources to handle peak loads are not used most of the time. This translates to operators paying for the provisioning of resources, without having active players that pay for these resources.
+
+\item Because no clients are allowed to communicate with other clients, every change that is made to the game world by a client, first had to be communicated to the server, which in turns relays this message to all clients after applying game logic and artificial intelligence (AI) algorithms. This two hop path, with the additional time for computation added by the server as well as possible buffering at the server when many clients communicate, significantly increases the latency of the system compared to a system where direct communication is used.
+\end{itemize}
 
 \subsubsection{Client/Multi-Server}
 
@@ -124,52 +121,52 @@ With the costs involved, it is therefore difficult for a new developer to enter 
 
 \subsection{The peer-to-peer proposal}
 
-In 2004, an architecture using the peer-to-peer networking model to host MMVEs was proposed by Knutsson et al. \cite{knutsson_p2p_first}. This
-revealed a new research field, which attempts to establish the peer-to-peer (P2P) model as a viable alternative to the classic C/S and C/MS
-architectures. P2P MMVE forms the focus of this work. There are various advantages to moving from C/S to P2P in MMVEs. These include: increased robustness, improved scalability, lower operator costs, improved handling of transient player load and lower latencies. The advantages are described in Section \ref{p2p_mmve_advantages} in detail,
-but firstly it would be beneficial to acquire a greater understanding of the basics of the P2P network model.
+To our knowledge, the first distributed multi-user virtual environment was MiMaze, developed in 1998 by Gautier and Diot \cite{mimaze}. This revealed a new research field, which attempted to establish the peer-to-peer (P2P) model as a viable alternative to the classic C/S and C/MS architectures. In 2004, Knutsson et al. proposed the first scalable architecture to host massively multiuser virtual environments  \cite{knutsson_p2p_first}.
 
-\section{Peer-to-Peer systems}
+P2P MMVEs form the focus of this work. There are various advantages to moving from C/S to P2P in MMVEs. These include: increased robustness, improved scalability, lower operator costs, improved handling of transient player load and lower latencies. The advantages are described in Section \ref{p2p_mmve_advantages} in detail, but firstly it would be beneficial to acquire a greater understanding of the basics of the P2P network model.
 
-\subsection{Overview}
+\section{Peer-to-Peer networks}
 
-A P2P network is a distributed network that exists out of many participating nodes to fulfil some objective. In this work, a P2P network is defined as being a distributed network with the following properties
+A P2P network is a distributed network that exists out of many participating peers to fulfil some objective. In this work, a P2P network is defined as being a distributed network with the following properties
 \cite{Rodrigues_acm_comms_p2p}:
 %
 \begin{itemize}
 \item \emph{High degree of decentralisation}:  No or little centralised control exists. Server functionality is distributed amongst all peers.
-\item \emph{Self-organisation}: Little or no self-organisation is required in the network. Nodes are given an initial IP to allow them to join the network, but thereafter new neighbours are automatically acquired and nodes remain connected to the network, even with other nodes joining and leaving.
+\item \emph{Self-organisation}: Little or no self-organisation is required in the network. Peers are given an initial IP to allow them to join the network, but thereafter new neighbours are automatically acquired and peers remain connected to the network, even with other peers joining and leaving.
 \item \emph{Multiple administrative domains} Peers are not under the control of any single authority. Peers in the network belong to different organisations or individuals and direct administration is impossible.
 \end{itemize}
 
 P2P systems have been popularised by mainly three systems developed in 1999: the Napster music sharing service, the Freenet data store and the SETI@home volunteer-based distributed computing project. These three projects highlighted the advantages of P2P networks being: low barrier to entry, scalability, resistance to faults and attacks, and an abundance and availability of resources.
 
-\subsection{The OSI model}
+\subsection{The OSI model and P2P overlays}
 
-A basis of computer networking is the layered architecture model, usually called the Open Systems Interconnection (OSI) model \cite{OSI_protocol_stack}. It defines various protocol layers that allow for abstraction of complex operation in the lower layers in the higher layers. The OSI layers are, from bottom to top: the physical layer, the data link layer, the network layer, the transport layer, the session layer, the presentation layer and the application layer. In practice, the session, presentation and applications layers are all folded into the application layer.
+A basis of computer networking is the layered architecture model, called the open systems interconnection (OSI) model \cite{OSI_protocol_stack}. It defines various protocol layers that allow for abstraction of complex operation in the lower layers in the higher layers. The OSI layers are, from bottom to top: the physical layer, the data link layer, the network layer, the transport layer, the session layer, the presentation layer and the application layer. In practice, the session, presentation and applications layers are usually all folded into the application layer.
 
-The physical layer is the physical transmission medium and carries physical signals. Physical level protocol examples include: IEEE 802.11 (Wi-fi), USB, Bluetooth, etc..
+The physical layer is the physical transmission medium and carries physical signals. Physical level protocol standards include: IEEE 802.11 (Wi-fi), USB, Bluetooth, etc.. The data link layer, sometimes referred to as the MAC layer in the Internet protocol stack, carries frames and is responsible for point-to-point data transfer on the same local area network (LAN). Signals from the bottom layer are converted into bits and sequences of bits are grouped into frames, which is seen to be sent over the data link layer. As can be seen, every higher layer abstracts elements of the lower layer to reduce complexity.
+
+The network layer allows communication between different LANs, using routers, gateways and host addressing. Every computer in a network is referred to as a host. A well known network layer protocol is the Internet protocol (IP), which routes all Internet traffic. The transport layer is referred to as the end-to-end layer and represents the abstract connection between a source and destination host, where all intermediate routers and LANs may be ignored, since they are abstracted away by the network layer. Well known protocols in this layer include the user datagram protocol (UDP) and transport control (TCP) protocol. Above the transport layer, for the purposes of this work, is the application layer. The application layer has access to all network services, including routing and reliable transmission.
+
+In the C/S architecture, the client and server are both located in the application layer and communicate with each other using the transport layer. They need not be aware of any of the lower layers.
+
+P2P networks are created and maintained in the application layer of the OSI model, called the P2P overlay. An overlay is required so peers may know which other peers are part of the P2P network, since most nodes on the Internet will not be part of the network. The overlay is then defined by the routing table information stored on each peer. The overlay can be thought of as an additional layer in the OSI model. The overlay interfaces with the transport layer and P2P applications are one layer higher and communicate by using the overlay.
+
+Peers in an overlay network might have neighbours that have no relationship to their physical position in the underlying network.
 
 \subsection{Structured and unstructured P2P overlays}
 \label{overlays}
 
-A P2P network can be fully characterised by its overlay. P2P networks are created and maintained in the application layer of the Open Systems Interconnection (OSI) model protocol stack. This application layer network is called the P2P overlay.
+Overlays can broadly be classified into structured and unstructured types. The classification is mostly based on the differing methods of routing and content retrieval in the network. This section only provides a brief comparison between structured and unstructured overlays. For a detailed comparison between the two types that also deals with many of the myths of structured overlays, please refer to \cite{Castro_structured_overlay_myths}.
 
-An overlay is required so peers may know which other peers are part of the P2P network, since most nodes in the physical network, such as the Internet, will not be part of the network. The overlay is then defined by the routing table information stored on each peer.
+With unstructured approaches, one is never assured that a data item will be retrieved, even if that data item is present in the network. If many duplicates of a data item are contained in the network, this becomes less of a problem, since it is assumed that the request will be routed to some set of peers that do  possess the item.
 
-Peers in an overlay network might have neighbours that have no relationship to their physical position in the underlying network. Overlays can broadly be classified into structured and unstructured types. The classification is mostly based on the differing methods of routing and content retrieval in the network. This section only provides a brief comparison between structured and unstructured overlays. For a detailed comparison between the two types that also deals with many of the myths of structured overlays, please refer to \cite{Castro_structured_overlay_myths}.
+An unstructured architecture is well suited to content sharing and Voice over Internet Protocol (VoIP) networks, for example: P2P TV, BitTorrent, Gnutella and Skype. The reason for this is the high level of duplication in these networks, especially for popular content. It is also easier to perform keyword searches in unstructured networks and the overlay requires less maintenance.
 
-With unstructured approaches, one is never assured that a data item will be retrieved, even if that data item is present in the network. If many duplicates of a data item are contained in the network, this becomes less of a problem, since it is assumed that the request will be routed to some set of nodes that do  possess the item.
-
-An unstructured architecture works well for content sharing and Voice over Internet Protocol (VoIP) networks, for example: P2P TV, BitTorrent, Gnutella and Skype. The reason for this is the high level of duplication in these networks, especially for popular content. It is also easier to perform keyword searches in unstructured networks and the overlay requires less maintenance.
-
-Because there is no assurance that a data item might be retrieved from an unstructured network, especially when that item is scarce, unstructured overlays are not considered adequate as a basis for P2P MMVEs, where all data items must be available at all times.
-
-Structured overlays have been proposed that provide for efficient routing and reliable retrieval of data items. Some of these well known overlays are: CAN \cite{CAN}, Chord \cite{chord}, Tapestry \cite{tapestry} and Pastry \cite{pastry}. The basic idea of a structured overlay is that all nodes are identified by unique identifiers (IDs).
+Structured overlays have been proposed that provide for efficient routing and reliable retrieval of data items. Some well known structured overlays are: CAN \cite{CAN}, Chord \cite{chord}, Tapestry \cite{tapestry}, Pastry \cite{pastry} and Kademlia \cite{Kademlia_Maymounkov}. The basic principle of a structured overlay is that all nodes are identified by unique identifiers (IDs).
 
 A popular method to create the IDs is to use hashes to a circular key space, using for example, the SHA-1 hash function. Any node in the overlay network is then able to efficiently route a query with a given ID, to a node with an ID closest to the given ID. An accurate comparison is that unstructured overlays are good at finding ``hay'', while structured overlays are good at finding ``needles'' \cite{Rodrigues_acm_comms_p2p}.
 
 \subsection{Features of structured P2P overlays}
+\label{structured_overlay_features}
 
 A structured P2P overlay has certain key features that determines its lookup speed, space consumption and bandwidth requirement \cite{p2p_networking_handbook}. These features are geometries, routing algorithms, join/leave mechanisms, routing table maintenance and bootstrapping.
 
@@ -205,9 +202,9 @@ The process of bootstrapping is complete when a joining peer becomes a functioni
 \begin{itemize}
 \item P2P networks have a low barrier to entry, since little or no centralised infrastructure is required to maintain the system. This makes P2P networks inexpensive to operate and is one of the reasons Napster was able to provide its service for free.
 
-\item P2P networks are considered scalable. Pure P2P networks can theoretically grow from hundreds to millions of nodes, with the service remaining functional. This is all possible without the need for the operator to acquire more infrastructure, as opposed to the centralised client/server network, which required more powerful server clusters are the network grows to handle the growing number of client requests.
+\item P2P networks are considered scalable. Pure P2P networks can theoretically grow from hundreds to millions of peers, with the service remaining functional. This is all possible without the need for the operator to acquire more infrastructure, as opposed to the centralised client/server network, which required more powerful server clusters are the network grows to handle the growing number of client requests.
 
-\item A P2P network is also resistant to faults and attacks, since the failure of a single node has little to no effect on the network. This is because there are usually few nodes that are critical to the correct functionality of the system. To incapacitate a P2P network, an attacker usually has to shut down a large proportion of the network.
+\item A P2P network is also resistant to faults and attacks, since the failure of a single peer has little to no effect on the network. This is because there are usually few peers that are critical to the correct functionality of the system. To incapacitate a P2P network, an attacker usually has to shut down a large proportion of the network.
 
 \item Not only does a P2P operator not require its own infrastructure, but the P2P infrastructure that forms part of the network and consists of peer machines provide abundant and highly available resources, being computation power, long term and short term storage. This means that P2P networks can be designed to run on powerful computers.
 \end{itemize}
@@ -216,114 +213,282 @@ The process of bootstrapping is complete when a joining peer becomes a functioni
 \section{Peer-to-Peer MMVE network architectures}
 \label{p2p_network_architectures}
 
-\subsection{Overview}
+P2P MMOGs are considered a sub-class of P2P Massively Multi-user Virtual Environments (MMVEs), a class that also includes large scale military simulators.
 
-P2P MMOGs are considered a sub-class of P2P Massively Multiuser Virtual Environments (MMVEs), a class that also includes large scale military simulators.
+This architecture does, however, still have a few major issues that need to be solved before MMVEs can be developed that use it. If these issues, discussed in Section \ref{key_challenges}, can be solved, a P2P architecture holds some powerful advantages over a C/S system.
 
-This architecture does, however, still have a few major issues that need to be solved before MMVEs can be developed that use it. If
-these issues, discussed in Section \ref{key_challenges}, can be solved, a P2P architecture holds some powerful advantages over a C/S system.
-
-The core idea of the P2P model is that each peer contributes sufficient resources to the network to host itself. This also means that all functions
-of the server in the classic C/S model are distributed amongst all peers.
-
-\subsection{Requirements}
+The core idea of the P2P model is that each peer contributes sufficient resources to the network to host itself. This also means that all functions of the server in the classic C/S model are distributed amongst all peers. The authoritative environment state should now also be distributed amongst the peers in the network. Each peer will, therefore, contain a section of non-authoritative state for its own display purposes, and contain sections of the authoritative environment state.
 
 \subsection{Advantages}
 \label{p2p_mmve_advantages}
 
-The P2P network is robust, because there is no server that can fail, only individual peers. Individual peers failing will not affect any other peers
-other than the peer that failed. This behaviour makes game down-time extremely unlikely.
+\begin{itemize}
+\item The P2P architecture is robust, because there is no server that can fail, only individual peers. Individual peers failing will not affect any other peers other than the peer that failed. This behaviour makes game down-time extremely unlikely.
 
-Furthermore, because every peer hosts itself, the system is scalable. Another advantage is that no extra costs are incurred from an operator
-perspective, when more peers join the network. This will also allow for efficient handling of transient loads. If many players suddenly enter the
-game no resource provisioning issues will arise, since peers already possess their required resources.
+\item The system is scalable, because every peer hosts itself.
 
-P2P architectures also create a lot of opportunity for independent developers, because a large initial investment is no longer required to purchase
-the expensive server hardware. Not only are hardware costs reduced, but running costs are also reduced. The bandwidth required by the game server is
-now shared amongst users, which means that very little bandwidth costs will be incurred by the provider.
+\item Because of the high scalability, no extra resources are required from an operator perspective, when more peers join the network.
 
-Latency is also improved, because it is now possible to directly communicate between peers and it is not necessary to communicate via a server. There
-is also no single server that has to process user actions (events). User actions need only be processed by other peers who find the specific action of interest. The distribution of the load as well as direct communication will further reduce latency.
+\item P2P networks also efficiently handle transient loads, since the joining peers contribute their own resources. If many players suddenly enter the
+game no resource provisioning issues will arise, since peers already possess the required resources.
 
-\subsection{State of the art}
+\item P2P architectures create a lot of opportunities for independent developers, because a large initial investment is no longer required to purchase
+the expensive server hardware. Not only are hardware costs reduced, but running costs are also reduced.
+
+\item Bandwidth required by the game server is now shared amongst users, which means that very little bandwidth costs will be incurred by the provider.
+
+\item Latency is improved, because it is now possible to directly communicate between peers and it is not necessary to communicate via a server.
+The distribution of the load as well as direct communication will further reduce latency.
+\end{itemize}
+
+\subsection{Requirements}
+
+Key requirements have been identified for the creation of a P2P MMVE. What follows is an expansion and reinterpretation of the requirements identified by Schiele et al. \cite{Schiele_p2p_requirements}. Some of those key requirements, that are specific to P2P MMVEs, are briefly highlighted in this section.
+
+\subsubsection{Distributed computation}
+\label{distributed_computation_requirement}
+
+Non-Player Characters (NPCs) are characters that are not controlled by any human player, but are rather controlled by some artificial intelligence routine or script executing on some host machine. These characters represent the traders and monsters in MMVEs and usually contain sets of rules that determine how they should interact with Player Characters (PCs) as well as their own state information. An NPC's state can be how much money and items it has to trade or how much health it still has after being attacked by a player.
+
+Some game objects require computational power to function. An example of this is the Artificial Intelligence routines of NPCs or the computation of physics effects on in-game objects. In P2P MMVE, it might be required to distribute these computational tasks to offload computation load from peers that do not have sufficient resources.
+
+\subsubsection{Consistency}
+A key challenge with any networked game is how to maintain state consistency between users in the virtual world. In other words, to ensure that all users perceive a virtual world in the same state. Solving the state consistency problem for P2P MMVEs is one of the major development challenges and forms the focus of this work. The challenge of state consistency will be described in detail in Chapter \ref{chp:CONSISTENCY}.
+
+\subsubsection{Persistency and state management}
+
+P2P MMVEs require persistent state, which means that the information of users in the virtual world should be maintained. The items that a user possesses in the virtual world should remain on his virtual avatar, even if she logs out and later back on to the virtual environment.
+
+Persistency is different to state management. Persistency is the long term storage of data, usually on secondary storage. State management deals with managing the state of objects in the virtual world. This includes handling all requests for that object from peers who do not yet possess the object, or processes changes that players have made to the objects in the virtual world.
+
+\subsubsection{Interactivity}
+
+P2P MMVE should be interactive and responsive. This means that they should support low latency interactions and possibly mask high latency operations, using techniques such as dead reckoning \cite{cheat_proof_playout}, so as not to break immersion. Interactivity means that all players actions should be handled as soon as possible.
+
+\subsubsection{Scalability}
+
+MMVE are by definition massive, supporting thousands to tens of thousands of players in the same virtual environment, as discussed in Section \ref{scalability_req}. A P2P MMVE should support as many users as a classic MMVE, preferably more.
+
+\subsubsection{Security}
+
+Security, which includes cheating mitigation, has been identified as a major issue for P2P networks \cite{knutsson_p2p_first}, \cite{challenges_p2p_gaming}, \cite{cheat_proof_event_ordering}. The challenges reside in the fact that peers are not under the control of the game producer. Since the authoritative environment state is distributed amongst peers, all peers have access to sections of the authoritative environment state. Peers also have access to the code that was classically only housed on the server. This creates the opportunity that peer might attempt to alter the authoritative state in ways that are not consistency with the environment rules.
+
+One advantage that can be exploited to prevent cheating is that no peer contains all authoritative environment state and no single peer has more authority than another.
+
+\subsubsection{Efficiency}
+
+The network architecture of a P2P MMVE should be efficient. This usually goes without saying, but the reason why it is specifically stated is because the P2P network architecture basically implements the functionality of the server in the classic server model.
+
+The server functionality has to be distributed accross all users of the P2P system. In addition to server functionality, a peer still requires the functionality of a classic client as well. This means the rendering of intricate graphics and calculation of complex physics. The P2P MMVE network architecture should, therefore, require as little as possible resources, of the resource that would ordinarily have been used for graphics and physics.
+
+\subsubsection{Incentives}
+
+P2P schemes require all players to share resources in order to ensure correct functionality. Players might, however, not want to share their resources, whilst still benefiting from the resources of others. The purpose of incentive mechanisms is to ensure that all players contribute resources, by incentivised contribution.
+
+All distributed resource sharing models require incentive mechanisms. For example, Bittorrent systems use the tit-for-tat protocol to ensure that all people downloading data are also contributing data \cite{tit_for_tat}. Such mechanisms are also required with P2P MMVEs. One advantage in designing an incentive mechanism for a P2P MMVE is that players can be made to contribute resources for the duration of play. The issues with file sharing systems are not present where a peer, after downloading a file, has no more incentive to contribute.
 
 \subsection{Key challenges}
 \label{key_challenges}
-Although many advantages can be had from P2P MMVEs, some challenges still remain. The main challenges are state consistency, limited peer bandwidth, cheating mitigation, incentive mechanisms and distributed computation.
+
+Using P2P MMVEs has many advantages, but some challenges still remain. The main challenges are state consistency, limited peer bandwidth, cheating mitigation, incentive mechanisms and distributed computation. This section will present some information on work that has been done in the different areas and talk about the maturity of the various solutions. In general though, most solutions are still research projects and none have yet been implemented as commercial products.
 
 \subsubsection{Peer bandwidth}
-Another challenge for P2P networks is the required peer bandwidth. In a paper by Miller and Crowcroft, a packet simulator was created to determine the required bandwidth and effective latency, if a game such as World of Warcraft were to be implemented using P2P technologies \cite{Miller_p2p_infeasability}. Their simulation results indicate that today's networks are not able to host P2P MMVEs, with the required bandwidth and latency constraints. Such a significant result requires verification, but at the least, it shows that reducing bandwidth and latencies for P2P
-MMVEs should be a primary design requirement.
+\label{peer_bandwidth_usage}
+
+In a paper by Miller and Crowcroft, a packet simulator was created to determine the required bandwidth and effective latency, if a game such as World of Warcraft were to be implemented using P2P technologies \cite{Miller_p2p_infeasability}. Their simulation results indicate that today's networks are not able to host P2P MMVEs, with the required bandwidth and latency constraints. Such a significant result requires verification, but at the least, it shows that reducing bandwidth and latencies for P2P MMVEs should be a primary design requirement.
 
 \subsubsection{Cheating mitigation}
 \label{key_challenges_cheating}
 
-Cheating mitigation has been identified as a major issue for P2P networks \cite{knutsson_p2p_first}, \cite{challenges_p2p_gaming}, \cite{cheat_proof_event_ordering}. The challenges reside in the fact that peers are not under the control of the game producer. Since all server data are distributed amongst peers, all peers have access to sections of the server data. Peers also have access to the distributed server code. One advantage that can be exploited to prevent cheating is that no peer contains all server data and no single peer has more authority than another.
+There are various security issues that are usually classified according to the level in the OSI protocol stack where they occur. The areas identified by \cite{cheat_proof_event_ordering} and expanded upon by \cite{cheating_taxonomy} are: game level, application level, protocol level and infrastructure level. The description is consistent with the generally used layered security model \cite{distributed_systems_security}.
 
-There are various security issues that are usually classified according to the level in the protocol stack where they occur. The areas identified by \cite{cheat_proof_event_ordering} and expanded upon by \cite{cheating_taxonomy} are: game level, application level, protocol level and infrastructure level. This is consistent with the generally used layered security model \cite{distributed_systems_security}.
+\begin{itemize}
+\item Game level cheats are ways in which a malicious player may gain an unfair advantage over other players, within the confines of the game. These cheats are usually because of software bugs and some examples are duplication and teleport cheats.
 
-Game level cheats are ways in which a malicious player may gain an unfair advantage over other players, within the confines of the game. These cheats are usually because of software bugs and some examples are duplication and teleport cheats.
+\item Application level cheats are where malicious players alter the game software to gain an unfair advantage. This is usually done by gaining access to the game state to which they should not have access at the current time. An example of this is ``map reveal'' cheats in strategy games, where the ``fog of war'' is removed and the player can observe all the opponent's movements. Other cheats that are used include augmenting the player's UI with extra information that allows the player to make more informed decisions.
 
-Application level cheats are where malicious players alter the game software to gain an unfair advantage. This is usually done by gaining access to the game state to which they should not have access at the current time. An example of this is ``map reveal'' cheats in strategy games. Where the ``fog of war'' is removed and the player can observe all the opponent's movements. Other cheats are sometimes used that augment the player's UI with extra information that allows the player to make more informed decisions. It is debatable whether these additions are cheats. They are, however, considered almost essential for competitive WoW play.
+\item Protocol level cheats are cheats based on the different methods of communicating data across the system. These usually concern dropping, delaying of modifying IP packets to achieve certain outcomes in the game.
 
-Protocol level cheats are cheats based on the different methods of communicating data across the system. These usually concern dropping, delaying of modifying IP packets to achieve certain outcomes in the game. Infrastructure level cheats concern exploiting the underlying infrastructure on which the games are built. These include hacking the hardware or P2P overlay.
+\item Infrastructure level cheats concern exploiting the underlying infrastructure on which a game is built. Types of infrastructure cheats include denial of service (DOS) attacks on the P2P overlay to prevent messages that should be forwarded by a peer from being forwarded.
+\end{itemize}
 
-As with all taxonomies, all cheats may not cleanly fit into one if these boxes, some cheats may occur over multiple levels or a cheat with a specific outcome can be implemented differently on different levels. The field of P2P security has recently received more attention than in the past and has started to bear fruit \cite{survey_p2p_game_cheats}. This is, however, an ongoing research field with many issues still open. For an in-depth review of the security issues facing peer-to-peer system in general, refer to \cite{p2p_security_issues}. These issues are the same issues facing P2P MMVEs, with the exception of the game and application layer issues.
+As with all taxonomies, all cheats may not cleanly fit into one if these boxes, some cheats may occur over multiple levels or a cheat with a specific outcome can be implemented differently on different levels. The field of P2P security has recently received more attention than in the past and has started to bear fruit \cite{survey_p2p_game_cheats}.
+
+This is, however, an ongoing research field with many issues still open. For an in-depth review of the security issues facing peer-to-peer system in general, refer to \cite{p2p_security_issues}. These issues are the same issues facing P2P MMVEs, with the exception of the game and application layer issues.
 
 \subsubsection{Incentive mechanisms}
 
-P2P schemes require all players to share resources in order to ensure correct functionality. The issue with this is that players might not want to share their resources, but still benefit from the resources of others. This is where incentive mechanisms become important. The function of these mechanisms is to ensure that all players contribute resources, by incentivised contribution.
+Some proposed incentive schemes increase a player's reputation when resources are provided  \cite{classic_p2p_reputation} \cite{proactive_reputation}. This might create a type of meta game, where players try to gain as much reputation as possible. It can however be argued that this scheme does not really enforce the provisioning of resources. A player who does not want to provide resources might not see a higher reputation as sufficient incentive to provide resources.
 
-All distributed resource sharing models require incentive mechanisms. For example, Bittorrent systems use the tit-for-tat protocol to ensure that all people downloading data are also contributing data \cite{tit_for_tat}. Such mechanisms are also required with P2P MMVEs. One advantage in designing an incentive algorithm for a P2P MMVE is that players can be made to contribute resources for the duration of play. The issues with file sharing systems are not present where a peer, after downloading a file, has no more incentive to contribute. When a peer plays a game, incentive can be created to provide resources for the duration of the game.
-
-Some incentive schemes proposed increase a player's reputation when resources are provided  \cite{classic_p2p_reputation} \cite{proactive_reputation}. This might create a type of meta game, where players try to gain as much reputation as possible. It can however be argued that this scheme does not really enforce the provisioning of resources. A player who does not want to provide resources might not see a higher reputation as sufficient incentive to provide resources.
-
-Other issues with incentive schemes is that sometimes players might have insufficient resources. Such players should be aided by other players with sufficient resources and not be disallowed to play the game. When limited resources are taken into account, the issue of reporting a false amount of available resources becomes a problem. A peer that has sufficient resources, might report insufficient resources, to not be penalised. It is evident that there exists space for more research in this field.
-
+Other issues with incentive schemes is that sometimes players might have insufficient resources. Such players should be aided by other players with sufficient resources and not be disallowed from playing the game. When limited resources are taken into account, the issue of reporting a false amount of available resources becomes a problem. A peer that has sufficient resources, might report insufficient resources, to avoid being penalised. It is evident that there is a need for more research in this field.
 
 \subsubsection{Distributed computation}
+\label{distributed_computing_challenge}
 
-Non-Player Characters (NPCs) are characters that are not controlled by any human player, but are rather controlled by some artificial intelligence routine or script executing on some host machine. These characters represent the traders and monsters in MMVEs and usually contain sets of rules that determine how they should interact with Player Characters (PCs) as well as their own state information. An NPC's state can be how much money and items it has to trade or how much health it still has after being attacked by a player.
-
-In the original NPC host allocation classification by Fan, both NPC state and computational routines are combined into a single category \cite{Fan_phd}. In the classification presented below, NPC state forms part of normal game state persistency, since NPC objects are game objects like any other. The NPC routines requiring computational power are grouped under the heading of distributed computation. This heading is meant to include the distribution of all in game computational elements.
-
-Some game objects require computational power to function. An example of this is the Artificial Intelligence routines of NPCs or the computation of physics effects on in-game objects. Some architectures assume that the computational requirements will be fulfilled where the object state is hosted \cite{solipsis}, but other schemes exist that allow for the CPU power to be distributed amongst peers. One such scheme makes use of a ``job board'' like mechanism, where tasks are advertised on specialised super peers. Other peers monitor these super peers and may elect to perform the advertised tasks \cite{fan_mediator_paper}.
+Some architectures assume that the computational requirements will be fulfilled where the object state is hosted \cite{solipsis}, but other schemes exist that allow for the CPU power to be distributed amongst peers. One such scheme makes use of a ``job board'' like mechanism, where tasks are advertised on specialised peers. All peers monitor these specialised peers and may elect to perform the advertised tasks \cite{fan_mediator_paper}.
 
 \subsubsection{State consistency}
-%State persistency, compared to state consistency
-A key challenge with any networked game is how to maintain state consistency between users in the virtual world. In other words, to ensure that all users perceive a virtual world in the same state. Solving the state consistency problem for P2P MMVEs is one of the major development challenges and forms the focus of this work. The challenge of state consistency will be described in detail in Chapter \ref{chp:CONSISTENCY}.
+
+The state of the art of state consistency techniques will be reviewed in detail in Chapters \ref{chp:CONSISTENCY} and \ref{p2p_MMVE_state_persistency}.
 
 \section{Research objectives}
+
+The objective of this work is to design and develop a novel state management and persistency architecture, specifically designed for P2P MMVEs, that satisfies all P2P MMVE storage requirements and takes into account the requirements of the consistency architecture in which it will operate.
+
+\section{Related work}
+
+The basis for this dissertation is the work done by Lu Fan, in his dissertation entitled: ``Solving Key Design Issues for Massively Multiplayer Online Games on Peer-to-Peer Architectures'' \cite{Fan_phd} as well as the paper by Fan et al.: ``Design Issues for Peer-to-Peer Massively Multiplayer Online Games'' \cite{Fan_deisgn_issues_p2p}.
+
+In the works by Fan, a survey is performed as to the main challenges that are still present with P2P MMVEs at that time (2009). The main challenges are identified as interest management, event dissemination, cheating mitigation, task sharing, incentive mechanisms and state persistency.
+
+Fan states that: ``Game state persistency is a major challenge for P2P MMVEs as existing P2P storage infrastructures are designed to support file sharing, and seldom fulfil the performance and security requirements of a MMVE. \ldots the persistency area is still immature with many problems waiting to be investigated.'' \cite{Fan_phd}.
+
+Fan, however, does not focus on solving state persistency issues of P2P MMVEs. A focus is instead placed on self-organisation in the P2P network, super peer selection, fault tolerance mechanisms, membership management mechanisms, heterogenous task mapping and an accounting scheme for interest management \cite{Fan_phd}. The mediator framework is designed and the novelty is reported to be the task mapping infrastructure that allows processing jobs to be advertised on a job-board system for other peers to perform, thereby sharing the processor load of all peers in the network \cite{fan_mediator_paper}. A brief overview of this work is presented in Section \ref{distributed_computing_challenge}.
+
+Recent work that is most similar to ours is the dissertation by Varvello entitled : ``A Peer-to-Peer Architecture for Networked Virtual Environments'' \cite{varvello_phd}. They develop P2P Second Life by altering the Second Life implementation to run over an existing P2P file sharing network, called KAD \cite{KAD_Steiner}, which runs on the Kademlia P2P routing overlay \cite{Kademlia_Maymounkov}. Their focus is thus on a practical implementation, taking an already implemented MMVE and running that as a P2P system over an already implemented P2P network. They also design and simulate a responsive distributed storage system for P2P MMVEs, called Walkad \cite{Walkad_Varvello}. Walkad is deployed to a cluster and ModelInet \cite{ModelInet_Vahdat} is used to emulate wide-area latencies in the cluster underlay. A synthetic Internet topology is generated to model the wide-area latencies, using Inet \cite{Inet_warwick_jamin}.
+
+There are some similarities between Pithos and P2P Second Life. Both provide the design and implementation of a storage system for P2P MMVEs, although the designs are very different as will be explained shortly. Some of the requirements for P2P MMVE state management and persistency were also identified by P2P Second Life, these are: scalability, security and responsiveness. Additionally we identify reliability and fairness as key to designing the P2P MMVEs of the future. We argue for the various identified requirements from the perspective of the generic consistency model that we design. Both our systems also make a distinction between local and non-local storage requests, since it is recognised that users have a finite Area of Interest (AoI).
+
+The KAD P2P network is, however, a file sharing network where user profiles, such as session time, do not necessarily model user lifetimes in P2P MMVEs. It is also not possible to control the parameters of the peers in the network, such as churn. The practical implementation is also on a relatively small scale, running on 1024 peers with less than 600 objects in the virtual environment.
+
+Our design philosophy was to design a P2P storage architecture from the ground up, for the P2P MMVEs of the future, supporting thousands of peers and able to store millions of objects. In order to evaluate our design, we elected to implement it in the form of a large scale network simulation based on the Omnet++ network simulator. This allows for thousands of nodes and hundreds of thousands of objects to be simulated, with realistic latency characteristics in the underlying network based on real-world Internet measurements. In our simulation, most results are shown for a smaller network of 2500 nodes, but in order to show the scalability of our system we also simulate it for 10,000 nodes and millions of objects.
+
+The design philosophy of our storage system compared to that by Varvello is also different. They use a cell-based storage system, where each cell has multiple coordinators. Each cell coordinator replicates all the objects of the cell it coordinates. Our storage system is a group based system, where users are dynamically grouped and objects are stored in groups, rather than cells. Our system also attempts to distribute the load to all peers in the group, by having all group peers store objects. In P2P Second Life, only cell coordinators store objects in the cell. Avatars in the cells do not store objects for that cell.
+
+In terms of performance, there is also some difference between Pithos and P2P Second Life. The responsiveness of Walkad, the improved storage systems developed for P2P Second Life, varies from $O(1)$ in the best case, for local queries to $O(N_c)$, also for local queries, where $N_c$ is the number of cells in the virtual world. The actual performance depends on how equally all regions of the virtual environment are partitioned. If all environments are partitioned exactly the same number of times, requests to neighbouring cells have $O(1)$ responsiveness. Our storage system has a fixed performance of $O(1)$ for local (group) queries. For non-local queries, both our storage systems have order $O(\log (N))$ performance, but again using different implementations.
+
+For our design, the bandwidth requirements of the different methods are also evaluated, since bandwidth usage of P2P systems is of great importance as discussed in Section \ref{peer_bandwidth_usage}. Bandwidth usage is not something that is evaluated in P2P Second Life.
+
+Pithos is also evaluated from a security perspective. Some designs that improve security are presented and evaluated for various percentages of malicious users in the network. In the work on P2P Second Life, security is stated as being of high importance, but the system is not designed for security or evaluated in an environment containing malicious peers.
+
+%=======================================
+% Varvello
+%=======================================
+% Similarities
+%=======================================
+%Similar requiremens than what we observed:
+%Recognises the need for responsiveness.
+%Need for consistency
+%Scalability
+%Persistency (Reliability)
+%Does not look at reliability per se, but measures how long objects remain alive. (Object lifetime measurements)
+%Security is mentioned as important, but that it will not be addressed.
+%Recognise difference between local and non-local queries
+
+%=======================================
+% Object management
+%=======================================
+%===============================================
+% Main disadvantages, compared to Pithos design
+%===============================================
+
+%Does not address dynamic object creation and removal. In Pithos peers constantly generate objects and other peers have to be made aware of the new objects.
+
+%Bandwidth usage is not discussed
+
+%simulate for maximum of 586 objects, we do hundreds of thousands per group
+%Limited number of nodes (max 1024), we simulate from 2500 to 10,000
+
+%Dynamic regioning is performed during the initialisation phase, and never afterwards. It unsure how the system will be impacted with dynamic object creation.
+
+%Naive approach has lower theoretical responsiveness. Walkad also has lower theoretical responsiveness.
+%Little chance of cells being all on the same level, that would require equally spaced objects throughout the virtual world. Note: This is stronger than uniform spacing.
+
+%Queries require a single routing hop per cell in the range query for direct neighbours and O(log(N)) outside.
+
+%Does not deal with security (no quorum mechanisms)
+
+%===============================================
+% Other observations
+%===============================================
+%Local queries used to for state display (while walking and running)
+%150ms latency for local queries
+%200ms for non-local queries
+
+%Does not evaluate underlying network architecture
+%Look at reference 90 for KAD user session characteristics
+%Kademlia also requires O(log(N)) routing time
+%Also uses TTL of 24 hours
+
+%State that their contribution isn't the design of the storage architecture, but rather how they adapted KAD to handle object storage and retrieval is (For the naive implementation).
+
+%Use R cell coordinators, where R replicas of an object are stored on each of the R cell coordinators.
+%So many peers are chosen as coordinators that all peers equally share the load i.t.o. cell IDs manageed.
+%This is stated as the main method of load balancing.
+%Nothing is stated about the actual amount of data shared.
+
+%Their system showed 0.7 persistency during the time which objects were begin dynamically created.
+
+%Walkad doesn't deal with avatars, because avatars move around constantly and that required constant updates to the objects. Avatars moving require constant repartitioning of the world (which would drastically decrease consistency).
+
+%Walkad can be integrated into Pithos's overlay storage to further improve performance.
+
+%Dynamic regioning
+
+%No distinction is made between state management and state persistency
+
+%Focus on consistency, while we focus on the authoratitive store itself.
+
+%=======================================
+% Questions
+%=======================================
+%How is a cell coordinator chosen? If there are between 10 and 20, how is one selected?
+%Do coordinators experience churn?
+%What are those 30\% statistics and why are they so low?
+%What are KAD node lifetime statistics?
+%When node balancing is tied to the management of cell-IDs, are active and control cells regarded as equal?
+
+%=======================================
+% Avatar management
+%=======================================
 
 \section{Contributions}
 \label{objectives}
 
-The main objective of this work is to advance the state of the art of P2P MMVEs. Early in the literature study phase, it was discovered that no research projects that deal with P2P MMVEs present the complete picture of the field. A significant amount of research has been done in the field of state consistency (reviewed in Chapter \ref{chp:CONSISTENCY}), but in this field, no model has been provided which shows what is required to build a complete state consistency architecture. The first contribution of this work is to provide such an architecture at the start of Chapter \ref{chp:CONSISTENCY}.
+\begin{itemize}
+\item A generic state consistency model is developed that encompasses both C/S and P2P consistency models.
 
-The generic consistency model that is developed is not only applicable to P2P MMVEs, but to any networked virtual environment that required state consistency. The generic consistency model is also compared with well known client/server and P2P consistency models, to show how the existing models can be seen as more specialised versions of the generic consistency model.
+\item A review of various state management and state persistency systems is performed.
+    \begin{itemize}
+    \item The state management survey identifies some key metrics by which state management systems may be compared, namely: fairness, reliability, responsiveness, scalability and security.
+    \item Storage types described in the literature are found to be classifiable as super peer storage, overlay storage, hybrid region-based storage and distance-based storage.
+    \item A journal survey paper has been published on this work, appearing in the IEEE Transactions on Parallel and Distributed Systems \cite{gilmore_p2p_mmog_state_persistency}.
+    \end{itemize}
 
-After developing a generic consistency model, this work then focusses on an area of state consistency that has received little attention from the research community, namely: state management and state persistency. This area is concerned with managing object states as they are updated by events occurring in the virtual environment. Also during a literature review of this field, it was found that no thorough review of this field has been done to compare the different types of storage systems present in P2P MMVEs and presented in the literature. We then preceded to perform such a review, presented in Chapter \ref{p2p_MMVE_state_persistency}. The results of this survey has also been published in the IEEE Transactions of Parallel and Distributed Systems \cite{gilmore_p2p_mmog_state_persistency}.
+\item A novel state management and persistency architecture, called Pithos, is proposed and implemented in simulation, which increases reliability and responsiveness compared to classic state persistency methods.
+    \begin{itemize}
+    \item Multiple methods of implementation are described that provide different benefits, depending on the situation.
+    \item The various implementation methods are evaluated and recommendations are made on which methods work better in which situations.
+    \item The initial design and implementation of Pithos has been published at the International Workshop on Massively Multiuser Virtual Environments (MMVE) at the IEEE International Symposium on Audio-Visual Environments and Games (HAVE) \cite{Pithos_mmve_2011}.
+    \end{itemize}
 
-During the survey, some key metrics were identified by which state management and state persistency systems may be described. A proposal was also made as to how these metrics may be measured. What was found upon completion of the survey is that no storage system has thus far been created to satisfy all identified metrics. Work was then undertaken to develop a novel state management and persistency architecture that satisfies all identified requirements.
-
-The state management and persistency architecture has been developed and called ``Pithos''. Pithos has been implemented in a network simulation framework, called Oversim, which runs on the Omnet++ simulation environment. The Oversim framework itself has also been extended to implement our novel generic consistency architecture. Pithos has been implemented in the root object store section of this architecture.
-
-Many of the key mechanisms in Pithos, such as object retrieval, have been implemented using multiple methods. These methods are then compared to determine the advantages and disadvantages of each. Pithos is also compared to the storage systems identified. Pithos always shows similar or improved performance over classic storage systems in all identified areas.
-
-In order to verify the correct functioning of Pithos, mathematical models are also developed to describe Pithos's performance in the various identified metrics. Amongst these is a novel Mathematical model that makes use of an embedded continuous time Markov chain to determine expected object lifetime for varying amounts of network churn, various network sizes and replication rate. The mathematical model is compared with actual Pithos results and appears to match almost exactly.
+\item A statistical model for expected object lifetimes is developed and used to verify the Pithos results.
+\end{itemize}
 
 \section{Summary of this work}
 
-Chapter \ref{chp:CONSISTENCY} presents an overview of state consistency models. Initially, it describes the general process by which state consistency is achieved. Some classic consistency models are then presented in terms of the generic model. Consistency models for P2P MMVEs are then presented, with an overview of work that has been done in each of the various sections required to implement a complete consistency model.
+In order to design a state management and persistency architecture for P2P MMVEs, the environment in which such an architecture will function first has to be understood. This environment was found to be the consistency model of the P2P MMVE. In Chapter \ref{chp:CONSISTENCY}, a study is undertaken to determine all the required parts of a consistency model. From studying the literature on classic consistency architectures, as well as the literature on modern P2P MMVE consistency architectures, a generic consistency architecture was developed. Both P2P MMVE state consistency or C/S state consistency are all specialised cases of the generic model.
 
-Chapter \ref{p2p_MMVE_state_persistency} focuses on the state management and state persistency aspect of P2P MMVE state consistency. Initially, some metrics are defined according to which different storage architecture may be compared. A literature review is then presented, where papers that deal with various storage techniques are grouped and the advantages and disadvantages of each group is then discussed. This chapter also identifies a need for a novel state management and persistency architecture.
+Chapter \ref{chp:CONSISTENCY} starts by developing the generic consistency model, describing generally what tasks have to be performed to achieve state consistency. The complete generic model is then presented and the classic consistency and P2P MMVE consistency models are then presented. It is shown how the presented models relate to the generic consistency model.
 
-Chapter \ref{chp:DESIGN} describes the design and implementation of Pithos, the novel state management and persistency architecture. Initially, the overarching Pithos design is described, including the perceived use case and design goals. The Oversim simulation environment is then described, along with the extensions that were made to model the generic consistency model. The Pithos implementation is then described in terms of Oversim modules. Key mechanisms that implement that Pithos design are then presented with reference to the Pithos Oversim modules. Various methods to implement some mechanisms are descried.
+All modules that form part of the generic consistency model are described, and a summary of research into the various fields are presented. During the investigation of the consistency model, state management and state persistency are found to form part of state consistency in the authoritative storage module.
 
-Chapter \ref{chp:EVALUATION} evaluates the Pithos implementation. The performance of the key mechanisms are presented and the various implementation methods are compared. Pithos is also compared with other storage implementations.
+Knowing that state management and state persistency will be required by the consistency model, the other modules that interface with the authoritative storage module are investigated. These are found to be the environment logic module and object updated module.
 
-Chapter \ref{chp:MODELLING} models Pithos's performance with reference to the identified metrics for P2P MMVE storage systems. A focus is placed on expected object lifetime and a novel model is developed, based on an embedded continuous time Markov chain.
+Chapter \ref{p2p_MMVE_state_persistency} explores the various state management and persistency schemes described in the literature. It firstly defines key requirements that state management and persistency architectures should possess, based on what was learned in Chapter \ref{chp:CONSISTENCY}. Key requirements are found to be: fairness, reliability, responsiveness, scalability and security. The storage types reviewed were found to be broadly characterisable into: super peer storage, overlay storage, hybrid region-based storage and distance-based storage. A discussion of each storage type is presented in terms of the requirements identified earlier.
 
-Chapter \ref{chp:VERIFICATION} compares model results with Pithos simulation results. The purpose of this chapter is to verify the correct functionality of Pithos, according to mathematical models. The chapter also explores how to design storage systems with desired object lifetimes.
+It is found that none of the storage types currently available in the literature satisfy all the identified requirements. Chapter \ref{chp:DESIGN} presents the design of a novel state management and persistency architecture, called ``Pithos'', to satisfy all identified requirements. Pithos is designed as a hybrid storage, containing slower, but scalable overlay storage and faster but non-scalable group storage.
 
-Chapter \ref{chp:CONC} concludes the work. It presents a summary of the work, lists contributions made and discusses some future areas of research.
+The design firstly describes which modules and mechanisms are used to satisfy the P2P MMVE state management and persistency requirements identified in Chapter \ref{p2p_MMVE_state_persistency}. Chapter \ref{chp:DESIGN} also presents the Pithos design from a use case perspective, showing how the other modules, identified in Chapter \ref{chp:CONSISTENCY}, are allowed to interact with Pithos. The design of each module and mechanism is described on a conceptual level, without referring to any specific implementation environment.
+
+Chapter \ref{chp:IMPLEMENTATION} describes how Pithos is implemented in the simulation environment, called Oversim. The chapter first provides a motivation for selecting simulation and Oversim as the implementation environment. It also describes how Oversim is expanded to allow for the complete generic state consistency model developed in Chapter \ref{chp:CONSISTENCY} to be integrated into it. Pithos nodes are then described in terms of their Oversim module implementations. The chapter also presents some of the major implementation specific issues encountered during the implementation of Pithos, along with the chosen solutions. Specific attention is paid on how group consistency was ensured. The implementation of the application driving Pithos, called PithosTestApp, is also presented.
+
+Chapter \ref{chp:EVALUATION} provides an evaluation of Pithos in terms of the requirements identified in Chapter \ref{p2p_MMVE_state_persistency}. Pithos is found to have high reliability, while having a responsiveness of 1.6 hops in the best case. Responsiveness is found to heavily depend on the underlying network architecture, as well as the probability of inter-group, compared to intra-group requests.
+
+The bandwidth requirements of Pithos are also presented and found to be in the order of tens of kilo bits per second, but depending on the size of the object stored in the system. It is found that the group storage section of Pithos requires only 12\% overhead, but that the overlay storage section, which is based on a third-party implementation, requires 86\% overhead. The fairness of Pithos is evaluated and found to compare well with that of overlay storage.
+
+The Pithos implementation is evaluated for various percentages of malicious peers present in the network, that modify all objects requested from them. The quorum mechanism implemented in Pithos is shown to improve retrieval reliability for relatively large percentages of malicious nodes present in the network.
+
+Finally, the results of the object repair mechanism, by which Pithos ensures long-term object survival is shown. It is found that object survival, which is of high importance when designing a distributed storage system, depends heavily on the repair rate, number of initial replicas and expected object lifetime.
+
+Chapter \ref{chp:MODELLING} expands on available literature, to improve the accuracy of object lifetime predictions in networks, such as Pithos, where group size is limited. This is done using an expanded Markov chain model, which allows for the theoretical predictions of object lifetimes. The theoretical predictions are verified using the Pithos implementations and found to closely match.
