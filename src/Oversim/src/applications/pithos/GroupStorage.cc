@@ -455,7 +455,10 @@ PeerData GroupStorage::selectDestination(std::vector<TransportAddress> send_list
 		for (j = 0 ; j < send_list.size() ; j++)
 		{
 			if (send_list.at(j) == peerData.getAddress())
+			{
 				original_address = false;
+				break;
+			}
 		}
 	}
 
@@ -479,7 +482,8 @@ int GroupStorage::getReplicaNr(simtime_t request_time, unsigned int rpcid)
 	unsigned int replicas = par("replicas");
 
 	//This ensures that an infinite while loop situation will never occur, but it also constrains the number of replicas to the number of known nodes
-	if (replicas > group_ledger->getGroupSize())
+	//The +-1 is because the peer should never select itself, but it is also listed as part of its group
+	if (replicas > group_ledger->getGroupSize()-1)
 	{
 		unsigned int i;
 		ResponsePkt *response;
@@ -487,11 +491,11 @@ int GroupStorage::getReplicaNr(simtime_t request_time, unsigned int rpcid)
 		createResponseMsg(&response, GROUP_PUT, request_time, rpcid, false);
 
 		//Send one failure response packet for each replica that cannot be stored
-		for (i = 0 ; i < replicas - group_ledger->getGroupSize() ; i++)
+		for (i = 0 ; i < replicas - group_ledger->getGroupSize()+1 ; i++)
 			send(response->dup(), "read");
 
 		RECORD_STATS(numPutError++);
-		replicas = group_ledger->getGroupSize();
+		replicas = group_ledger->getGroupSize()-1;
 
 		//If there is only one peer available, the object will be lost as soon as that peer leaves the group, if periodic repair is not done when the group size increases,
 		//since there will be no other peers that can be used for replication. We therefore report put failure if no replication can be done.
@@ -517,6 +521,7 @@ void GroupStorage::send_forstore(ValuePkt *store_req)
 
 	unsigned int replicas;
 	std::vector<TransportAddress> send_list;
+	send_list.push_back(this_address);	//Add this peers address to the send list to ensure its never chosen for security reasons.
 
 	PendingRequestsEntry entry;
 	ResponseTimeoutEvent *timeout;
