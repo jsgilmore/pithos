@@ -26,17 +26,54 @@ A maximum distance needs to be defined for the directory server
 Ensure correctness for pithos under 32bit systems. This includes testing long variable sizes and making them 32bit safe.
 
 Dissertation:
-Make sure the dissertation never talks about "this paper".
 Make sure the state management and persistency chapter uses the terms state management and persistency correctly.
 Remove the term "game" where it is not required and replace with environment and VE.
-Replance "player" with "user".
-In the introduction, talk about MMVEs, and what applications they can be. Then name MMOGs as exmample of MMVEs.
+Replace "player" with "user".
+Replace "node" with "peer", where applicable.
+Add bandwidth (overhead) as a required metric of a storage system.
+Ensure that all applicable experimental setup parameters are given in the relevant evaluation sections.
+Add figure displaying the expanded Oversim terminal.
+Add figure displaying the structure of an object ledger.
 
-Make sure all introductions are relevant.
-Make sure all conclusions are relevant.
-Complete the Pithos design Chapter (Show design results, for example group consistency)
-Complete the results Chapter where only Pithos results are shown and compared to other such systems.
-Complete theoretical section, which derives expected values for all the relevant Pithos metrics.
-Complete the chapter that compares theoretical results with the actual Pithos results.
-Conclude
+Abstract:
+Complete
+
+Introduction:
+
+Modelling:
+Add sections back into the chapter that were removed when the paper was shortened.
+Add more results, comparing variations in more parameters.
+
+Ensure all symbols and abbreviations are present.
+
+Conclusion:
+Complete
+
+Evalutaion:
+Simulation todo:
+Simulate the effect of group size on reliability, responsiveness and bandwidth usage.
+
+Lit study todo:
+Find paper that validates my overlay storage and reliability results for Chord.
+
+Figures to generate:
+When talking about another distributions that's the same, create a subplot showing that distribution.
+Present responsiveness distribution for the "low" and "high" cases.
+
+Coding todo:
+Figure out why there is a 3s spike at overlay storage and retrieval
+
+Writing todo:
+Write about the responsiveness of overlay storage in the LAN setup.
+Write about the performance of the Pareto distribution.
+Write about success responsiveness for the group probability case.
+Add time label to group storage responsiveness for safe storage.
+Add time label to group retrieval responsiveness for parallel retrieval.
+Rewrite performance under repair section for just bandwidth, not efficiency
+
+Writing and data mining todo:
+Add responsiveness and bandwidth to security.
+
+Hand-in PhD
+Pass defence
 Receive PhD
