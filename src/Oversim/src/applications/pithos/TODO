@@ -64,7 +64,6 @@ Coding todo:
 Figure out why there is a 3s spike at overlay storage and retrieval
 
 Writing todo:
-Describe what we expect to see at the start of every new experiment, before we perform the experiment.
 Write about the responsiveness of overlay storage in the LAN setup.
 Write about the performance of the Pareto distribution.
 Write about success responsiveness for the group probability case.

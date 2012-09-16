@@ -1,14 +1,14 @@
 close all
-% clear all
-% 
-% folder = '../results/2500_norep_10sfinger_fp/';
-% 
-% eval(['load ' folder 'group_get_sf.csv']);
-% eval(['load ' folder 'group_put_sf.csv']);
-% eval(['load ' folder 'overlay_get_sf.csv']);
-% eval(['load ' folder 'overlay_put_sf.csv']);
-% eval(['load ' folder 'overall_get_sf.csv']);
-% eval(['load ' folder 'overall_put_sf.csv']);
+clear all
+
+folder = '../results/LAN_responsiveness/';
+
+eval(['load ' folder 'group_get.csv']);
+eval(['load ' folder 'group_put.csv']);
+eval(['load ' folder 'overlay_get.csv']);
+eval(['load ' folder 'overlay_put.csv']);
+eval(['load ' folder 'overall_get.csv']);
+eval(['load ' folder 'overall_put.csv']);
 
 figure('Name','group get')
 set(gca, 'FontSize', 24) 
@@ -28,7 +28,7 @@ xlabel('time (s)');
 
 figure('Name','overlay get')
 set(gca, 'FontSize', 24) 
-hist(overlay_get(:,2), 10000);
+hist(overlay_get(:,2), 500);
 h = findobj(gca,'Type','patch');
 set(h,'FaceColor','k','EdgeColor','k')
 ylabel('Number of messages');
