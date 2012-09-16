@@ -398,7 +398,10 @@ void Peer_logic::handleResponseMsg(cMessage *msg)
 		RECORD_STATS(globalStatistics->recordOutVector("GroupStorage: GET Latency (s)", SIMTIME_DBL(simTime() - response->getTimestamp())));
 
 		if (response->getIsSuccess())
+		{
 			it->second.numGroupGetSucceeded++;
+			RECORD_STATS(globalStatistics->recordOutVector("GroupStorage: GET Success Latency (s)", SIMTIME_DBL(simTime() - response->getTimestamp())));
+		}
 		else it->second.numGroupGetFailed++;
 
 		processGet(&(it->second), response);
