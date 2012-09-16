@@ -32,8 +32,6 @@ The INET underlay is based on the Omnet++ INET underlay and allows for the simul
 
 The SingleHost underlay allows for interaction with a physical network. It allows for the implementation of physical nodes, running on networks computers. These physical nodes can then connect to a simulated network and receive packets with bandwidth and delay characteristics as if they were situated on a network with the simulation's specific characteristics.
 
-To be able to simulate Pithos for the large numbers of nodes required, as discussed in Section \ref{scalability_req}, it runs on the simple underlay. Pithos is dependant on the delay characteristics of the lower level protocols, but the CAIDA and Skitter measurements capture these quantities in their measurements. The reasons why the underlying network shows certain delay characteristics are not important. A focus is also not currently placed on the effects of transient background traffic flows in the Internet architecture on which Pithos executes.
-
 \begin{figure}[htbp]
  \centering
  \includegraphics[clip=true, viewport=49mm 48mm 245mm 173mm, width=0.5\columnwidth]{Oversim_terminals}
@@ -82,18 +80,17 @@ Figure \ref{fig_oversim_architecture} shows the complete Oversim node architectu
 
 %Show the generic consistency architecture in Oversim
 
-To allow Oversim to simulate a complete consistency architecture, we extended the Oversim framework itself. The three tiers were replaced with all the elements identified in the generic consistency model in Section \ref{generic_event_update_model}. Practically, this required the implementation of a new type of overlay terminal type, replacing the tiers with the following layers:
+To allow for the evaluation of Pithos as a module of a larger generic state consistency architecture, we extended the Oversim framework itself to simulate a complete request stream. The three tiers were replaced with all the elements identified in the generic consistency model in Section \ref{generic_event_update_model} for a single stream. Practically, this required the implementation of a new type of overlay terminal type, replacing the tiers with the following layers:
 \begin{itemize}
 \item agent,
-\item event layer IM,
-\item event dissemination,
-\item event ordering,
-\item game logic,
+\item request interest management,
+\item request dissemination,
+\item request ordering,
+\item request logic,
 \item authoritative object updater,
 \item authoritative object store,
-\item update layer IM,
-\item update dissemination,
-\item object merger,
+\item response interest management,
+\item response dissemination,
 \item non-authoritative object updater,
 \item non-authoritative object store,
 \item display updater,
@@ -129,7 +126,7 @@ Transparency was achieved by designating certain gates for certain types of traf
 \subsection{Super peer logic}
 \label{pithos_module_types_sp_logic}
 
-The super peer logic module implements all the functionality of the super peer node, except for keeping track of group objects. The tasks of the super peer logic include handling joining peers, facilitating peer migration, ensuring group consistency (Section \ref{group_consistency_implementation}), initiating object repair (Section \ref{object_repair_implementation}) and maintaining a list of group objects and a list of peers on which those objects are stored (Section \ref{pithos_module_types_ledgers}).
+The super peer logic module implements all the functionality of the super peer node, except for keeping track of group objects. The tasks of the super peer logic include handling joining peers, facilitating peer migration, ensuring group consistency (Section \ref{group_consistency_implementation}), initiating object repair and maintaining a list of group objects and a list of peers on which those objects are stored (Section \ref{pithos_module_types_ledgers}).
 
 \subsection{Peer logic}
 
@@ -186,7 +183,7 @@ While the previous chapter describes all key mechanisms, some adjustments had to
 
 \subsection{Joining the network and grouping}
 
-As described in Section \ref{join_mechanism}, in order to join the network, a super peer should supply its location in the virtual environment (VE) to the directory server. A joining peer should also supply its location to the directory server, so the directory server may supply the joining peer with a super peer's address to join.
+As described in Section \ref{join_mechanism_design}, in order to join the network, a super peer should supply its location in the virtual environment (VE) to the directory server. A joining peer should also supply its location to the directory server, so the directory server may supply the joining peer with a super peer's address to join.
 
 Because Pithos is not functioning in an actual VE, peers have no locations. For simulation purposes, each super peer is assigned a random location created by sampling both an x and a y coordinate from a uniform random distribution in a fixed range (0 to 100). Joining peers are assigned positions in the same uniform random manner when they are initialised.
 

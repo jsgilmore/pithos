@@ -61,7 +61,7 @@ In Pithos, responsiveness is achieved by grouping players into fully connected g
 
 In a fully connected network, where all nodes are connected to all other nodes, every node is one hop away from every other node. This solution is, however not scalable. In order to achieve a scalable single hop architecture, it was decided to group users in the virtual world. User groups are then fully connected, which allows for highly responsive group interactions. Group sizes are smaller than the overall network size and allows for the fully connected groups to remain scalable.
 
-In virtual worlds, users already group themselves into explicit groups, including questing groups, raid groups and guilds. Implicit groups are also formed by flocking, where multiple users congregate in areas of the virtual environment that are of interest to them \cite{flocking}.
+In virtual worlds, users already group themselves into explicit groups, including questing groups, raid groups and guilds. In Section 3.1 of \cite{varvello_phd}, it was found that most users in Second Life form small groups.  Implicit groups are also formed by flocking, where multiple users congregate in areas of the virtual environment that are of interest to them \cite{flocking}.
 
 \subsubsection{Distance-based storage}
 Grouping users is not sufficient to achieve a responsive system. Users should also require data stored in the group more than data stored outside the group. To this end, distance based storage is used on a group level. This means that objects are stored in the group that is closest to them. The assumption is that users interact more with objects that are closer to them and, therefore, have more interest in closer objects. If a user has interest in a far off object, she will likely move closer to that object.
@@ -119,7 +119,6 @@ Objects are uniformly distributed on group peers, ensuring that all group peers 
 
 Overlay storage maps objects and peers to the same uniform key space and stores an object on a peer that is the closest match for the object's key. This uniformly random mapping ensures a uniform distribution of objects in the overlay.
 
-
 \section{Key modules and mechanisms}
 \label{key_modules_mechs}
 
@@ -135,6 +134,8 @@ Figure \ref{fig_pithos} shows the Pithos architecture. The figure shows groups o
 Pithos groups peers to form a two tiered storage model. The first tier is a storage model at group level (group storage) and the second is a storage model over all groups (overlay storage).
 
 Pithos can be considered as a multi-tiered structured overlay, with group storage an implementation of an $O(1)$ overlay and overlay storage an implementation of an $O(\log (N))$ overlay.
+
+When referring to state management and persistency as defined in Section \ref{management_persistency_def}, Pithos is designed to serve both requirements. Group storage is designed for state management and overlay storage for state persistency. Since state persistency does not require responsive storage, the overlay section of Pithos is well suited to this task, while group storage, with its high responsiveness is well suited to state management.
 
 \subsection{Group storage}
 
@@ -153,7 +154,7 @@ In group storage, peers handle requests from the higher application layers. Peer
 Super peers are responsible for representing a group and managing group membership. Super peers also implement object repair.
 
 \subsubsection{Join mechanism and bootstrapping}
-\label{join_mechanism}
+\label{join_mechanism_design}
 
 The directory server places joining peers into groups represented by super peers. The first task of a Pithos peer is to join the network and a group. This is done using the directory server, which possesses a static IP address and port that is known to every new peer and super peer.
 
@@ -168,15 +169,15 @@ With reference to Figure \ref{fig_pithos_join}, the join and bootstrapping mecha
 %
 \begin{enumerate}
 \item Whenever a super peer is created or potentially selected, it advertises its information with the directory server. This information includes its IP address, port and location of the super peer.
-    
+
 \item When a peer wishes to join the network, it sends its current location to the directory server.
-    
+
 \item  The directory server then responds with the address of a super peer, representing an initial group which the peer can join.
-    
+
 \item The joining peer then sends the same type of join request to the supplied super peer address.
-    
+
 \item If the super peer accepts the joining peer, it sends that peer a list of all peers currently in the group, as well as a list of objects currently available in the group.
-    
+
 \item The super peer also informs all other group peers of the newly joined peer.
 \end{enumerate}
 
@@ -198,15 +199,15 @@ In Pithos, two methods exist to ensure group consistency and handle peers leavin
 %
 \begin{enumerate}
 \item At regular intervals, each group peer uniformly randomly selects another peer in the group to send a keep-alive (Ping) message to.
-    
+
 \item If a peer received a keep-alive message, it responds with an acknowledge (Pong) message.
 
 \item A peer that does not respond with an acknowledge message within a sufficiently large amount of time is considered to have left the network.
-    
+
 \item The originating peer of the keep alive message informs the super peer that the target of the keep-alive message is thought to have left the group.
-    
+
 \item The super peer then also sends a keep-alive message to the target peer, to ensure that there isn't some communications issue between the two group peers and the target peer has actually left the network.
-    
+
 \item If the target peer does not respond to the super peer, the super peer informs all group peers that the target peer has left the group.
 \end{enumerate}
 
@@ -225,7 +226,7 @@ For graceful group leaves, the same leave mechanisms as used in group migration 
 
 Users will constantly being moving in the virtual environment, leading to changes in position. These position changes may lead to users moving from one group to another. It is imperative that all objects stored in Pithos remain available even with users traversing groups.
 
-As users move around in the virtual world, Pithos queries the directory server with the new positions, using the same mechanism described for joining a group in Section \ref{network_join_implementation}. The peer then receives a new super peer address from the directory server, if this address is different from the address of the currently known super peer. When a new address is received, Pithos initiates group migration.
+As users move around in the virtual world, Pithos queries the directory server with the new positions, using the same mechanism described for joining a group in Section \ref{join_mechanism_design}. The peer then receives a new super peer address from the directory server, if this address is different from the address of the currently known super peer. When a new address is received, Pithos initiates group migration.
 
 Group migration involves informing the group that the peer is leaving, clearing all statistics and initiating the group join mechanism. Informing the group that the peer is leaving ensures that this peer will not be picked for any storage or retrieval requests, while the group is unaware that the peer has left. If this is not done, the group will only know that a peer has left after a timeout for a request to the peer expires, which reduces request success rates.
 
@@ -251,6 +252,15 @@ Affinity propagation clusters nodes using a similarity matrix to find similar no
 Clustering is also used in mobile ad-hoc networks (MANETs) for routing purposes. Mobile-aware clustering algorithms used in MANETs, might also be applicable to P2P MMVEs \cite{clustering_survey}. Mobile-aware clustering uses relative velocities of mobile nodes to define clusters containing nodes with low relative velocity to each other.
 
 Any of the above mentioned techniques might be used to achieve distributed clustering in P2P MMVEs. The focus of this work is, however, not on developing a novel clustering algorithm for P2P MMVEs.
+
+\subsubsection{Distance-based storage}
+\label{distance_based_design}
+
+For Pithos to succeed as an MMVE storage architecture, intra-group data requests should be preferred to inter-group data requests. This requirement, combined with the fact that the grouping algorithm geographically groups players in the virtual world, lends Pithos to a storage system based on distance-based storage. Similar to interest management, the assumption is that players have a limited area of interest and require interaction with a limited number of objects within range.
+
+Distance-based storage is implemented on a group level rather than an individual level, which means that objects are stored on the nearest group of players, rather than the nearest user. It is assumed that such an approach will alleviate the security and reliability challenges present in distance-based storage \cite{gilmore_p2p_mmog_state_persistency}.
+
+With group-based distance-based storage, it is assumed that because peers now store objects closest to the group, the objects that they are interested in will most likely be stored within their own group. Therefore, most data requests should be intra-group requests. The overlay storage component ensures that nodes that require data, which are not stored within their group, are still able to access requested data.
 
 \subsection{Overlay storage (DHT)}
 
@@ -289,9 +299,9 @@ Another reason to replicate objects is to make the system more secure. If it is 
 
 \subsection{Repair}
 
-When objects are stored, as described in Section \ref{store_implementation}, multiple replicas of the same object is stored within a group. This form of redundancy extends the lifetime of an object, but with the presence of constant network churn, all objects will eventually cease to exist.
+When objects are stored, as described in Section \ref{pithos_store}, multiple replicas of the same object is stored within a group. This form of redundancy extends the lifetime of an object, but with the presence of constant network churn, all objects will eventually cease to exist.
 
-The solution is to use a repair mechanism to ensure that missing object replicas are constantly replaced. Two types of repair mechanisms were implemented: periodic repair and leaving repair. 
+The solution is to use a repair mechanism to ensure that missing object replicas are constantly replaced. Two types of repair mechanisms were implemented: periodic repair and leaving repair.
 
 With periodic repair, the super peer periodically checks the number of available replicas of every object in its group ledger. If an object contains less than the required number of replicas and there are peers in the group that do not already store the object, that object is replicated. Because the super peer itself contains no objects, it requests that an object be replicated from a peer that does contain the object. That peer will receive a repair request for a specific object, select a group peer in a uniformly random fashion, that does not already contain the object, and initiate a store request to that peer.
 
@@ -309,19 +319,11 @@ Since objects are only destroyed when a peer leaves the group, with leaving repa
 \begin{enumerate}
 \setcounter{enumi}{6}
 \item After a the super peer has detected that a peer has left and has informed all other peers, the super peer selects a peer that contains an object that was destroyed by the leaving peer and requests that that object be replicated.
-    
+
 \item The peer receiving the replication request from the super peer selects another peer in the group that does not already contain the object and replicates the object on the selected peer.
 \end{enumerate}
 
 Leaving repair attempts to minimise the super peer load by only repairing objects when a node leaves the network. This is as opposed to periodic repair, where the super peer has to constantly cycle though its list of object replicas and verify the number of replicas currently stored in the system.
-
-\subsection{Distance-based storage}
-
-For Pithos to succeed as an MMVE storage architecture, intra-group data requests should be preferred to inter-group data requests. This requirement, combined with the fact that the grouping algorithm geographically groups players in the virtual world, lends Pithos to a storage system based on distance-based storage. Similar to interest management, the assumption is that players have a limited area of interest and require interaction with a limited number of objects within range.
-
-Therefore, distance-based storage is implemented on a group level rather than an individual level. This means that objects are stored on the nearest group of players, rather than the nearest user. It is assumed that such an approach will alleviate the security and reliability challenges present in distance-based storage \cite{gilmore_p2p_mmog_state_persistency}.
-
-With group-based distance-based storage, it is assumed that because peers now store objects closest to the group, the objects that they are interested in will most likely be stored within their own group. Therefore, most data requests should be intra-group requests. The overlay storage component ensures that nodes that require data, which are not stored within their group, are still able to access requested data.
 
 \section{Satisfying the use cases}
 All Pithos modules and mechanisms that ensure adherence to the storage requirements have now been described. What remains to be described is how the use cases presented in Section \ref{use_cases_goals} are designed on the architecture that adheres to the storage requirements.
@@ -342,15 +344,15 @@ Referring to Figure \ref{fig_pithos_storage}, Pithos storage works as follows:
 %
 \begin{enumerate}
 \item The higher layer is expected to send a storage request to Pithos, containing the object to be stored.
-    
+
 \item Pithos contains logic that relays the storage request to both peers in group storage as well as overlay storage.
-    
+
 \item The group storage module will store the object in its local authoritative object store and acknowledge the reception of the object by sending a response message to the source node.
-    
+
 \item Each peer successfully storing a received object will inform all group peers, as well as the super peer, of the new object stored. The peers and super peer can add this information to their group ledger, used to serve retrieval requests.
-    
+
 \item Sometime after group storage has completed, overlay storage will also complete. Overlay storage informs Pithos logic of the success or failure of the request.
-    
+
 \item Pithos monitors all responses and records the success or failure of each request. When a sufficient number of responses have been recorded, Pithos informs the higher layer of either a successful or failed store.
 \end{enumerate}
 
@@ -363,6 +365,9 @@ The question arises as to what constitutes a sufficient number of responses. Two
 Because safe storage ensures that most of the replications are successfully stored, there is a smaller chance of it reporting a false positive than for fast storage. The disadvantage is that from the point of view of the higher layer, and by extension any system that uses Pithos, safe put requests have a lower responsiveness. Fast storage on the other hand is no less reliable than safe storage, but the chances of a false positive being reported to the higher layer is greater. The advantage of fast storage is that the from the perspective of the module using Pithos, it is performed faster than safe storage. The higher layer can, therefore, start using the stored object faster. A comparison of fast and safe storage is performed in Chapter \ref{chp:EVALUATION}.
 
 \subsection{Retrieve}
+\label{pithos_retrieve}
+
+%Talk about the types of keys (content key and name key) and how objects will be named in the storage system.
 
 \begin{figure}[htbp]
  \centering
@@ -375,15 +380,15 @@ The process of retrieving data is very similar to that of storing it. With refer
 %
 \begin{enumerate}
 \item The retrieve request, received from the higher layer, contains the hash of the object name which the higher layer requires.
-    
+
 \item Pithos first checks whether the object that was requested exists within the group by checking its group ledger. This is required, because the higher layer might have requested an object that is stored in another group. Out-of-group requests are only serviced by overlay storage. If the object is housed in the Pithos peer's local store, the object is sent to the higher layer. If the object is not housed locally, Pithos requests the object from both overlay and group storage.
-    
+
     The group ledger is used to determine which group peers contain which objects. The number of peers selected depends on the retrieval type. Three retrieval types exist: fast, parallel and safe retrieval. Fast retrieval selects a single peer for object retrieval. Parallel and safe retrieval select multiple peers to concurrently retrieve an object from. More requests sent in parallel improves the probability of the request succeeding as well as reduce the time it takes to serve the request.
 
 \item When the retrieval request is received at the destination peer, the object is retrieved from local storage, attached to a response message and sent to the requesting peer.
-    
+
 \item Sometime after group retrieval has completed, overlay retrieval will also complete and send the object, stored in the overlay, to Pithos.
-    
+
 \item After Pithos has received a sufficient number of responses, it informs the higher layer of either a successful or failed retrieval. The object itself is attached to a successful request response.
 \end{enumerate}
 

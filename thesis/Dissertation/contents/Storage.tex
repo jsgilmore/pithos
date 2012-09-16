@@ -7,6 +7,7 @@ While the previous chapter broadly introduced all the concepts of state consiste
 This chapter classifies the techniques used in documented P2P MMVE architectures and discusses the advantages and disadvantages of the different types of storage. The chapter also shows that no current storage type is well suited to P2P MMVEs.
 
 \section{A definition of state management and state persistency}
+\label{management_persistency_def}
 
 A discussion of state storage requires an understanding of the difference between state management and state persistency. These terms are regularly confused in the literature and sometimes one is used where the other is more appropriate. Authors describe both mechanisms as if it is all part of the same model.
 
@@ -110,7 +111,7 @@ Looking at the disadvantages and advantages of each classic storage method, the 
 
 Because of the advantages of region-based storage, it has become a popular storage architecture to employ for online worlds. Most worlds can be divided into regions and the game world can be designed in such a way that region boundaries are difficult to cross and that users can only cross these boundaries when moving from one distinct area into the next. This can be done by placing high mountain ranges on region boundaries, with a single pass through the range. This prevents users from switching between regions if they stand on a region boundary. It also ensures that most users that interact, do so within the same server, which decreases inter-server communication.
 
-An issue with the region-based approach, compared to the object-based approach is that each region contains many users and, therefore, requires a large server to host a region. Some region-based servers are themselves server clusters to handle the client load. An object-based server on the other has a fixed load, which can be determined based on the number of objects each server stores. 
+An issue with the region-based approach, compared to the object-based approach is that each region contains many users and, therefore, requires a large server to host a region. Some region-based servers are themselves server clusters to handle the client load. An object-based server on the other has a fixed load, which can be determined based on the number of objects each server stores.
 Because of the success of the object-based and region-based storage schemes, P2P storage schemes are also based on either of the two. Because peers are less powerful than servers, the object-based approach seems to have gained more traction, since server load is fixed. If a region-based approach is used, peers are required to host large regions, which might overload them. If a the region is made too small, the amount of inter-peer communication might become prohibitive.
 
 \section{P2P MMVE storage requirements}
@@ -191,11 +192,7 @@ Distance-based & Medium      & High           & Low      & Medium   & High\\
 \caption{Differences between storage mechanisms} \label{tab_storage}
 \end{table}
 %
-Table \ref{tab_storage} presents a characterisation of current storage systems according to the characteristics defined in Section
-\ref{key_challenges_cm}. Table \ref{tab_storage} also provides some references that act as examples of the different storage types mentioned. These
-example architectures will be discussed in detail in the sections to follow. The purpose of the complexity category in Table \ref{tab_storage} is to
-provide a measure of how difficult it will be for an application developer to use any of the storage types and is discussed in Section
-\ref{recommendations}.
+Table \ref{tab_storage} presents a characterisation of current storage systems according to the characteristics defined in Section \ref{key_challenges_cm}.
 
 \subsection{Super peer storage}
 \label{super_peer_storage}
@@ -207,8 +204,9 @@ A mechanism is required for selecting a super peer for the region as well as mig
 
 \subsubsection{Fairness}
 %Super peer storage - issues
-The super peer storage model has many potential issues, of which overloading of the super peer is one. A super peer could be relatively easily overloaded if a region becomes too crowded, since a super peer is usually a personal computer of some player in the game and not a specialised server. 
-Super peer storage is not fair, since a peer with extra resources is expected to act as super peer to the region whilst other users do no contribute storage. This is contrary to the principle of P2P, where all peers contribute resources.
+The super peer storage model has many potential issues, of which overloading of the super peer is one. A super peer could be relatively easily overloaded if a region becomes too crowded, since a super peer is usually a personal computer of some player in the game and not a specialised server.
+
+Super peer storage is not fair, since a peer with extra resources is expected to act as super peer to the region whilst other users do not contribute storage. This is contrary to the principle of P2P, where all peers contribute resources.
 
 \subsubsection{Reliability}
 \label{super_peer_storage_reliability}
@@ -234,6 +232,12 @@ Knuttson et al. \cite{knutsson_p2p_first} employ regional super peers called ``c
 Coordinator hand-offs also occur less than if the coordinator was an elected member of the region. If this is the case, a new coordinator has to be chosen every time the current coordinator leaves the region. In this scheme, hand-offs only occur as a result of network churn, which is far lower than the number of players moving from one region to another.
 
 Reliability is achieved by maintaining backup coordinators as the Distributed Hash Table (DHT) neighbours of each region coordinator. One method by which redundant region coordinators are maintained in \cite{knutsson_p2p_first}, is to create backup coordinators on peers with IDs closest to the current coordinator. This means that if the main coordinator fails, all data will automatically be routed to the backup, because of the feature of DHTs. This method is similar to how reliability is achieved in overlay storage as described in Section \ref{overlay_storage_reliability}.
+
+The most mature form of super peer storage is found in P2P Second Life \cite{varvello_phd} in the form of Walkad \cite{Walkad_Varvello}. Walkad assigns multiple coordinators to a single cell. For every object stored in a cell, a copy of the object is stored on every communicator. A peer requiring an object selects a single communicator from the set of available coordinators to retrieve the object from. Walkad also employs dynamic regioning, which means that there exists some threshold of objects per cell which aids in scalability and prevents overloading of the super peer.
+
+Increasing the number of replicas maintained per cell, increases the number of nodes that participate in the storage system, thereby increasing the fairness of the storage system. There will, theoretically, be some limit where increasing the number of replicas further will have a negligible effect on overall reliability. The question then becomes, for this situation, what is the percentage of peers that contribute to the storage system. Another issue that might occur is excessive bandwidth usage by the system when 20 and up replicas are maintained per object per cell.
+
+It should also be noted that the required number of replicas will be a function of network churn to maintain a specific reliability. The number of users present should not affect reliability. The question then arises: how is the fairness and bandwidth requirements of the system influenced when tens of thousands of users enter the virtual environment.
 
 \subsection{Overlay storage}
 \label{overlay_storage}

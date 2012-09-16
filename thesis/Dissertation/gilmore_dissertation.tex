@@ -21,7 +21,8 @@
  \usepackage{amssymb}%............................ AMS Symbol fonts
 
 %==== Font setup (default is Computer Modern) =======================
-% \usepackage[T1]{fontenc}%........................ Type 1 fonts
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}%........................ Type 1 fonts
  \usepackage{textcomp}%........................... Additional text character
  \usepackage{bm}%................................. Bold math symbols (after fonts)
 
@@ -65,6 +66,8 @@
 \usepackage[a4paper,plainpages=false,colorlinks,linktocpage,bookmarks=true,bookmarksopen=false]{hyperref}
 % use this for printing only (no color, print version):
 %\usepackage[a4paper,plainpages=false,colorlinks=false,linktocpage,bookmarks=true,bookmarksopen=false]{hyperref}
+
+\usepackage{multirow}
 
 %\renewcommand{\lstlistlistingname}{List of Listings}
 
@@ -154,10 +157,10 @@ qualifications.]
 \include{contents/conclusion}
 
 %==== Appendices ====================================================
-%\appendix
-%\appendixpage\relax
+\appendix
+\appendixpage\relax
 
-%\include{contents/App-1}
+\include{contents/App-1}
 
 %==== Bibliography acro's & Index ===================================
 %\backmatter
