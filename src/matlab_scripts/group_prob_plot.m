@@ -54,6 +54,7 @@ group_prob = [0.0,9.98,19.74,29.61,39.46,49.29,59.16,69.10,78.93,88.60,97.83];
 
 group_rel = [0.993, 0.993, 0.995, 0.996, 0.996, 0.997, 0.998, 0.998, 0.999, 0.999];
 group_resp = [0.01567, 0.03037, 0.04618, 0.0623, 0.0759, 0.0917, 0.1066, 0.1209, 0.1356, 0.1342];
+group_resp_succ = [0.1362,0.1330,0.1326,0.1325, 0.1337, 0.1344, 0.1338,0.1340,0.1330,0.1337];
 group_in = [53,57,72,85,102,110,126,136,151,165,187];
 group_out = [59,63,77,89,104,112,127,137,150,164,183];
 group_av = (group_in+group_out)/2;
@@ -73,22 +74,35 @@ pithos_av = (pithos_in+pithos_out)/2;
 data_in = [4,4,4,4,4,4,4,4,4,4,4];
 data_out = [98,101,107,113,119,124,131,138,145,151,157];
 
-plot(group_prob(2:length(group_prob)), group_rel, 'ko-');
+figure
+set(gca, 'FontSize', 24)
+plot(group_prob(2:length(group_prob)), group_rel, 'bo-', 'LineWidth',2);
 hold on
-plot(group_prob, pithos_rel, 'ko-');
-plot(group_prob, overlay_rel, 'ko-');
+plot(group_prob, pithos_rel, 'ks-', 'LineWidth',2);
+plot(group_prob, overlay_rel, 'rd-', 'LineWidth',2);
+ylabel('Reliability');
+xlabel('Group probability (%)');
+hleg = legend('Group storage', 'Pithos overall', 'Overlay storage');
 
 figure 
-plot(group_prob(2:length(group_prob)), group_resp, 'ko-');
+set(gca, 'FontSize', 24)
+plot(group_prob(2:length(group_prob)), group_resp, 'bo-', 'LineWidth',2);
 hold on
-plot(group_prob, pithos_resp, 'ko-');
-plot(group_prob, overlay_resp, 'ko-');
+plot(group_prob(2:length(group_prob)), group_resp_succ, 'x-', 'Color',[0.48,0.06,0.89], 'MarkerSize',12, 'LineWidth',2);
+plot(group_prob, pithos_resp, 'ks-', 'LineWidth',2);
+plot(group_prob, overlay_resp, 'rd-', 'LineWidth',2);
+ylabel('Latency (s)');
+xlabel('Group probability (%)');
+hleg = legend('Group', 'Group success', 'Pithos', 'Overlay');
 
 figure
-plot(group_prob, group_av, 'ko-');
+set(gca, 'FontSize', 24)
+plot(group_prob, group_av, 'bo-', 'LineWidth',2);
 hold on
-plot(group_prob, pithos_av, 'ko-');
-plot(group_prob, overlay_av, 'ko-');
-plot(group_prob, data_in, 'ko-');
-plot(group_prob, data_out, 'ko-');
+plot(group_prob, pithos_av, 'ks-', 'LineWidth',2);
+plot(group_prob, overlay_av, 'rd-', 'LineWidth',2);
+plot(group_prob, data_in+data_out, '+-', 'Color',[0.87,0.49,0], 'LineWidth',2, 'MarkerSize',12);
+ylabel('Bandwidth (Bps)');
+xlabel('Group probability (%)');
+hleg = legend('Group', 'Pithos', 'Overlay', 'Higher layer');
 
