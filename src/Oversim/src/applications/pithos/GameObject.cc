@@ -107,6 +107,19 @@ GameObject& GameObject::operator=(const BinaryValue& binval)
 		return *this;
 	}
 
+	//If a malicious nodes alters the data in the DHT module, it sets the value to: "Modified Data"
+	//TODO: Insert a check here, that checks if the simulation configuration is set to have malicious nodes. This check will drastically reduce the number of string comparisons performed.
+	if (binval == BinaryValue("Modified Data"))
+	{
+		objectName = "Modified";
+		size = 0;
+		creationTime = SIMTIME_ZERO;
+		ttl = 0;
+		value = intuniform(0, 100000);
+
+		return *this;
+	}
+
 	std::string buf;			//Have a buffer string
 	std::stringstream ss;		//Create a string stream
 
