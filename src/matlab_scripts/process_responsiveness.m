@@ -1,14 +1,14 @@
 close all
-clear all
-
-folder = '../results/Pastry_lan_15mbps/';
-
-%eval(['load ' folder 'group_get.csv']);
-%eval(['load ' folder 'group_put.csv']);
-eval(['load ' folder 'overlay_get.csv']);
-%eval(['load ' folder 'overlay_put.csv']);
-%eval(['load ' folder 'overall_get.csv']);
-%eval(['load ' folder 'overall_put.csv']);
+% clear all
+% 
+% folder = '../results/2500_norep_10sfinger_fp/';
+% 
+% eval(['load ' folder 'group_get.csv']);
+% eval(['load ' folder 'group_put.csv']);
+% eval(['load ' folder 'overlay_get.csv']);
+% eval(['load ' folder 'overlay_put.csv']);
+% eval(['load ' folder 'overall_get.csv']);
+% eval(['load ' folder 'overall_put.csv']);
 
 figure('Name','group get')
 set(gca, 'FontSize', 24) 
