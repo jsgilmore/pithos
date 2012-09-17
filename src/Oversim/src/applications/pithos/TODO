@@ -31,7 +31,6 @@ Remove the term "game" where it is not required and replace with environment and
 Replace "player" with "user".
 Replace "node" with "peer", where applicable.
 Add bandwidth (overhead) as a required metric of a storage system.
-Ensure that all applicable experimental setup parameters are given in the relevant evaluation sections.
 Add figure displaying the expanded Oversim terminal.
 Add figure displaying the structure of an object ledger.
 
@@ -47,11 +46,12 @@ Add more results, comparing variations in more parameters.
 Ensure all symbols and abbreviations are present.
 
 Conclusion:
-Complete
 
 Evalutaion:
 Simulation todo:
 Simulate the effect of group size on reliability, responsiveness and bandwidth usage.
+Check whether Pastry also has the 3s spikes and update overlay retrieval LAN responsiveness section.
+Add up-to-date fairness graphs.
 
 Lit study todo:
 Find paper that validates my overlay storage and reliability results for Chord.
@@ -64,12 +64,8 @@ Coding todo:
 Figure out why there is a 3s spike at overlay storage and retrieval
 
 Writing todo:
-Write about the responsiveness of overlay storage in the LAN setup.
-Write about the performance of the Pareto distribution.
-Write about success responsiveness for the group probability case.
 Add time label to group storage responsiveness for safe storage.
 Add time label to group retrieval responsiveness for parallel retrieval.
-Rewrite performance under repair section for just bandwidth, not efficiency
 
 Writing and data mining todo:
 Add responsiveness and bandwidth to security.
