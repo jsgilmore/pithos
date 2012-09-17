@@ -184,7 +184,6 @@ void PithosTestApp::handleGetResponse(RootObjectGetCAPIResponse* msg, PithosStat
         return;
     }
 
-    //RECORD_STATS(globalStatistics->addStdDev("PithosTestApp: GET Latency (s)", SIMTIME_DBL(simTime() - context->requestTime)));
     RECORD_STATS(globalStatistics->recordOutVector("PithosTestApp: GET Latency (s)", SIMTIME_DBL(simTime() - context->requestTime)));
 
     if (!(msg->getIsSuccess())) {
@@ -308,8 +307,6 @@ double PithosTestApp::getGroupProbability()
 OverlayKey PithosTestApp::getKey()
 {
 	OverlayKey key;
-
-	std::cout << getGroupProbability() << endl;
 
 	//Randomly select in or out of group request
 	if (uniform(0,100) <= getGroupProbability())
