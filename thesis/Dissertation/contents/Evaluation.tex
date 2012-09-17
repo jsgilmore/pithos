@@ -355,7 +355,7 @@ No additional peaks are perceived, as opposed to the peaks seen earlier. The mea
  \label{fig_overlay_get_lan_wide}
 \end{figure}
 %
-Figure \ref{fig_overlay_get_lan_wide} shows the responsiveness of overlay storage for the LAN underlay network. Three groups of latencies can be observed. One close to zero seconds, one at 1.5s and another at 3s. The first group contains 96\% of overlay requests, the second 1\% and the third, 3\%. The second and third groups are thought to be timeout that occur within the third-party overlay implementation begin used.
+Figure \ref{fig_overlay_get_lan_wide} shows the responsiveness of overlay storage for the LAN underlay network. Three groups of latencies can be observed. One close to zero seconds, one at 1.5s and another at 3s. The first group contains the majority (96\%) of overlay requests, the second 1\% and the third, 3\% of overlay requests. It  is not clear why there is three distinct responsiveness groups. What is clear is that this is a feature of the Chord overlay implementation, since Pastry does not show these features in simulation. Because these features are only responsible for 4\% of the requests, they were not deemed to require an in-depth investigation.
 
 \begin{figure}[htbp]
  \centering
@@ -366,7 +366,7 @@ Figure \ref{fig_overlay_get_lan_wide} shows the responsiveness of overlay storag
 %
 Figure \ref{fig_overlay_get_lan} shows the group close to zero seconds. This group, as well as the other two, exists out of multiple hops. These hops are, however, not underlay hops, but overlay hops, since they are more than 1ms apart. The overlay creates its own application layer network and the overlay storage takes $O(\log(N))$ overlay hops. A single overlay hop may contain multiple underlay hops.
 
-The mean overlay retrieval for LAN responsiveness is 0.130s, which is significantly slower than the 0.0016s of group retrieval for LAN responsiveness.
+The mean overlay retrieval for LAN responsiveness is 130ms, which is significantly slower than the 1.6ms of group retrieval for LAN responsiveness.
 
 \subsection{Overall storage}
 
@@ -494,6 +494,8 @@ An apparent anomaly is the group storage latency that increases with an increase
 
 The lower the group probability, the more failure responses are returned by group storage, which are returned instantly. It is these responses that decrease the mean group storage latency for lower group probabilities. When failure responses are ignored, group latency remains constant at the value of 100\% group probability.
 
+The effect of failure responses on the group retrieval responsiveness can be seen by the line showing group success responsiveness. The responsiveness of group successes remain the same for all group probabilities.
+
 \subsection{Bandwidth}
 \label{group_probability_bandwidth}
 
@@ -537,6 +539,8 @@ Three types of retrieval methods are compared: fast retrieval, parallel retrieva
 
 As was stated earlier, the object TTL will also influence the reliability, since if objects have to be maintained for longer periods of time there exists a greater probability of all object replicas being lost. To better show the effect of repair on object reliability, object TTLs were increases to 1000s from 300s.
 
+To show the sensitivity of reliability to node lifetime, two node lifetime distributions are explored in this experiment: the exponential and Pareto lifetime distributions. The Pareto distribution is a heavy-tailed distribution, which means that a certain percentage of nodes will live a significantly longer time than others. It is expected that the Pareto distribution will lead to higher reliability, since there is a higher probability of one of the object replicas being stored on a node with a long lifetime.
+
 \begin{itemize}
 \item Fast group storage is used.
 \item Network of 2500 peers and 100 super peers.
@@ -569,7 +573,7 @@ When node lifetimes are the same as the periodic repair interval, leaving repair
 
 Except for the case where the periodic repair timer is equal to the expected node lifetime, leaving and periodic repair appear to perform similarly in terms of reliability.
 
-Parallel retrieval, employing no repair mechanism, is most reliable and consistently reliable for all node lifetimes.
+Parallel retrieval, employing no repair mechanism, is most reliable and consistently reliable for all node lifetimes. The second most reliable setup is no repair with Pareto lifetime distributions. It should be noted that a Pareto node lifetime distribution leads to more reliable system in every instance. In other words, when comparing the cases of no repair with repair, Pareto lifetime distributions with repair also performs better than the no repair case for the same lifetime distributions.
 
 \subsection{Bandwidth}
 
@@ -580,19 +584,21 @@ Parallel retrieval, employing no repair mechanism, is most reliable and consiste
  \label{fig_repair_bw_eff}
 \end{figure}
 %
-Figure \ref{fig_repair_bw_eff} compares the bandwidth efficiency of the various repair techniques. Bandwidth efficiency is defined to be the factor of usable data that would have been transferred to the higher layer, had the system been 100\% reliable, compared to the total bandwidth used by Pithos. 100\% reliability is used, otherwise bandwidth efficiency is also a function of reliability, since less data is transferred if fewer requests are successful. It should be noted that the largest part of Pithos's bandwidth usage is contributed by overlay storage, as shown in Sections \ref{overlay_results} and \ref{group_probability_bandwidth}.
+Figure \ref{fig_repair_bw_eff} compares the bandwidth usage of the various repair techniques. It should be noted that the largest part of Pithos's bandwidth usage is contributed by overlay storage, as shown in Sections \ref{overlay_results} and \ref{group_probability_bandwidth}.
 
-Although parallel retrieval was shown to be the most reliable retrieval mechanisms for various node lifetimes, Figure \ref{fig_repair_bw_eff} shows that it is also the most bandwidth inefficient, with only between 1.5\% to 8\% usable data transferred. The bandwidth efficiency of leaving and periodic repair are similar for long peer lifetimes, compared to the periodic repair timer.
+Although parallel retrieval has been shown to be the most reliable retrieval mechanisms for various node lifetimes, Figure \ref{fig_repair_bw_eff} shows that it required the most bandwidth, with only between 1.5\% to 8\% usable data transferred. The bandwidth usage of leaving and periodic repair are similar for long peer lifetimes, compared to the periodic repair timer.
 
-Bandwidth efficiency is monotonously increasing, because as peers remain in the network for longer periods of time, less bandwidth is required to repair missing replicas. Bandwidth efficiency also increases, since there is more usable data transferred when peers are alive for longer periods of time. Peers that live longer have less time to generate usable data. The increase in usable data for longer node lifetimes, than the object TTL does not lead to a significant increase in Pithos bandwidth.
+Bandwidth usage is low for short node lifetimes, because of the low reliability. Many retrieve requests fail for short node lifetimes, which means that fewer object are returned and less bandwidth is used.
 
-Although doing no repair is less reliable, it is more bandwidth efficient, because no object repairs have to be performed.
+Although doing no repair is less reliable, it used less bandwidth, because no object repairs have to be performed. Pareto lifetimes distributions also require less bandwidth, since the overlay does not have to exchange as much routing information.
 
 \subsection{Conclusion}
 
 The leaving and periodic repair mechanisms were found to posses similar reliability and bandwidth performances. It seemed that leaving repair does, however, cope better with dynamic node lifetimes. A periodic timer also has to be designed for specific network parameters, including expected node lifetime and object TTL. If, during the lifetime of the network, the parameters change, the system will not be able to dynamically adapt.
 
 As expected, doing no repair is less reliable than doing repair, but uses less bandwidth. Parallel retrieval is highly reliable, but requires a large amount of bandwidth.
+
+Some studies have found that Pareto lifetime distributions might be a better fit to the time users spend in an MMVE \cite{}. We have shown that Pareto lifetime distributions are a less rigorous test of the Pithos architecture and that Pithos shows improved performance under Pareto distributions.
 
 \section{Security}
 \label{malicious_results}
@@ -640,6 +646,8 @@ As with the previous experiments, the following configuration parameters are cho
 Figure \ref{fig_malicious_nodes_rel} shows Pithos's reliability as a function of the percentage of malicious users in the network for both the fast retrieval and safe retrieval schemes. As expected, the fast retrieval reliability is almost the same as the malicious user percentage. System reliability for fast retrieval is the product of the malicious user factor and the system reliability when malicious users are present in the network.
 
 The reason for this direct relationship is because the probability of an object retrieval being corrupted in the network is equal to the probability of a peer being malicious, since a malicious peer corrupts all objects returned and a non-malicious peer corrupts none of the objects returned. The overall probability is then the probability that an object retrieval would have succeeded if no malicious nodes were present, multiplied by the probability of nodes being malicious.
+
+Overlay retrieval, using no form of security as with fast retrieval, performs worse than fast retrieval. This is especially true for higher malicious node probabilities.
 
 Figure \ref{fig_malicious_nodes_rel} also shows the improvement received from using safe retrieval. The curve shows that safe retrieval provides greater benefit for smaller factors of malicious nodes. As soon as the majority of objects are corrupted, which occurs when the malicious users probability is greater than 50\%, object reliability drops significantly.
 
