@@ -47,14 +47,19 @@ Ensure all symbols and abbreviations are present.
 
 Conclusion:
 
-Evalutaion:
-Simulation todo:
-Simulate the effect of group size on reliability, responsiveness and bandwidth usage.
-Check whether Pastry also has the 3s spikes and update overlay retrieval LAN responsiveness section.
-Add up-to-date fairness graphs.
+Implementation:
+Add replicas per object graphs
 
-Lit study todo:
-Find paper that validates my overlay storage and reliability results for Chord.
+Evalutaion:
+
+Writing and data mining todo:
+Add responsiveness and bandwidth to security.
+
+Simulation todo:
+Add up-to-date fairness graphs.
+Add responsiveness of parallel retrieval to repair section.
+Check whether Pastry also has the 3s spikes and update overlay retrieval LAN responsiveness section.
+Simulate the effect of group size on reliability, responsiveness and bandwidth usage.
 
 Figures to generate:
 When talking about another distributions that's the same, create a subplot showing that distribution.
@@ -63,12 +68,8 @@ Present responsiveness distribution for the "low" and "high" cases.
 Coding todo:
 Figure out why there is a 3s spike at overlay storage and retrieval
 
-Writing todo:
-Add time label to group storage responsiveness for safe storage.
-Add time label to group retrieval responsiveness for parallel retrieval.
-
-Writing and data mining todo:
-Add responsiveness and bandwidth to security.
+Lit study todo:
+Find paper that validates my overlay storage and reliability results for Chord.
 
 Hand-in PhD
 Pass defence

@@ -1,48 +1,72 @@
 close all
 clear all
 
-% Retrieval method & Malicious nodes&Reliability&Responsiveness&Group bandwidth&Overlay bandwidth  \\
-%     fast         & 0.0            &  0.9970   &      (s)     & in/out (Bps)  &  in/out (Bps)     \\
-%     fast         & 0.125          &  0.8767   &              &               &                    \\
-%     fast         & 0.25           &  0.7482   &    0.198     &  186/182      &    1186/1199      \\
-%     fast         & 0.375          &  0.6248   &              &               &                    \\
-%     fast         & 0.5            &  0.5025   &    0.192     &  177/173      &    1180/1194      \\
-%     fast         & 0.625          &  0.3722   &              &               &                    \\
-%     fast         & 0.75           &  0.2669   &    0.191     &  179/175      &    1179/1192      \\
-%     fast         & 0.875          &  0.1324   &              &               &                    \\
-%     fast         & 1.0            &  0.0061   &              &               &                    \\
+malicious_nodes =      [0.0,      0.125,    0.25,     0.375,    0.5,      0.625,    0.75,     0.875,    1.0];
 
-%     safe         & 0.0            &  0.9998
-%     safe         & 0.125          &  0.9926   &    0.351     &  724/590      &   1187/1201  \\
-%     safe         & 0.25           &  0.9558   &    0.356     &  721/588      &              \\
-%     safe         & 0.375          &  0.8609   &    0.295     &  714/583      &   979/993    \\
-%     safe         & 0.5            &  0.7134   &    0.346     &  717/587      &              \\
-%     safe         & 0.625          &  0.5047   &    0.350     &  716/586      &   1188/1202  \\
-%     safe         & 0.75           &  0.3042   &    0.350     &  715/581      &              \\
-%     safe         & 0.875          &  0.1135   &    0.354     &  714/582      &   1188/1205  \\
-%     safe         & 1.0            &  0.0      &    0.356     &  710/580      &   1183/1197  \\
+%Reliability
+safe4_get_rel =        [0.9998,   0.9926,   0.9558,   0.8609,   0.7134,   0.5047,   0.3042,   0.1135,   0.0];
+safe6_get_rel =        [0.9999,   0.9997,   0.9966,   0.9784,   0.9270,   0.8032,   0.6189,   0.3168,   0.0];
+fast_get_rel =         [0.9970,   0.8767,   0.7482,   0.6248,   0.5025,   0.3722,   0.2669,   0.1324,   0.0];
+overlay_get_rel =      [0.9140,   0.8557,   0.7056,   0.5156,   0.3437,   0.1921,   0.0797,   0.0166,   0.0];
 
-%With super peer maliciousness included (But whether a group peer is malicious is independant from whether an overlay peer is malicous)
-% Retrieval method & Malicious nodes&Reliability&Responsiveness&Group bandwidth&Overlay bandwidth  \\
-%     fast         & 0.0            &    0.9140
-%     fast         & 0.125          &    0.8583
-%     fast         & 0.25           &    0.7178
-%     fast         & 0.375          &    0.5230
-%     fast         & 0.5            &    0.3464
-%     fast         & 0.625          &    0.1991
-%     fast         & 0.75           &    0.0758
-%     fast         & 0.875          &    0.0182
-%     fast         & 1.0            &    0.0
-%     &                    \\
+%Responsiveness
+safe4_get_resp =       [0.354,    0.351,    0.356,    0.295,    0.346,    0.350,    0.350,    0.354,    0.356];
+safe6_get_resp =       [0.788,    0.789,    0.793,    0.637,    0.785,    0.780,    0.778,    0.789,    0.800];
+fast_get_resp =        [0.196,    0.197,    0.197,    0.203,    0.217,    0.213,    0.220,    0.218,    0.165];
+overlay_get_resp =     [1.760,    1.805,    1.841,    1.825,    1.785,    1.758,    1.692,    1.680,    0.0  ];
 
-safe4_get_rel = [0.9998, 0.9926, 0.9558, 0.8609, 0.7134, 0.5047, 0.3042, 0.1135, 0.0];
-safe6_get_rel = [0.9999, 0.9997, 0.9966, 0.9784, 0.9270, 0.8032, 0.6189, 0.3168, 0.0];
+%Data used
+safe4_get_data_in =    [4,        4,        4,        4,        4,        4,        4,        4,        4];
+safe6_get_data_in =    [4,        4,        4,        4,        4,        4,        4,        4,        4];
+fast_get_data_in =     [4,        4,        4,        4,        4,        4,        4,        4,        4];
+overlay_get_data_in =  [4,        4,        4,        4,        4,        4,        4,        4,        4];
 
-fast_get_rel = [0.9970, 0.8767, 0.7482, 0.6248, 0.5025 , 0.3722, 0.2669, 0.1324, 0.0061];
+safe4_get_data_out =   [157,      121,      116,      98,       87,       61,       37,       14,      0  ];
+safe6_get_data_out =   [72,       73,       71,       54,       66,       57,       44,       22,      0  ];
+fast_get_data_out =    [157,      157,      156,      156,      154,      154,      154,      154,     144];
+overlay_get_data_out = [157,      157,      156,      156,      154,      154,      154,      154,     144];
 
-overlay_get_rel = [0.9140,0.8583,0.7178,0.5230,0.3464,0.1991,0.0758,0.0182,0.0];
+%Group bandwidth
+safe4_get_group_in =   [725,      724,      721,      714,      717,      716,      715,      714,      710];
+safe6_get_group_in =   [723,      724,      716,      714,      713,      716,      712,      714,      710];
+fast_get_group_in =    [186,      179,      180,      174,      178,      176,      175,      174,      165];
+overlay_get_group_in = [0  ,      0  ,      0  ,      0  ,      0  ,      0  ,      0  ,      0  ,      0  ];
 
-malicious_nodes =       [0.0, 0.125 , 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1.0];
+safe4_get_group_out =  [593,      590,      588,      583,      587,      586,      581,      582,      580];
+safe6_get_group_out =  [593,      590,      586,      583,      580,      586,      583,      582,      580];
+fast_get_group_out =   [182,      175,      177,      171,      174,      174,      172,      170,      182];
+overlay_get_group_out= [0  ,      0  ,      0  ,      0  ,      0  ,      0  ,      0  ,      0  ,      0  ];
+
+%Overlay bandwidth
+safe4_get_overlay_in=  [1187,     1187,     1192,     979,      1185,     1188,     1188,     1188,     1183];
+safe6_get_overlay_in=  [1186,     1187,     1187,     979,      1186,     1188,     1188,     1188,     1183];
+fast_get_overlay_in =  [1180,     1183,     1182,     1185      1183,     1173      1174,     1162,     0   ];
+overlay_get_overlay_in=[1180,     1183,     1182,     1185,     1183,     1173,     1174,     1161,     0   ];
+
+safe4_get_overlay_out= [1201,     1201,     1208,     993,      1199,     1202,     1203,     1205,     1197];
+safe6_get_overlay_out= [1200,     1201,     1202,     993,      1200,     1202,     1202,     1205,     1197];
+fast_get_overlay_out = [1192,     1196,     1193,     1197,     1197,     1186,     1187,     1176,     0   ];
+overlay_get_overlay_out=[1182,    1196,     1193,     1197,     1197,     1186,     1187,     1176,     0   ];
+
+safe4_get_in = safe4_get_group_in + safe4_get_overlay_in;
+safe6_get_in = safe6_get_group_in + safe6_get_overlay_in;
+fast_get_in = fast_get_group_in + fast_get_overlay_in;
+overlay_get_in = overlay_get_group_in + overlay_get_overlay_in;
+
+safe4_get_out = safe4_get_group_out + safe4_get_overlay_out;
+safe6_get_out = safe6_get_group_out + safe6_get_overlay_out;
+fast_get_out = fast_get_group_out + fast_get_overlay_out;
+overlay_get_out = overlay_get_group_out + overlay_get_overlay_out;
+
+safe4_get = (safe4_get_in + safe4_get_out)/2;
+safe6_get = (safe6_get_in + safe6_get_out)/2;
+fast_get =  (fast_get_in + fast_get_out)/2;
+overlay_get =  (overlay_get_in + overlay_get_out)/2;
+
+safe4_get_data = safe4_get_data_in + safe4_get_data_out;
+safe6_get_data = safe6_get_data_in + safe6_get_data_out;
+fast_get_data = fast_get_data_in + fast_get_data_out;
+overlay_get_data = overlay_get_data_in + overlay_get_data_out;
 
 figure
 set(gca, 'FontSize', 24)
@@ -51,8 +75,31 @@ hold on
 plot(malicious_nodes, safe4_get_rel, 'rs-', 'LineWidth',2);
 plot(malicious_nodes, safe6_get_rel, 'bd-', 'LineWidth',2);
 plot(malicious_nodes, overlay_get_rel, '+-', 'Color',[0.17,0.51,0.34], 'LineWidth',2);
-
 ylabel('Reliability');
+xlabel('Malicious node probability');
+hleg = legend('Fast retrieval','Safe retrieval, 4 compares','Safe retrieval, 6 compares', 'Overlay retrieval');
+set(hleg, 'Location', 'SouthWest');
+
+figure
+set(gca, 'FontSize', 24)
+plot(malicious_nodes, fast_get_resp, 'ko-', 'LineWidth',2);
+hold on
+plot(malicious_nodes, safe4_get_resp, 'rs-', 'LineWidth',2);
+plot(malicious_nodes, safe6_get_resp, 'bd-', 'LineWidth',2);
+plot(malicious_nodes, overlay_get_resp, '+-', 'Color',[0.17,0.51,0.34], 'LineWidth',2);
+ylabel('Latency (s)');
+xlabel('Malicious node probability');
+hleg = legend('Fast retrieval','Safe retrieval, 4 compares','Safe retrieval, 6 compares', 'Overlay retrieval');
+set(hleg, 'Location', 'SouthWest');
+
+figure
+set(gca, 'FontSize', 24)
+plot(malicious_nodes, fast_get, 'ko-', 'LineWidth',2);
+hold on
+plot(malicious_nodes, safe4_get, 'rs-', 'LineWidth',2);
+plot(malicious_nodes, safe6_get, 'bd-', 'LineWidth',2);
+plot(malicious_nodes, overlay_get, '+-', 'Color',[0.17,0.51,0.34], 'LineWidth',2);
+ylabel('Bandwidth (Bps)');
 xlabel('Malicious node probability');
 hleg = legend('Fast retrieval','Safe retrieval, 4 compares','Safe retrieval, 6 compares', 'Overlay retrieval');
 set(hleg, 'Location', 'SouthWest');
