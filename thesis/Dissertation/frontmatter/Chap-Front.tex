@@ -1,11 +1,15 @@
 
 \chapter*{Abstract}
-Recently, there has been significant research focus on Peer-to-Peer (P2P) Massively Multiplayer Online Games (MMOGs). A number of architectures have been presented in the literature to implement the P2P approach. One aspect that has not received sufficient attention in these architectures is state persistency in P2P MMOGs. This survey presents an overview of the current challenges present in P2P MMOGs, followed by an overview of classic state consistency models used in C/S MMOGs. The survey then classifies the state persistency techniques currently used in P2P MMOGs into super peer storage, overlay storage, hybrid storage and distance-based storage. Key characteristics, namely scalability, fairness, reliability, responsiveness and security are then defined. Each state persistency technique is evaluated according to these characteristics and recommendations are then made of possible future areas of research into the different storage types.
+Recently, there has been significant research focus on Peer-to-Peer (P2P) Massively Multiuser Virtual Environments (MMVEs). A number of architectures have been presented in the literature to implement the P2P approach. One aspect that has not received sufficient attention in these architectures is state management and state persistency in P2P MMVEs. This work presents a novel state management and persistency architecture. In order to design the architecture, an investigation if performed into state consistency architectures, into which the state management and persistency architecture should fit. A novel generic state consistency model is proposed that encapsulated all state consistency models reviewed. The requirements for state management and persistency architectures, identified during the review of state consistency models, are used to review state management and consistency architecture currently receiving research attention.
+
+Identifying some deficiencies present in current designs, a novel state management and persistency architecture, called Pithos, is designed. Pithos is a reliable, responsive, secure and fair distributed storage system, ideally suited to P2P MMVEs. Pithos is implemented in Oversim, which runs on the Omnet++ network simulator. An evaluation of Pithos is performed to verify that it satisfies the identified requirements.
+
+It is found that the reliability of Pithos depends heavily on object lifetimes. If an object lives longer on average, retrieval requests are more reliable. An investigation if performed into the factors influencing object lifetime. A novel Markov chain model is proposed which allows for the prediction of objects lifetimes in any finite network, for a given amount of redundancy, node lifetime characteristics and object repair rate.
 
 
 \chapter*{Samevatting}
 
-Recently, there has been significant research focus on Peer-to-Peer (P2P) Massively Multiplayer Online Games (MMOGs). A number of architectures have been presented in the literature to implement the P2P approach. One aspect that has not received sufficient attention in these architectures is state persistency in P2P MMOGs. This survey presents an overview of the current challenges present in P2P MMOGs, followed by an overview of classic state consistency models used in C/S MMOGs. The survey then classifies the state persistency techniques currently used in P2P MMOGs into super peer storage, overlay storage, hybrid storage and distance-based storage. Key characteristics, namely scalability, fairness, reliability, responsiveness and security are then defined. Each state persistency technique is evaluated according to these characteristics and recommendations are then made of possible future areas of research into the different storage types.
+Moet nog vertaal word.
 
 
 \chapter{Acknowledgements}%==================================================
@@ -19,12 +23,12 @@ I would like to express my sincere gratitude to the following people and organis
   \item my parents, John and Coreen Gilmore, for making me the man I am today and making
   my studies possible;
   \item Dr Shun-Yun Hu, Dr Gregor Shiele and Dilum Bandara, for their valuable input.
-  \item Peter Hayward, Rampie Bell and Francois van Niekerk, for all the interesting ideas, talks and feedback;
-  \item All the MIH media lab members, for making my time there so enjoyable.
+  \item Francois van Niekerk, Peter Hayward and Rampie Bell, for all the interesting ideas, talks and feedback;
+  \item all the MIH media lab members, for making my time there so enjoyable.
 \end{itemize}
 
 
-\chapter{Dedications}%=======================================================
+\chapter*{}%=======================================================
  \vfill
  \begin{center}\itshape
     To my wife, Jacki Gilmore, for all your love, support and understanding.

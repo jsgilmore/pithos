@@ -29,6 +29,7 @@ Dissertation:
 Make sure the state management and persistency chapter uses the terms state management and persistency correctly.
 Remove the term "game" where it is not required and replace with environment and VE.
 Replace "player" with "user".
+Decide between "actor", "avatar" and "agent".
 Replace "node" with "peer", where applicable.
 Add bandwidth (overhead) as a required metric of a storage system.
 Add figure displaying the expanded Oversim terminal.
@@ -36,6 +37,12 @@ Add figure displaying the structure of an object ledger.
 
 Abstract:
 Complete
+
+Nomenclature:
+Add all missing symbols
+Add all missing abbreviations
+Group symbols
+Sort abbreviations
 
 Introduction:
 
@@ -48,9 +55,11 @@ Ensure all symbols and abbreviations are present.
 Conclusion:
 
 Implementation:
-Add replicas per object graphs
+Add replicas per object graphs for no, leaving and periodic repair
 
 Evalutaion:
+
+Mention maximum confidence interval measured
 
 Writing and data mining todo:
 Add responsiveness and bandwidth to security.
