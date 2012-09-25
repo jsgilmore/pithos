@@ -40,7 +40,11 @@ In P2P MMVEs there still exists a need for an authoritative object, but no centr
 
 It should be noted that in this work, a node refers to a computer that is connected to a network, where a peer refers to a computer that is connected to a P2P network. Practically, there is no difference between a computer connected to a C/S network and one connected to a P2P network, except for the software that it executes.
 
-\subsection{General flow}
+\subsection{Object creation flow}
+
+\subsection{Range query flow}
+
+\subsection{Event-update flow}
 \label{general_flow}
 
 \begin{figure}[htbp]
@@ -64,7 +68,7 @@ When an event has been translated into a state update, the authoritative object 
 
 When the update is delivered to Agent 2, the local object state is updated and the object's new state is displayed to the agent to allow the agent to make decisions and, therefore, generate events based on the new object state.
 
-\subsection{Generic event-update model}
+\subsection{Generic consistency model}
 \label{generic_event_update_model}
 
 To our knowledge, no papers exist that present a comprehensive picture of a state consistency architecture. In this chapter, papers will be discussed that individually implement all modules of the consistency architecture, but none were found to provide an overview of a state consistency model.

@@ -66,7 +66,7 @@ Reliability is measured as the ratio of successful responses received, to the to
 
 \subsubsection{Responsiveness (latency)}
 
-Responsiveness is measured as the round trip latency of a request in seconds.  In other words, the time it takes, since a request is generated, until a response is received.
+Responsiveness is measured as the round trip latency of a request in seconds.  In other words, the time it takes, since a request is generated, until a response is received. For the latencies measured in all the results shown, the widest 95\% confidence interval for all means measured is 0.3ms, which gives an idea of the precision of the results presented.
 
 \subsubsection{Bandwidth}
 
@@ -157,7 +157,7 @@ The advantage of fast storage over safe storage is its higher responsiveness of 
 \centering
 \begin{tabular}{|c|c|c|l|l|l|}
 \hline
-Storage & Retrieval & \multirow{2}{*}{Reliability} & Responsiveness & \multicolumn{2}{c|}{Bandwidth (Bps)} \\
+Storage & Retrieval & \multirow{2}{*}{Reliability} & Responsiveness & \multicolumn{2}{c|}{Group bandwidth (Bps)} \\
 \cline{5-6}
    method      &     method       &             &mean (var.) (s)& in&out\\
 \hline
@@ -190,7 +190,7 @@ The question whether fast or parallel retrieval is preferred depends on the impl
 \subsection{Bandwidth requirements}
 \label{bandwidth_requirements}
 
-To enable a fair comparison of the different Pithos storage and retrieval methods as well as overlay storage, requires also considering the required bandwidth. Table \ref{tab_pithos_results} shows the required bandwidth of Pithos's group storage architecture, as well as the overlay storage architecture. Because Pithos is a hybrid storage scheme, its properties depend on the underlying properties of the modules combined in the hybrid.
+To enable a fair comparison of the different Pithos storage and retrieval methods as well as overlay storage, requires also considering the required bandwidth. Table \ref{tab_pithos_results} shows the required bandwidth of Pithos's group storage architecture. Because Pithos is a hybrid storage scheme, its properties depend on the underlying properties of both group and overlay storage modules.
 
 To place the bandwidth usage into perspective, the data sent to Pithos by PithosTestApp and received from Pithos by PithosTestApp should be considered. For the simulation setup as described, 4 bytes per second (Bps) is sent to Pithos and 157 Bps is received from Pithos. The reason why there is less data sent to Pithos, is because of nodes only generating objects for 20s, as discussed in Section \ref{simulation_setup} and retrieval requests being generated during the complete lifetime of a node.
 
@@ -204,7 +204,7 @@ Six parallel requests lead to a factor four increase in required bandwidth. What
 It should be noted that this does not influence group reliability, since all peers are aware only of the objects that do exist in the group. Failures can only occur when a peer sends a retrieval request to a target peer, as the target peer leaves the network.
 
 \subsubsection{Overlay storage}
-Table \ref{tab_pithos_results} also shows the large bandwidth requirement of overlay storage, compared to group storage, requiring 1183 Bps inbound and 1197 Bps outbound to function correctly. The low setting required a lot less bandwidth, but also only has a reliability of 0.6216 and a responsiveness of 2.071 s as shown in Section \ref{overlay_results}.
+Table \ref{tab_overlay_rel_resp_results} also shows the large bandwidth requirement of overlay storage, compared to group storage, requiring 1183 Bps inbound and 1197 Bps outbound to function correctly. The low setting required a lot less bandwidth, but also only has a reliability of 0.6216 and a responsiveness of 2.071 s as shown in Section \ref{overlay_results}.
 
 \subsection{Conclusion}
 
@@ -362,7 +362,7 @@ Figure \ref{fig_overlay_get_lan_wide} shows the responsiveness of overlay storag
 
 \begin{figure}[htbp]
  \centering
- \includegraphics[clip=true, viewport=25mm 30mm 275mm 175mm, width=\columnwidth]{overlay_get_lan}
+ \includegraphics[clip=true, viewport=10mm 30mm 275mm 175mm, width=\columnwidth]{overlay_get_lan}
  \caption{Overlay retrieval responsiveness for fast storage and fast retrieval, running on a 1ms underlay network.}
  \label{fig_overlay_get_lan}
 \end{figure}
@@ -649,7 +649,7 @@ As with the previous experiments, the following configuration parameters are cho
 \item All requests are for local group objects.
 \end{itemize}
 
-\subsection{Results}
+\subsection{Reliability}
 \begin{figure}[htbp]
  \centering
  \includegraphics[clip=true, viewport=20mm 30mm 270mm 175mm, width=\columnwidth]{malicious_nodes_rel}
@@ -671,6 +671,30 @@ An interesting situation arises, where safe retrieval reliability drops below fa
 
 Figure \ref{fig_malicious_nodes_rel} also shows the performance of overlay storage under the presence of malicious nodes if no security mechanisms are implemented in overlay storage. The performance degrades as the percentage of malicious users increase. The performance is also worse than the overall Pithos performance.  It should be noted that the overall Pithos performance is not influenced by Overlay storage in this graph, since 100\% group probability is used. For lower percentages of group probability, the linear relationship between group and overlay storage, explored in Section \ref{group_probability_results} exists.
 
+\subsection{Responsiveness}
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=20mm 30mm 270mm 175mm, width=\columnwidth]{malicious_nodes_resp}
+ \caption{Responsiveness of various Pithos retrieval schemes for varying factors of malicious node probability.}
+ \label{fig_malicious_nodes_resp}
+\end{figure}
+%
+Figure \ref{fig_malicious_nodes_resp} shows the responsiveness of Pithos for various malicious node probabilities. Fast retrieval has the lowest latency, since it responds with the first object received and doesn't wait to compare objects. Overlay retrieval is slower than all other forms of retrieval, because of the nature of overlay retrieval as previously discussed.
+
+Safe retrieval, when comparing four objects is slower than fast retrieval, since it has to wait for four objects before it can compare. The responsiveness of the four compare retrieval is thus the responsiveness of the slowest of four requests. Safe retrieval, comparing six objects is slower than comparing four objects, since the responsiveness is now the slowest time of six requested objects. When requesting more objects, there is a higher probability that a slower object will be selected.
+
+\subsection{Bandwidth}
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=15mm 30mm 265mm 175mm, width=\columnwidth]{malicious_nodes_bw}
+ \caption{Bandwidth usage of various Pithos retrieval schemes for varying factors of malicious node probability.}
+ \label{fig_malicious_nodes_bw}
+\end{figure}
+%
+Figure \ref{fig_malicious_nodes_bw} shows the bandwidth usage of various retrieval schemes for various malicious node probabilities. Overlay retrieval uses the least amount of bandwidth, since Pithos also contains an overlay storage section, which means Pithos cannot use less bandwidth than overlay retrieval. Fast retrieval uses more bandwidth than overlay retrieval and the difference between overlay retrieval and fast retrieval is the amount of bandwidth required by the group storage module.
+
+Safe retrieval performing four comparisons and safe retrieval performing six comparisons use the same amount of bandwidth, since both retrieval methods request six objects. The one method only uses the first four responses, while the other uses all six responses. Safe retrieval uses more bandwidth than fast retrieval, since six objects are requested in group storage, instead of the one object requested in fast retrieval.
+
 \subsection{Conclusion}
 
 The section shows that Pithos's safe retrieval mechanism can be used to increase reliability in the presence of malicious users in the network, at the cost of responsiveness and bandwidth. Since we cannot assume that there will not be malicious in a virtual environment, this cost is deemed acceptable.
@@ -681,31 +705,59 @@ In practice, a low malicious node factor is expected, since it is assumed that m
 
 \section{Fairness}
 
-The purpose of this section is to verify that Pithos meets the fairness criteria. We also compare Pithos to overlay storage and show it to be more fair than overlay storage.
+The purpose of this section is to verify that Pithos meets the fairness criteria, which requires that no peers should contribute none of their storage space and that no peers should have to contribute a significantly larger proportion of their storage space than other peers. We also compare Pithos to overlay storage and show it to be as fair as overlay storage.
 
-One of the key reasons objects are distributed amongst groups is to achieve storage fairness. As described in Section \ref{fairness_requirement}, fairness is required to ensure that all peers contribute equally to the P2P network.
+\subsection{Experimental setup}
+
+To measure object fairness, the length of time that nodes generate objects for were increased from 20s to 100s, to allow more objects to enter the storage system. The mean rate of object generation was kept constant at 1 object every 5s.
+
+Object fairness is measured as the average number of objects that were stored on a node during its lifetime. Each node records its local object store size at regular intervals during its lifetime. At the end of a node's lifetime, it calculates the average number of objects that were stored on it. The results shown are, therefore, the average number of objects stored per node over that node's lifetime and the distribution is recorded over all nodes that were removed from the network during the simulation.
+
+As with the previous experiments, the following configuration parameters are chosen for reasons already discussed:
+%
+\begin{itemize}
+\item Fast group storage is used.
+\item Fast group retrieval is used.
+\item Network of 2500 peers and 100 super peers.
+\item Simulation length of 10,000s.
+\item Using the Oversim SimpleUnderlayNetwork for the physical network.
+\item Exponential object lifetime with 1800s mean and 300s TTL.
+\item Object sizes of 1024 bytes.
+\item Generating a store and retrieve request once every 5s.
+\item Using Chord as overlay.
+\item Storing six object replicas.
+\item No object repair is performed.
+\item All requests are for local group objects.
+\end{itemize}
+
+\subsection{Overlay fairness}
 
 \begin{figure}[htbp]
  \centering
- \includegraphics[clip=true, viewport=1cm 0.5cm 28.5cm 20cm, width=\columnwidth]{RootRepOverlayObjects}
- \caption{Top: Distribution showing the number of peers that store a certain number of group objects. Bottom: Distribution showing the number of peers that store a certain number of overlay objects.}
- \label{fig_group_overlay_objects}
+ \includegraphics[clip=true, viewport=15mm 30mm 270mm 175mm, width=\columnwidth]{fairness_overlay}
+ \caption{The distribution of objects over peers for overly storage, when measuring the average number of objects stored during a peer's lifetime.}
+ \label{fig_overlay_fairness}
 \end{figure}
 %
-To evaluate the fairness, we evaluate the standard deviation of the number of objects stored per peer. Figure \ref{fig_group_overlay_objects} (top) shows the distribution of group objects over nodes in the network. The distribution has a mean and standard deviation of 302 and 51 objects per node respectively.
+Figure \ref{fig_overlay_fairness} shows the distribution of overlay objects over nodes in the network. The distribution has a mean and standard deviation of 15.7 and 6.4 objects per node respectively. The figure also lists the 10\%, 25\%, 50\%, 75\% and 90\% percentiles for overlay storage.
 
-Figure \ref{fig_group_overlay_objects} (bottom) shows the distribution of overlay objects in Pithos with a mean and standard deviation of 153 and 189 objects per node respectively. Comparing the standard deviations of group storage to overlay storage, it appears that group storage is fairer than overlay storage.
+1\% of peers do not store any objects, which although not ideal, is a small percentage of the total number of peers.
+
+\subsection{Pithos fairness}
 
 \begin{figure}[htbp]
  \centering
- \includegraphics[clip=true, viewport=1cm 5cm 29cm 14.5cm, width=\columnwidth]{Objects}
- \caption{Combined object number distribution}
- \label{fig_objects}
+ \includegraphics[clip=true, viewport=15mm 30mm 270mm 175mm, width=\columnwidth]{fairness_pithos}
+ \caption{The distribution of objects over peers for Pithos, when measuring the average number of objects stored during a peer's lifetime.}
+ \label{fig_pithos_fairness}
 \end{figure}
 %
-Figure \ref{fig_objects} shows the combined object distribution of Pithos, with a mean and standard deviation of 453 and 200 objects per node respectively. This shows that the fairness of Pithos is currently dominated by the fairness of the overlay and that Pithos is as fair as overlay storage.
+Figure \ref{fig_pithos_fairness} shows the object distribution of Pithos, with a mean and standard deviation of 31.3 and 9 objects per node respectively. The figure shows that no peers store no objects. The kurtosis (a measure of how heavy-tailed the data are, compared to the normal distribution) is the same for both overlay storage and Pithos: 3.77. While all peers in Pithos store objects, the standard deviation of the objects stored is higher for Pithos (9 objects) than for overlay storage (6.4 objects).
 
-What should be concluded from this section is that there does no exist a minority of peers in Pithos that store the majority of the data. All peers are required to contribute to the P2P network.
+\subsection{Conclusion}
+What should be concluded from this section is that there does no exist a minority of peers in Pithos that store the majority of objects. All peers are required to contribute to the P2P network. It is difficult to define an empirical measure of fairness. When kurtosis is used, Pithos performs the same as overlay storage. When standard deviation is used, Pithos performs worse than overlay storage. The performance is, however, still comparable.
+
+It should be noted that this section compared Pithos with theoretically the fairest storage system reviewed in Section \ref{storage_type_overview}. All other storage systems are expected to be as fair at best, or less fair (for example super peer storage).
 
 \section{Scalability}
 

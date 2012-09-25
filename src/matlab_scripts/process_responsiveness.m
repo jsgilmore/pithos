@@ -1,18 +1,18 @@
 close all
-clear all
-
-folder = '../results/LAN_responsiveness/';
-
-eval(['load ' folder 'group_get.csv']);
-eval(['load ' folder 'group_put.csv']);
-eval(['load ' folder 'overlay_get.csv']);
-eval(['load ' folder 'overlay_put.csv']);
-eval(['load ' folder 'overall_get.csv']);
-eval(['load ' folder 'overall_put.csv']);
+% clear all
+% 
+% folder = '../results/LAN_responsiveness/';
+% 
+% eval(['load ' folder 'group_get.csv']);
+% eval(['load ' folder 'group_put.csv']);
+% eval(['load ' folder 'overlay_get.csv']);
+% eval(['load ' folder 'overlay_put.csv']);
+% eval(['load ' folder 'overall_get.csv']);
+% eval(['load ' folder 'overall_put.csv']);
 
 figure('Name','group get')
 set(gca, 'FontSize', 24) 
-hist(group_get(:,2), 5000);
+hist(group_get(:,2), 500000);
 h = findobj(gca,'Type','patch');
 set(h,'FaceColor','k','EdgeColor','k')
 ylabel('Number of messages');
