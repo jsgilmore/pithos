@@ -15,6 +15,11 @@ When discussing how to segment VE state, it is sometimes easier to speak in term
 
 On a physical level, each computer that executes a virtual environment (VE) is executing a copy of the virtual environment. This is because a computer can only operate on what is stored in its primary memory. Because computers cannot access each other's primary memory banks, the necessity of multiple object copies is created. The existence of multiple object copies necessitates an object consistency model. In MMVEs, each computer uses the information of the virtual environment, stored in memory, to display the virtual environment to the user. The user makes decisions based on what is displayed and the executed operations on the environment. These operations can effect change in the environment and this change has to be communicated to all other entities capable of interacting with the environment. The fact that users operate on a local version of the environment and that the environment should appear the same to all users requires state consistency mechanisms.
 
+\subsection{Object creation flow}
+
+
+\subsection{Range query flow}
+
 \section{Event-logic-update cycle}
 \label{event_logic_update}
 
@@ -39,10 +44,6 @@ Authoritative objects are the objects traditionally housed on the server in the 
 In P2P MMVEs there still exists a need for an authoritative object, but no centralised location exists to store that object. For each authoritative object, a peer is selected to store that object. That peer is termed the authoritative peer for the specific authoritative object it houses.
 
 It should be noted that in this work, a node refers to a computer that is connected to a network, where a peer refers to a computer that is connected to a P2P network. Practically, there is no difference between a computer connected to a C/S network and one connected to a P2P network, except for the software that it executes.
-
-\subsection{Object creation flow}
-
-\subsection{Range query flow}
 
 \subsection{Event-update flow}
 \label{general_flow}
