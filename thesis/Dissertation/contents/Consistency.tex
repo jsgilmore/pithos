@@ -7,29 +7,59 @@ The role of this chapter is to describe the state consistency architecture in wh
 
 \section{The virtual environment}
 
-A virtual environment (VE) can be characterised by its state, which consists of mutable or immutable objects. Immutable objects are those that cannot be altered, for example: rocks, hills and trees. Mutable objects are those that can be altered, for example: NPCs, chests and doors. The \emph{environment state} (\emph{game state} when the environment is an online game) includes all positions, health and other attributes of all avatars, NPCs and other objects in the VE. Mutable objects may further be divided into ephemeral and permanent objects. Ephemeral objects need only be available for certain times, such as a player's (user agent's) avatar, when that avatar is online. Permanent objects should remain in the virtual world, whether the player who owns it is on-line or off-line, such as a virtual house.
+A virtual environment (VE) can be characterised by its \emph{environment state}. When discussing how to segment environment state, it is sometimes easier to speak in terms of \emph{objects}, since they are separable. For the purposes of this work, objects are entities with both state and logic, which means they consume both storage space, as well as computing resources. Objects can also produce events, which should be sent to other objects. When this definition is used, NPC objects may be classified as a specific type of object, which forms part of the global environment state.
 
-User agents are users (players) that connect to a VE. and non-user agents are AI scripts that implement NPC functionality. It is assumed that a single user agent is tied to a specific node in the network. Non-user agents can be hosted on any node and the hosting is an implementation of distributed computation, discussed in Section \ref{distributed_computation_requirement}. Both AI scripts and physical users may interact with the virtual world. When no distinction is required, the generic term ``agent'' is used.
+Both mutable and immutable objects exist. Immutable objects are those that cannot be altered, for example: rocks, hills and trees. Mutable objects are those that can be altered, for example: NPCs, chests and doors. What objects are mutable is design decision made by the VE designer, depending on the VE requirements. The environment state includes all positions, health and other attributes of all avatars, NPCs and other objects in the VE.
 
-When discussing how to segment VE state, it is sometimes easier to speak in terms of \emph{objects}, since they are separable. For the purposes of this work, objects are entities with both state and logic, which means they consume both storage space, as well as computing resources. Objects can also produce events, which should be sent to other objects. When this definition is used, NPC objects may be classified as a specific type of object, which forms part of the global environment state.
+Mutable objects may further be divided into ephemeral and permanent objects. Ephemeral objects need only be available for certain times, such as a player's (user agent's) \emph{avatar}, when that avatar is online. Permanent objects should remain in the virtual world, whether the player who owns it is on-line or off-line, such as a virtual house.
 
-On a physical level, each computer that executes a virtual environment (VE) is executing a copy of the virtual environment. This is because a computer can only operate on what is stored in its primary memory. Because computers cannot access each other's primary memory banks, the necessity of multiple object copies is created. The existence of multiple object copies necessitates an object consistency model. In MMVEs, each computer uses the information of the virtual environment, stored in memory, to display the virtual environment to the user. The user makes decisions based on what is displayed and the executed operations on the environment. These operations can effect change in the environment and this change has to be communicated to all other entities capable of interacting with the environment. The fact that users operate on a local version of the environment and that the environment should appear the same to all users requires state consistency mechanisms.
+\emph{Agents} are defined to be some form of intelligence that can interact with the virtual environment and generate actions. An \emph{avatar} is an agent's representation in the virtual environment. It is the form the agent assumes while in the virtual world.
+
+User agents are users that connect to a VE and control their avatar through some external input/output interface and non-user agents are AI scripts that control an NPC avatar. It is assumed that a single user agent is tied to a specific node in the network. Non-user agents can be hosted on any node and the hosting is an implementation of distributed computation, discussed in Section \ref{distributed_computation_requirement}. Both user and non-user agents may interact with the virtual world. When no distinction is required, the generic term ``agent'' is used.
+
+On a physical level, each computer that executes a virtual environment (VE) is executing a copy of the virtual environment. This is because a computer can only operate on what is stored in its primary memory. Because computers cannot access each other's primary memory banks, the necessity of multiple object copies is created. The existence of multiple object copies necessitates an object consistency model.
+
+In MMVEs, each computer uses the information of the virtual environment, stored in memory, to display the virtual environment to the user. The user makes decisions based on what is displayed and the executed operations on the environment. These operations can effect change in the environment and this change has to be communicated to all other entities capable of interacting with the environment. The fact that users operate on a local version of the environment and that the environment should appear the same to all users requires state consistency mechanisms.
+
+\section{Environment change scenarios}
+\label{environment_change_scenarios}
+
+In a VE, three main actions should be possible concerning the environment state. It should be possible to add new objects to the virtual environment, an agent should be able to discover objects in its AoI and an agent should be able to alter mutable objects in the virtual environment through its actions.
 
 \subsection{Object creation flow}
 
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=120mm 221mm 184mmm 278mm, height=0.5\textwidth]{generic_consistency_graphic}
+ \caption{Diagram showing the flow of messages in the network, when an agent creates an object in the virtual world.}
+ \label{fig_object_create_graphic}
+\end{figure}
+%
+Figure \ref{fig_query_flow_graphic} illustrates the process of an agent creating a new object and that object being stored on some authoritative node. The figure shows both the virtual environment and the network. Agent 1 creates an object in the virtual environment. For that object to remain in the virtual environment, a node has to be selected to store the authoritative version of the object. In the network, creating an object translates to the node that houses Agent 1, to create Object 1, and select a node (Node 2) to store the authoritative version of Object 1. Once Object 1 has been created in the virtual environment, all other agents that can perceive the new object should be informed of its existence.
+
+For an agent to perceive an object, the object should be within its AoI. When Node 2 therefore stores the authoritative object, it should discover which nodes can perceive the object and then send updates to those nodes informing them of the new object. In the example in Figure \ref{fig_query_flow_graphic}, Agent 2 can perceive Object 1, which means Node 2 must inform Node 3 of the existence of Object 1, using an object update. Node 3 then receives the object update and adds a non-authoritative version of the new object to its non-authoritative object store. The display of Agent 2 should then be updated to display the new object.
 
 \subsection{Range query flow}
+As an agent moves through the virtual environment, it should discover new objects that enter into its moving AoI.
 
-\section{Event-logic-update cycle}
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=78mm 148mm 128mmm 208mm, height=0.5\textwidth]{generic_consistency_graphic}
+ \caption{Diagram showing the flow of messages in the network, when an agent queries its AoI for objects in the virtual world.}
+ \label{fig_query_flow_graphic}
+\end{figure}
+%
+Figure \ref{fig_query_flow_graphic} illustrates the process of an agent discovering new objects in its AoI. As Agent 1 moves through the virtual environment, it has to query nodes that house authoritative versions of objects in its AoI. Node 1, containing Agent 1, has to determine which nodes contain objects that exist within Agent 1's AoI. For the example shown, Node 1 knows that Node 2 contains an object that is located within the AoI of Agent 1. Node 1 sends a query, also called a range query, to Node 2 informing Node 2 of Agent 1's AoI. Node 2 checks which objects it houses that exist within Agent 1's AoI. Node 2 then informs Node 1 of Object 1, which is the only object in Agent 1's AoI.
+
+The agent performing the queries might have to query multiple nodes and the queried node may return multiple objects.
+
+\subsection{Event-update flow}
 \label{event_logic_update}
 
-It is impossible for multiple object states to always be consistent, because of the finite time taken to disseminate an object update that has occurred. A well designed object consistency model should no allow conflicting changes to local copies of object states.
+Agents are not allowed to alter the state of an object in the virtual environment directly, since this leaves the VE open to abuse. To alter the state of objects in the VE, the event-update cycle is used.
 
-An example of conflicting change is one actor in a virtual game world dealing five damage to another actor with five health. When the damage is dealt, the target actor is killed. If, however, the actor drank a potion that gives it some health, the damage dealt by the first player would not kill him. The state of the player being dead and the player being alive is not possible at the same time.
-
-To overcome the difficulty of conflicting states, it was found that nodes participating in a VE should not be able to update the environment state directly. Nodes should rather express the effect they would like to have on the virtual world in terms of actions (events) and all nodes actions should then be combined by a third, centralised party, which then updates the state of the VE according to the combined causal actions of all nodes in the VE, to ensure that conflicts cannot occur. A disconnect is, thereby, created between the actions that can be performed on objects and the effect that the actions can have on objects. This is called the event-logic-update cycle \cite{}.
-
-\emph{Events} are generated by objects and can be thought of as actions taken by agents, where agents can be humans or artificial intelligence (AI) scripts. These include casting a spell, using an item or walking.
+\subsubsection{Terminology}
+\emph{Events} are generated by agents and can be thought of as actions taken by those agents, where agents can be humans or artificial intelligence (AI) scripts. These include casting a spell, using an item or walking.
 
 \emph{Environment logic} is applied to events to determine what updates should be applied to the environment state. Environment logic is thus a ``think'' function, which determines how the environment should change as a result of an event. Another way to think about environment logic is to see it as the game rules.
 
@@ -37,63 +67,87 @@ An agent casting a spell might cause another agent's health to be reduced, her o
 
 Environment logic communicates how the world should change via \emph{state updates}. State updates are the incremental changes that specify how the environment state should change.
 
-An object exists in two forms: the authoritative object and the non-authoritative object. The state of the authoritative object is considered to be the true state or absolute state. Copies of the authoritative object can be made, but these copies are all non-authoritative objects. If a discrepancy occurs between an authoritative object and a non-authoritative object, the state of the authoritative object is considered to be the true state. The work of the consistency mechanism in the VE is to ensure that all non-authoritative object states follows the authoritative object state within a time frame that is reasonable for the particular VE and the particular type of object.
+An object exists in two forms: the \emph{authoritative object} and the \emph{non-authoritative object}. The state of the authoritative object is considered to be the true state or absolute state. Copies of the authoritative object can be made, but these copies are all non-authoritative objects. If a discrepancy occurs between an authoritative object and a non-authoritative object, the state of the authoritative object is considered to be the true state. The work of the consistency mechanism in the VE is to ensure that all non-authoritative object states follows the authoritative object state within a time frame that is reasonable for the particular VE and the particular type of object.
 
 Authoritative objects are the objects traditionally housed on the server in the C/S based MMVEs. All clients obtain replicas of these objects (termed the non-authoritative versions) and duplicate them locally in order to perform low latency computations. An example would be an NPC monster. When agents perceive the monster in the virtual world, a duplicate of the NPC objects is sent to the agent's computer for display purposes. When another agent attacks the NPC, the change in health will be computed at the server and an update is then sent in order to ensure consistency between authoritative and non-authoritative objects.
 
-In P2P MMVEs there still exists a need for an authoritative object, but no centralised location exists to store that object. For each authoritative object, a peer is selected to store that object. That peer is termed the authoritative peer for the specific authoritative object it houses.
+\subsubsection{Motivation}
 
-It should be noted that in this work, a node refers to a computer that is connected to a network, where a peer refers to a computer that is connected to a P2P network. Practically, there is no difference between a computer connected to a C/S network and one connected to a P2P network, except for the software that it executes.
+It is impossible for multiple object states to always be consistent, because of the finite time taken to disseminate an object update that has occurred. A well designed object consistency model should not allow conflicting changes to local copies of object states.
 
-\subsection{Event-update flow}
-\label{general_flow}
+An example of conflicting change is one actor in a virtual game world dealing five damage to another actor with five health. When the damage is dealt, the target actor is killed. If, however, the actor drank a potion that gives it some health, the damage dealt by the first player would not kill him. The state of the player being dead and the player being alive is not possible at the same time.
+
+To overcome the difficulty of conflicting states, it was found that nodes participating in a VE should not be able to update the environment state directly. Nodes should rather express the effect they would like to have on the virtual world in terms of actions (events) and all nodes actions should then be combined by a third, centralised party, which then updates the state of the VE according to the combined causal actions of all nodes in the VE, to ensure that conflicts cannot occur. A disconnect is, thereby, created between the actions that can be performed on objects and the effect that the actions can have on objects. This is called the event-update cycle, also called the  ``request-process-update-display sequence'' \cite{Hu_voronoi_IM}.
+
+In P2P MMVEs there still exists a need for an authoritative object, but no centralised location exists to store that object. For each authoritative object, a node is selected to store that object and acts as arbitrator for events operating on that object. That node is termed the authoritative node for the specific authoritative object it houses.
+
+It should be noted that in this work, a node refers to a computer that is connected to a network, and a peer refers to a computer that is connected to a P2P network. Practically, there is no difference between a computer connected to a C/S network and one connected to a P2P network, except for the software that it executes. The term peer is used to clarify that what is talked about is specific to a P2P network.
+
+\subsubsection{Description}
 
 \begin{figure}[htbp]
  \centering
- \includegraphics[clip=true, viewport=18mm 227mm 69mmm 292mm, width=0.6\textwidth]{generic_consistency_graphic}
- \caption{Graphic showing the flow of events and updates to achieve state consistency}
+ \includegraphics[clip=true, viewport=32mm 221mm 96mmm 278mm, height=0.5\textwidth]{generic_consistency_graphic}
+ \caption{Diagram showing the flow of messages in the network, when an agent generates an event that updates an object in the virtual world.}
  \label{fig_event_update_flow_graphic}
 \end{figure}
 
-Figure \ref{fig_event_update_flow_graphic} depicts the flow of events and updates in response to the generation of an event by some agent. Agents are defined to be some form of intelligence that can interact with the virtual environment.
+Figure \ref{fig_event_update_flow_graphic} depicts the flow of events and updates in response to the generation of an event by some agent.
 
-In Figure \ref{fig_event_update_flow_graphic}, Agent 1 generates Event 1 at the remote location shown. To maintain generality, events are defined to possess areas of effect (AoEs). An event's AoE determines which objects are in range to be potentially affected by an event. When an event's AoE encloses an object, that object is in range to be affected by the event. Whether the object is affected by the event, will be determined by the environment logic.
+In Figure \ref{fig_event_update_flow_graphic}, Agent 1 generates Event 1 at the remote location shown in the virtual environment. To maintain generality, events are defined to possess areas of effect (AoEs). An event's AoE determines which objects are in range to be potentially affected by an event. When an event's AoE encloses an object, that object is in range to be affected by the event. Whether the object is affected by the event, will be determined by the environment logic housed on the authoritative node.
 
-In Figure \ref{fig_event_update_flow_graphic}, Event 1 affect Object 1. Event 1 is, therefore, sent to Object 1's authoritative node, i.e. the node containing the authoritative copy of Object 1. Determining which objects are affected by an event is termed \emph{event layer interest management}. Delivering the event to the authoritative nodes of the affected object is termed \emph{event dissemination}. It should be noted that designs exist that use multiple authoritative objects, for example the event-based consistency model described in Section \ref{classic_event_based}, but that more research focus has been placed on consistency architectures where every object only possesses a single authoritative object, such as the update-based consistency model described in Section \ref{classic_update_based}.
+In Figure \ref{fig_event_update_flow_graphic}, Event 1 affects Object 1. Node 1, housing Agent 1, therefore has to determine which objects are affected by an event that it generates. It has to determine on which nodes those objects are housed and send the event to those nodes. In this example, only Object 1 is affected by Event 1. Node 1, therefore, sends Event 1 to Object 1's authoritative node (Node 2).
 
-When Event 1 arrives at Node 1, containing Object 1, the event is placed in a event queue in an order based on the time each event occurred. The process of determining which order events have to be processed in is called \emph{event ordering}, since many events will be arriving at an object's authoritative node from multiple agents simultaneously.
+Determining which objects are affected by an event is termed \emph{event interest management}. Delivering the event to the authoritative nodes of the affected object is termed \emph{event dissemination}. It should be noted that designs exist that use multiple authoritative objects, for example the event-based consistency model described in Section \ref{classic_event_based}, but that more research focus has been placed on consistency architectures where every object only possesses a single authoritative object, such as the update-based consistency model described in Section \ref{classic_update_based}.
+
+When Event 1 arrives at Node 2, containing Object 1, the event is placed in a event queue in an order based on the time each event occurred in. The process of determining which order events have to be processed in is called \emph{event ordering}, since many events will be arriving at an object's authoritative node from multiple agents simultaneously.
 
 After event ordering has been performed, environment logic is applied to determine how a specific event will affect a specific object. To determine possible updates, that state of other objects might also have to be taken into account. An example is firing at an agent through a wall. If the thickness of the wall determines how much damage is delivered to the agent, the authoritative node processing the damage to the agent object will have to know the thickness of the wall.
 
-When an event has been translated into a state update, the authoritative object on the authoritative node is updated. The new state of the object should also be communicated with all agents that can perceive the object in the virtual world. An object is perceived by an agent if the agent's area of interest (AoI)  in the VE encompasses the object. Every agent that can perceive an object, requires a non-authoritative copy of that object Determining which agents should receive object state updates is termed \emph{update layer interest management}. In the figure, Object 1 is perceived by Agent 2. Node 1 therefore has to send an update to the node containing agent 2. Delivering state updates to the affected agent nodes is termed \emph{update dissemination}.
+When an event has been translated into a state update, the authoritative object on the authoritative node (Node 2) is updated. The new state of the object should also be communicated with all agents that can perceive the object in the virtual world. An object is perceived by an agent if the agent's area of interest (AoI)  in the VE encompasses the object. Every agent that can perceive an object, requires a non-authoritative copy of that object. Determining which agents should receive object state updates is termed \emph{update interest management}. In the figure, Object 1 is perceived by Agent 2. Node 2, therefore, sends an update to Node 3, the node containing Agent 2. Delivering state updates to the affected agent nodes is termed \emph{update dissemination}.
 
-When the update is delivered to Agent 2, the local object state is updated and the object's new state is displayed to the agent to allow the agent to make decisions and, therefore, generate events based on the new object state.
+When the update is delivered to Agent 2, the local object state is updated and the object's new state is displayed to Agent 2 to allow the agent to make decisions and generate events based on the new object state.
 
-\subsection{Generic consistency model}
+\section{Generic consistency model}
 \label{generic_event_update_model}
 
-To our knowledge, no papers exist that present a comprehensive picture of a state consistency architecture. In this chapter, papers will be discussed that individually implement all modules of the consistency architecture, but none were found to provide an overview of a state consistency model.
+To our knowledge, no literature exist that present a comprehensive picture of a state consistency architecture. In this chapter, papers will be discussed that individually implement all modules of the consistency architecture, but none were found to provide an overview of a complete state consistency model.
 
-Since an overarching framework for state consistency was lacking in the literature, we developed the generic state consistency architecture, shown in Figure \ref{fig_event_update_flowdiagram}. This architecture allows us to put the literature regarding state consistency into context and allows us to identify requirements of the authoritative object store from a consistency perspective.
+\subsection{Request-response consistency basis}
+Since the description of an overarching framework for state consistency was lacking in the literature, we decided to develop such a framework. To develop this framework, the main issues that state consistency has to solve for each of the scenarios discussed in Section \ref{environment_change_scenarios}, were identified:
+%
+\begin{itemize}
+\item Determine the set of nodes that are interested in a generated request (object, query or event).
+\item How requests are sent to the set of interested nodes.
+\item Determining the correct order of received requests (events).
+\item Generating a response (updates or objects) in response to a request (queries or events).
+\item Determining the set of nodes that require the generated response.
+\item How responses are sent to the set of interested nodes.
+\item How the effect of a response is displayed to an agent.
+\end{itemize}
+
+Each identified consistency scenario is a form of the basic request-response model identified here. Using this basic model, the generic consistency model was created that incorporated all scenarios. This model is shown in Figure \ref{fig_event_update_flowdiagram}. This architecture allows us to put the literature regarding state consistency into context and allows us to identify requirements of the authoritative object store from a consistency perspective.
+
+\subsection{Model}
 
 \begin{figure}[htbp]
  \centering
- \includegraphics[clip=true, viewport=46mm 84mm 196mm 287mm, width=0.6\textwidth]{generic_consistency_flowdiagram}
+ \includegraphics[clip=true, viewport=46mm 84mm 196mm 287mm, width=0.72\textwidth]{generic_consistency_flowdiagram}
  \caption{Flow diagram describing the event-update flow cycle and all steps required, from generating an event to delivering an update, to ensure object consistency.}
  \label{fig_event_update_flowdiagram}
 \end{figure}
 
-Figure \ref{fig_event_update_flowdiagram} shows the generic consistency flow diagram that ensures object state consistency.
+Figure \ref{fig_event_update_flowdiagram} shows the generic consistency flow diagram that ensures object state consistency. Three ``flows'' exist, that model each of the query, create and modification scenarios discussed earlier. A flow is initiated by an agent at terminated at an agent. Flow are symmetrical, which means any agent can initiate a flow or be the terminating agent for a flow. This is illustrated by the dashed lines in the model, which shows that all of the modules present in the downwards flow from the top agent, are also present in the upwards flow from the bottom agent.
 
 \subsubsection{Agents and generators}
 
 Agents generate three streams of requests, using a respective generator, that are sent to the authoritative object hosts: objects, events and queries.
 
-Agents may be able to build structures, make clothes or construct a variety of mechanisms in the virtual world. The objects that the agent creates in this way should be stored on an authoritative peer.
+Agents may be able to build structures, make clothes or construct a variety of mechanisms in the virtual world. The objects that the agent creates in this way should be stored on an authoritative node.
 
-Agents can also interact with the virtual environment and other agents, which are objects themselves. Agents interacting with objects generate events, which have to be sent to the authoritative peer.
+Agents can also interact with the virtual environment and other agents, which are objects themselves. Agents interacting with objects generate events, which have to be sent to the authoritative node.
 
-Lastly, as agents more around in the virtual world, they might query an authoritative peer for any new objects that have entered their AoI. This is referred to as a range query and requires the retrieval of all objects within a certain area.
+Lastly, as agents more around in the virtual world, they might query an authoritative node for any new objects that have entered their AoI. This is referred to as a range query and requires the retrieval of all objects within a certain area.
 
 \subsubsection{Interest management and dissemination}
 
@@ -117,22 +171,26 @@ Update interest management determines which nodes require the generated update, 
 
 Update dissemination delivers a generated update to all nodes that contain local copies of the object. Multiple object updates may be generated for a single event. Any generated update may be delivered to multiple nodes that contain local copies of the object. Object dissemination delivers generated objects to the nodes that requested them.
 
-\subsubsection{Discussion}
+\subsection{The event-logic-update scenario as the generic scenario}
+
+It should be noted that object queries and object creation can both be implemented as specialised forms of the event-update model. An object query can be implemented as a ``query'' event with an AoE equal to the generating agent's AoI. The environment logic determines which objects are within the event's AoE and state updates containing the complete object can then be sent to the node containing the originating agent.
+
+Object creation can also be handled as an event, where an ``object creation'' event contains the information required to instantiate the required object. The object creation event can then be sent to the applicable authoritative node. The environment logic will process the object creation event, generate a state update containing the new object and respond with that update to the node of the agent generating the object. This is also considered the safer method by which an object can be generated, since the environment logic can ensure that the object is allowed within the confines of the game rules.
+
+It is therefore sufficient for the generic state consistency model to only contain the event-logic-update flow, but the other two flow were added for clarity. For the range query, it clarifies that the response is always sent to the node generating the query. For the object creation case, it clarifies that the object itself is generated on the non-authoritative node and then sent to the authoritative node, where it is then housed.
+
+\subsection{Discussion}
 
 The flow diagram in Figure \ref{fig_event_update_flowdiagram} shows all steps that should be taken to ensure object consistency. We shall now demonstrate that the flow diagram of Figure \ref{fig_event_update_flowdiagram} is applicable to all known state consistency models of C/S as well as P2P MMVE architectures.
 
 It should be noted that the generic consistency model is developed to fit all consistency architectures. To this end, some modules might be trivial in some consistency architectures, but become non-trivial with others. This is especially true for the C/S consistency model, where only a single server or server cluster exists, as will be described in Section \ref{classic_models}.
 
-The differences between  the various architectures is where the authoritative objects are  housed, and how the authoritative peers are distributed. In a C/S system, all authoritative objects are housed in the server. In a P2P architecture, authoritative objects can be distributed on a number of peers, depending on the specific architecture. The various state consistency schemes for both C/S and P2P networks will be reviewed in the next sections.
+The differences between  the various architectures is where the authoritative objects are  housed, and how the authoritative nodes are distributed. In a C/S system, all authoritative objects are housed in the server. In a P2P architecture, authoritative objects can be distributed on a number of nodes, depending on the specific architecture. The various state consistency schemes for both C/S and P2P networks will be reviewed in the next sections.
 
 \section{Classic consistency models}
 \label{classic_models}
 
-An overview of the two common models, currently used in MMVEs will be described. The models used in P2P MMVEs are all permutations of these two basic models. The two models are based on the two different network models. These are the fully distributed model, also called the event-based model \cite{p2p_cm_aoe}, and the C/S-based model, also called update-based model
-\cite{unreal_networking}.
-
-\subsection{Event-based (Fully distributed)}
-\label{classic_event_based}
+An overview of the two common models, currently used in MMVEs will be described. The models used in P2P MMVEs are all permutations of these two basic models. The two models are based on the two different network models. These are the fully distributed model, also called the event-based model \cite{p2p_cm_aoe}, and the C/S-based model, also called update-based model \cite{unreal_networking}.
 
 \begin{figure}[htbp]
 \centering \subfloat[Event-based (fully distributed)]{\label{fig_p2p_cm}
@@ -141,10 +199,23 @@ An overview of the two common models, currently used in MMVEs will be described.
 \includegraphics[clip=true, viewport= 2.5cm 15cm 19cm 30cm, width=0.5\columnwidth]{CS_P2P_CMs}}
 \caption{Consistency models}
 \end{figure}
-%
+
+\subsection{Event-based (Fully distributed)}
+\label{classic_event_based}
+
+
 Figure \ref{fig_p2p_cm} shows the fully distributed model. Each node has a copy of the global VE state. Any event that a node generates is sent to all other nodes. Each node processes all events separately and updates its own environment state accordingly. This consistency model is one where there exists multiple authoritative environment states.
 
-The event-based model has fallen into disuse over the past few years, because of its lack of scalability and the slow down experienced when high latency nodes are connected. The slow down is necessary to maintain consistency.
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=1mm 129mm 209mm 266mm, width=\textwidth]{generic_to_fully_dist}
+ \caption{The event-based consistency model, showing the modules as defined for the generic consistency model. The diagram shows how the generic consistency model may be used to describe the event-based consistency model.}
+ \label{fig_generic_to_fully_dist}
+\end{figure}
+%
+Figure \ref{fig_generic_to_fully_dist} shows the event-based model in terms of the modules defined for the generic consistency model. The figure shows two nodes and how they may interact. For the event-based model, each node is both an authoritative and a non-authoritative node, for the purposes of which modules they contain. There also exists no non-authoritative storage, object interest management, object dissemination, update interest management, or update dissemination modules. The authoritative storage module is directly connected to the display updater module.
+
+The event-based model has fallen into disuse over the past few years, because of its lack of scalability and the slow-down experienced when high latency nodes are connected due to the event ordering techniques used.
 
 \subsubsection{Event generation and dissemination}
 
@@ -193,6 +264,15 @@ A partially connected model is not a classic consistency model.
 \label{classic_update_based}
 
 An alternative to the event-based model is the update-based model, shown in Figure \ref{fig_cs_cm}. This model is based on the C/S network model and based on the principle that only the server contains authoritative environment state.
+
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=30mm 60mm 179mm 253mm, width=0.72\textwidth]{generic_to_cs}
+ \caption{The update-based consistency model, showing the modules as defined for the generic consistency model. The diagram shows how the generic consistency model may be used to describe the update-based consistency model.}
+ \label{fig_generic_to_cs}
+\end{figure}
+%
+Figure \ref{fig_generic_to_cs} shows the update-based consistency model, showing the modules as defined for the generic consistency model. This model is similar to the generic consistency model itself, introduced in Figure \ref{fig_event_update_flowdiagram}. The only difference is that there exists a single authoritative node, containing all objects and that no interest management is required by the clients, since all queries, objects and events are only sent to the server.
 
 \subsubsection{Event generation and dissemination}
 Agents control clients that are able to generate events. As with classic event-based consistency, event layer interest management is trivial, since all events are sent to the server, usually making use of a unicast event dissemination technique. Interest management only becomes non-trivial when the P2P MMVE consistency model is considered in Section \ref{p2p_mmve_state_consistency}. The reasons why these sections exist in a discussion of the classic consistency models is to show that, although trivial, all sections relate to the generic consistency model.
