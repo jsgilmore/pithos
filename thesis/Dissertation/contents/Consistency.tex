@@ -75,7 +75,7 @@ Authoritative objects are the objects traditionally housed on the server in the 
 
 It is impossible for multiple object states to always be consistent, because of the finite time taken to disseminate an object update that has occurred. A well designed object consistency model should not allow conflicting changes to local copies of object states.
 
-An example of conflicting change is one actor in a virtual game world dealing five damage to another actor with five health. When the damage is dealt, the target actor is killed. If, however, the actor drank a potion that gives it some health, the damage dealt by the first player would not kill him. The state of the player being dead and the player being alive is not possible at the same time.
+An example of conflicting change is one avatar in a virtual game world dealing five damage to another avatar with five health. When the damage is dealt, the target avatar is killed. If, however, the avatar drank a potion that gives it some health, the damage dealt by the first player would not kill him. The state of the player being dead and the player being alive is not possible at the same time.
 
 To overcome the difficulty of conflicting states, it was found that nodes participating in a VE should not be able to update the environment state directly. Nodes should rather express the effect they would like to have on the virtual world in terms of actions (events) and all nodes actions should then be combined by a third, centralised party, which then updates the state of the VE according to the combined causal actions of all nodes in the VE, to ensure that conflicts cannot occur. A disconnect is, thereby, created between the actions that can be performed on objects and the effect that the actions can have on objects. This is called the event-update cycle, also called the  ``request-process-update-display sequence'' \cite{Hu_voronoi_IM}.
 
@@ -98,9 +98,9 @@ In Figure \ref{fig_event_update_flow_graphic}, Agent 1 generates Event 1 at the 
 
 In Figure \ref{fig_event_update_flow_graphic}, Event 1 affects Object 1. Node 1, housing Agent 1, therefore has to determine which objects are affected by an event that it generates. It has to determine on which nodes those objects are housed and send the event to those nodes. In this example, only Object 1 is affected by Event 1. Node 1, therefore, sends Event 1 to Object 1's authoritative node (Node 2).
 
-Determining which objects are affected by an event is termed \emph{event interest management}. Delivering the event to the authoritative nodes of the affected object is termed \emph{event dissemination}. It should be noted that designs exist that use multiple authoritative objects, for example the event-based consistency model described in Section \ref{classic_event_based}, but that more research focus has been placed on consistency architectures where every object only possesses a single authoritative object, such as the update-based consistency model described in Section \ref{classic_update_based}.
+Determining which objects are affected by an event is termed \emph{event interest management}. Delivering the event to the authoritative nodes of the affected object is termed \emph{event dissemination}. \footnote{It should be noted that designs exist that use multiple authoritative objects, for example the event-based consistency model described in Section \ref{classic_event_based}, but that more research focus has been placed on consistency architectures where every object only possesses a single authoritative object, such as the update-based consistency model described in Section \ref{classic_update_based}.}
 
-When Event 1 arrives at Node 2, containing Object 1, the event is placed in a event queue in an order based on the time each event occurred in. The process of determining which order events have to be processed in is called \emph{event ordering}, since many events will be arriving at an object's authoritative node from multiple agents simultaneously.
+When Event 1 arrives at Node 2, containing Object 1, the event is placed in a event queue in an order based on the time each event occurred in. The process of determining which order events have to be processed is called \emph{event ordering}, since many events will be arriving at an object's authoritative node from multiple agents simultaneously.
 
 After event ordering has been performed, environment logic is applied to determine how a specific event will affect a specific object. To determine possible updates, that state of other objects might also have to be taken into account. An example is firing at an agent through a wall. If the thickness of the wall determines how much damage is delivered to the agent, the authoritative node processing the damage to the agent object will have to know the thickness of the wall.
 
@@ -111,7 +111,7 @@ When the update is delivered to Agent 2, the local object state is updated and t
 \section{Generic consistency model}
 \label{generic_event_update_model}
 
-To our knowledge, no literature exist that present a comprehensive picture of a state consistency architecture. In this chapter, papers will be discussed that individually implement all modules of the consistency architecture, but none were found to provide an overview of a complete state consistency model.
+In this section, we will discuss the literature where individual modules of the generic framework are implemented, but to our knowledge, no article has been published that presents a comprehensive picture of a state consistency architecture.
 
 \subsection{Request-response consistency basis}
 Since the description of an overarching framework for state consistency was lacking in the literature, we decided to develop such a framework. To develop this framework, the main issues that state consistency has to solve for each of the scenarios discussed in Section \ref{environment_change_scenarios}, were identified:
@@ -137,11 +137,11 @@ Each identified consistency scenario is a form of the basic request-response mod
  \label{fig_event_update_flowdiagram}
 \end{figure}
 
-Figure \ref{fig_event_update_flowdiagram} shows the generic consistency flow diagram that ensures object state consistency. Three ``flows'' exist, that model each of the query, create and modification scenarios discussed earlier. A flow is initiated by an agent at terminated at an agent. Flow are symmetrical, which means any agent can initiate a flow or be the terminating agent for a flow. This is illustrated by the dashed lines in the model, which shows that all of the modules present in the downwards flow from the top agent, are also present in the upwards flow from the bottom agent.
+Three ``flows'' exist, that model each of the query, create and modification scenarios discussed earlier. A flow is initiated by an agent at terminated at an agent. Flow are symmetrical, which means any agent can initiate a flow or be the terminating agent for a flow. This is illustrated by the dashed lines in the model, which shows that all of the modules present in the downwards flow from the top agent, are also present in the upwards flow from the bottom agent.
 
 \subsubsection{Agents and generators}
 
-Agents generate three streams of requests, using a respective generator, that are sent to the authoritative object hosts: objects, events and queries.
+Agents generate three streams of requests, using a query, object or event generator. The requests are sent to the authoritative object hosts.
 
 Agents may be able to build structures, make clothes or construct a variety of mechanisms in the virtual world. The objects that the agent creates in this way should be stored on an authoritative node.
 
@@ -215,7 +215,7 @@ Figure \ref{fig_p2p_cm} shows the fully distributed model. Each node has a copy 
 %
 Figure \ref{fig_generic_to_fully_dist} shows the event-based model in terms of the modules defined for the generic consistency model. The figure shows two nodes and how they may interact. For the event-based model, each node is both an authoritative and a non-authoritative node, for the purposes of which modules they contain. There also exists no non-authoritative storage, object interest management, object dissemination, update interest management, or update dissemination modules. The authoritative storage module is directly connected to the display updater module.
 
-The event-based model has fallen into disuse over the past few years, because of its lack of scalability and the slow-down experienced when high latency nodes are connected due to the event ordering techniques used.
+The event-based model has fallen into disuse over the past few years, because of its lack of scalability and the degradation in responsiveness experienced when high latency nodes are connected due to the event ordering techniques used, as explained in Section \ref{event_based_event_ordering}.
 
 \subsubsection{Event generation and dissemination}
 
@@ -224,6 +224,8 @@ With reference to the generic flow diagram in Figure \ref{fig_event_update_flowd
 Event layer interest management is trivial, since all nodes receive all updates. Every node, therefore, requires an up-to-date list of all other nodes in the network. Event dissemination typically makes use of unicast to send all events to all nodes.
 
 \subsubsection{Event ordering}
+\label{event_based_event_ordering}
+
 The order in which events are received is the same for all nodes, otherwise the environment states of different nodes may become inconsistent.
 Usually some kind of lockstep technique is used to solve this issue \cite{pessimistic_lock_step}. The issue with lockstep is that it reduces the latency to twice that of the node with the highest latency.
 
@@ -242,7 +244,7 @@ Update layer interest management and update dissemination is not required, since
 
 \subsubsection{Authoritative object store}
 
-The complete environment state is stored on each node.
+The complete environment state is stored on each node. This is why the event ordering technique employed is important. If an event is received in the incorrect order at one of the nodes, it may cause inconsistency for the authoritative state of that node. Such a situation is difficult to correct. A possible solution is for detection mechanisms to be implemented, where peers exchange object states at regular intervals for comparison. If a peer's state has diverged from the group, a quorum mechanism might be employed to correct the divergence.
 
 \subsubsection{Advantages}
 The event-based model works well for strategy games, and was implemented in Age of Empires \cite{p2p_cm_aoe} and Starcraft \cite{starcraft_network_model}.
@@ -252,11 +254,11 @@ When latency issues are not present and all users possess reasonable latencies, 
 \subsubsection{Disadvantages}
 The event-based model is not scalable, since all nodes must connect to all other nodes and all events are transmitted to
 everyone. This means that as $N$, the number of nodes in the network increases, the traffic increases with a factor of $N^2$. The security issues of
-the P2P network model, on which this consistency model is based, are also present. Slowdown is also experienced by all user if one user's
+the P2P network model, on which this consistency model is based, are also present. A degradation of responsiveness is also experienced by all user if one user's
 latency is below par, since the lockstep mechanism has to wait for all events to be received for that round to conclude \cite{cheat_proof_event_ordering}.
 
 \subsubsection{Partially connected event-based consistency}
-An even-based model that is not fully distributed might be considered, although such a model holds many challenges. Interest management techniques might be used to determine which nodes require updates. A challenge arises when nodes that were not aware of each other come into contact in the virtual world. A merge operation will have to be performed on the two authoritative environment states to ensure consistency. Such a model has not been proposed in practice and significant research will have to be performed into defining a framework that establishes relationships between events to maintain consistency. Such a system might be developed by defining classes of events and their interactions. A linear temporal logic model might then be developed to ensure consistent merging of states.
+An event-based model that is not fully distributed might be considered, although such a model holds many challenges. Interest management techniques might be used to determine which nodes require updates. A challenge arises when nodes that were not aware of each other come into contact in the virtual world. A merge operation will have to be performed on the two authoritative environment states to ensure consistency. Such a model has not been proposed in practice and significant research will have to be performed into defining a framework that establishes relationships between events to maintain consistency. Such a system might be developed by defining classes of events and their interactions. A linear temporal logic model might then be developed to ensure consistent merging of states.
 
 A partially connected model is not a classic consistency model.
 
