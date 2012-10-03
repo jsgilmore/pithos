@@ -18,7 +18,7 @@
 
 /**
  * @file DHT.h
- * @author Gregoire Menuel, Ingmar Baumgart
+ * @author John Gilmore, Gregoire Menuel, Ingmar Baumgart
  */
 
 #ifndef __DHT_H_
@@ -127,6 +127,12 @@ private:
 
     // module references
     DHTDataStorage* dataStorage; /**< pointer to the dht data storage */
+
+    cMessage *periodicTimer; /**< timer self-message for writing periodic statistical information */
+    static const int TEST_MAP_INTERVAL = 10; /**< interval in seconds for writing periodic statistical information */
+    //variables to record the average number of objects stored during the peer's lifetime
+    unsigned int object_total;
+    unsigned int times_recorded;
 };
 
 #endif
