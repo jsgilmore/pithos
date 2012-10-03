@@ -1196,7 +1196,8 @@ void GroupStorage::handleMessage(cMessage *msg)
 	}
 	else if ((ttlTimer = dynamic_cast<ObjectTTLTimer*>(msg)) != NULL)
     {
-		//If the object's TTL has expired, remove the object from the ledger.
+		//If the object's TTL has expired, remove the object from the local storage map.
+		//(The object is also automatically removed from the group ledger by the group ledger)
 		storage_map.erase(ttlTimer->getKey());
         delete msg;
 

@@ -31,6 +31,9 @@ class PeerLedger
 		//Smart pointers are not required here, since the pointers do not point to elements in dynamic containers
 		std::vector<ObjectDataPtr> objectDataList;
 
+		unsigned int object_total;
+		unsigned int times_recorded;
+
 	public:
 
 		PeerDataPtr peerDataPtr;
@@ -54,6 +57,10 @@ class PeerLedger
 		void eraseObjectRef(const int &i);
 
 		void eraseObjectRef(ObjectDataPtr object_data_ptr);
+
+		//Record the number of objects to be able to calculate an average at the end of life. This should be done at regular intervals, otherwise the average is incorrect.
+		void recordObjectNum();
+		double getObjectAverage();
 };
 
 #endif /* PEERLEDGER_H_ */
