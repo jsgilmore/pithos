@@ -116,7 +116,7 @@ plot(lifetime, reliability_periodic, 'bd-', 'LineWidth',2);
 plot(lifetime, reliability_pareto, 'x-', 'Color',[0.48,0.06,0.89], 'MarkerSize',12, 'LineWidth',2);
 axis([0 1800 0 1.05])
 ylabel('Reliability');
-xlabel('Lifetime (s)');
+xlabel('Node lifetime (s)');
 hleg = legend('No repair','No repair, parallel retrieval','Leaving repair', 'Periodic repair, 100s', 'No repair, Pareto distribution');
 set(hleg, 'Location', 'SouthEast');
 
@@ -128,8 +128,8 @@ plot(lifetime, responsiveness_leaving, 'rs-', 'LineWidth',2);
 plot(lifetime, responsiveness_periodic, 'bd-', 'LineWidth',2);
 plot(lifetime, responsiveness_pareto, 'x-', 'Color',[0.48,0.06,0.89], 'MarkerSize',12, 'LineWidth',2);
 ylabel('Latency (s)');
-xlabel('Lifetime (s)');
-hleg = legend('No repair','No repair, parallel retrieval','Leaving repair', 'Periodic repair, 100s', 'No repair, Pareto distribution');
+xlabel('Node lifetime (s)');
+hleg = legend('No repair','Leaving','Leaving repair', 'Periodic repair, 100s', 'No repair, Pareto distribution');
 
 figure
 set(gca, 'FontSize', 24) 
@@ -141,6 +141,6 @@ plot(lifetime, bandwidth_overall_periodic, 'bd-', 'LineWidth',2);
 plot(lifetime, bandwidth_overall_pareto, 'x-', 'Color',[0.48,0.06,0.89], 'MarkerSize',12, 'LineWidth',2);
 plot(lifetime, data_none, '*-', 'Color',[0.87,0.49,0], 'MarkerSize',12, 'LineWidth',2);
 ylabel('Bandwidth (Bps)');
-xlabel('Lifetime (s)');
+xlabel('Node lifetime (s)');
 hleg = legend('No repair','No repair, parallel retrieval','Leaving repair', 'Periodic repair, 100s', 'No repair, Pareto distribution', 'Higher layer data');
 set(hleg, 'Location', 'SouthEast');
