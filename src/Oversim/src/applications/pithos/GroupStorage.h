@@ -132,6 +132,7 @@ class GroupStorage : public cSimpleModule
 		GroupLedger *group_ledger;
 
 		GlobalStatistics* globalStatistics; /**< pointer to GlobalStatistics module in this node*/
+		GlobalNodeList* globalNodeList;           /**< pointer to GlobalNodeList in this node  */
 
 		Communicator* communicator;
 
