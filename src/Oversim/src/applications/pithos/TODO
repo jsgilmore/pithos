@@ -31,7 +31,6 @@ Remove the term "game" where it is not required and replace with environment and
 Replace "player" with "user".
 Decide between "actor", "avatar" and "agent".
 Replace "node" with "peer", where applicable.
-Add bandwidth (overhead) as a required metric of a storage system.
 Add figure displaying the expanded Oversim terminal.
 Add figure displaying the structure of an object ledger.
 
@@ -61,13 +60,8 @@ Evalutaion:
 
 Mention maximum confidence interval measured
 
-Writing and data mining todo:
-Add responsiveness and bandwidth to security.
-
 Simulation todo:
-Add up-to-date fairness graphs.
 Add responsiveness of parallel retrieval to repair section.
-Check whether Pastry also has the 3s spikes and update overlay retrieval LAN responsiveness section.
 Simulate the effect of group size on reliability, responsiveness and bandwidth usage.
 
 Figures to generate:
