@@ -5,7 +5,7 @@ channel simple_ethernetline extends ned.DatarateChannel
 {
     parameters:
         delay = 0ms;
-        datarate = 10Mbps;
+        datarate = 15Mbps;
 }
 
 // Ethernet channel with packet loss for SimpleUnderlay
