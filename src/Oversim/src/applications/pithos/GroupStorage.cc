@@ -82,10 +82,6 @@ void GroupStorage::initialize()
 		throw cRuntimeError("GroupStorage::initializeApp(): Communicator module not found!");
 	}
 
-	if (uniform(0.0, 1.0) < par("malicious_peer_p").doubleValue())
-		isMalicious = true;
-	else isMalicious = false;
-
 	event = new cMessage("event");	//This is the join retry timer.
 
 	pingTimer = new cMessage("pingTimer"); //The timer that triggers a group peer ping
@@ -93,6 +89,8 @@ void GroupStorage::initialize()
 	scheduleAt(simTime()+pingTime, pingTimer);
 
 	globalStatistics = GlobalStatisticsAccess().get();
+	globalNodeList = GlobalNodeListAccess().get();
+	isMalicious = false;	//This is correctly set the first time we receive a join request from the higher layer
 
 	// statistics
 	numSent = 0;
@@ -1222,8 +1220,11 @@ void GroupStorage::handleMessage(cMessage *msg)
 		scheduleAt(simTime()+1, event);		//TODO: make the 1 second wait time a configuration variable that may be set
 
 		//Obtain this node's transport address from the communicator module
+		//This is not done during initialisation, since the communiator is then also still begin initialised.
 		const NodeHandle *thisNode = &(((BaseApp *)communicator)->getThisNode());
 		this_address = TransportAddress(thisNode->getIp(), thisNode->getPort());
+		//Check whether this peer should act maliciously
+		isMalicious = globalNodeList->isMalicious(this_address);
 
 		delete(msg);
 	}
