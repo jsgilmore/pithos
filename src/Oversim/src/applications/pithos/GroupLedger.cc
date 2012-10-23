@@ -150,10 +150,10 @@ void GroupLedger::handleMessage(cMessage* msg)
 				//std::cout << "Unspecified address is: " << groupStorage->getSuperPeerAddress() << endl;
 				return;
 			}
-		}
 
-		//Record some stats here that will be recorded by every peer for all group peers.
-		//...
+			//Record some stats here that will be recorded by every peer for all group peers.
+			RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of known group peers")).c_str(), peer_list.size()));
+		}
     }
     else if ((ttlTimer = dynamic_cast<ObjectTTLTimer*>(msg)) != NULL)
 	{
