@@ -1,6 +1,8 @@
+----------------------------------------------------------------------------------------------------------------------------
 PhD TODO list:
-
-Pithos:
+----------------------------------------------------------------------------------------------------------------------------
+Pithos coding:
+----------------------------------------------------------------------------------------------------------------------------
 Major:
 Implement object modification for group storage.
 Intuitivly, many more updates will occur, compared to puts, which strengthens the case for implementing update.
@@ -12,8 +14,10 @@ These distributions have to be translated into their C/S counterparts, to enable
 Ensure sent get stats in Pithos test app, match the stats in Group storage. This can probably be fixed by recording the number of unhandled requests.
 
 Implement Pithos as a real world application
+Test Pithos on PlanetLab and EmuLab
 Develop grouping algorithm based on player traces
 Have Pithos construct groups based on the grouping algorithm
+Use player traces for node movement in Pithos
 
 Minor:
 Make the latitude and longitude ranges for peers and super peers a changeable paramter instead of 100
@@ -23,9 +27,12 @@ The error condition of an unspecified peer should be logged.
 Group storage should record its own successes, failures and latencies and not depend on PithosTestApp from recording them indirectly.
 The DHT module can be changed so as to store and retrieve GameObjects instead of BinaryValues
 A maximum distance needs to be defined for the directory server
-Ensure correctness for pithos under 32bit systems. This includes testing long variable sizes and making them 32bit safe.
+Ensure correctness for pithos under 32 bit systems. This includes testing long variable sizes and making them 32 bit safe.
 
+----------------------------------------------------------------------------------------------------------------------------
 Dissertation:
+----------------------------------------------------------------------------------------------------------------------------
+Overall:
 Make sure the state management and persistency chapter uses the terms state management and persistency correctly.
 Remove the term "game" where it is not required and replace with environment and VE.
 Replace "player" with "user".
@@ -35,7 +42,7 @@ Add figure displaying the expanded Oversim terminal.
 Add figure displaying the structure of an object ledger.
 
 Abstract:
-Complete
+Translate to Afrikaans
 
 Nomenclature:
 Add all missing symbols
@@ -46,32 +53,22 @@ Sort abbreviations
 Introduction:
 
 Modelling:
-Add sections back into the chapter that were removed when the paper was shortened.
-Add more results, comparing variations in more parameters.
-
-Ensure all symbols and abbreviations are present.
 
 Conclusion:
 
 Implementation:
 Add replicas per object graphs for no, leaving and periodic repair
+Add more empirical measurements for group consistency, comparing all group views to that of the super peer's view.
+
+Modelling:
 
 Evalutaion:
-
 Mention maximum confidence interval measured
-
-Simulation todo:
 Add responsiveness of parallel retrieval to repair section.
 Simulate the effect of group size on reliability, responsiveness and bandwidth usage.
-
-Figures to generate:
 When talking about another distributions that's the same, create a subplot showing that distribution.
 Present responsiveness distribution for the "low" and "high" cases.
-
-Coding todo:
 Figure out why there is a 3s spike at overlay storage and retrieval
-
-Lit study todo:
 Find paper that validates my overlay storage and reliability results for Chord.
 
 Hand-in PhD
