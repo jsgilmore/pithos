@@ -108,10 +108,10 @@ When an event has been translated into a state update, the authoritative object 
 
 When the update is delivered to Agent 2, the local object state is updated and the object's new state is displayed to Agent 2 to allow the agent to make decisions and generate events based on the new object state.
 
-\section{Generic consistency model}
+\section{Generic consistency architecture}
 \label{generic_event_update_model}
 
-In this section, we will discuss the literature where individual modules of the generic framework are implemented, but to our knowledge, no article has been published that presents a comprehensive picture of a state consistency architecture.
+In this section, we will discuss the literature where individual modules of the generic framework are implemented, but to our knowledge, no article has been published that presents a comprehensive view of a state consistency architecture. This generic architecture allows us to put the literature regarding state consistency into context and allows us to identify requirements of the authoritative object store from a consistency perspective.
 
 \subsection{Request-response consistency basis}
 Since the description of an overarching framework for state consistency was lacking in the literature, we decided to develop such a framework. To develop this framework, the main issues that state consistency has to solve for each of the scenarios discussed in Section \ref{environment_change_scenarios}, were identified:
@@ -126,7 +126,7 @@ Since the description of an overarching framework for state consistency was lack
 \item How the effect of a response is displayed to an agent.
 \end{itemize}
 
-Each identified consistency scenario is a form of the basic request-response model identified here. Using this basic model, the generic consistency model was created that incorporated all scenarios. This model is shown in Figure \ref{fig_event_update_flowdiagram}. This architecture allows us to put the literature regarding state consistency into context and allows us to identify requirements of the authoritative object store from a consistency perspective.
+Each identified consistency scenario is in the same basic request-response form. The items in parentheses show the possible forms that the specified request or response can take. Using this basic model, the generic consistency model was created that incorporated all scenarios. This model is shown in Figure \ref{fig_event_update_flowdiagram}.
 
 \subsection{Model}
 

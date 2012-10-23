@@ -37,6 +37,7 @@ else strcmp(type, 'exponential')
     theta = lambda;
 end
 
+%Create a four-dimensional array to house all the data.
 lifetimes = zeros(N, R, G, MU/mu_step);
 
 x = 1;

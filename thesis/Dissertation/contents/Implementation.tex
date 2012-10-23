@@ -50,6 +50,7 @@ Three churn generators also exist, one for generating each of the three Pithos n
 Lifetime churn creates nodes with specified average lifetimes, sampled from an exponential distribution. This is a distribution regularly used to model lifetimes in reliability engineering. Pareto churn samples node lifetimes from a Pareto distribution (type of heavy-tailed distribution), instead of an exponential distribution. Pareto churn requires mean node lifetime as well as mean node dead time to be specified.
 
 \subsubsection{Exponential versus Pareto lifetime distributions}
+\label{exp_vs_pareto}
 
 \begin{figure}[htbp]
  \centering
@@ -172,13 +173,20 @@ The group storage module forms part of the peer node. It receives requests from 
 \subsubsection{Group ledgers}
 \label{pithos_module_types_ledgers}
 
-The group ledger is an abstract data type that maintains lists of all objects stored in the group, as well as all peers that are part of the group. The group ledger is used by the group logic and super peer logic modules to keep track of all group objects and peers.
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=21mm 217mm 191mm 283mm, width=\columnwidth]{Group_ledger}
+ \caption{Structure of the group ledger in the Pithos implementation.}
+ \label{fig_group_ledger}
+\end{figure}
+%
+Figure \ref{fig_group_ledger} shows the structure of the group ledger implementation. The group ledger is an abstract data type that maintains lists of all objects stored in the group, as well as all peers that are part of the group. The group ledger is used by peers and super peers to keep track of all group objects and peers.
 
 The group ledger was designed for efficient storage, while still allowing high speed access to data. In order for the ledger to be efficient, it implements a map of object ledgers, where each object ledger contains object information and a list of peers where that object is stored on. The group ledger also contains a peer ledger list, where each peer ledger contains a list of objects that are housed on that peer.
 
 In the object ledger, each entry in the peer list is a reference to peer information contained in the peer ledger. In the peer ledger, each entry in the object list is a reference to peer information contained in the object ledger. This means that peer and object information are only stored once, and always referred to by references. This dually linked structure allows for searching in any direction. Objects are stored in a map, since there might be thousands of objects in a group, compared to tens of peers. Efficient object lookup is, therefore, a priority, whereas sequential peer search is sufficient.
 
-The ledger abstract data type is implemented using reference counting pointers (smart pointers), to avoid any memory leaks that might have occured due to incorrect memory management of the large number of pointers present.
+The ledger abstract data type is implemented using reference counting pointers (smart pointers), to avoid any memory leaks that might have occurred due to incorrect memory management of the large number of pointers present.
 
 \subsection{Super peer node}
 \label{pithos_module_types_sp_logic}
@@ -277,7 +285,7 @@ For a detailed discussion on group consistency and the reasons for the various s
  \label{fig_gc_final}
 \end{figure}
 %
-Figure \ref{fig_gc_final} shows the group consistency after all improvements were added for a large group. It can be seen that complete consistency is achieved for a group of more than 25 nodes.
+Figure \ref{fig_gc_final} shows the view of the group size of approximately 30 peers as a function of time. Every peer reports its view of the group size at regular intervals and those views are overlayed and plotted.
 
 \section{PithosTestApp implementation}
 \label{pithostestapp}

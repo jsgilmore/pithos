@@ -106,11 +106,11 @@ Storing multiple replicas attempts to limit the effect that a malicious user mig
 
 When security is a concern, multiple parallel retrieval requests can be performed. A quorum mechanism is then used at the receiving peer to compare the different received objects. The object that is returned by most of the peers is then considered to be the correct object. A peer modifying an object has no effect on the system, since the receiving peer selects the object returned by the other peers.
 
-The quorum mechanism will fail if the majority of peers queried colludes to send the same altered object. This can be detected by comparing received objects to objects received from the overlay storage. Ideally, it should only be necessary to perform this comparison if it is suspected that some of the peers in the group s are colluding to maliciously alter objects.
+The quorum mechanism will fail if the majority of peers queried colludes to send the same altered object. This can be detected by comparing received objects to objects received from the overlay storage. Ideally, it should only be necessary to perform this comparison if it is suspected that some of the peers in the group are colluding to maliciously alter objects.
 
 \subsection{Fairness}
 
-Fairness is achieved by using both overlay storage and group storage. Both of these schemes require all objects in the network to participate in storage. 
+Fairness is achieved by using both overlay storage and group storage. Both of these schemes require all objects in the network to participate in storage.
 
 \subsubsection{Group storage}
 
@@ -138,11 +138,9 @@ When referring to state management and persistency as defined in Section \ref{ma
 
 \subsection{Group storage module}
 
-If group storage is considered an $O(1)$ structured overlay, it requires all features mentioned in Section \ref{structured_overlay_features}: geometry, routing functionality, a join mechanism, a leave mechanism and bootstrapping.
-
 On a network level, group storage consists out of three node types: super peers, peers and a single directory server for the whole network. It is possible for a single Pithos terminal to be both a peer and a super peer.
 
-Since group storage can be seen as an $O(1)$ structured overlay, it required the features identified in Section \ref{structured_overlay_features}: geometry, routing, network join and leave and bootstrapping. Additionally to the required routing features, group migration should also be possible (moving from one group to another) and records of all objects stored and all peers present are also required. Lastly, some method of determining group membership is required.
+Since group storage can be seen as an $O(1)$ structured overlay, it requires the features identified in Section \ref{structured_overlay_features}: geometry, routing, network join and leave and bootstrapping. Additionally to the required routing features, group migration should also be possible (moving from one group to another) and records of all objects stored and all peers present are also required. Lastly, some method of determining group membership is required.
 
 \subsubsection{Geometry and routing}
 
@@ -269,7 +267,7 @@ The function of overlay storage is similar to that of group storage. It provides
 
 The requirements of overlay storage is that is should be reliable, bandwidth efficient and able to handle network churn. It is assumed that a $O(\log(N))$ overlay is used. For the overlay storage, responsiveness is unimportant, since group storage ensures responsiveness. Reliability is the most important aspect of overlay storage.
 
-An example of an overly storage that might be used in Pithos is PAST \cite{PAST_storage}, based on the Partry overlay \cite{pastry}.
+An example of an overly storage that might be used in Pithos is PAST \cite{PAST_storage}, based on the Pastry overlay \cite{pastry}.
 
 \subsection{Certification mechanism}
 
@@ -415,7 +413,9 @@ Removal is handled by the object TTL. It is not possible to define an explicit r
 
 \section{Conclusion}
 
-This section describes the Pithos conceptual design. The use cases are defined from the perspective of the higher layer that wishes to make use of Pithos's services. The conceptual design is first described in terms of how it ensures the storage requirements are met. Each module and mechanism that contributes to the achievement of the identified requirements are then discussed. The implementation of the use cases is described with a discussion of how they relate to the modules and mechanisms required to ensure the consistency requirements are met.
+This section describes the Pithos conceptual design. Pithos is a hierarchical distributed storage system that uses grouping to reduce latencies of store and retrieve requests, as is required by massively multi-user virtual environments (MMVEs). The use cases are defined from the perspective of the higher layer that wishes to make use of Pithos's services.
+
+The conceptual design is first described in terms of how it ensures the storage requirements are met. Each module and mechanism that contributes to the achievement of the identified requirements are then discussed. The implementation of the use cases is described with a discussion of how they relate to the modules and mechanisms required to ensure the consistency requirements are met.
 
 Pithos is designed as a multi-tiered distributed storage system, containing multiple $O(1)$ group stores and a single $O(\log(N)$ overlay store. Each node is connected to the overlay storage and grouped into group storage. A certification mechanisms ensures store and retrieve requests can be tracked and that malicious users can be identified. It contains a quorum mechanism that rejects maliciously altered objects. To maintain reliability, a replication redundance mechanism with repair is used.
 

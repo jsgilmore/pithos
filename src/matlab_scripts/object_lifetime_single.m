@@ -5,16 +5,15 @@ close all
 type = 'exponential';
 
 %The maximum number of replicas
-r = 4;
+r = 3;
 
 %The maximum number of nodes in the larger network
-n = 500;
+n = 7;
 
-group_size_av = 150;
+group_size_av = 5;
 
 %Repair rate
-%mu = 0.7/150;
-mu = 0.0;
+mu = 0.5;
 
 %Parameters of a pareto node lifetime distribution
 % alpha = 0.5239
@@ -28,6 +27,10 @@ lambda = 1800
 %and makes little sense, since a Pareto distribution has a variable failure
 %rate.
 if strcmp(type, 'pareto')
+    %This is an approximation that was made in the literature and has not
+    %been found to be accurate in practise. Actually, the object lifetimes
+    %are just too sensitive to small values of change of the departure rate
+    %parameter.
     theta = (alpha-2)/beta;
 else
     theta = 1/lambda;

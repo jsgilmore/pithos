@@ -42,6 +42,8 @@
         \AddToShipoutPicture*{\AtTextCenter{%
                 \parbox[c]{0pt}{\makebox[0pt][c]{%
                     \includegraphics[width=#1]{#2}}}}}}
+                    
+\usepackage[caption=false]{subfig}
 
 %==== Local Defs ====================================================
 \makeatletter
@@ -49,8 +51,23 @@
 %
 % Please insert user defined commands here
 % and NOT in the document itself!
-%
-\usepackage[caption=false]{subfig}
+%This code defines a bordered matrix with square brackets used in the modelling chapter.
+\def\bbordermatrix#1{\begingroup \m@th
+  \@tempdima 4.75\p@
+  \setbox\z@\vbox{%
+    \def\cr{\crcr\noalign{\kern2\p@\global\let\cr\endline}}%
+    \ialign{$##$\hfil\kern2\p@\kern\@tempdima&\thinspace\hfil$##$\hfil
+      &&\quad\hfil$##$\hfil\crcr
+      \omit\strut\hfil\crcr\noalign{\kern-\baselineskip}%
+      #1\crcr\omit\strut\cr}}%
+  \setbox\tw@\vbox{\unvcopy\z@\global\setbox\@ne\lastbox}%
+  \setbox\tw@\hbox{\unhbox\@ne\unskip\global\setbox\@ne\lastbox}%
+  \setbox\tw@\hbox{$\kern\wd\@ne\kern-\@tempdima\left[\kern-\wd\@ne
+    \global\setbox\@ne\vbox{\box\@ne\kern2\p@}%
+    \vcenter{\kern-\ht\@ne\unvbox\z@\kern-\baselineskip}\,\right]$}%
+  \null\;\vbox{\kern\ht\@ne\box\tw@}\endgroup}
+  
+\makeatother
 
 \renewcommand{\UScaptionsafrikaans}{%
     \def\DeclarationName{Verklaring}%
@@ -102,8 +119,8 @@
 %         Private Bag X1, 7602 Matieland, South Africa.
 %              }}
 
-\supervisor{Dr.\  Herman\ A. Engelbrecht}
-\setdate{12}{2012}
+\supervisor{Dr. H.A. Engelbrecht}
+\setdate{3}{2013}
 
 %====================================================================
 %     MAIN DOCUMENT
