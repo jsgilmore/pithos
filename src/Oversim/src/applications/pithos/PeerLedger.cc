@@ -16,7 +16,9 @@
 #include "PeerLedger.h"
 
 PeerLedger::PeerLedger() {
-	// TODO Auto-generated constructor stub
+
+	object_total = 0;
+	times_recorded = 0;
 
 }
 
@@ -95,4 +97,15 @@ void PeerLedger::eraseObjectRef(ObjectDataPtr object_data_ptr)
 
 	if (!found)
 		opp_error("Peer pointer not found when erasing.");
+}
+
+double PeerLedger::getObjectAverage()
+{
+	return ((double)object_total)/times_recorded;
+}
+
+void PeerLedger::recordObjectNum()
+{
+	object_total += objectDataList.size();
+	times_recorded++;
 }

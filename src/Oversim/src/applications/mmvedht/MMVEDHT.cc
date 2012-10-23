@@ -36,6 +36,7 @@ using namespace std;
 MMVEDHT::MMVEDHT()
 {
     dataStorage = NULL;
+    periodicTimer = NULL;
 }
 
 MMVEDHT::~MMVEDHT()
@@ -52,6 +53,8 @@ MMVEDHT::~MMVEDHT()
     if (dataStorage != NULL) {
         dataStorage->clear();
     }
+
+    cancelAndDelete(periodicTimer);
 }
 
 void MMVEDHT::initializeApp(int stage)
@@ -74,6 +77,11 @@ void MMVEDHT::initializeApp(int stage)
                   "overlay can handle (%d)", overlay->getMaxNumSiblings());
     }
 
+    periodicTimer = new cMessage("MMVEDHTTimer");
+    scheduleAt(simTime(), periodicTimer);
+    object_total = 0;
+    times_recorded = 0;
+
     maintenanceMessages = 0;
     normalMessages = 0;
     numBytesMaintenance = 0;
@@ -87,19 +95,29 @@ void MMVEDHT::initializeApp(int stage)
 
 void MMVEDHT::handleTimerEvent(cMessage* msg)
 {
-    DHTTtlTimer* msg_timer = dynamic_cast<DHTTtlTimer*> (msg);
+	if (msg == periodicTimer)
+	{
+		scheduleAt(simTime() + TEST_MAP_INTERVAL, msg);
 
-    if (msg_timer) {
-        EV << "[DHT::handleTimerEvent()]\n"
-           << "    received timer ttl, key: "
-           << msg_timer->getKey().toString(16)
-           << "\n (overlay->getThisNode().getKey() = "
-           << overlay->getThisNode().getKey().toString(16) << ")"
-           << endl;
+		//At regular intervals, record the total number of objects stored to be able to later calculate an averag.
+		object_total += dataStorage->getSize();
+		times_recorded++;
+	} else {
+		DHTTtlTimer* msg_timer = dynamic_cast<DHTTtlTimer*> (msg);
 
-        dataStorage->removeData(msg_timer->getKey(), msg_timer->getKind(),
-                                msg_timer->getId());
-    }
+		if (msg_timer)
+		{
+			EV << "[DHT::handleTimerEvent()]\n"
+			   << "    received timer ttl, key: "
+			   << msg_timer->getKey().toString(16)
+			   << "\n (overlay->getThisNode().getKey() = "
+			   << overlay->getThisNode().getKey().toString(16) << ")"
+			   << endl;
+
+			dataStorage->removeData(msg_timer->getKey(), msg_timer->getKind(),
+									msg_timer->getId());
+		}
+	}
 }
 
 bool MMVEDHT::handleRpcCall(BaseCallMessage* msg)
@@ -951,6 +969,8 @@ void MMVEDHT::finishApp()
                                     numBytesMaintenance / time);
         globalStatistics->addStdDev("DHT: Sent Normal Bytes/s",
                                     numBytesNormal / time);
+
+        globalStatistics->recordOutVector("Average overlay objects per peer", (double(object_total))/times_recorded);
     }
 }
 
