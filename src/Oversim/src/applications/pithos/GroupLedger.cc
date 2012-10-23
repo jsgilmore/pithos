@@ -50,8 +50,7 @@ void GroupLedger::initialize()
 
 	object_lifetime = 0.0;
 
-	periodicTimer = new cMessage("PithosTestMapTimer");
-
+	periodicTimer = new cMessage("GroupLedgerTimer");
 	scheduleAt(simTime(), periodicTimer);
 }
 
@@ -77,6 +76,16 @@ void GroupLedger::recordAndClear()
 
 	object_map.clear();
 	peer_list.clear();
+}
+
+void GroupLedger::recordObjectNumbers()
+{
+	PeerLedgerList::iterator peer_ledger_it;
+
+	for (peer_ledger_it = peer_list.begin() ; peer_ledger_it != peer_list.end() ; peer_ledger_it++)
+	{
+		peer_ledger_it->recordObjectNum();
+	}
 }
 
 /**
@@ -111,12 +120,17 @@ void GroupLedger::handleMessage(cMessage* msg)
 
 		if (isSuperPeerLedger())
 		{
+			//Count the number of objects on every peer in the group, to be able to calculate an average later.
+			recordObjectNumbers();
+
 			//If a peer is the super peer of a group, show its own address as both super peer address and peer address
 			group_name << "GroupLedger (" << thisAdr << ":" << thisAdr <<"): ";
 
 			RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Data stored for known group objects")).c_str(), data_size));
 			RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of total group objects")).c_str(), objects_total));
 			RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of starved group objects")).c_str(), objects_starved));
+			RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of known group peers")).c_str(), peer_list.size()));
+			RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of unique group objects")).c_str(), object_map.size()));
 
 			if (object_map.size() > 0)
 				RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Average number of replicas per object")).c_str(), double(objects_total)/(object_map.size() + objects_starved)));
@@ -136,11 +150,10 @@ void GroupLedger::handleMessage(cMessage* msg)
 				//std::cout << "Unspecified address is: " << groupStorage->getSuperPeerAddress() << endl;
 				return;
 			}
-		}
 
-		//Have every peer reports its view of the group
-		//RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of known group peers")).c_str(), peer_list.size()));
-		//RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of unique group objects")).c_str(), object_map.size()));
+			//Record some stats here that will be recorded by every peer for all group peers.
+			RECORD_STATS(globalStatistics->recordOutVector((group_name.str() + std::string("Number of known group peers")).c_str(), peer_list.size()));
+		}
     }
     else if ((ttlTimer = dynamic_cast<ObjectTTLTimer*>(msg)) != NULL)
 	{
@@ -510,15 +523,23 @@ void GroupLedger::removePeer(PeerData peer_dat)
 	//std::ostringstream msg;
 	//msg << "[" << thisAdr << "]: Peer remove error\n";
 
+	//Record success or failure
 	if (peer_ledger_it == peer_list.end())
 	{
 		//std::cout << "Peer (" << peer_dat.getAddress() << ") slated for removal not found.\n";
 		RECORD_STATS(numPeerRemoveFail++);
-		//RECORD_STATS(globalStatistics->recordOutVector(msg.str().c_str(), 10));
+		//RECORD_STATS(globalStatistics->recordOut(msg.str().c_str(), 10));
 		return;
 	} else {
 		RECORD_STATS(numPeerRemoveSuccess++);
 		//RECORD_STATS(globalStatistics->recordOutVector(msg.str().c_str(), 0));
+	}
+
+	//Only a single peer per group should record object size, otherwise object size is recorded by every object in the group and larger groups will dominate the mean.
+	if (isSuperPeerLedger())
+	{
+		//Record the average number of objects that were stored on the peer being removed, during its lifetime
+		RECORD_STATS(globalStatistics->recordOutVector("Average group objects per peer", peer_ledger_it->getObjectAverage()));
 	}
 
 	objectListSize = peer_ledger_it->getObjectListSize();
