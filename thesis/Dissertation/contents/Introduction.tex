@@ -343,6 +343,7 @@ The state of the art of state consistency techniques will be reviewed in detail 
 The objective of this work is to design and develop a novel state management and persistency architecture, specifically designed for P2P MMVEs, that satisfies all P2P MMVE storage requirements and takes into account the requirements of the consistency architecture in which it will operate.
 
 \section{Related work}
+\label{intro_related_work}
 
 The basis for this dissertation is the work done by Lu Fan, in his dissertation entitled: ``Solving Key Design Issues for Massively Multiplayer Online Games on Peer-to-Peer Architectures'' \cite{Fan_phd} as well as the paper by Fan et al.: ``Design Issues for Peer-to-Peer Massively Multiplayer Online Games'' \cite{Fan_deisgn_issues_p2p}.
 
@@ -354,7 +355,7 @@ Fan, however, does not focus on solving state persistency issues of P2P MMVEs. A
 
 Recent work that is most similar to ours is the dissertation by Varvello entitled: ``A Peer-to-Peer Architecture for Networked Virtual Environments'' \cite{varvello_phd}. They develop P2P Second Life by altering the Second Life implementation to run over an existing P2P file sharing network, called KAD \cite{KAD_Steiner}, which runs on the Kademlia P2P routing overlay \cite{Kademlia_Maymounkov}. Their focus is thus on a practical implementation, taking an already implemented MMVE and running that as a P2P system over an already implemented P2P network. They also design and simulate a responsive distributed storage system for P2P MMVEs, called Walkad \cite{Walkad_Varvello}. Walkad is deployed to a cluster and ModelInet \cite{ModelInet_Vahdat} is used to emulate wide-area latencies in the cluster underlay. A synthetic Internet topology is generated to model the wide-area latencies, using Inet \cite{Inet_warwick_jamin}.
 
-There are some similarities between Pithos and P2P Second Life. Both provide the design and implementation of a storage system for P2P MMVEs, although the designs are very different as will be explained shortly. Some of the requirements for P2P MMVE state management and persistency were also identified by P2P Second Life, these are: scalability, security and responsiveness. Additionally we identify reliability and fairness as key to designing the P2P MMVEs of the future. We argue for the various identified requirements from the perspective of the generic consistency model that we design. Both our systems also make a distinction between local and non-local storage requests, since it is recognised that users have a finite Area of Interest (AoI).
+There are some similarities between Pithos and P2P Second Life. Both provide the design and implementation of a storage system for P2P MMVEs, although the designs are very different as will be explained shortly. Some of the requirements for P2P MMVE state management and persistency were also identified by P2P Second Life, these are: scalability, security and responsiveness. Additionally we identify fairness and reliability as key to designing the P2P MMVEs of the future. We argue for the various identified requirements from the perspective of the generic consistency model that we design. Both our systems also make a distinction between local and non-local storage requests, since it is recognised that users have a finite Area of Interest (AoI).
 
 The KAD P2P network is, however, a file sharing network where user profiles, such as session time, do not necessarily model user lifetimes in P2P MMVEs. It is also not possible to control the parameters of the peers in the network, such as churn. The Walkad simulation is also on a relatively small scale, running on 1024 peers with less than 600 objects in the virtual environment.
 
@@ -457,7 +458,7 @@ Pithos is also evaluated from a security perspective. Some designs that improve 
 
 \item A review of various state management and state persistency systems is performed in Chapter \ref{p2p_MMVE_state_persistency}.
     \begin{itemize}
-    \item The state management survey identifies some key metrics by which state management systems may be compared, namely: fairness, reliability, responsiveness, scalability and security.
+    \item The state management survey identifies some key metrics by which state management systems may be compared, namely: fairness, overhead, reliability, responsiveness, scalability and security.
     \item Storage types described in the literature are found to be classifiable as super peer storage, overlay storage, hybrid region-based storage and distance-based storage.
     \item A journal survey paper has been published on this work, appearing in the IEEE Transactions on Parallel and Distributed Systems \cite{gilmore_p2p_mmog_state_persistency}.
     \end{itemize}
@@ -481,7 +482,7 @@ All modules that form part of the generic consistency model are described, and a
 
 Knowing that state management and state persistency will be required by the consistency model, the other modules that interface with the authoritative storage module are investigated. These are found to be the environment logic module and object update module.
 
-Chapter \ref{p2p_MMVE_state_persistency} explores the various state management and persistency schemes described in the literature. It first defines key requirements that state management and persistency architectures should possess, based on what was learned in Chapter \ref{chp:CONSISTENCY}. Key requirements are found to be: fairness, reliability, responsiveness, scalability and security. The storage types reviewed were found to be broadly characterisable into: super peer storage, overlay storage, hybrid region-based storage and distance-based storage. A discussion of each storage type is presented in terms of the requirements identified earlier.
+Chapter \ref{p2p_MMVE_state_persistency} explores the various state management and persistency schemes described in the literature. It first defines key requirements that state management and persistency architectures should possess, based on what was learned in Chapter \ref{chp:CONSISTENCY}. Key requirements are found to be: fairness, overhead, reliability, responsiveness, scalability and security. The storage types reviewed were found to be broadly characterisable into: super peer storage, overlay storage, hybrid region-based storage and distance-based storage. A discussion of each storage type is presented in terms of the requirements identified earlier.
 
 It is found that none of the storage types currently available in the literature satisfy all the identified requirements. Chapter \ref{chp:DESIGN} presents the design of a novel state management and persistency architecture, called ``Pithos'', to satisfy all identified requirements. Pithos is designed as a hybrid storage, containing slower, but scalable overlay storage and faster but non-scalable group storage.
 
