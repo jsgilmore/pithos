@@ -280,12 +280,18 @@ For a detailed discussion on group consistency and the reasons for the various s
 
 \begin{figure}[htbp]
  \centering
- \includegraphics[clip=true, viewport=0mm 0mm 430mm 180mm, width=\columnwidth]{gc_final}
+ \includegraphics[clip=true, viewport=0mm 0mm 570mm 265mm, width=\columnwidth]{gc_final}
  \caption{Group consistency after all improvements}
  \label{fig_gc_final}
 \end{figure}
 %
-Figure \ref{fig_gc_final} shows the view of the group size of approximately 30 peers as a function of time. Every peer reports its view of the group size at regular intervals and those views are overlayed and plotted.
+Figure \ref{fig_gc_final} shows the view of group containing 40 peers on average as a function of time. Every peer reports its view of the group size at 1s intervals and those views are overlayed and plotted.
+
+To calculate group consistency, each vector was compared with the super peer's view of the group. For each of the 251 nodes that joined and left the group over the 10,000s simulation time, error vectors were calculated by calculating the difference between the super peer group size vector and the group size vector of every other peer in the group for the duration that a peer was part of the group.
+
+The mean and standard deviations were then calculated for each of these vectors to form two new mean error and standard deviation error vectors. The mean and standard deviation of the mean error vector is 0.0096 and 0.0104 respectively. The mean and standard deviation of the standard deviation vector is 0.0941 and 0.1338.
+
+This data shows that on average there is a 0.0096 peer difference between the number of peers that the super per perceives and the number of peers that the rest of the group peers perceive within every 1s interval. This is considered a sufficiently high level of consistency for the purpose of the Pithos evaluation.
 
 \section{PithosTestApp implementation}
 \label{pithostestapp}
