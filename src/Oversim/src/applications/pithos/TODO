@@ -33,22 +33,11 @@ Ensure correctness for pithos under 32 bit systems. This includes testing long v
 Dissertation:
 ----------------------------------------------------------------------------------------------------------------------------
 Overall:
-Make sure the state management and persistency chapter uses the terms state management and persistency correctly.
-Remove the term "game" where it is not required and replace with environment and VE.
-Replace "player" with "user".
-Decide between "actor", "avatar" and "agent".
 Replace "node" with "peer", where applicable.
-Add figure displaying the expanded Oversim terminal.
-Add figure displaying the structure of an object ledger.
 
 Abstract:
-Translate to Afrikaans
 
 Nomenclature:
-Add all missing symbols
-Add all missing abbreviations
-Group symbols
-Sort abbreviations
 
 Introduction:
 
