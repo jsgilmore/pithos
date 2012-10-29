@@ -5,7 +5,7 @@
 
 \section{Massively Multi-user Virtual Environments}
 
-Massively multi-user virtual environments (MMVEs) are characterised by thousands of users interacting in the same virtual environment or game world; socially, cooperatively or competitively. MMVEs can be serious, such as air traffic control simulations and military war games or casual, such as computer games. MMVEs as computer games are referred to as massively multiplayer online games (MMOGs) and can themselves be hardcore, where significant investments of time and money are required, or casual, where little time and money are required. Hardcore games usually also have better graphics, and require large amounts of computing power, storage space and Internet bandwidth, compared with their casual counterparts.
+Massively multi-user virtual environments (MMVEs) are characterised by thousands of users interacting in the same virtual environment; socially, cooperatively or competitively. MMVEs can be serious, such as air traffic control simulations and military war games or casual, such as computer games. MMVEs as computer games are referred to as massively multiplayer online games (MMOGs) and can themselves be hardcore, where significant investments of time and money are required, or casual, where little time and money are required. Hardcore games usually also have better graphics, and require large amounts of computing power, storage space and Internet bandwidth, compared with their casual counterparts.
 
 In this work, a focus is placed on hardcore MMOGs, or MMVEs that classically require large server clusters to host the virtual environment and consume significant amounts of Internet bandwidth.
 
@@ -53,11 +53,11 @@ The design requirements of an MMOG are the same as the design requirements for a
 
 What is additionally required for an MMOG is a network and state consistency architecture. The network architecture defines how hosts are connected, the roles of different hosts and how information is distributed between hosts.
 
-There are many social as well as technical aspects to consider when designing a virtual world \cite{designing_virtual_worlds}, but an essential requirement of all MMVEs, including all the MMOGs presented in Section \ref{modern_mmogs}, is that multitudes of players should be able to interact with each other and the virtual environment. This is called the consistency architecture. The consistency architecture ensures that players share the same view of the virtual environment they inhabit. It is also responsible for relaying player actions to other players and informing other players of any new players or objects in the virtual world.
+There are many social as well as technical aspects to consider when designing a virtual world \cite{designing_virtual_worlds}, but an essential requirement of all MMVEs, including all the MMOGs presented in Section \ref{modern_mmogs}, is that multitudes of users should be able to interact with each other and the virtual environment. This is called the consistency architecture. The consistency architecture ensures that users share the same view of the virtual environment they inhabit. It is also responsible for relaying user actions to other users and informing other users of any new users or objects in the virtual world.
 
-Player data should also be stored when players log off from the game. In-game object states should also be stored as well as the states of computer characters in the game.
+User data should also be stored when users log off from the virtual environment. Virtual object states should also be stored as well as the states of computer characters in the virtual environment.
 
-A separation between authoritative and non-authoritative state is also required in MMVEs. If two players do not agree on the state of the game, due to latency or cheating, is must be possible to return the game to a state on which both players can agree. This ``true'' state is called the authoritative state, with players usually possessing non-authoritative states. When two entities do not agree on the environment state, authoritative state is used as a state on which both can agree upon and revert to.
+A separation between authoritative and non-authoritative state is also required in MMVEs. If two users do not agree on the state of the virtual environment, due to latency or cheating, is must be possible to return the virtual environment to a state on which both users can agree. This ``true'' state is called the authoritative state, with users usually possessing non-authoritative states. When two entities do not agree on the environment state, authoritative state is used as a state on which both can agree upon and revert to.
 
 \subsection{Classic client-server MMVEs}
 
@@ -72,29 +72,29 @@ A classic network architecture, used in the design of all MMVEs presented in Sec
 \caption{Network architectures}
 \end{figure}
 
-Figure \ref{fig_cs_arch} shows the C/S model. The server is the entity on which the MMOG is hosted and is controlled by the game operator. The server contains the authoritative environment state, to which clients must revert if their states deviate from the authoritative state. Clients are computers operated by players, that connect to the server to play the game. The server is responsible for handling all queries from clients. Clients never communicate with other clients; they send their actions to the server and receive the updated states of other players from the server. All client environment states are non-authoritative.
+Figure \ref{fig_cs_arch} shows the C/S model. The server is the entity on which the MMOG is hosted and is controlled by the operator. The server contains the authoritative environment state, to which clients must revert if their states deviate from the authoritative state. Clients are computers operated by users that connect to the server to be able to interact with the virtual environment and other users in it. The server is responsible for handling all queries from clients. Clients never communicate with other clients; they send their actions to the server and receive the updated states of other users from the server. All client environment states are non-authoritative.
 
 \subsubsection{Advantages}
 
-The C/S architecture has two main advantages that has made it the architecture of choice for all MMOG developers. Because of the centralised approach of the architecture, both administration and security are greatly simplified. Administration is simplified, because the game operator has full control over the server, server data and code. Efficient logging is also supported, because the server is able to not only log all server actions, but also all client actions.
+The C/S architecture has two main advantages that has made it the architecture of choice for all MMOG developers. Because of the centralised approach of the architecture, both administration and security are greatly simplified. Administration is simplified, because the operator has full control over the server, server data and code. Efficient logging is also supported, because the server is able to not only log all server actions, but also all client actions.
 
-Security is a significant issue in MMOGs, since some players sell in-game currency for real-world currency \cite{chinese_gold_farmer}. This makes the MMOG a platform that is capable of producing income, which increases the incentive of players to gain an unfair advantage over others. The more popular an MMOG, the greater the security threat. Because the operator has full control over the server code and is never required to furnish the
+Security is a significant issue in MMOGs, since some users sell virtual currency for real-world currency \cite{chinese_gold_farmer}. This makes the MMOG a platform that is capable of producing income, which increases the incentive of users to gain an unfair advantage over others. The more popular an MMOG, the greater the security threat. Because the operator has full control over the server code and is never required to furnish the
 client with the server code, a potential attacker never has any knowledge of the server architecture and code. Because clients are never allowed to communicate directly, all malicious users can be filtered out of the network by the server when detected and even banned from the network.
 
-Operators are able to ban players, since these games usually require a game account, which is linked to a copy of the game as well as some payment method. This introduces a large cost to players whose accounts are banned. The server or cluster is also housed in a secured location, where access can be controlled. These factors simplify the security of the C/S model by allowing the developers to place all intelligence in the server.
+Operators are able to ban users, since these virtual environments usually require an account, which is linked to a copy of the software as well as some payment method. This introduces a large cost to users whose accounts are banned. The server or cluster is also housed in a secured location, where access can be controlled. These factors simplify the security of the C/S model by allowing the developers to place all intelligence in the server.
 
 \subsubsection{Disadvantageous}
 \label{classic_cs_disadvantages}
 
 The C/S architecture has the following disadvantages: weak robustness, weak scalability, high cost to the operator, high latency, high amount of required server bandwidth and weak handling of transient loads.
 \begin{itemize}
-\item The robustness of the system is weak because it is a single point of failure. If the server fails or goes down for maintenance, the game is off-line and players are unable to play.
+\item The robustness of the system is weak because it is a single point of failure. If the server fails or goes down for maintenance, the virtual environment is off-line and users are unable to interact with it.
 
-\item The system is also weakly scalable, since a single server cannot easily be extended with more resources. Even if an off-line approach is used, where hardware is upgraded after the system is taken down for maintenance, the hardware required to support a game hosting more than 3000 players, become prohibitively expensive, as described in Section \ref{mmog_cost}.
+\item The system is also weakly scalable, since a single server cannot easily be extended with more resources. Even if an off-line approach is used, where hardware is upgraded after the system is taken down for maintenance, the hardware required to support a virtual environment hosting more than 3000 users, become prohibitively expensive, as described in Section \ref{mmog_cost}.
 
-The server hardware should be able to support peak system loads, which means that sufficient resources should always be provisioned to support these peak load. This is not an economically viable solution, because resources to handle peak loads are not used most of the time. This translates to operators paying for the provisioning of resources, without having active players that pay for these resources.
+The server hardware should be able to support peak system loads, which means that sufficient resources should always be provisioned to support these peak load. This is not an economically viable solution, because resources to handle peak loads are not used most of the time. This translates to operators paying for the provisioning of resources, without having active users that pay for these resources.
 
-\item Because no clients are allowed to communicate with other clients, every change that is made to the game world by a client, first had to be communicated to the server, which in turns relays this message to all clients after applying game logic and artificial intelligence (AI) algorithms. This two hop path, with the additional time for computation added by the server as well as possible buffering at the server when many clients communicate, significantly increases the latency of the system compared to a system where direct communication is used.
+\item Because no clients are allowed to communicate with other clients, every change that is made to the virtual environment by a client, first has to be communicated to the server, which in turns relays this message to all clients after applying environment logic and artificial intelligence (AI) algorithms. This two hop path, with the additional time for computation added by the server as well as possible buffering at the server when many clients communicate, significantly increases the latency of the system compared to a system where direct communication is used.
 \end{itemize}
 
 \subsubsection{Client/Multi-Server}
@@ -102,9 +102,9 @@ The server hardware should be able to support peak system loads, which means tha
 In an effort to address some of the C/S issues, the distributed C/S, also called the Client/Multi-Server (C/MS) model, was introduced, shown in Figure \ref{fig_cms_arch}. In a C/MS model,
 the server functions are distributed amongst multiple machines to distribute the server load.
 
-In general, the issues addressed and improved by the C/MS architecture are robustness, scalability, and peak load handling. The system is more robust, because the failure of one server will not necessarily lead to the failure of the whole system for certain system designs. The system is more scalable, because many less powerful servers may be used, which allows for the hosting of more players than what is currently possible with single server hardware. It also handles transient loads better, because, for cases where loads can be predicted, resources can by moved between servers to improve the user experience.
+In general, the issues addressed and improved by the C/MS architecture are robustness, scalability, and peak load handling. The system is more robust, because the failure of one server will not necessarily lead to the failure of the whole system for certain system designs. The system is more scalable, because many less powerful servers may be used, which allows for the hosting of more users than what is currently possible with single server hardware. It also handles transient loads better, because, for cases where loads can be predicted, resources can by moved between servers to improve the user experience.
 
-The disadvantages of this system is that the administration complexity is greatly increased. Such systems, although capable of handling many more users than a single server, is also more expensive. These disadvantages are, however, not technical problems and so it is assumed for current games, that these systems are what is required if a game is to be hosted for a large number of players.
+The disadvantages of this system is that the administration complexity is greatly increased. Such systems, although capable of handling many more users than a single server, is also more expensive. These disadvantages are, however, not technical problems and so it is assumed for current virtual environments, that these systems are what is required if a virtual environment is to be hosted for a large number of users.
 
 \subsection{The cost of doing business}
 \label{mmog_cost}
@@ -123,7 +123,7 @@ With the costs involved, it is therefore difficult for a new developer to enter 
 
 To our knowledge, the first distributed multi-user virtual environment was MiMaze, developed in 1998 by Gautier and Diot \cite{mimaze}. This revealed a new research field, which attempted to establish the peer-to-peer (P2P) model as a viable alternative to the classic C/S and C/MS architectures. In 2004, Knutsson et al. proposed the first scalable architecture to host massively multiuser virtual environments  \cite{knutsson_p2p_first}.
 
-P2P MMVEs form the focus of this work. There are various advantages to moving from C/S to P2P in MMVEs. These include: increased robustness, improved scalability, lower operator costs, improved handling of transient player load and lower latencies. The advantages are described in Section \ref{p2p_mmve_advantages} in detail, but firstly it would be beneficial to acquire a greater understanding of the basics of the P2P network model.
+P2P MMVEs form the focus of this work. There are various advantages to moving from C/S to P2P in MMVEs. These include: increased robustness, improved scalability, lower operator costs, improved handling of transient user load and lower latencies. The advantages are described in Section \ref{p2p_mmve_advantages} in detail, but firstly it would be beneficial to acquire a greater understanding of the basics of the P2P network model.
 
 \section{Peer-to-Peer networks}
 
@@ -228,7 +228,7 @@ The core idea of the P2P model is that each peer contributes sufficient resource
 \label{p2p_mmve_advantages}
 
 \begin{itemize}
-\item The P2P architecture is robust, because there is no server that can fail, only individual peers. Individual peers failing will not affect any other peers other than the peer that failed. This behaviour makes game down-time extremely unlikely.
+\item The P2P architecture is robust, because there is no server that can fail, only individual peers. Individual peers failing will not affect any other peers other than the peer that failed. This behaviour makes virtual environment down-time extremely unlikely.
 
 \item In P2P MMVEs, it is generally assumed that peers provide abundant and highly available resources, such as computation power, and long term and short term storage. Peers are usually personal computers, with gigahertz of processing power, multiple processing cores, gigabytes of short-term storage and terabytes of long-term storage space. In other words, it is assumed that P2P MMVEs do not consist of resource-constrained peers.
 
@@ -236,16 +236,14 @@ The core idea of the P2P model is that each peer contributes sufficient resource
 
 \item Because of the high scalability, no extra resources are required from an operator perspective, when more peers join the network.
 
-\item P2P networks also efficiently handle transient loads, since the joining peers contribute their own resources. If many players suddenly enter the
-game no resource provisioning issues will arise, since peers already possess the required resources.
+\item P2P networks also efficiently handle transient loads, since the joining peers contribute their own resources. If many users suddenly enter the virtual environment, no resource provisioning issues will arise, since peers already possess the required resources.
 
 \item P2P architectures create a lot of opportunities for independent developers, because a large initial investment is no longer required to purchase
 the expensive server hardware. Not only are hardware costs reduced, but running costs are also reduced.
 
-\item Bandwidth required by the game server is now shared amongst users, which means that very little bandwidth costs will be incurred by the provider.
+\item The bandwidth requirements of the virtual environment server is now shared amongst users, which means that very little bandwidth costs will be incurred by the operator.
 
-\item Latency is improved, because it is now possible to directly communicate between peers and it is not necessary to communicate via a server.
-The distribution of the load as well as direct communication will further reduce latency.
+\item Latency is improved, because it is now possible to directly communicate between peers and it is not necessary to communicate via a server. The distribution of the load as well as direct communication will further reduce latency.
 \end{itemize}
 
 \subsection{Requirements}
@@ -255,30 +253,30 @@ Key requirements have been identified for the creation of a P2P MMVE. What follo
 \subsubsection{Distributed computation}
 \label{distributed_computation_requirement}
 
-Non-Player Characters (NPCs) are characters that are not controlled by any human player, but are rather controlled by some artificial intelligence routine or script executing on some host machine. These characters represent the traders and monsters in MMVEs and usually contain sets of rules that determine how they should interact with Player Characters (PCs) as well as their own state information. An NPC's state can be how much money and items it has to trade or how much health it still has after being attacked by a player.
+Non-Player Characters (NPCs) are characters that are not controlled by any human user, but are rather controlled by some artificial intelligence routine or script executing on some host machine. These characters represent the traders and monsters in MMVEs and usually contain sets of rules that determine how they should interact with Player Characters (PCs) as well as their own state information. An NPC's state can be how much money and items it has to trade or how much health it still has after being attacked by a user.
 
-Some game objects require computational power to function. An example of this is the Artificial Intelligence routines of NPCs or the computation of physics effects on in-game objects. In P2P MMVE, it might be required to distribute these computational tasks to offload computation load from peers that do not have sufficient resources.
+Some virtual objects require computational power to function. An example of this is the Artificial Intelligence routines of NPCs or the computation of physics effects on virtual objects. In P2P MMVE, it might be required to distribute these computational tasks to offload computation load from peers that do not have sufficient resources.
 
 \subsubsection{Consistency}
-A key challenge with any networked game is how to maintain state consistency between users in the virtual world. In other words, to ensure that all users perceive a virtual world in the same state. Solving the state consistency problem for P2P MMVEs is one of the major development challenges and forms the focus of this work. The challenge of state consistency will be described in detail in Chapter \ref{chp:CONSISTENCY}.
+A key challenge with any networked virtual environment is how to maintain state consistency between users in the virtual world. In other words, to ensure that all users perceive a virtual world in the same state. Solving the state consistency problem for P2P MMVEs is one of the major development challenges and forms the focus of this work. The challenge of state consistency will be described in detail in Chapter \ref{chp:CONSISTENCY}.
 
 \subsubsection{Persistency and state management}
 
 P2P MMVEs require persistent state, which means that the information of users in the virtual world should be maintained. The items that a user possesses in the virtual world should remain on his virtual avatar, even if she logs out and later back on to the virtual environment.
 
-Persistency is different to state management. Persistency is the long term storage of data, usually on secondary storage. State management deals with managing the state of objects in the virtual world. This includes handling all requests for that object from peers who do not yet possess the object, or processing changes that players have made to the objects in the virtual world.
+Persistency is different to state management. Persistency is the long term storage of data, usually on secondary storage. State management deals with managing the state of objects in the virtual world. This includes handling all requests for that object from peers who do not yet possess the object, or processing changes that users have made to the objects in the virtual world.
 
 \subsubsection{Interactivity}
 
-P2P MMVE should be interactive and responsive. This means that they should support low latency interactions and possibly mask high latency operations, using techniques such as dead reckoning \cite{cheat_proof_playout}, so as not to break immersion. Interactivity means that all players actions should be handled as soon as possible.
+P2P MMVE should be interactive and responsive. This means that they should support low latency interactions and possibly mask high latency operations, using techniques such as dead reckoning \cite{cheat_proof_playout}, so as not to break immersion. Interactivity means that all user actions should be handled as soon as possible.
 
 \subsubsection{Scalability}
 
-MMVE are by definition massive, supporting thousands to tens of thousands of players in the same virtual environment, as discussed in Section \ref{scalability_req}. A P2P MMVE should support as many users as a classic MMVE, preferably more.
+MMVEs are by definition massive, supporting thousands to tens of thousands of users in the same virtual environment, as discussed in Section \ref{scalability_req}. A P2P MMVE should support as many users as a classic MMVE, preferably more.
 
 \subsubsection{Security}
 
-Security, which includes cheating mitigation, has been identified as a major issue for P2P networks \cite{knutsson_p2p_first}, \cite{challenges_p2p_gaming}, \cite{cheat_proof_event_ordering}. The challenges reside in the fact that peers are not under the control of the game producer. Since the authoritative environment state is distributed amongst peers, all peers have access to sections of the authoritative environment state. Peers also have access to the code that was classically only housed on the server. This creates the opportunity that peer might attempt to alter the authoritative state in ways that are not consistency with the environment rules.
+Security, which includes cheating mitigation, has been identified as a major issue for P2P networks \cite{knutsson_p2p_first}, \cite{challenges_p2p_gaming}, \cite{cheat_proof_event_ordering}. The challenges reside in the fact that peers are not under the control of the operator. Since the authoritative environment state is distributed amongst peers, all peers have access to sections of the authoritative environment state. Peers also have access to the code that was classically only housed on the server. This creates the opportunity that peer might attempt to alter the authoritative state in ways that are not consistency with the environment rules.
 
 One advantage that can be exploited to prevent cheating is that no peer contains all authoritative environment state and no single peer has more authority than another.
 
@@ -290,9 +288,9 @@ The server functionality has to be distributed accross all users of the P2P syst
 
 \subsubsection{Incentives}
 
-P2P schemes require all players to share resources in order to ensure correct functionality. Players might, however, not want to share their resources, whilst still benefiting from the resources of others. The purpose of incentive mechanisms is to ensure that all players contribute resources, by incentivised contribution.
+P2P schemes require all users to share resources in order to ensure correct functionality. Users might, however, not want to share their resources, whilst still benefiting from the resources of others. The purpose of incentive mechanisms is to ensure that all users contribute resources, by incentivised contribution.
 
-All distributed resource sharing models require incentive mechanisms. For example, Bittorrent systems use the tit-for-tat protocol to ensure that all people downloading data are also contributing data \cite{tit_for_tat}. Such mechanisms are also required with P2P MMVEs. One advantage in designing an incentive mechanism for a P2P MMVE is that players can be made to contribute resources for the duration of play. The issues with file sharing systems are not present where a peer, after downloading a file, has no more incentive to contribute.
+All distributed resource sharing models require incentive mechanisms. For example, Bittorrent systems use the tit-for-tat protocol to ensure that all people downloading data are also contributing data \cite{tit_for_tat}. Such mechanisms are also required with P2P MMVEs. One advantage in designing an incentive mechanism for a P2P MMVE is that users can be made to contribute resources for the duration of play. The issues with file sharing systems are not present where a peer, after downloading a file, has no more incentive to contribute.
 
 \subsection{Key challenges}
 \label{key_challenges}
@@ -310,9 +308,9 @@ In a paper by Miller and Crowcroft, a packet simulator was created to determine 
 There are various security issues that are usually classified according to the level in the OSI protocol stack where they occur. The areas identified by \cite{cheat_proof_event_ordering} and expanded upon by \cite{cheating_taxonomy} are: game level, application level, protocol level and infrastructure level. The description is consistent with the generally used layered security model \cite{distributed_systems_security}.
 
 \begin{itemize}
-\item Game level cheats are ways in which a malicious player may gain an unfair advantage over other players, within the confines of the game. These cheats are usually because of software bugs and some examples are duplication and teleport cheats.
+\item Game level cheats are ways in which a malicious user may gain an unfair advantage over other users, within the confines of the game. These cheats are usually because of software bugs and some examples are duplication and teleport cheats.
 
-\item Application level cheats are where malicious players alter the game software to gain an unfair advantage. This is usually done by gaining access to the game state to which they should not have access at the current time. An example of this is ``map reveal'' cheats in strategy games, where the ``fog of war'' is removed and the player can observe all the opponent's movements. Other cheats that are used include augmenting the player's UI with extra information that allows the player to make more informed decisions.
+\item Application level cheats are where malicious users alter the game software to gain an unfair advantage. This is usually done by gaining access to the game state to which they should not have access at the current time. An example of this is ``map reveal'' cheats in strategy games, where the ``fog of war'' is removed and the user can observe all the opponent's movements. Other cheats that are used include augmenting the user's UI with extra information that allows the user to make more informed decisions.
 
 \item Protocol level cheats are cheats based on the different methods of communicating data across the system. These usually concern dropping, delaying of modifying IP packets to achieve certain outcomes in the game.
 
@@ -325,9 +323,9 @@ This is, however, an ongoing research field with many issues still open. For an 
 
 \subsubsection{Incentive mechanisms}
 
-Some proposed incentive schemes increase a player's reputation when resources are provided  \cite{classic_p2p_reputation} \cite{proactive_reputation}. This might create a type of meta game, where players try to gain as much reputation as possible. It can however be argued that this scheme does not really enforce the provisioning of resources. A player who does not want to provide resources might not see a higher reputation as sufficient incentive to provide resources.
+Some proposed incentive schemes increase a user's reputation when resources are provided  \cite{classic_p2p_reputation} \cite{proactive_reputation}. This might create a type of meta-game, where users try to gain as much reputation as possible. It can however be argued that this scheme does not really enforce the provisioning of resources. A user who does not want to provide resources might not see a higher reputation as sufficient incentive to provide resources.
 
-Other issues with incentive schemes is that sometimes players might have insufficient resources. Such players should be aided by other players with sufficient resources and not be disallowed from playing the game. When limited resources are taken into account, the issue of reporting a false amount of available resources becomes a problem. A peer that has sufficient resources, might report insufficient resources, to avoid being penalised. It is evident that there is a need for more research in this field.
+Other issues with incentive schemes is that sometimes users might have insufficient resources. Such users should be aided by other users with sufficient resources and not be disallowed from interacting with the virtual environment. When limited resources are taken into account, the issue of reporting a false amount of available resources becomes a problem. A peer that has sufficient resources, might report insufficient resources, to avoid being penalised. It is evident that there is a need for more research in this field.
 
 \subsubsection{Distributed computation}
 \label{distributed_computing_challenge}
@@ -340,7 +338,7 @@ The state of the art of state consistency techniques will be reviewed in detail 
 
 \section{Research objectives}
 
-The objective of this work is to design and develop a novel state management and persistency architecture, specifically designed for P2P MMVEs, that satisfies all P2P MMVE storage requirements and takes into account the requirements of the consistency architecture in which it will operate.
+The objective of this work is to design and develop a novel state management and persistency architecture, specifically designed for P2P MMVEs that satisfies all P2P MMVE storage requirements and takes into account the requirements of the consistency architecture in which it will operate.
 
 \section{Related work}
 \label{intro_related_work}

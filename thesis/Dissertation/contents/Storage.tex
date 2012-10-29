@@ -2,7 +2,7 @@
 \label{p2p_MMVE_state_persistency}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-While the previous chapter broadly introduced all the concepts of state consistency, this chapter will focus solely on state management and state persistency in P2P MMVEs. State management and persistency in P2P MMVEs respectively allow for the short- and long term storage of game data. The fact that game data are now distributed amongst various peers in the network creates challenges not usually present in classic C/S MMVEs.
+While the previous chapter broadly introduced all the concepts of state consistency, this chapter will focus solely on state management and state persistency in P2P MMVEs. State management and persistency in P2P MMVEs respectively allow for the short- and long term storage of environment data. The fact that environment data are now distributed amongst various peers in the network creates challenges not usually present in classic C/S MMVEs.
 
 This chapter classifies the techniques used in documented P2P MMVE architectures and discusses the advantages and disadvantages of the different types of storage. The chapter also shows that no current storage type is well suited to P2P MMVEs.
 
@@ -36,7 +36,7 @@ This section introduces the classic state management and persistency architectur
 \subsection{Sharding}
 \label{sharding}
 
-A storage model where the VE state is duplicated over multiple servers, with players connecting to one of these servers is termed ``sharding''. For all practical purposes, this approach is still merely a C/S approach, with players forced into a specific C/S environment. Each shard hosts the global authoritative state and thus state management and persistency is performed centrally by the shard server, where all objects are stored.
+A storage model where the VE state is duplicated over multiple servers, with users connecting to one of these servers is termed ``sharding''. For all practical purposes, this approach is still merely a C/S approach, with users forced into a specific C/S environment. Each shard hosts the global authoritative state and thus state management and persistency is performed centrally by the shard server, where all objects are stored.
 
 \subsubsection{Advantages}
 
@@ -47,34 +47,34 @@ Sharding has the following advantages:
 
 \item It is relatively simple to implement, because no inter-server communication is required and no server migration is supported.
 
-\item It allows for a relatively small environment to support many players because of the duplication of the worlds. This reduces the load on level designers and content designers, who now have to populate a much smaller world with content.
+\item It allows for a relatively small environment to support many users because of the duplication of the worlds. This reduces the load on level designers and content designers, who now have to populate a much smaller world with content.
 \end{itemize}
 
 \subsubsection{Disadvantages}
 
 Sharding has the following disadvantages:
 \begin{itemize}
-\item Clients are not able to interact or communicate with players on other shards, which reduces game immersion.
+\item Clients are not able to interact or communicate with users on other shards, which reduces game immersion.
 
-\item Players are not able to enter a shard if that shard has reached its capacity. In the past, this has caused unhappiness amongst players, since popular shards could be difficult to log in to. Players are also reluctant to move to a new shard, because a lot of time is invested in their characters in their ``home'' shard.
+\item Users are not able to enter a shard if that shard has reached its capacity. In the past, this has caused unhappiness amongst users, since popular shards could be difficult to log in to. Users are also reluctant to move to a new shard, because a lot of time is invested in their characters in their ``home'' shard.
 
 \item Inefficient resource allocation occurs, as one shard may be overpopulated while another is underpopulated.
 \end{itemize}
 
 \subsection{Replication-based}
 %Redundant
-The replication-based model is similar to sharding, with the difference that all servers share the same duplicated game state. Each server contains the global game state and clients connect to any one of these servers (mirror-servers \cite{mirrored_server}) or through a load distribution algorithm to a server (proxy-servers \cite{proxy_server_dist}).
+The replication-based model is similar to sharding, with the difference that all servers share the same duplicated environment state. Each server contains the global environment state and clients connect to any one of these servers (mirror-servers \cite{mirrored_server}) or through a load distribution algorithm to a server (proxy-servers \cite{proxy_server_dist}).
 Each server handles all actions from clients and updates its own database. The servers in turn send updates to each other over a high quality link, such as fibre, to maintain database consistency at high speeds.
 
 \subsubsection{Advantages}
 
-The replication-based scheme improved upon sharding in that users are now part of the same virtual world. In order to enable the virtual world to host more players, more servers may be added.
+The replication-based scheme improved upon sharding in that users are now part of the same virtual world. In order to enable the virtual world to host more users, more servers may be added.
 
 \subsubsection{Disadvantages}
 
-The problem with this system is that two users standing next to each other in the virtual world, might be on different servers and, therefore, experience two slightly different worlds. Players are more likely to interact with other player who are close to them, than players who are far away. For this interaction to occur, the messages might now have to traverse servers. Sending a message to another server is a much more expensive operation than transferring information between two users within the same server. This required a message to be sent to another server, as opposed to an internal signal within the same server.
+The problem with this system is that two users standing next to each other in the virtual world, might be on different servers and, therefore, experience two slightly different worlds. Users are more likely to interact with other users who are close to them, than users who are far away. For this interaction to occur, the messages might now have to traverse servers. Sending a message to another server is a much more expensive operation than transferring information between two users within the same server. This required a message to be sent to another server, as opposed to an internal signal within the same server.
 
-The single shared database still limits the number of concurrent players that can connect to the world.
+The single shared database still limits the number of concurrent users that can connect to the world.
 
 \subsection{Zone or region-based}
 %Zone-based
@@ -82,34 +82,34 @@ The zone-based (also called region-based) storage model divides the virtual worl
 
 \subsubsection{Advantages}
 
-The advantage of region-based state management is that all players who are close to each other are likely to be hosted on the same server. Users interaction on the same server are more responsive and require less overhead than user interactions between servers.
+The advantage of region-based state management is that all users who are close to each other are likely to be hosted on the same server. Users interaction on the same server are more responsive and require less overhead than user interactions between servers.
 
 \subsubsection{Disadvantages}
 
-The disadvantage of the static region approach is that it does not scale well when one region is suddenly populated with users. This type of behaviour happens quite regularly and is known as flocking \cite{flocking}. When players find something of interest in a region, many players will flock to that region. The solution to flocking has been over provisioning of resources to handle peak loads. When peak loads do not occur, the over provisioned hardware is, however, wasted.
+The disadvantage of the static region approach is that it does not scale well when one region is suddenly populated with users. This type of behaviour happens quite regularly and is known as flocking \cite{flocking}. When users find something of interest in a region, many users will flock to that region. The solution to flocking has been over provisioning of resources to handle peak loads. When peak loads do not occur, the over provisioned hardware is, however, wasted.
 
 If servers become overloaded, while others have resources to spare, some servers may have to be brought off-line to balance region load amongst the over-loaded and under-loaded servers. This will cause the VE to be unavailable during that time.
 
-Dynamic regioning solves the issues related to flocking and transient loads, but this approach adds overhead and significant complexity with regards to the migration of the data and the handling of player actions while the data are in transit. No current, commercially successful, VE is known to make use of dynamic regioning.
+Dynamic regioning solves the issues related to flocking and transient loads, but this approach adds overhead and significant complexity with regards to the migration of the data and the handling of user actions while the data are in transit. No current, commercially successful, VE is known to make use of dynamic regioning.
 
 \subsection{Object-based}
 
-The object-based storage model equally distributes all in-game objects amongst the servers \cite{object_based_consistency1}, \cite{object_based_consistency2}, \cite{object_based_consistency3}. For an MMVE, most of these objects are expected to be player objects.
+The object-based storage model equally distributes all virtual objects amongst the servers \cite{object_based_consistency1}, \cite{object_based_consistency2}, \cite{object_based_consistency3}. For an MMVE, most of these objects are expected to be user objects.
 
 \subsubsection{Advantages}
 
-The advantage of this method is that the system load is fixed for a certain player population and that the load is equally distributed amongst all servers. This allows for more accurate prediction and provisioning of resources, but still does not handle transient loads well.
+The advantage of this method is that the system load is fixed for a certain user population and that the load is equally distributed amongst all servers. This allows for more accurate prediction and provisioning of resources, but still does not handle transient loads well.
 
 \subsubsection{Disadvantages}
 
-The inter-server communications are random and also more than the inter-server communications for a region based system. The reason for this is that the number of player interactions increase with a decrease in the distance
-between the players. Players playing together move together, chat and interact with NPCs together. For a region based model, all player-neighbour interactions remain local to the server.
+The inter-server communications are random and also more than the inter-server communications for a region based system. The reason for this is that the number of user interactions increase with a decrease in the distance
+between users in the virtual environment. Users playing together move together, chat and interact with NPCs together. For a region based model, all user-neighbour interactions remain local to the server.
 
 \subsection{Conclusion}
 
 Examining the disadvantages and advantages of each classic storage method, the two methods that seem most promising are the region-based and object-based approaches. Sharding doesn't allow for a single world or any form of load balancing and replication-based schemes still have the single database as a bottleneck.
 
-Because of the advantages of region-based storage, it has become a popular storage architecture to employ for online worlds. Most worlds can be divided into regions and the game world can be designed in such a way that region boundaries are difficult to cross and that users can only cross these boundaries when moving from one distinct area into the next. This can be done by placing high mountain ranges on region boundaries, with a single pass through the range. This prevents users from switching between regions if they stand on a region boundary. It also ensures that most users that interact, do so within the same server, which decreases inter-server communication.
+Because of the advantages of region-based storage, it has become a popular storage architecture to employ for virtual environments. Most virtual environments can be divided into regions and the virtual environment can be designed in such a way that region boundaries are difficult to cross and that users can only cross these boundaries when moving from one distinct area into the next. This can be done by placing high mountain ranges on region boundaries, with a single pass through the range. This prevents users from switching between regions if they stand on a region boundary. It also ensures that most users that interact, do so within the same server, which decreases inter-server communication.
 
 An issue with the region-based approach, compared to the object-based approach is that each region contains many users and, therefore, requires a large server to host a region. Some region-based servers are themselves server clusters to handle the client load. An object-based server on the other has a fixed load, which can be determined based on the number of objects each server stores.
 Because of the success of the object-based and region-based storage schemes, P2P storage schemes are also based on either of the two. Because peers are less powerful than servers, the object-based approach seems to have gained more traction, since server load is fixed. If a region-based approach is used, peers are required to host large regions, which might overload them. If a the region is made too small, the amount of inter-peer communication might become prohibitive.
@@ -126,9 +126,9 @@ The key challenges related to P2P MMVE storage models are: fairness, overhead, r
 \label{scalability_req}
 Scalability underpins all evaluation criteria. This implies that for a system to be scalable, all other evaluation criteria should be satisfied for large numbers of peers and data. For this reason, scalability will not be explicitly reviewed in the following storage types. Rather, all other evaluation criteria will be evaluated for a large number of peers, thereby taking into account scalability.
 
-The question of what constitutes a large number of peers arises. To establish what an adequate number of peers is, current MMVE architectures can be used for inspiration. \emph{It is proposed that to classify a system as sufficiently scalable, 2500 peers is the smallest number of peers that a system must accommodate}. This is the number of players per server (realm), currently supported by most active C/S MMVEs. For a system to be classified as \emph{truly scalable}, it is believed that the architecture should support 60,000 concurrent users, twenty times more than a sufficiently scalable system. This is the number of peak concurrent users (PCUs) currently supported by the super computer used to host Eve Online \cite{eve_pcu}. These two measures will ensure that a system is as scalable as other currently available architectures.
+The question of what constitutes a large number of peers arises. To establish what an adequate number of peers is, current MMVE architectures can be used for inspiration. \emph{It is proposed that to classify a system as sufficiently scalable, 2500 peers is the smallest number of peers that a system must accommodate}. This is the number of users per server (realm), currently supported by most active C/S MMVEs. For a system to be classified as \emph{truly scalable}, it is believed that the architecture should support 60,000 concurrent users, twenty times more than a sufficiently scalable system. This is the number of peak concurrent users (PCUs) currently supported by the super computer used to host Eve Online \cite{eve_pcu}. These two measures will ensure that a system is as scalable as other currently available architectures.
 
-For systems that will support the MMVEs of the future, it is believed that a target of 1 million peers should be used. This number is sixteen times that of a truly scalable system and the peak concurrent player count of World of Warcraft in China in 2008 \cite{WoW_china_pcu}. Systems that will support these numbers can be classified as \emph{highly scalable}. It is important to note that no current systems support such a large PCU count on a single server cluster. The PCU count presented for WoW is the PCU count over all server clusters hosting WoW in China \cite{WoW_china_pcu}.
+For systems that will support the MMVEs of the future, it is believed that a target of 1 million peers should be used. This number is sixteen times that of a truly scalable system and the peak concurrent user count of World of Warcraft in China in 2008 \cite{WoW_china_pcu}. Systems that will support these numbers can be classified as \emph{highly scalable}. It is important to note that no current systems support such a large PCU count on a single server cluster. The PCU count presented for WoW is the PCU count over all server clusters hosting WoW in China \cite{WoW_china_pcu}.
 
 \subsection{Fairness}
 \label{fairness_requirement}
@@ -137,7 +137,7 @@ Ensuring fairness in the system means distributing load evenly according to the 
 
 Fairness does not exclude heterogeneity of nodes. It is accepted that nodes have different amounts of available resources. It also does not exclude node specialisation. It is accepted that some P2P architectures require specialised nodes or require a set of different types of super peers to function. Fairness merely states that when all node contributions are added, the sum of all node contributions should be equal.
 
-\emph{Fairness can be evaluated by evaluating the distribution of game state amongst all nodes in the P2P network.} This can be measured at a file level, i.e. what is the standard deviation of the number of files contained on each node, or on byte level, i.e. what is the standard deviation of the number of bytes stored on each node. A lower standard deviation will point to a fairer data storage scheme, if it is assumed that all nodes should contribute an equal amount of storage.
+\emph{Fairness can be evaluated by evaluating the distribution of virtual objects amongst all nodes in the P2P network.} This can be measured at a file level, i.e. what is the standard deviation of the number of files contained on each node, or on byte level, i.e. what is the standard deviation of the number of bytes stored on each node. A lower standard deviation will point to a fairer data storage scheme, if it is assumed that all nodes should contribute an equal amount of storage.
 
 \subsection{Reliability}
 
@@ -179,7 +179,7 @@ In this section four approaches to state persistency in P2P MMVEs is discussed: 
 Two other types of storage sometimes described in P2P MMVEs papers are \emph{centralised storage} and \emph{individual storage}. Centralised storage is storage in a centralised database, the same as for a C/S MMVE \cite{badumna_engine}, \cite{rooney_centralised_storage}, \cite{hybrid_p2p_cs_centralised}. Centralised storage for an MMVE requires the same large expensive servers and high bandwidth as required by a classic C/S architecture and therefore does not fit into the P2P MMVE paradigm. For this reason, centralised storage will not be evaluated in this chapter.
 
 %Individual storage
-With individual storage, player data are stored on a player's own computer  \cite{individual_storage1}, \cite{cheat_proof_playout}. These architectures do not address the storage of NPC state or mutable objects. These objects cannot be as easily mapped to a single peer in the network as player state can and, therefore, require a mapping mechanism to decide where to host these objects. Although individual storage will not be explicitly discussed in this chapter, it can be regarded as a subset of distance-based storage, which will be discussed in detail in Section \ref{distance_based_storage}.
+With individual storage, user data are stored on a user's own computer  \cite{individual_storage1}, \cite{cheat_proof_playout}. These architectures do not address the storage of NPC state or mutable objects. These objects cannot be as easily mapped to a single peer in the network as user state can and, therefore, require a mapping mechanism to decide where to host these objects. Although individual storage will not be explicitly discussed in this chapter, it can be regarded as a subset of distance-based storage, which will be discussed in detail in Section \ref{distance_based_storage}.
 
 \begin{table}[htbp]
 \centering
@@ -208,20 +208,20 @@ A mechanism is required for selecting a super peer for the region as well as mig
 
 \subsubsection{Fairness}
 %Super peer storage - issues
-The super peer storage model has many potential issues, of which overloading of the super peer is one. A super peer could be relatively easily overloaded if a region becomes too crowded, since a super peer is usually a personal computer of some player in the game and not a specialised server.
+The super peer storage model has many potential issues, of which overloading of the super peer is one. A super peer could be relatively easily overloaded if a region becomes too crowded, since a super peer is usually a personal computer of some user in the virtual environment and not a specialised server.
 
 Super peer storage is not fair, since a peer with extra resources is expected to act as super peer to the region whilst other users do not contribute storage. This is contrary to the principle of P2P, where all peers contribute resources.
 
 \subsubsection{Reliability}
 \label{super_peer_storage_reliability}
 
-In a P2P network, with a high rate of churn, players are expected to constantly leave and join the network. This requires that redundancy mechanisms have to be developed that would ensure state data are always available, even when a super peer leaves the network. A possible solution is having redundant super peers in each region that take over hosting responsibility when the main super peer leaves.
+In a P2P network, with a high rate of churn, users are expected to constantly leave and join the network. This requires that redundancy mechanisms have to be developed that would ensure state data are always available, even when a super peer leaves the network. A possible solution is having redundant super peers in each region that take over hosting responsibility when the main super peer leaves.
 
 It is important that the main and backup super peers always possess consistent states, even during a transition from main to backup. Other schemes to support improved reliability deal with reputation mechanisms for super peers. Super peers that have more resources and stay in the network longer are preferred during super peer selection, using reputation mechanisms \cite{fan_mediator_paper}.
 
 \subsubsection{Security}
 
-Super peer storage is not secure, since a single peer stores all game state of the region. If a single peer is allowed to house the player information of a large group of players, it might become possible for such a peer to maliciously modify the data. The issue is not only that modification of the data might be possible, but also that it would be impossible for the cheating to be detected, because of no centralised logging. Locally obtaining access to data will circumvent the protections created by a certification system, which would then pose a threat to all security objectives protected by the certification system as mentioned in Section \ref{characteristics_security}.
+Super peer storage is not secure, since a single peer stores all environment state of the region. If a single peer is allowed to house the user information of a large group of users, it might become possible for such a peer to maliciously modify the data. The issue is not only that modification of the data might be possible, but also that it would be impossible for the cheating to be detected, because of no centralised logging. Locally obtaining access to data will circumvent the protections created by a certification system, which would then pose a threat to all security objectives protected by the certification system as mentioned in Section \ref{characteristics_security}.
 
 A scheme that would improve the security of this systems has been proposed, where every event is also sent to the backup super peer of the region \cite{past_storage_focus}. The main super peer responds with the update and the backup super peer responds with a hash of the update. A peer can then check whether the hashes match to determine whether the data has been received correctly. A hash is not the state update itself, so will be smaller, but the events that have to be sent to all super peers will increase traffic in the network and bandwidth usage by peers.
 
@@ -234,7 +234,7 @@ The advantage of super peer storage is its responsiveness. All data are stored o
 Knuttson et al. \cite{knutsson_p2p_first} employ regional super peers called ``coordinators'', to host all shared object states. The coordinator is chosen as the peer whose ID is closest to that of the region ID. The region ID is a SHA-1 hash of the region's textual name \cite{SHA}. This mapping makes it unlikely that the coordinator will be a member of the region. The advantages of such a selection scheme is that the opportunities for cheating are reduced, because the data are hosted on a peer that has no or little interest in the data, as described in Section
 \ref{distance_based_storage_security}.
 
-Coordinator hand-offs also occur less than if the coordinator was an elected member of the region. If this is the case, a new coordinator has to be chosen every time the current coordinator leaves the region. In this scheme, hand-offs only occur as a result of network churn, which is far lower than the number of players moving from one region to another.
+Coordinator hand-offs also occur less than if the coordinator was an elected member of the region. If this is the case, a new coordinator has to be chosen every time the current coordinator leaves the region. In this scheme, hand-offs only occur as a result of network churn, which is far lower than the number of users moving from one region to another.
 
 Reliability is achieved by maintaining backup coordinators as the Distributed Hash Table (DHT) neighbours of each region coordinator. One method by which redundant region coordinators are maintained in \cite{knutsson_p2p_first}, is to create backup coordinators on peers with IDs closest to the current coordinator. This means that if the main coordinator fails, all data will automatically be routed to the backup, because of the feature of DHTs. This method is similar to how reliability is achieved in overlay storage as described in Section \ref{overlay_storage_reliability}.
 
@@ -247,7 +247,7 @@ It should also be noted that the required number of replicas will be a function 
 \subsection{Overlay storage}
 \label{overlay_storage}
 
-Overlay storage is classified as using any type of structured P2P overlay to store data in a distributed fashion. This is a very broad definition, which basically encompasses any P2P distributed storage currently in use. Some examples and a comparison of different distributed storage techniques can be found in \cite{Hasan_distributed_storage_survey}. The reasoning is that any P2P distributed storage can be used to only store game files. Therefore, distributed storage is used as a distributed database for game files.
+Overlay storage is classified as using any type of structured P2P overlay to store data in a distributed fashion. This is a very broad definition, which basically encompasses any P2P distributed storage currently in use. Some examples and a comparison of different distributed storage techniques can be found in \cite{Hasan_distributed_storage_survey}. The reasoning is that any P2P distributed storage can be used to only store virtual objects. Therefore, distributed storage is used as a distributed database for virtual objects.
 
 \subsubsection{Reliability}
 \label{overlay_storage_reliability}
@@ -283,10 +283,10 @@ In 2004, Merabti and El Rhalibi mention the issue of ``Data Storage'' \cite{usin
 al. implement a workable solution for state persistency in 2005.
 
 %Douglas, 2005 \cite{Douglas05enablingmassively}
-Douglas et al. designed a P2P MMVE architecture in 2005 \cite{Douglas05enablingmassively} and implemented state persistency using a distributed storage implementation, which they developed in 2003 \cite{Harwood03hashingspatial}. The storage system allows for the manipulation of spatial data, while also implementing range queries. This enables the system to store and retrieve data that exist in a certain area of the game world. In the MMVE architecture they developed, state persistency is implemented by the ``Spatial Data Service'' (SDS), which is a distributed storage architecture that uses the Chord P2P overlay for routing \cite{chord}.
+Douglas et al. designed a P2P MMVE architecture in 2005 \cite{Douglas05enablingmassively} and implemented state persistency using a distributed storage implementation, which they developed in 2003 \cite{Harwood03hashingspatial}. The storage system allows for the manipulation of spatial data, while also implementing range queries. This enables the system to store and retrieve data that exist in a certain area of the virtual environment. In the MMVE architecture they developed, state persistency is implemented by the ``Spatial Data Service'' (SDS), which is a distributed storage architecture that uses the Chord P2P overlay for routing \cite{chord}.
 
 %Hampel, 2006 \cite{past_storage_focus}
-PAST has become a popular way to implement state persistency. This is the approach proposed by both Hampel et al. in 2006 \cite{past_storage_focus} as well as Fan in 2009 \cite{Fan_phd}. In these publications, it is said that PAST is used to store the global game state, but never is detailed what is stored and how regularly it is stored. Player information is supposed to be stored as game state, but from the papers it is unclear how position updates are handled. It is not clear whether the last position of a player is stored at all or how regularly it is stored. It is important to know how position updates are handled in the game, since position updates are the most common type of update \cite{knutsson_p2p_first}.
+PAST has become a popular way to implement state persistency. This is the approach proposed by both Hampel et al. in 2006 \cite{past_storage_focus} as well as Fan in 2009 \cite{Fan_phd}. In these publications, it is said that PAST is used to store the global virtual environment state, but never is detailed what is stored and how regularly it is stored. User information is supposed to be stored as virtual environment state, but from the papers it is unclear how position updates are handled. It is not clear whether the last position of a user is stored at all or how regularly it is stored. It is important to know how position updates are handled in the virtual environment, since position updates are the most common type of update \cite{knutsson_p2p_first}.
 
 PAST has not gained much commercial adoption, because of the lack of support for keyword searches, which is a requirement of most distributed storage networks, where users constantly search for content. Keyword searches are, however, not required by the storage mechanism of an MMVE. The IDs of the items stored in the network will be known. A player's inventory can, for example, always be called \verb.(player_name)_inventory.. A hash of this file name will find the correct file. This, and the use of Scribe, is why PAST has become popular with researchers of P2P MMVEs.
 
@@ -295,7 +295,7 @@ PAST \cite{PAST_storage} uses Pastry to implement a distributed storage system. 
 In an effort to increase responsiveness, PAST also employs caching techniques \cite{storage_and_chaching_PAST}. If a peer forwards many queries for a file, that peer can elect to cache the file to improve the responsiveness of the system. This caching can only occur if the peer has space available. If a peer has cached a file and another file is explicitly inserted into the peer, it can elect to remove the cached file in order to free up space. This means that the success of the caching mechanism is directly related to the level of storage utilisation. Higher utilisation will prevent files
 from being cached.
 
-The main difference between the implementation by Douglas et al. and the PAST implementations, is that the former supports range queries on spatial data, which allows for a set of objects to be returned, queried by their virtual in-game position. With PAST, the exact ID of an object is required before it may be retrieved. Using PAST is the simplest means by which game state persistency may be implemented, but PAST is not necessarily the application best suited to game state persistency. There exists a need for more research into appropriate state persistency mechanisms for P2P MMVEs.
+The main difference between the implementation by Douglas et al. and the PAST implementations, is that the former supports range queries on spatial data, which allows for a set of objects to be returned, queried by their virtual position. With PAST, the exact ID of an object is required before it may be retrieved. Using PAST is the simplest means by which environmental state persistency may be implemented, but PAST is not necessarily the application best suited to environmental state persistency. There exists a need for more research into appropriate state persistency mechanisms for P2P MMVEs.
 
 \subsection{Hybrid region-based storage}
 \label{hybrid_storage}
@@ -340,11 +340,11 @@ The issue of fairness is also still present in hybrid storage. The system is fai
  \label{fig_zoned_federation_model}
 \end{figure}
 %
-The first hybrid state persistency model for P2P MMVEs was proposed by Iimura et al. in 2004 \cite{zoned_federation} and called the ``Zoned Federation Model'', shown in Figure \ref{fig_zoned_federation_model}. The regional super peers are called ``Zone Owners'', which handle all events by clients in their zone or region. In the Zoned Federation model, a Zone Owner acts as the primary storage medium for all object states in the zone or region. As shown in Figure \ref{fig_cs_region_o_cm}, this is analogous to an update based model, divided into zones. The difference here is that the game state of all zone owners are regularly backed-up to overlay storage. The zoned federation model can thus be seen as a super peer/overlay storage hybrid. The super peers storage provides for low latency data storage and the overlay storage provides security and reliability.
+The first hybrid state persistency model for P2P MMVEs was proposed by Iimura et al. in 2004 \cite{zoned_federation} and called the ``Zoned Federation Model'', shown in Figure \ref{fig_zoned_federation_model}. The regional super peers are called ``Zone Owners'', which handle all events by clients in their zone or region. In the Zoned Federation model, a Zone Owner acts as the primary storage medium for all object states in the zone or region. As shown in Figure \ref{fig_cs_region_o_cm}, this is analogous to an update based model, divided into zones. The difference here is that the environmental state of all zone owners are regularly backed-up to overlay storage. The zoned federation model can thus be seen as a super peer/overlay storage hybrid. The super peers storage provides for low latency data storage and the overlay storage provides security and reliability.
 
-An extended abstract, published by GauthierDickey et al. in 2004 \cite{hybrid_storage1}, proposed to distinguish between permanent and ephemeral data. Permanent data are described as data that should exist at all times and ephemeral data are described as data that need only exist for as long as its owner is in the game. An item, being dropped by a dispatched NPC, can be considered as ephemeral. When the peer on which the data is hosted leaves the area, that item can disappear. An example of permanent data is a player's inventory contents, which can further be classified as participatory data or a player's house, which can be classified as existential data. Participatory data are data that need only be available when a specific player is in the game and existential data are data that should be available, even when a certain player is not present in the game.
+An extended abstract, published by GauthierDickey et al. in 2004 \cite{hybrid_storage1}, proposed to distinguish between permanent and ephemeral data. Permanent data are described as data that should exist at all times and ephemeral data are described as data that need only exist for as long as its owner is in the virtual environment. An item, being dropped by a dispatched NPC, can be considered as ephemeral. When the peer on which the data is hosted leaves the area, that item can disappear. An example of permanent data is a player's inventory contents, which can further be classified as participatory data or a player's house, which can be classified as existential data. Participatory data are data that need only be available when a specific player is in the virtual environment and existential data are data that should be available, even when a certain user is not present in the virtual environment.
 
-Categorising data by how long and under which circumstances the data should exist, may assist in the design of the storage model. Since ephemeral data does not have to exist after the player has left the game, it may be stored in primary memory. Participatory data might also be stored on the player's computer, but security issues will have to be kept in mind. Existential data will have to be stored somewhere other than on the player's computer, since other players will require the data, even in the absence of the player that might have left the game. GauthierDickey et al. did not explore how their data classification scheme might be translated into a state persistency model.
+Categorising data by how long and under which circumstances the data should exist, may assist in the design of the storage model. Since ephemeral data does not have to exist after the player has left the virtual environment, it may be stored in primary memory. Participatory data might also be stored on the player's computer, but security issues will have to be kept in mind. Existential data will have to be stored somewhere other than on the player's computer, since other players will require the data, even in the absence of the player that might have left the virtual environment. GauthierDickey et al. did not explore how their data classification scheme might be translated into a state persistency model.
 
 \subsection{Distance-based storage}
 \label{distance_based_storage}
@@ -355,12 +355,12 @@ Distance based approaches, such as the Voronoi storage approaches \cite{Buyukkay
 \subsubsection{Responsiveness}
 
 %Distance-based - issues
-An issue with the above reasoning is that multiple peers are usually interacting with a single object. The examples of the NPC monster and trader are again relevant. Usually many players interact with a trader NPC and usually players attack monster NPCs in groups.
+An issue with the above reasoning is that multiple peers are usually interacting with a single object. The examples of the NPC monster and trader are again relevant. Usually many users interact with a trader NPC and usually users attack monster NPCs in groups.
 
-Multiple player interactions are, however, not as big an issue as others have suggested \cite{Fan_deisgn_issues_p2p}. In the best case, the object being used by a player is also hosted on that player's peer. If another player requires use of a remotely hosted object, that player may still interact with the object, where the host peer is simply acting as a server to that player. This essentially means that every player hosting an object becomes a server for that object. In the case where a player interacts with an object hosted locally, there is no object latency. In the case where a player
+Multiple user interactions are, however, not as big an issue as others have suggested \cite{Fan_deisgn_issues_p2p}. In the best case, the object being used by a user is also hosted on that user's peer. If another user requires use of a remotely hosted object, that user may still interact with the object, where the host peer is simply acting as a server to that user. This essentially means that every user hosting an object becomes a server for that object. In the case where a user interacts with an object hosted locally, there is no object latency. In the case where a user
 accesses a remotely hosted object, there is only one hop latency, the same as with a C/S or super peer application.
 
-Issues with this approach stem from the fact the players are constantly moving. When players move, the objects in their regions change. Authoritative objects, therefore, have to be constantly transferred from one peer to another, which might cause significant network traffic. An object in transit might also delay interaction with that object. Because object transfer introduces overhead into the system, how regularly an object has to be transferred and whether the number of transferrals produce sufficiently low overhead to implement a real-time game, still have to be investigated.
+Issues with this approach stem from the fact the users are constantly moving. When users move, the objects in their regions change. Authoritative objects, therefore, have to be constantly transferred from one peer to another, which might cause significant network traffic. An object in transit might also delay interaction with that object. Because object transfer introduces overhead into the system, how regularly an object has to be transferred and whether the number of transferrals produce sufficiently low overhead to implement a real-time virtual environment, still have to be investigated.
 
 Voronoi-based storage schemes also become unresponsive when communications are no longer between neighbours, but between two arbitrary peers in the
 Voronoi overlay. When such communications occur, the average required time to route a message is $\OO{N^{1/2}}$ for a two-dimensional configuration.
@@ -369,14 +369,14 @@ reduces the average routing time to $\OO{\log{(N)}}$, the same as for overlay st
 
 \subsubsection{Reliability}
 
-Reliability, because of network churn, is still an issue. Peers will leave the network whenever a player stops playing the game, which makes it a common occurrence. When peers leave the network, the objects that are stored on that peer should still be accessible to other players. This will require transferring all objects contained in the leaving peer to another object, still present in the network. No literature could be found that dealt with the issue of reliability in a distance-based storage network.
+Reliability, because of network churn, is still an issue. Peers will leave the network whenever a users leaves the virtual environment, which makes it a common occurrence. When peers leave the network, the objects that are stored on that peer should still be accessible to other users. This will require transferring all objects contained in the leaving peer to another object, still present in the network. No literature could be found that dealt with the issue of reliability in a distance-based storage network.
 
 The same solution that is used for overlay storage, namely the presence of redundant peers, might also be implemented for distance storage. Another structured overlay might be used to implement this redundancy in exactly the same way it is done with hybrid storage (mentioned in Section \ref{hybrid_storage_reliability}).
 
 \subsubsection{Security}
 \label{distance_based_storage_security}
 
-The main issue with the distance based scheme is security. Peers that have the most interest in an object also have the most interest to manipulate that object in ways inconsistent with the game rules. When objects are hosted on peers that have the most interest in them, there will be a strong temptation to try and manipulate these objects. Because these modification are all local, it is also not possible to log the alterations and detect cheating. Means by which local objects can be secured have to be found or distance based algorithms with quorum need to be investigated.
+The main issue with the distance based scheme is security. Peers that have the most interest in an object also have the most interest to manipulate that object in ways inconsistent with the environment rules. When objects are hosted on peers that have the most interest in them, there will be a strong temptation to try and manipulate these objects. Because these modification are all local, it is also not possible to log the alterations and detect cheating. Means by which local objects can be secured have to be found or distance based algorithms with quorum need to be investigated.
 
 This security issue is similar to that of super peer storage, in that local data can be accessed, thus circumventing the certification system. With this circumvention, the objectives of authentication, authorisation, confidentiality, trust, privacy and identity management are all compromised.
 
@@ -388,14 +388,13 @@ Distance-based storage is relatively fair as all objects are distributed amongst
 \label{distance_based_existing_archs}
 
 %Colyseus, 2006
-Bharambe et al. created the Colyseus architecture in 2006 \cite{colyseus_distance_based}. The architecture is designed to support First Person Shooter (FPS) games and implemented to function with Quake II. Mutable game objects are stored on the peer that is nearest to the object in the game world. An ``object placer'' component is mentioned, but the details of the placement algorithm are left for future work. The architecture also does not implement non-volatile state persistency, since this is not required for normal FPS games, where object states need only exist to the end of a
-round and where players generally do not leave before the end of the round. This means that object states are only stored in primary memory, until the end of a game round.
+Bharambe et al. created the Colyseus architecture in 2006 \cite{colyseus_distance_based}. The architecture is designed to support First Person Shooter (FPS) games and implemented to function with Quake II. Mutable virtual objects are stored on the peer that is nearest to the object in the virtual environment. An ``object placer'' component is mentioned, but the details of the placement algorithm are left for future work. The architecture also does not implement non-volatile state persistency, since this is not required for normal FPS games, where object states need only exist to the end of a round and where players generally do not leave before the end of the round. This means that object states are only stored in primary memory, until the end of a game round.
 
 %Solipsis, 2008
-The Solipsis architecture was created by Frey et al. in 2008 \cite{solipsis}. The architecture uses Voronoi diagrams to create virtual regions. Stationary objects are maintained by site peers until a player picks up an object. When an object is picked up, control of that object is transferred to the player that picked up the object. The Solipsis architecture focusses on distributed physics computation and when a player gains control of an object, that player is responsible for the object's physics computations. That player should also save all object state until a new player takes the object, at which time control is transferred to her. Control can also be transferred back to a site peer if an object remains stationary for some
+The Solipsis architecture was created by Frey et al. in 2008 \cite{solipsis}. The architecture uses Voronoi diagrams to create virtual regions. Stationary objects are maintained by site peers until a user picks up an object. When an object is picked up, control of that object is transferred to the user that picked up the object. The Solipsis architecture focusses on distributed physics computation and when a user gains control of an object, that user is responsible for the object's physics computations. That user should also save all object state until a new user takes the object, at which time control is transferred to her. Control can also be transferred back to a site peer if an object remains stationary for some
 time.
 
-What differentiates the Solipsis distance-based storage from the other architectures presented in this section, is that object states are only handled by peers as long as those peers directly use an object. At other times, those objects are handled by site peers. This differs from other distance-based storage techniques, where all objects that are nearest to a player in the virtual world are controlled by that player.
+What differentiates the Solipsis distance-based storage from the other architectures presented in this section, is that object states are only handled by peers as long as those peers directly use an object. At other times, those objects are handled by site peers. This differs from other distance-based storage techniques, where all objects that are nearest to a user in the virtual world are controlled by that user.
 
 %Buyukkaya and Abdallah, 2008 and Hu et al., 2008
 In 2008, papers were published by Buyukkaya and Abdallah \cite{Buyukkaya_voronoi_state_management}, and Hu et al. \cite{Hu_voronoi_IM}, proposing to use Voronoi diagrams \cite{voronoi_diagrams_survey} to implement distance-based storage. Voronoi state management schemes host the mutable objects on the peer in which region the object exists. As peers move around in the virtual world, the Voronoi diagram has to be constantly recalculated and objects have to be moved to new owner peers as the regions in which they fall change. The significant advantage of the Voronoi approach is that peers only require connections with their neighbours, and peers within their AoI.
@@ -407,11 +406,11 @@ In 2008, papers were published by Buyukkaya and Abdallah \cite{Buyukkaya_voronoi
  \label{fig_voronoi_diagram}
 \end{figure}
 %
-Voronoi storage approaches use Voronoi diagrams to determine on which peers objects should be stored. Given a set of points, the Voronoi diagram of the set of points is the partition of the plane, which associates a region around every point in such a way that all other points contained in the region are closer to the centre point than any other point in the set. Figure \ref{fig_voronoi_diagram} shows a Voronoi diagram, where the lines define the region boundaries, the dots define the players, which make up the set of points for which the diagram was calculated, the plus signs represent mutable objects and the circle represents the AoI of a central point in the set.
+Voronoi storage approaches use Voronoi diagrams to determine on which peers objects should be stored. Given a set of points, the Voronoi diagram of the set of points is the partition of the plane, which associates a region around every point in such a way that all other points contained in the region are closer to the centre point than any other point in the set. Figure \ref{fig_voronoi_diagram} shows a Voronoi diagram, where the lines define the region boundaries, the dots define the users, which make up the set of points for which the diagram was calculated, the plus signs represent mutable objects and the circle represents the AoI of a central point in the set.
 
-For the Voronoi approaches a peer controls and hosts all objects within its Voronoi region. The reasoning is that there is a high probability that the player closest to the object is also the player using the object. Examples of this are where a player is trading or fighting with an NPC.
+For the Voronoi approaches a peer controls and hosts all objects within its Voronoi region. The reasoning is that there is a high probability that the user closest to the object is also the user using the object. Examples of this are where a player is trading or fighting with an NPC.
 
-A thesis by Chang also describes the Voronoi approach in more detail and how to achieve game state consistency amongst all peers in a Voronoi network \cite{Chang_Voronoi_state_management_masters}. What distinguishes this work from the others is the implementation of a load balancing mechanism. When peers get overloaded, another, more powerful peer is chosen as an Aggregator. The Aggregator assumes responsibility for a larger area that encompasses multiple peers. This scheme will reduce the load on peers with minimal resources, but it is uncertain how this would reduce load when peers with an average number of resources in an area become overloaded.
+A thesis by Chang also describes the Voronoi approach in more detail and how to achieve state consistency amongst all peers in a Voronoi network \cite{Chang_Voronoi_state_management_masters}. What distinguishes this work from the others is the implementation of a load balancing mechanism. When peers get overloaded, another, more powerful peer is chosen as an Aggregator. The Aggregator assumes responsibility for a larger area that encompasses multiple peers. This scheme will reduce the load on peers with minimal resources, but it is uncertain how this would reduce load when peers with an average number of resources in an area become overloaded.
 
 The works by Buyukkaya and Abdallah, Hu et al., and Chang form part of the VAST project, which is being created to be a fully functional P2P overlay architecture, using Voronoi diagrams as its basis \cite{VAST}. The reason why state persistency in Voronoi-based P2P MMVEs architectures are mostly distance-based approaches, is because the Voronoi diagram immediately identifies which objects are closest to a particular peer, and therefore, which objects that peer has to host. Architectures not making use of Voronoi diagrams still require some other mechanism to allocate object hosting to peers.
 
@@ -419,12 +418,12 @@ The works by Buyukkaya and Abdallah, Hu et al., and Chang form part of the VAST 
 
 After providing an overview of the classic C/S and C/MS state persistency techniques, the chapter classified P2P MMVE state persistency techniques into super peer based, overlay based, distance based and hybrid storage. The advantages and disadvantages of each method were discussed after identifying key challenges that state persistency techniques have to solve. These challenges are: fairness, overhead, reliability, responsiveness, scalability and security.
 
-Supper peer storage can be seen as a C/S type storage implementation, where every region has a super peer that stores all data for that region. Overlay storage is a fully distributed, P2P approach to storage, where every peer stores data as part of a P2P overlay network. Hybrid region based storage combines super peer and overlay storage to improve the overall storage performance. Distance based storage is a different paradigm that stores game objects on the nearest peer to that game object. This type of storage is usually characterised by the use of Voronoi diagrams to
+Supper peer storage can be seen as a C/S type storage implementation, where every region has a super peer that stores all data for that region. Overlay storage is a fully distributed, P2P approach to storage, where every peer stores data as part of a P2P overlay network. Hybrid region based storage combines super peer and overlay storage to improve the overall storage performance. Distance based storage is a different paradigm that stores virtual objects on the nearest peer to that virtual object. This type of storage is usually characterised by the use of Voronoi diagrams to
 determine which peers are nearest to which objects.
 
 Super peer storage is characterised by its high level of responsiveness and ease of implementation. Overlay storage is characterised by its high level of fairness and reliability. Hybrid region-based storage combines the two previous schemes and has high levels of reliability and responsiveness. Distance based storage is also very responsive and can be made both reliable and fair.
 
-Security is still an issue for all storage types. Super peer storage has the issues that are usually present in a centralised system, namely low fairness, security and also not being reliable and not resistant to failure. The main issue with overlay storage is its unresponsiveness, because of the routing delay in the P2P overlay. Hybrid storage suffers from the disadvantages of super peer storage, namely low fairness and security, due to all files still stored on super peers. The main issue of distance based storage is security, because players that have the most incentive to alter object states own those objects.
+Security is still an issue for all storage types. Super peer storage has the issues that are usually present in a centralised system, namely low fairness, security and also not being reliable and not resistant to failure. The main issue with overlay storage is its unresponsiveness, because of the routing delay in the P2P overlay. Hybrid storage suffers from the disadvantages of super peer storage, namely low fairness and security, due to all files still stored on super peers. The main issue of distance based storage is security, because users that have the most incentive to alter object states own those objects.
 
 Distance based storage is still fairly immature, but shows a lot of promise. No publicly available implementation could be found for this type of storage. Where this type of storage was used, it was explained as distance based storage, but most of the details were left out. Distance-based storage holds the most promise to fulfill all P2P MMVE requirements.
 

@@ -54,7 +54,7 @@ This section will describe how the design of Pithos satisfies the identified sto
 
 \subsection{Responsiveness}
 
-In Pithos, responsiveness is achieved by grouping players into fully connected groups, using group-based distance-based storage to distribute objects and using replication to enable the parallel retrieval of objects.
+In Pithos, responsiveness is achieved by grouping users into fully connected groups, using group-based distance-based storage to distribute objects and using replication to enable the parallel retrieval of objects.
 
 \subsubsection{Group storage}
 
@@ -242,11 +242,11 @@ Each peer and super peer in the network contain a group ledger to keep track of 
 
 In order for Pithos to build group, a clustering mechanism is required. There already exists a wealth of clustering algorithms in literature and a few will be reviewed here.
 
-\emph{Distributed peer clustering techniques}: use the distance between users in the virtual environment to dynamically group players. The main idea of flocking is that players move around in groups, rather than randomly on their own. It is desirable that user density within groups should remain constant, because a fully distributed architecture is not scalable. This means that groups should merge or split as the user density within them change. It might also be required to have mobile groups, where a group has a velocity as well as a position, to be able to uniquely identify groups, even with players joining and leaving and the group moving through the virtual world.
+\emph{Distributed peer clustering techniques}: use the distance between users in the virtual environment to dynamically group users. The main idea of flocking is that users move around in groups, rather than randomly on their own. It is desirable that user density within groups should remain constant, because a fully distributed architecture is not scalable. This means that groups should merge or split as the user density within them change. It might also be required to have mobile groups, where a group has a velocity as well as a position, to be able to uniquely identify groups, even with users joining and leaving and the group moving through the virtual world.
 
 Affinity propagation clusters nodes using a similarity matrix to find similar nodes \cite{affinity_propagation}. The similarity matrix may contain user positions. In this case, affinity propagation will group nodes depending on their location in a virtual world. This algorithm might be well suited to P2P applications, since it is a distributed clustering algorithm based on message passing.
 
-\emph{Dynamic regioning}: divides the virtual world into regions that can be resized or further divided to maintain constant player densities across regions. SOSPS \cite{self_organising_sps_post} creates dynamic regions based on a Voronoi overlay network \cite{voronoi_diagrams_survey}. Near constant user density is achieved by increasing and decreasing the area sizes. This system is based on VON, a distributed Voronoi overlay network designed for MMVEs \cite{VON_VAST}.
+\emph{Dynamic regioning}: divides the virtual world into regions that can be resized or further divided to maintain constant user densities across regions. SOSPS \cite{self_organising_sps_post} creates dynamic regions based on a Voronoi overlay network \cite{voronoi_diagrams_survey}. Near constant user density is achieved by increasing and decreasing the area sizes. This system is based on VON, a distributed Voronoi overlay network designed for MMVEs \cite{VON_VAST}.
 
 Clustering is also used in mobile ad-hoc networks (MANETs) for routing purposes. Mobile-aware clustering algorithms used in MANETs, might also be applicable to P2P MMVEs \cite{clustering_survey}. Mobile-aware clustering uses relative velocities of mobile nodes to define clusters containing nodes with low relative velocity to each other.
 
@@ -255,9 +255,9 @@ Any of the above mentioned techniques might be used to achieve distributed clust
 \subsubsection{Distance-based storage mechanism}
 \label{distance_based_design}
 
-For Pithos to succeed as an MMVE storage architecture, intra-group data requests should be preferred to inter-group data requests. This requirement, combined with the fact that the grouping algorithm geographically groups players in the virtual world, lends Pithos to a storage system based on distance-based storage. Similar to interest management, the assumption is that players have a limited area of interest and require interaction with a limited number of objects within range.
+For Pithos to succeed as an MMVE storage architecture, intra-group data requests should be preferred to inter-group data requests. This requirement, combined with the fact that the grouping algorithm geographically groups users in the virtual world, lends Pithos to a storage system based on distance-based storage. Similar to interest management, the assumption is that users have a limited area of interest and require interaction with a limited number of objects within range.
 
-Distance-based storage is implemented on a group level rather than an individual level, which means that objects are stored on the nearest group of players, rather than the nearest user. It is assumed that such an approach will alleviate the security and reliability challenges present in distance-based storage \cite{gilmore_p2p_mmog_state_persistency}.
+Distance-based storage is implemented on a group level rather than an individual level, which means that objects are stored on the nearest group of users, rather than the nearest user. It is assumed that such an approach will alleviate the security and reliability challenges present in distance-based storage \cite{gilmore_p2p_mmog_state_persistency}.
 
 With group-based distance-based storage, it is assumed that because peers now store objects closest to the group, the objects that they are interested in will most likely be stored within their own group. Therefore, most data requests should be intra-group requests. The overlay storage component ensures that nodes that require data, which are not stored within their group, are still able to access requested data.
 
@@ -327,7 +327,7 @@ Leaving repair attempts to minimise the super peer load by only repairing object
 \section{Satisfying the use cases}
 All Pithos modules and mechanisms that ensure adherence to the storage requirements have now been described. What remains to be described is how the use cases presented in Section \ref{use_cases_goals} are designed on the architecture that adheres to the storage requirements.
 
-It is assumed that some higher layer exists above Pithos, which generates requests. According to our generic consistency model, these requests will arrive from the game logic or object updater. It should be noted that a request can be a storage, retrieval, modification or removal request and does not only imply a request for data, i.e. a retrieval request.
+It is assumed that some higher layer exists above Pithos, which generates requests. According to our generic consistency model, these requests will arrive from the environment logic or object updater. It should be noted that a request can be a storage, retrieval, modification or removal request and does not only imply a request for data, i.e. a retrieval request.
 
 \subsection{Store}
 \label{pithos_store}

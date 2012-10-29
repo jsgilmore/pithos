@@ -1,32 +1,38 @@
 
 \chapter*{Abstract}
-Recently, there has been significant research focus on Peer-to-Peer (P2P) Massively Multiuser Virtual Environments (MMVEs). A number of architectures have been presented in the literature to implement the P2P approach. One aspect that has not received sufficient attention in these architectures is state management and state persistency in P2P MMVEs. This work presents a novel state management and persistency architecture. In order to design the architecture, an investigation if performed into state consistency architectures, into which the state management and persistency architecture should fit. A novel generic state consistency model is proposed that encapsulated all state consistency models reviewed. The requirements for state management and persistency architectures, identified during the review of state consistency models, are used to review state management and consistency architecture currently receiving research attention.
+Recently, there has been significant research focus on Peer-to-Peer (P2P) Massively Multi-user Virtual Environments (MMVEs). A number of architectures have been presented in the literature to implement the P2P approach. One aspect that has not received sufficient attention in these architectures is state management and state persistency in P2P MMVEs. This work presents and simulates a novel state management and persistency architecture, called Pithos.
 
-Identifying some deficiencies present in current designs, a novel state management and persistency architecture, called Pithos, is designed. Pithos is a reliable, responsive, secure and fair distributed storage system, ideally suited to P2P MMVEs. Pithos is implemented in Oversim, which runs on the Omnet++ network simulator. An evaluation of Pithos is performed to verify that it satisfies the identified requirements.
+In order to design the architecture, an investigation is performed into state consistency architectures, into which the state management and persistency architecture should fit. A novel generic state consistency model is proposed that encapsulated all state consistency models reviewed. The requirements for state management and persistency architectures, identified during the review of state consistency models, are used to review state management and persistency architectures currently receiving research attention.
 
-It is found that the reliability of Pithos depends heavily on object lifetimes. If an object lives longer on average, retrieval requests are more reliable. An investigation if performed into the factors influencing object lifetime. A novel Markov chain model is proposed which allows for the prediction of objects lifetimes in any finite network, for a given amount of redundancy, node lifetime characteristics and object repair rate.
+Identifying some deficiencies present in current designs, such as lack of fairness, responsiveness and scalability, a novel state management and persistency architecture, called Pithos, is designed. Pithos is a reliable, responsive, secure, fair and scalable distributed storage system, ideally suited to P2P MMVEs. Pithos is implemented in Oversim, which runs on the Omnet++ network simulator. An evaluation of Pithos is performed to verify that it satisfies the identified requirements.
 
+It is found that the reliability of Pithos depends heavily on object lifetimes. If an object lives longer on average, retrieval requests are more reliable. An investigation is performed into the factors influencing object lifetime. A novel Markov chain model is proposed which allows for the prediction of objects lifetimes in any finite sized network, for a given amount of redundancy, node lifetime characteristics and object repair rate.
 
 \chapter*{Samevatting}
 
-Moet nog vertaal word.
+Onlangs is daar 'n beduidende navorsingsfokus op Eweknie Massiewe Multi-gebruiker Virtuele Omgewings (MMVOs). 'n Aantal argitekture is in die literatuur beskikbaar wat die eweknie benadering voorstel. Een aspek wat nie voldoende aandag ontvang in hierdie argitekture nie is toestandsbestuur en toestandsvolharding in eweknie MMVOs. Hierdie werk ontwerp en simuleer 'n nuwe toestandsbestuur- en toestandsvolhardingargitektuur genaamd Pithos.
 
+Ten einde die argitektuur te ontwerp is 'n ondersoek uitgevoer in toestandskonsekwentheidargitekture, waarin die toestandsbestuur- en toestandsvolhardingargitektuur moet pas. 'n Nuwe generiese toestandskonsekwentheidargitektuur word voorgestel wat alle hersiene toestandskonsekwentheid argitekture vervat. Die vereistes vir die toestandsbestuur- en toestandsvolhardingargitekture, geidentifiseer tydens die hersiening van die toestandskonsekwentheidargitekture, word gebruik om toestandsbestuur- en toestandsvolhardingargitekture te hersien wat tans navorsingsaandag geniet.
 
-\chapter{Acknowledgements}%==================================================
+Identifisering van sekere leemtes teenwoordig in die huidige ontwerpe, soos 'n gebrek aan regverdigheid, responsiwiteit en skaleerbaarheid, lei tot die ontwerp van 'n nuwe toestandsbestuur- en toestandsvolhardingargitektuur wat Pithos genoem word. Pithos is 'n betroubare, responsiewe, veilige, regverdige en skaleerbare verspreide stoorstelsel, ideaal geskik is vir eweknie MMVOs. Pithos word ge\"{i}mplementeer in Oversim, wat loop op die Omnet++ netwerk simulator. 'n Evaluering van Pithos word uitgevoer om te verifieer dat dit voldoen aan die ge\"{i}dentifiseerde behoeftes.
+
+Daar is gevind dat die betroubaarheid van Pithos afhang van die objek leeftyd. As 'n objek gemiddeld langer leef, dan is herwinning versoeke meer betroubaar. 'n Ondersoek word uitgevoer na die faktore wat die objek leeftyd be\"{i}nvloed. 'n Nuwe Markov ketting model word voorgestel wat voorsiening maak vir die voorspelling van objek leeftye in eindige grootte netwerke, vir gegewe hoeveelhede van oortolligheid, nodus leeftyd eienskappe en objek herstelkoers.
+
+\chapter*{Acknowledgements}%==================================================
 
 I would like to express my sincere gratitude to the following people and organisations:
 \begin{itemize}
-  \item the Holy Father, for keeping me and blessing me with so much;
   \item my promotor, Dr Herman Engelbrecht, for his continued guidance and support;
-  \item my wife, Jacki Gilmore, for her lasting love, support and understanding;
-  \item MIH for their financial aid and the opportunities they provided;
+  \item MIH, for their financial assistance towards this research and the many opportunities they provided;
   \item my parents, John and Coreen Gilmore, for making me the man I am today and making
   my studies possible;
-  \item Dr Shun-Yun Hu, Dr Gregor Shiele and Dilum Bandara, for their valuable input.
+  \item Dr Shun-Yun Hu, Dr Gregor Shiele and Dilum Bandara, for their valuable input throughout my studies;
   \item Francois van Niekerk, Peter Hayward and Rampie Bell, for all the interesting ideas, talks and feedback;
-  \item all the MIH media lab members, for making my time there so enjoyable.
+  \item all the MIH media lab members, for making my time there so enjoyable;
+  \item the Holy Father, for keeping me and blessing me with so much.
 \end{itemize}
 
+The financial assistance of the National Research Foundation (NRF) towards this research is hereby acknowledged. Opinions expressed and conclusions arrived at, are those of the author and are not necessarily to be attributed to the NRF.
 
 \chapter*{}%=======================================================
  \vfill

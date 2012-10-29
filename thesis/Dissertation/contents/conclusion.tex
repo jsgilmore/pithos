@@ -1,63 +1,119 @@
 \chapter{Conclusions and Recommendations}
 \label{chp:CONC}
 
-This work focussed on developing a state management architecture for P2P MMVEs. In order to do this, an understanding was required of P2P networks, MMVEs and what the main challenges of P2P MMVEs are.  It was found that state management and persistency is used by the consistency architecture and, therefore, that the consistency architecture implicitly specifies the storage requirements.
-
-After having identified the requirements of a state management and persistency architecture, related work was reviewed and compared against the identified requirements. This allowed us to identify areas where improvements might be made.
-
-The design of Pithos was presented in order to satisfy all identified requirements, presenting every aspect of Pithos in terms of the requirement identified. The Pithos use case was reviewed and presented as a distributed storage system and the mechanisms to implement the use cases were discussed.
-
-With the conceptual design finalised, the implementation specifics were reviewed. Pithos has been implemented as an Oversim simulation that allows for large scale simulations. Some implementation issues that were reviewed were maintaining group consistency as well as persistency in group storage. An evaluation was performed in order to verify that Pithos satisfies all the requirements originally identified.
-
-When Pithos was evaluated for various churn levels and repair rates, it was seen that many factors influence reliability. The factors influencing reliability were found to be directly related to expected object lifetime. A Markov chain model was developed to allow for the prediction of expected object lifetimes. It was found that the literature reviewed assumed an infinite network size and does not take limited network sizes into account. Comparing our model with simulation results, it was found that finite group sizes does affect object lifetimes when the average group size is small, compared to the required number of replicas.
+As stated in the introduction: the objective of this work was to design and develop a novel state management and persistency architecture, specifically designed for P2P MMVEs that satisfies all P2P MMVE storage requirements and takes into account the requirements of the consistency architecture in which it will operate.
 
 \section{State consistency}
 
-The generic consistency model we developed, identified requirements that all MMVEs should possess in order to remain consistent. It was seen that multiple data streams exists: events, updates, objects and queries. For every stream, a request is generated, interest management determines where the stream should go and dissemination ensures that the request is delivered to its intended set of recipients. The recipient processes the stream in some way, e.g. applying environment logic to an event, which creates updates. The task of processing can in itself generate new requests.
+In order to evaluate and compare the many consistency models described in literature, a generic state consistency model was developed.
 
-All requests received at the authoritative peer, interface with the authoritative object store. The authoritative object store is, therefore, required to process all requests sent to it in a timely manner. The authoritative object store is composes of both state management and state persistency. State management determines how objects in primary memory are stored and required a highly responsive system, while state persistency determines how objects will be stored on persistent storage as backup. State persistency, therefore, does not require as responsive a storage system.
+The generic consistency model provides a common framework for describing the interaction of modules such as event ordering, event and update dissemination, object storage and interest management.
 
-The generic consistency model developed provides a framework for the design and development of MMVEs in general. Because many aspects of the generic consistency model are trivial in C/S models, the model is perhaps more applicable to a P2P MMVE environment. This is not to say that the generic model is not able to describe the classic C/S case, just that it might contain additional complexity not required to fully describe the classic C/S model.
-
-Two classic consistency models were evaluated, the update-based (C/S) and event-based (fully distributed) models. It was discussed how, although the event-based model seems more applicable to the P2P architecture, it is not scalable. The update-based model has rather been adapted for P2P, by segmenting the game state into multiple authoritative objects and distributing those authoritative objects throughout the network. This maintains scalability and also allows for greater control object consistency, because of the presence of a single authoritative object store.
-
-It is recommended that future systems implementing a P2P MMVE consistency architecture use the generic consistency model as a reference to exactly describe what it is that is being implemented. Too often it was the case that a paper stated it was describing a consistency architecture, when only, for example, an interest management scheme was presented. Designers reviewing the generic consistency architecture might find ways to simplify the model or to integrate certain sections. This might be possible, but care should be taken not to lose generality.
-
-Likewise, designers might see aspects of consistency management that is not covered by any component in the generic consistency model. It would then be of great value if the designers find ways to expand the generic model to make it even more generic.
+Thus, the generic consistency model developed provides a framework for the design and development of MMVEs in general. Because many aspects of the generic consistency model are trivial in C/S models, the model is perhaps more applicable to a P2P MMVE environment. This is not to say that the generic model is not able to describe the classic C/S case, just that it contains additional complexity not required to fully describe the classic C/S model.
 
 \section{State management and persistency}
 
-After a review of what is required of a state management and persistency architecture, from the perspective of a state consistency architecture, five main requirements were identified: fairness, reliability, responsiveness, scalability and security. A thorough literature review was then performed and the reviewed storage architectures were categorised into super peer storage, overlay storage, hybrid region-based storage and distance-based storage.
+State management determines how objects in primary memory are stored and updated and requires a highly responsive system, State persistency determines how objects will be stored on persistent storage as backup for long term integrity. State persistency, therefore, does not require as responsive a storage system.
 
-The advantages and disadvantages of each storage type was reviewed using the identified requirements. It was found that none of the storage types satisfied all identified requirements.
+From the perspective of a state consistency architecture, five main requirements were identified for state management and state persistency: fairness, reliability, responsiveness, scalability and security.
 
-An issue that was also encountered was the lack of a thorough comparison of the different storage types in the literature, as well as a lack of common tests that might be used to classify multiple storage types. This made it difficult to empirically compare different storage types and further work into such an area might showcase some advantages of different storage types that have not been found using theoretical comparison alone.
+Although a lack of a thorough comparison of different storage systems in literature made it difficult to empirically compare the existing storage systems, it was found that none of the storage systems satisfy all identified requirements \cite{gilmore_p2p_mmog_state_persistency}. We therefore developed our novel state management and persistency architecture, to fulfil all the previously identified requirements \cite{Pithos_mmve_2011}.
 
-Of the storage types reviewed, it seemed that great benefits may be derived from hybridisation of different types of storage.
+\section{Pithos design}
 
-It is also believed that a greater focus should be placed on whether the storage type is meant for state management or state persistency. As we discussed, it seems logical that some requirements, such as responsiveness are not applicable to both, which might allow for very different design choices. The interaction between state management and state persistency has also not been explored in detail. When to back-up state to become persistency state has not been dealt with. Also what types of state to back up and what types of state to leave might be investigated.
+The Pithos use case is that of a generic storage system, supporting storage, retrieval, modification and removal. Pithos is a hierarchical distributed storage system that uses grouping to reduce latencies of requests, as is required by massively multi-user virtual environments (MMVEs).
 
-Furthermore, a categorisation of different types of state might be helpful. Especially in terms of the differences in requirements. Distinctions such as ephemeral as opposed to permanent state might be investigated. The storage parameters, such as object TTL, for ephemeral state, compared to permanent state will be very different.
+Group storage, distance-based storage and replication are used to make Pithos responsive. Overlay storage, replication and repair are used to make Pithos reliable. Certification, replication and quorum mechanisms are used to make Pithos secure. Group storage and overlay storage are used to make Pithos fair.
+
+Users in Pithos are divided into groups which form group storage networks. Group storage networks are $O(1)$ structured overlays that ensure one hop latencies for requests. Super peers exist to manage groups and peer join groups using a directory server. Group ledgers are by each peer to keep track of the peers and objects stored within a group. A third-party $O(\log (N))$ overlay storage implementation is used to allow nodes to retrieve data stored outside of their groups.
+
+Pithos is implemented as an Oversim simulation that runs on the OMNeT++ network simulation framework. The simulation allowed for the evaluation of Pithos using up to 10,400 nodes, using realistic latency profiles.
+
+\section{Pithos evaluation}
+
+The responsiveness and reliability of Pithos was evaluated, taking bandwidth usage into account. Pithos performance was compared to overlay storage performance.
+
+What was found in Pithos is that a trade-off exists between reliability and bandwidth. Pithos can be made highly reliable by increasing the amount of bandwidth used and reliability decreases with a decrease in bandwidth.Pithos is more reliable than overlay storage for the same amount of bandwidth used. Pithos uses a total of 1950 Bps bandwidth to achieve 99.98\% reliability, while the most reliable overlay storage configuration tested achieved 93.65\% reliability, using 2182 Bps bandwidth. Pithos is also more responsive than overlay storage, with a responsiveness of 0.192s, compared with the overlay responsiveness of 1.4s.
+
+A latency of 192ms for Pithos might seem high, but the effect of the underlay network should be taken into account. This was shown by simulating Pithos in a LAN environment, where it achieved a responsiveness of 1.6ms in a network where each hop had a 1ms delay.
+
+When comparing group probabilities, it was found that the worst Pithos could perform was equal to the performance of overlay storage.
+
+The performance of Pithos under invalid data attacks were also investigated for various probabilities of malicious nodes. It was found that Pithos performs consistently better than overlay storage i.t.o. reliability. As expected, using a quorum mechanism further improved the Pithos reliability. At 40\% malicious users, overlay storage is 46\% reliable. In comparison, when using the least bandwidth, Pithos is 60\% reliable whilst it is 96\% reliable when using the most bandwidth.
+
+The distribution of objects on peers were also investigated to determine the fairness of Pithos. It was found that Pithos is comparable i.t.o. fairness to overlay storage.
+
+The scalability of Pithos was also tested, by quadrupling the network size, increasing the number of nodes in the simulation by 300\% from 2600 nodes to 10,400 nodes. The overall reliability and responsiveness remained the same at 99.7\% and 0.19s respectively. The bandwidth usage, however, increased by 20\% from 1375 Bps to 1652 Bps due to increased bandwidth usage by overlay storage.
+
+It was, therefore, found that Pithos is a reliable, responsive, fair and scalable state management and persistency architecture that will be able to fulfill its role as the authoritative object store for the P2P MMVEs of the future.
+
+Simulating for 10,400 nodes is also 10 times larger than the P2P Second Life Walkad simulation of 1024 nodes \cite{Walkad_Varvello}. Before Pithos, Walkad is considered to be the most recent and significant contribution to the area of state management and state persistency for P2P MMVEs. The advantage of Walkad is that it is a practical implementation of a state management and persistency architecture that is already integrated into an existing MMVE. The disadvantages of Walkad are that it does not take security consideration into account; it runs on an existing file sharing network where users may have very different usage profiles; it was emulated on a relatively small scale (1024 peers and 600 objects at most); and its theoretical performance is below that of Pithos. The Walkad routing time for local queries is between $O(1)$ and $O(N_c)$ depending on the cell distribution, where Pithos's routing time is fixed at $O(1)$.
+
+\section{Modelling object lifetime}
+
+Since the reliability of Pithos depends on whether an object is available in the storage network, the expected object lifetime has a strong correlation with the system reliability. It was therefore deemed important to be able to predict expected object lifetimes in realistic network under realistic network effects, such as churn.
+
+A deficiency was discovered in the literature on object lifetime prediction. It was assumed that an infinite network existed into which an object is placed. This is in contradiction to the Pithos case, where size limited groups exist. Group sizes in Pithos might be comparable to the number of required replicas in the system. When this occurs, it is sometimes not possible to insert the required number of replicas in the system. Existing Markov chain models were extended to take finite network sizes into account.
+
+Object lifetime was found to be dependant on the node departure rate, average network size under steady state, the required number of replicas and the object repair rate. The object lifetime predictions from the model were compared to object lifetimes measured in Pithos. The predicted expected object lifetimes were found to be within 3\% of the measured values, which validates the correctness of the Pithos implementation.
+
+\section{Recommendations}
+
+\subsection{State management and persistency}
+It is believed that a greater focus should be placed on whether an authoritative storage type is meant for state management or state persistency. As we discussed, it seems logical that some requirements, such as responsiveness, are not applicable to both, which might allow for very different design choices.
 
 It might be of benefit to develop a generic state categorisation, where a study is made as to all the types of states in P2P MMVEs, along with the characteristics of how the different types of states are altered. Similarities might be investigated and used to define a finite set of state types and how there is interacted with them. This would allow for further optimisation to distributed storage systems for P2P MMVEs.
 
-\section{Pithos}
+\subsection{Pithos}
+The next step in the Pithos implementation will be to add libraries to allow for physical network operation and then to deploy Pithos on a global scale network, such as PlanetLab. Although PlanetLab will not be able to show Pithos for larger numbers of nodes than one or two thousand, it will show real-world performance. It will also enable the measurement of resource requirements on a per-node basis, such as processor and memory requirements, that are quantities that cannot easily be measured in simulation.
 
-The design of Pithos focussed on meeting all identified requirements. The Pithos use case was also discussed, i.e. how an entity is expected to use Pithos. This was done by viewing Pithos as a storage system with classical storage, retrieval, modification and removal use cases.
+Significant research effort has now been invested to solve the remaining challenges of P2P MMVEs, with some issues, most notably security, ever present in P2P networks. Future work in P2P MMVEs should not be on further improving the various modules of state consistency, but rather in building a complete architecture.
 
-The implementation of Pithos as an Oversim simulation allowed for it to be simulated on a large scale (ten thousand peers), while still using an underlay network with latencies modelled on actual Internet latency measurements.
+Possible applications for such a complete P2P MMVE include:
+%
+\begin{itemize}
+\item Development of a P2P virtual conference environment.
+\item Distributed social networks, since social networks usually posses natural grouping elements in the social network that may be directly transferred to the network layer.
+\item Free-to-play P2P MMOGs, playing to the strengths of P2P MMVEs such are responsive environments.
+\end{itemize}
 
-The next step in the Pithos implementation will be to add libraries to allow for physical network operation and then to deploy Pithos on a global scale network, such as PlanetLab. Although PlanetLab will not be able to show Pithos for larger numbers of nodes than one or two thousand, it will show real-world performance.  It will also enable the measurement of resource requirements on a per-node basis, such as processor and memory requirements. Quantities that cannot easily be measured in simulation.
+Responsive MMVEs are an especially interesting field, since these types of MMVEs are not currently possible in classic C/S MMVEs. All MMVEs have high latencies while playing, in the order of 200ms. This only supports specific genres of games, such as strategy games and RPGs. It is currently difficult to support first-person shooters or racing games using the MMVE paradigm.
 
-To reduce the load on the directory server, a distributed grouping algorithm should also be implemented. In the evaluation of Pithos, it was seen that the best performance is achieved when more requests remain local to the group. A grouping algorithm should therefore be evaluated in terms of how well it can localise requests when actual player and objet traces are used for a variety of virtual environments. The more group request, the better the overall performance will be.
+\section{Future work}
 
-Many enhancements can be made to the quorum mechanism. When a parallel request is performed, a single object can be requested and multiple hashes of the object can be requested from other nodes. The has of the received object can be compared with the hashes received. If the received object has matches a majority of received hashes, the retrieval was successful. If not, another node that did contain the correct object might be queried. This approach will reduce responsiveness but decrease bandwidth usage.
+\subsection{State management and persistency}
 
-\section{Final thoughts on P2P MMVEs}
+\begin{itemize}
+\item An empirical comparison of the various state management and persistency architectures would be beneficial. As seen in our evaluation of overlay storage, it was less reliable than originally thought. Empirical comparisons between other storage types might lead to similar discoveries.
 
-P2P MMVEs are ever maturing. Significant research effort has now been invested to solve the remaining challenges of P2P MMVEs, with some issues, most notably security, ever present in P2P networks. I think a time has come create a complete P2P MMVE consistency architecture, using all the great work that has been done in the field. A focus should not be placed on further improving the various modules of state consistency, bur rather just to build a complete one. 
-The consistency architecture should then be used in the development of a virtual environment. A game is perhaps here a good option, because it is assumed that people enjoy playing games more than running air traffic control simulators (although this too could be packaged into a game). Running a game on a P2P architecture, and making it freely available to play, will provide valuable feedback to researchers to inform the future development. Some lessons learned might be specific to the game that was implemented, but this fact should not deter researchers to just choose one and use it. Ideally the chosen game should play to the strengths of P2P MMVE, such as highly responsiveness.
+\item The interaction between state management and state persistency has not been explored in detail. Further research is required in determining when to back-up state to persistent storage and what types of state require persistent backups.
 
-Players will surely enjoy a massive variant of a genre that has not been implement in MMVE thus far. Action shooter titles are very popular and have the most players, but it has not yet been possible to implement such a game as a classic MMVE. P2P MMVE might make this genre a possibility.
+\item A categorisation of different types of state will be helpful. Especially in terms of the differences in requirements. Distinctions such as ephemeral as opposed to permanent state might be investigated. The storage parameters, such as object TTL, for ephemeral state, compared to permanent state will be very different. Storage system can then distinguish different types of state and treat them differently to improve overall performance.
+\end{itemize}
 
-Only when thousands of players are playing a P2P MMVE and having fun, can P2P MMVEs be said to have been successful. I don't believe this future is far off.
+\subsection{Pithos}
+\begin{itemize}
+\item To reduce the load on the directory server, a distributed grouping algorithm should also be implemented. In the evaluation of Pithos, it was seen that the best performance is achieved when more requests remain local to the group. A grouping algorithm should therefore be evaluated in terms of how well it can localise requests when actual user and object traces are used for a variety of virtual environments. The more group requests, the better the overall performance will be.
+
+\item Various distributed grouping algorithms should be compared to establish which work best in the P2P MMVE and Pithos context.
+    
+\item A group-based distance-based storage scheme should be designed for Pithos, where virtual objects are mapped to the nearest group of peers.
+    
+\item The group-based approach proposed for Pithos should be compared to region-based approaches. The creation of a grouping layer in Pithos will allow for various grouping schemes to be evaluated. A grouping scheme can be player grouping in terms of relative distance or in terms of the region they are in. Group-based approaches should be compared with region-based approaches in terms of the state consistency achieved, the performance of Pithos for groups and regions. Inter-group and inter-region traffic should also be compared as well as the group probability that is achieved using the various schemes.
+
+\item Super peers can also be made part of a Voronoi network, which will allow each super peer to be aware of their neighbours in the virtual world. A distributed join mechanism can then be implemented, where a single random node can be used as entry point into the network. Super peer can pass a join request on to another super peer that is closer to the joining node.
+    
+\item Request distributions should be investigated. The rate at which different virtual worlds generate storage, retrieval and modification requests to the authoritative store. How regularly objects are updated, how regularly objects are created and also retrieved should be investigated. The ratios of different requests should also be investigated. It is assumed that the request profile will vary depending on the game type (World of Warcraft vs. Second Life). A better understanding of request profiles and their reliability and responsiveness requirements might allow for improvements to Pithos.
+
+\item More work is required into testing the performance of object modification in Pithos. This requires the above-mentioned request distributions to determine how regularly objects are updated and how significant object updated are, compared to the object sizes. This may lead to improvements in the object modification design that may have specialised handling mechanisms for different types of object updated.
+    
+\item Pithos should be compared to other storage systems, for example super peer storage and distance-based storage.
+
+\item Many enhancements can be made to the quorum mechanism. When a parallel request is performed, a single object can be requested and multiple hashes of the object can be requested from other nodes. The has of the received object can be compared with the hashes received. If the received object has matches a majority of received hashes, the retrieval was successful. If not, another node that did contain the correct object might be queried. This approach will reduce responsiveness but decrease bandwidth usage.
+    
+\item Quorum techniques for overlay storage can be implemented and a comparison of Pithos using quorum can then be done with overlay storage using quorum.
+
+\item Pithos should also be implemented as a real-world implementation and deployed on PlanetLab. This will allow Pithos to be evaluated in a real-world setting and also allow for memory and CPU requirements to be investigated.
+
+\item Before such an implementation, a ``hardware in the loop'' implementation might be done. Oversim supports real-world computers to be connected to the simulated network. This will allow for the Pithos to be tested on a computer to determine memory and CPU requirements, while still having a larger scale network than what PlanetLab can provide.
+\end{itemize}

@@ -42,7 +42,7 @@
         \AddToShipoutPicture*{\AtTextCenter{%
                 \parbox[c]{0pt}{\makebox[0pt][c]{%
                     \includegraphics[width=#1]{#2}}}}}}
-                    
+
 \usepackage[caption=false]{subfig}
 
 %==== Local Defs ====================================================
@@ -66,7 +66,7 @@
     \global\setbox\@ne\vbox{\box\@ne\kern2\p@}%
     \vcenter{\kern-\ht\@ne\unvbox\z@\kern-\baselineskip}\,\right]$}%
   \null\;\vbox{\kern\ht\@ne\box\tw@}\endgroup}
-  
+
 \makeatother
 
 \renewcommand{\UScaptionsafrikaans}{%
@@ -80,9 +80,9 @@
 %\usepackage{listings}
 
 % generate nice bookmarks and hyperrefs when exporting to pdf and dvi (screen version):
-\usepackage[a4paper,plainpages=false,colorlinks,linktocpage,bookmarks=true,bookmarksopen=false]{hyperref}
+%\usepackage[a4paper,plainpages=false,colorlinks,linktocpage,bookmarks=true,bookmarksopen=false]{hyperref}
 % use this for printing only (no color, print version):
-%\usepackage[a4paper,plainpages=false,colorlinks=false,linktocpage,bookmarks=true,bookmarksopen=false]{hyperref}
+\usepackage[a4paper,plainpages=false,colorlinks=false,linktocpage,bookmarks=true,bookmarksopen=false]{hyperref}
 
 \usepackage{multirow}
 

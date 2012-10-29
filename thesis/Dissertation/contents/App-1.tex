@@ -46,7 +46,7 @@ This also solved the case where Peer A requested an object from Peer B, just as 
 \section{Final solution}
 \begin{figure}[htbp]
  \centering
- \includegraphics[clip=true, viewport=0mm 0mm 430mm 180mm, width=\columnwidth]{gc_final}
+ \includegraphics[clip=true, viewport=0mm 0mm 570mm 265mm, width=\columnwidth]{gc_final}
  \caption{Group consistency after all improvements}
  \label{fig_gc_final_app}
 \end{figure}
@@ -55,4 +55,4 @@ Figure \ref{fig_gc_final_app} shows the group consistency after all improvements
 
 When object lifetime was tested, all requests were stopped after a certain period of time to speed up the simulation. This created an issue where group peers did not become aware of peers leaving the group, because no peers sent requests that could timeout. This prompted the addition of keep-alive messages.
 
-Regular keep alive messages are sent to peers. If a peer does not respond to the message, that peer is removed from the group. The time between keep alive messages can be adjusted as a function of network churn. In order to reduce the load on the super peer, each peer randomly chooses a target peer and sends a keep-alive message, as explained in Section \ref{leave_design}. 
+Regular keep alive messages are sent to peers. If a peer does not respond to the message, that peer is removed from the group. The time between keep alive messages can be adjusted as a function of network churn. In order to reduce the load on the super peer, each peer randomly chooses a target peer and sends a keep-alive message, as explained in Section \ref{leave_design}.

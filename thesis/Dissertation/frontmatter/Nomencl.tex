@@ -5,73 +5,87 @@
 
 \begin{Nomencl}[\gnat]
 
-\NomGroup{Some symbols}
-		\item[$N$]                      Maximum number of nodes in the network
-        \item[$n$]                      Number of nodes currently in the network
-        \item[$R$]                      Required number of replicas
-        \item[$r$]                      Number of replicas currently in the network
+\NomGroup{Statistical distributions}
+        \item[$\alpha$]                 Heavy-tailed degree of the Pareto distribution
+        \item[$\beta$]                  Scale parameter of the Pareto distribution
+        \item[$\lambda$]                Exponential rate parameter
+        \item[$h(x)$]                   Failure or hazard rate of a distribution
+        
+\NomGroup{Pithos performance}
         \item[$R_{\textrm{Pithos}}$]    Reliability of Pithos
         \item[$R_{\textrm{group}}$]     Reliability of group storage
         \item[$R_{\textrm{overlay}}$]   Reliability of overlay storage
         \item[$P_{\textrm{group}}$]     Group probability
-        \item[$\mu$]                    Repair rate
-        \item[$T_{\textrm{repair}}$]    Repair time
+        
+\NomGroup{Storage networks}
+		\item[$N$]                      Maximum number of nodes in the network
+        \item[$n$]                      Number of nodes currently in the network
+        \item[$\tilde{n}$]              Mean number of nodes in the network
+        \item[$R$]                      Required number of replicas
+        \item[$r$]                      Number of replicas currently in the network
+        \item[$\mu$]                    Object repair rate
+        \item[$T_{\textrm{repair}}$]    Object repair period
         \item[$\theta$]                 Departure rate of peers under steady state
         \item[$\phi$]                   Arrival rate of peers under steady state
-        \item[$\tilde{n}$]              Mean number of nodes in the network
-        \item[$\lambda$]                Exponential rate parameter
-        \item[$h$]                      Hazard rate
-        \item[$S$]                      Total number of states
-        \item[$t_i$]                    Time spent in state $i$
+        
+\NomGroup{Markov chains}        
+        \item[$i$]                      The number of object replicas in the network in the current state
+        \item[$k$]                      The number of nodes in the network in the current state
+        \item[$j$]                      The number of object replicas in the network in the next state
+        \item[$l$]                      The number of nodes in the network in the next state
+        \item[$p(ik, jl)$]              State transition rate moving from the dual state $ik$ to the dual state $jl$
+        \item[$S$]                      Number of states in a Markov chain
+        \item[$S_\textrm{transient}$]   Number of transient states in a Markov chain
+        \item[$t_{ik}$]                 Time spent in the dual state $ik$
         \item[$\textbf{P}$]             Transitional rates matrix
         \item[$\textbf{\^{P}}$]         Normalised transitional rates matrix
         \item[$\textbf{I}$]             Identity matrix
         \item[$\textbf{Q}$]             Transient transitional rates matrix
         \item[$\textbf{N}$]             Fundamental matrix
-        \item[$L$]                      Node lifetime
+        \item[$\textbf{L}$]             Object lifetime vector
+        
 \NomGroup{Units}
         \item[s]        Seconds
         \item[Bps]      Bytes Per Second
         \item[bps]      Bits Per Second
         \item[\%]       Percentage
 \NomGroup{Abbreviations}
-		\item[MMVE]		Massively Multi-user Virtual Environment
-        \item[MMO]		Massively Multiplayer Online
+        \item[AI]       Artificial Intelligence
+        \item[ALM]      Application Layer Multicast
+        \item[AoE]      Area of Effect
+        \item[AOI]      Area of Interest
+        \item[C/MS]     Client/Multi-Server
+        \item[C/S]      Client/Server
+        \item[CDF]      Cumulative Distribution Function
+        \item[DHT]      Distributed Hash Table
+        \item[DOS]      Denial of Service
+        \item[FPS]      First-Person Shooter
+        \item[ID]       Identifier
+        \item[IM]       Interest Management
+        \item[IP]       Internet Protocol
+        \item[LAN]      Local Area Network
+        \item[MAC]      Media Access Control
+        \item[MMO]		Massively Multiplayer Online        
         \item[MMORPG]   Massively Multiplayer Online Role-Playing Game
         \item[MMOSG]    Massively Multiplayer Online Social Game
-        \item[FPS]      First-Person Shooter
-        \item[RPG]      Role-Playing Game
-        \item[P2P]      Peer-to-Peer
-        \item[C/S]      Client/Server
-        \item[C/MS]     Client/Multi-Server
-        \item[LAN]      Local Area Network
-        \item[IP]       Internet Protocol
-        \item[UDP]      User Datagram Protocol
-        \item[TCP]      Transport Control Protocol
-        \item[OSI]      Open Systems Interconnection
-        \item[WoW]      World of Warcraft
-        \item[AI]       Artificial Intelligence
-        \item[ID]       Identifier
-        \item[VoIP]     Voice over IP
-        \item[PC]       Player Character
-        \item[NPC]      Non-Player Character
-        \item[DOS]      Denial of Service
-        \item[VE]       Virtual Environment
-        \item[AOI]      Area of Interest
-        \item[AoE]      Area of Effect
-        \item[IM]       Interest Management
-        \item[NEO]      New Event Ordering
-        \item[RACS]     Referee Anti-Cheat Scheme
-        \item[ALM]      Application Layer Multicast
-        \item[NFS]      Network File System
-        \item[PCU]      Peak Concurrent Users
-        \item[DHT]      Distributed Hash Table
-        \item[MAC]      Media Access Control
-        \item[RPC]      Remote Procedure Call
-        \item[TTL]      Time-To-Live
+  		\item[MMVE]		Massively Multi-user Virtual Environment
         \item[MTTF]     Mean Time To Failure
-        \item[LAN]      Local Area Network
+        \item[NEO]      New Event Ordering
+        \item[NFS]      Network File System
+        \item[NPC]      Non-Player Character
+        \item[OSI]      Open Systems Interconnection
+        \item[P2P]      Peer-to-Peer
+        \item[PC]       Player Character
+        \item[PCU]      Peak Concurrent Users
         \item[PDF]      Probability Density Function
-        \item[CDF]      Cumulative Distribution Function
+        \item[RACS]     Referee Anti-Cheat Scheme
+        \item[RPC]      Remote Procedure Call
+        \item[RPG]      Role-Playing Game
+        \item[TCP]      Transport Control Protocol
+        \item[TTL]      Time-To-Live
+        \item[UDP]      User Datagram Protocol
+        \item[VE]       Virtual Environment
+        \item[VoIP]     Voice over IP
+        \item[WoW]      World of Warcraft
 \end{Nomencl}
 \endinput
