@@ -151,7 +151,7 @@ A basis of computer networking is the layered architecture model, called the ope
 
 The physical layer is the physical transmission medium and carries physical signals. Physical level protocol standards include: IEEE 802.11 (Wi-fi), USB, Bluetooth, etc.. The data link layer, sometimes referred to as the MAC layer in the Internet protocol stack, carries frames and is responsible for point-to-point data transfer on the same local area network (LAN). Signals from the bottom layer are converted into bits and sequences of bits are grouped into frames, which is seen to be sent over the data link layer. As can be seen, every higher layer abstracts elements of the lower layer to reduce complexity.
 
-The network layer allows communication between different LANs, using routers, gateways and host addressing. Every computer in a network is referred to as a host. A well known network layer protocol is the Internet protocol (IP), which routes all Internet traffic. The transport layer is referred to as the end-to-end layer and represents the abstract connection between a source and destination host, where all intermediate routers and LANs may be ignored, since they are abstracted away by the network layer. Well known protocols in this layer include the user datagram protocol (UDP) and transport control (TCP) protocol. Above the transport layer, for the purposes of this work, is the application layer. The application layer has access to all network services, including routing and reliable transmission.
+The network layer allows communication between different LANs, using routers, gateways and host addressing. Every computer in a network is referred to as a host. A well known network layer protocol is the Internet protocol (IP), which routes all Internet traffic. The transport layer is referred to as the end-to-end layer and represents the abstract connection between a source and destination host, where all intermediate routers and LANs may be ignored, since they are abstracted away by the network layer. Well known protocols in this layer include the user datagram protocol (UDP) and transport control protocol (TCP). Above the transport layer, for the purposes of this work, is the application layer. The application layer has access to all network services, including routing and reliable transmission.
 
 In the C/S architecture, the client and server are both located in the application layer and communicate with each other using the transport layer. They need not be aware of any of the lower layers.
 
@@ -193,7 +193,7 @@ P2P networks experience constant churn, where nodes are joining and leaving the 
 
 If a node leaves the overlay, its neighbours have to be informed so they may update their routing tables. This is termed \emph{routing table maintenance} and has to happen every time a peer leaves the network. Neighbouring nodes of a node that left the network might also have to inform their neighbours of the change. Two types of routing table maintenance exist: opportunistic and active maintenance.
 
-Opportunistic maintenance attaches routing information to existing request packets. Routing data is essentially ``piggy backed'' onto existing messages. This reduced messages overhead but the rate of routing table maintenance is directly proportional to the message rate. Active maintenance makes use of explicit update messages, which required more bandwidth but is more reliable.
+Opportunistic maintenance attaches routing information to existing request packets. Routing data is essentially ``piggy backed'' onto existing messages. This reduced messages overhead but the rate of routing table maintenance is directly proportional to the message rate. Active maintenance makes use of explicit update messages, which requires more bandwidth but is more reliable.
 
 
 \subsubsection{Bootstrapping}
@@ -209,7 +209,7 @@ The process of bootstrapping is complete when a joining peer becomes a functioni
 \begin{itemize}
 \item P2P networks have a low barrier to entry, since little or no centralised infrastructure is required to maintain the system. This makes P2P networks inexpensive to operate and is one of the reasons Napster was able to provide its service for free.
 
-\item P2P networks are considered scalable. Pure P2P networks can theoretically grow from hundreds to millions of peers, with the service remaining functional. This is all possible without the need for the operator to acquire more infrastructure, as opposed to the centralised client/server network, which required more powerful server clusters are the network grows to handle the growing number of client requests.
+\item P2P networks are considered scalable. Pure P2P networks can theoretically grow from hundreds to millions of peers, with the service remaining functional. This is all possible without the need for the operator to acquire more infrastructure, as opposed to the centralised client/server network, which requires more powerful server clusters as the network grows to handle the growing number of client requests.
 
 \item A P2P network is also resistant to faults and attacks, since the failure of a single peer has little to no effect on the network. This is because there are usually few peers that are critical to the correct functionality of the system. To incapacitate a P2P network, an attacker usually has to shut down a large proportion of the network.
 \end{itemize}
@@ -228,9 +228,9 @@ The core idea of the P2P model is that each peer contributes sufficient resource
 \label{p2p_mmve_advantages}
 
 \begin{itemize}
-\item The P2P architecture is robust, because there is no server that can fail, only individual peers. Individual peers failing will not affect any other peers other than the peer that failed. This behaviour makes virtual environment down-time extremely unlikely.
+\item The P2P architecture is robust, because there is no server that can fail, only individual peers. Individual peers failing will not affect peers other than the peer that failed. This behaviour makes virtual environment down-time unlikely.
 
-\item In P2P MMVEs, it is generally assumed that peers provide abundant and highly available resources, such as computation power, and long term and short term storage. Peers are usually personal computers, with gigahertz of processing power, multiple processing cores, gigabytes of short-term storage and terabytes of long-term storage space. In other words, it is assumed that P2P MMVEs do not consist of resource-constrained peers.
+\item In P2P MMVEs, it is generally assumed that peers provide abundant and highly available resources, such as computational power, and long term and short term storage. Peers are usually personal computers, with gigahertz of processing power, multiple processing cores, gigabytes of short-term storage and terabytes of long-term storage space. In other words, it is assumed that P2P MMVEs do not consist of resource-constrained peers.
 
 \item The system is scalable, because every peer essentially hosts itself.
 
@@ -255,7 +255,7 @@ Key requirements have been identified for the creation of a P2P MMVE. What follo
 
 Non-Player Characters (NPCs) are characters that are not controlled by any human user, but are rather controlled by some artificial intelligence routine or script executing on some host machine. These characters represent the traders and monsters in MMVEs and usually contain sets of rules that determine how they should interact with Player Characters (PCs) as well as their own state information. An NPC's state can be how much money and items it has to trade or how much health it still has after being attacked by a user.
 
-Some virtual objects require computational power to function. An example of this is the Artificial Intelligence routines of NPCs or the computation of physics effects on virtual objects. In P2P MMVE, it might be required to distribute these computational tasks to offload computation load from peers that do not have sufficient resources.
+Some virtual objects require computational power to function. An example of this is the Artificial Intelligence routines of NPCs or the computation of physics effects on virtual objects. In P2P MMVEs, it might be required to distribute these computational tasks to offload computation load from peers that do not have sufficient resources.
 
 \subsubsection{Consistency}
 A key challenge with any networked virtual environment is how to maintain state consistency between users in the virtual world. In other words, to ensure that all users perceive a virtual world in the same state. Solving the state consistency problem for P2P MMVEs is one of the major development challenges and forms the focus of this work. The challenge of state consistency will be described in detail in Chapter \ref{chp:CONSISTENCY}.
@@ -268,7 +268,7 @@ Persistency is different to state management. Persistency is the long term stora
 
 \subsubsection{Interactivity}
 
-P2P MMVE should be interactive and responsive. This means that they should support low latency interactions and possibly mask high latency operations, using techniques such as dead reckoning \cite{cheat_proof_playout}, so as not to break immersion. Interactivity means that all user actions should be handled as soon as possible.
+P2P MMVEs should be interactive and responsive. This means that they should support low latency interactions and possibly mask high latency operations, using techniques such as dead reckoning \cite{cheat_proof_playout}, so as not to break immersion. Interactivity means that all user actions should be handled as soon as possible.
 
 \subsubsection{Scalability}
 
@@ -276,7 +276,7 @@ MMVEs are by definition massive, supporting thousands to tens of thousands of us
 
 \subsubsection{Security}
 
-Security, which includes cheating mitigation, has been identified as a major issue for P2P networks \cite{knutsson_p2p_first}, \cite{challenges_p2p_gaming}, \cite{cheat_proof_event_ordering}. The challenges reside in the fact that peers are not under the control of the operator. Since the authoritative environment state is distributed amongst peers, all peers have access to sections of the authoritative environment state. Peers also have access to the code that was classically only housed on the server. This creates the opportunity that peer might attempt to alter the authoritative state in ways that are not consistency with the environment rules.
+Security, which includes cheating mitigation, has been identified as a major issue for P2P networks \cite{knutsson_p2p_first}, \cite{challenges_p2p_gaming}, \cite{cheat_proof_event_ordering}. The challenges reside in the fact that peers are not under the control of the operator. Since the authoritative environment state is distributed amongst peers, all peers have access to sections of the authoritative environment state. Peers also have access to the code that was classically only housed on the server. This creates the opportunity that a peer might attempt to alter the authoritative state in ways that are not consistent with the environment rules.
 
 One advantage that can be exploited to prevent cheating is that no peer contains all authoritative environment state and no single peer has more authority than another.
 

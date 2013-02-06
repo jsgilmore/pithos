@@ -1,4 +1,4 @@
-\documentclass[10pt,a4paper,conference]{IEEEtran}
+\documentclass[10pt,journal,cspaper,compsoc]{IEEEtran}
 
 % Some very useful LaTeX packages include:
 % (uncomment the ones you want to load)
@@ -64,7 +64,7 @@
 % version and documentation can be obtained at:
 % http://www.ctan.org/tex-archive/macros/latex/required/amslatex/math/
 
-%\usepackage{amssymb}%............................ AMS Symbol fonts
+\usepackage{amssymb}%............................ AMS Symbol fonts
 
 
 
@@ -153,10 +153,26 @@
 %
 \usepackage{url}
 
-\usepackage{sistyle}
-    \SIstyle{S-Africa}
-    \SIunitspace{{\cdot}}
-    \SIunitdot{{\cdot}}
+%==== Local Defs ====================================================
+\makeatletter
+
+%This code defines a bordered matrix with square brackets used in the modelling chapter.
+\def\bbordermatrix#1{\begingroup \m@th
+  \@tempdima 4.75\p@
+  \setbox\z@\vbox{%
+    \def\cr{\crcr\noalign{\kern2\p@\global\let\cr\endline}}%
+    \ialign{$##$\hfil\kern2\p@\kern\@tempdima&\thinspace\hfil$##$\hfil
+      &&\quad\hfil$##$\hfil\crcr
+      \omit\strut\hfil\crcr\noalign{\kern-\baselineskip}%
+      #1\crcr\omit\strut\cr}}%
+  \setbox\tw@\vbox{\unvcopy\z@\global\setbox\@ne\lastbox}%
+  \setbox\tw@\hbox{\unhbox\@ne\unskip\global\setbox\@ne\lastbox}%
+  \setbox\tw@\hbox{$\kern\wd\@ne\kern-\@tempdima\left[\kern-\wd\@ne
+    \global\setbox\@ne\vbox{\box\@ne\kern2\p@}%
+    \vcenter{\kern-\ht\@ne\unvbox\z@\kern-\baselineskip}\,\right]$}%
+  \null\;\vbox{\kern\ht\@ne\box\tw@}\endgroup}
+  
+\makeatother
 
 % generate nice bookmarks and hyperrefs when exporting to pdf and dvi (screen version):
 %\usepackage[a4paper,plainpages=false,colorlinks,linktocpage,bookmarks=true,bookmarksopen=false]{hyperref}
@@ -196,13 +212,13 @@ Distributed storage systems store objects on a number of nodes, requiring use of
 
 Nodes are usually connected to the storage network of their own volition and can leave the network at any time, this causes network churn that will eventually destroy any object stored in the network, as discussed in Section \ref{model}. Because of finite object lifetimes, the goal is to design the storage system so all objects are available for a sufficiently long time. In OpenDHT, for example, an object possesses a specified time-to-live (TTL) \cite{open_dht}, whereafter the object is deleted by the host node. Objects in this system just have to live as long as their TTL. In other storage systems, for example the one mentioned earlier, object lifetimes are made longer than the expected lifetime of the system (thousands of years).
 
-In order to design such a storage system, it is therefore of great interest to know the expected lifetimes of objects in the system under the expected network conditions and to be able to alter parameters in a predictable way to achieve desirable object lifetimes. While other papers, which will be reviewed in Section \ref{related_work}, have looked at the problem of object lifetimes, none, to the best of our knowledge, have considered the issue of limited size networks.
+In order to design such a storage system, it is therefore of great interest to know the expected lifetimes of objects in the system under the expected network conditions and to be able to alter parameters in a predictable way to achieve desirable object lifetimes. While other papers, which will be reviewed in Section \ref{model_related_work}, have looked at the problem of object lifetimes, none, to the best of our knowledge, have considered the issue of limited size networks.
 
 In this paper it will be shown that object lifetimes are reduced if the network size is limited, compared to the total number of required object replicas. While large networks do exist, most networks will practically start out as size limited networks and grow over time as the system gains popularity. Size limited networks have also shown themselves in our research, where we've developed a hierarchical distributed storage system, called Pithos \cite{Pithos_mmve_2011}. On the second tier of storage, nodes are mapped to a two dimensional Euclidean space and grouped by distance. Each group forms a size limited network, which stores objects. It was found that the lifetime of objects stored in Pithos are affected by the average group size during the lifetime of an object, for small average group sizes.
 
 The paper is structured as follows:
 %
-Section \ref{related_work} explains how object storage and repair are generally implemented in a distributed storage system and discusses other work that has focussed on predicting object lifetimes in distributed storage systems,
+Section \ref{model_related_work} explains how object storage and repair are generally implemented in a distributed storage system and discusses other work that has focussed on predicting object lifetimes in distributed storage systems,
 %
 Section \ref{model} introduces the model that we developed to model object lifetimes,
 %
@@ -265,7 +281,7 @@ There are four types of state transitions possible in the Markov model presented
 \begin{figure}[htbp]
  \centering
  \includegraphics[clip=true, viewport=0.0cm 24.5cm 5.5cm 30cm, width=0.6\columnwidth]{Markov_example_syms}
- \caption{Markov chain modelling object replica number as well as network size, where $n-1\geqq R$ and $r > 1$}
+ \caption{Markov chain extract modelling object replica number as well as network size from the perspective of the central state, where $n-1 \geqslant R$ and $r > 1$}
  \label{fig_markov_example_syms}
 \end{figure}
 
@@ -323,7 +339,7 @@ No transitions other than the ones described above can occur in the presented Ma
 \begin{figure}[htbp]
  \centering
  \includegraphics[clip=true, viewport=0.0cm 24.5cm 5.0cm 30cm, width=0.6\columnwidth]{Markov_example}
- \caption{Markov chain modelling object replica number as well as network size, where $n-1\geqq R$ and $r > 1$.}
+  \caption{Markov chain extract modelling object replica number as well as network size from the perspective of the central state and showing state transition values, where $n-1 \geqslant R$ and $r > 1$}
  \label{fig_markov_example}
 \end{figure}
 %
@@ -347,9 +363,11 @@ It is evident that this model is a finite state model when a maximum number of n
 
 The node departure rate $\theta$ can be calculated from the lifetime distributions of the nodes in the network. As in the related work discussed in Section \ref{model_related_work}, all node lifetimes are assumed to be statistically independent and exponentially distributed. The exponential distribution is characterised by the single ``rate'' parameter $\lambda$.
 
-The departure rate of nodes correspond to the failure rate (also called the hazard rate) of the node lifetime distribution \cite{rausand2004systemreliability}. An advantage of the exponential distribution is its ``memoryless'' property, which has a constant failure rate $h = \lambda$. For nodes with exponential lifetime distributions, the node departure rate is therefore $\theta = \lambda$.
+The departure rate of nodes correspond to the failure rate (also called the hazard rate) of the node lifetime distribution \cite{rausand2004systemreliability}. An advantage of the exponential distribution is its ``memoryless'' property, which has a constant failure rate $h = \lambda$. For node lifetimes this is equivalent to a constant departure rate. For nodes with exponential lifetime distributions, the node departure rate is therefore $\theta = \lambda$. The constant departure rate simplifies statistical models making use of the node failure rate parameter.
 
-As discussed in Section \ref{exp_vs_pareto}, the Pareto distribution is also used in reliability engineering to model node lifetimes and might be a better fit to online session times than the exponential distribution. The issue with using the Pareto distribution to model node lifetimes is its variable failure rate. This means that for a Pareto distribution, the average node departure rate under steady state is a function of the lifetimes of the nodes in the network $\theta = h(x)$.
+The Pareto distribution is also used in reliability engineering to model node lifetimes. The Pareto distribution has a shape similar to the exponential distribution, but with a heavy tail. The issue with using the Pareto distribution to model node lifetimes is its variable failure rate. This means that for a Pareto distribution, the average node departure rate under steady state is a function of the lifetimes of the nodes in the network $\theta = h(x)$.
+
+Even though the exponential lifetime distribution is simpler to work with, the Pareto distribution has been shown to more closely match user session times in online games \cite{Kwok_dist_match}.
 
 In the work by Wu, Tian and Ng \cite{replication_article}, an approximation is made for Pareto failure rate, given by $\theta=(\alpha-2)/\beta$, where $\alpha$ and $\beta$ are two parameters of the Pareto distribution. \footnote{No derivation is provided for the approximation and the approximation could also not be found in the cited book.} During the calculation of expected object lifetimes, the expected lifetimes were found to be sensitive to small changes in the value of $\theta$, which renders the approximation unusable for practical predictions using Pareto lifetimes.
 
@@ -445,7 +463,7 @@ The expected time to absorption is then the product of the time spent in each st
     \textbf{E[L]} = \textbf{Nt},
 \end{equation}
 %
-where \textbf{t} is the vector consisting of the times $t_{ik}$ for all $ik$.
+where \textbf{t} is the vector consisting of the times $t_{ik}$ for all $ik$. $\textbf{E[L]}$ provides a vector of the expected lifetimes of all possible states. From this vector, one has to extract a vector containing only valid initial states as defined in Section \ref{model}.
 
 \section{Model results}
 \label{results}
@@ -532,14 +550,45 @@ Future work includes comparing object lifetimes using replication, with object l
   % regular IEEE prefers the singular form
   \section*{Acknowledgement}
 \fi
-
-The financial assistance of MIH and the National Research Foundation (NRF) towards this research is hereby acknowledged. Opinions expressed and
-conclusions arrived at, are those of the author and are not necessarily to be attributed to MIH or the NRF.
+The authors would like to acknowledge Dr. Steve Kroon for his assistance with refining our model.
+The financial assistance of MIH and the National Research Foundation (NRF) towards this research is hereby acknowledged. Opinions expressed and conclusions arrived at, are those of the author and are not necessarily to be attributed to MIH or the NRF.
 
 %\newpage
 %\IEEEtriggeratref{43} %Balance the bibliography
 \bibliographystyle{IEEEtran}
 \bibliography{../BibTeX/P2P_MMOG}
+
+% biography section
+%
+% If you have an EPS/PDF photo (graphicx package needed) extra braces are
+% needed around the contents of the optional argument to biography to prevent
+% the LaTeX parser from getting confused when it sees the complicated
+% \includegraphics command within an optional argument. (You could create
+% your own custom macro containing the \includegraphics command to make things
+% simpler here.)
+%\begin{biography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{mshell}}]{Michael Shell}
+% or if you just want to reserve a space for a photo:
+
+\begin{IEEEbiography}{Herman A. Engelbrecht}
+received the PhD degree in electronic engineering from the University of Stellenbosch in 2007. He joined the Department of Electrical and Electronic Engineering at the University of Stellenbosch in 2003. His research interests include pattern Recognition, computer vision, and electronic media. He is a member of the IEEE.
+\end{IEEEbiography}
+
+% if you will not have a photo at all:
+\begin{IEEEbiography}{John S. Gilmore}
+received the bachelor’s and master’s degrees in electrical and electronic engineering with computer science from Stellenbosch University in 2007 and 2010, respectively. He is currently working toward the PhD degree at the MIH Media Lab at Stellenbosch University. His research interests include computer networks, distributed systems, and communication protocols. He is a student member of the IEEE.
+\end{IEEEbiography}
+
+% You can push biographies down or up by placing
+% a \vfill before or after them. The appropriate
+% use of \vfill depends on what kind of text is
+% on the last page and whether or not the columns
+% are being equalized.
+
+%\vfill
+
+% Can be used to pull up biographies so that the bottom of the last one
+% is flush with the other column.
+%\enlargethispage{-5in}
 
 % that's all folks
 \end{document}

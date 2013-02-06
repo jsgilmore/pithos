@@ -58,7 +58,7 @@ There are four types of state transitions possible in the Markov model presented
 \begin{figure}[htbp]
  \centering
  \includegraphics[clip=true, viewport=0.0cm 24.5cm 5.5cm 30cm, width=0.6\columnwidth]{Markov_example_syms}
- \caption{Markov chain modeling object replica number as well as network size, where $n-1\geqq R$ and $r > 1$}
+ \caption{Markov chain modeling object replica number as well as network size, where $n-1\geqslant R$ and $r > 1$}
  \label{fig_markov_example_syms}
 \end{figure}
 
@@ -116,7 +116,7 @@ No transitions other than the ones described above can occur in the presented Ma
 \begin{figure}[htbp]
  \centering
  \includegraphics[clip=true, viewport=0.0cm 24.5cm 5.0cm 30cm, width=0.6\columnwidth]{Markov_example}
- \caption{Markov chain modeling object replica number as well as network size, where $n-1\geqq R$ and $r > 1$.}
+ \caption{Markov chain modeling object replica number as well as network size, where $n-1\geqslant R$ and $r > 1$.}
  \label{fig_markov_example}
 \end{figure}
 %
@@ -532,7 +532,7 @@ As with the previous experiments, the following configuration parameters are cho
 %
 Figure \ref{fig_lifetime_simulation_model_none_30_100} compares the theoretical results to simulation results for the case where no repair is performed. Nodes have expected lifetimes of $100s$, the number of required replicas is 10 and the average network size is 14 nodes.
 
-The expected object lifetimes as predicted by the theoretical model pass through the crosses that show the simulation data means. The mean prediction error is $4.5s$ with a standard deviation of $16.5s$. Comparing the mean prediction error to the predicted lifetime means, a mean prediction error percentage of $1.32\%$ is achieved. 
+The expected object lifetimes as predicted by the theoretical model pass through the crosses that show the simulation data means. The mean prediction error is $4.5s$ with a standard deviation of $16.5s$. Comparing the mean prediction error to the predicted lifetime means, a mean prediction error percentage of $1.32\%$ is achieved.
 
 For initial network sizes on the edges of measured data, the simulation data might seem to deviate from the model data. However, in these ranges, only a few measurements could be made, instead of the thousand measurements made away from the maximum and minimum initial network size. The inaccuracy in these ranges can also be seen from the wide 5\% significance levels.
 
@@ -577,4 +577,4 @@ We show how to reliably predict expected object lifetimes under the assumption o
 
 The theoretical model allows for the Pithos architecture to be designed with specific expected node lifetimes. It provides a guideline for the values of various parameters in the Pithos architecture, such as repair rate and required number of replicas. The expansion of the theoretical model to take into account finite networks allows for the model to accurately predict object lifetimes for small Pithos groups.
 
-Because of the various groups that exist in Pithos, the possible range of group sizes have to be evaluated. The theoretical model will also assist in designing a system using dynamic parameters as a function of group size. 
+Because of the various groups that exist in Pithos, the possible range of group sizes have to be evaluated. The theoretical model will also assist in designing a system using dynamic parameters as a function of group size.

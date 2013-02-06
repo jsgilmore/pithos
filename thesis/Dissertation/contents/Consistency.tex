@@ -9,7 +9,7 @@ The role of this chapter is to describe the state consistency architecture in wh
 
 A virtual environment (VE) can be characterised by its \emph{environment state}. When discussing how to segment environment state, it is sometimes easier to speak in terms of \emph{objects}, since they are separable. For the purposes of this work, objects are entities with both state and logic, which means they consume both storage space, as well as computing resources. Objects can also produce events, which should be sent to other objects. When this definition is used, NPC objects may be classified as a specific type of object, which forms part of the global environment state.
 
-Both mutable and immutable objects exist. Immutable objects are those that cannot be altered, for example: rocks, hills and trees. Mutable objects are those that can be altered, for example: NPCs, chests and doors. What objects are mutable is design decision made by the VE designer, depending on the VE requirements. The environment state includes all positions, health and other attributes of all avatars, NPCs and other objects in the VE.
+Both mutable and immutable objects exist. Immutable objects are those that cannot be altered, for example: rocks, hills and trees. Mutable objects are those that can be altered, for example: NPCs, chests and doors. What objects are mutable is a design decision made by the VE designer, depending on the VE requirements. The environment state includes all positions, health and other attributes of all avatars, NPCs and other objects in the VE.
 
 Mutable objects may further be divided into ephemeral and permanent objects. Ephemeral objects need only be available for certain times, such as a player's (user agent's) \emph{avatar}, when that avatar is online. Permanent objects should remain in the virtual world, whether the user who owns it is on-line or off-line, such as a virtual house.
 
@@ -30,7 +30,7 @@ In a VE, three main actions should be possible concerning the environment state.
 
 \begin{figure}[htbp]
  \centering
- \includegraphics[clip=true, viewport=120mm 221mm 184mmm 278mm, height=0.5\textwidth]{generic_consistency_graphic}
+ \includegraphics[clip=true, viewport=115mm 221mm 184mmm 278mm, height=0.5\textwidth]{generic_consistency_graphic}
  \caption{Diagram showing the flow of messages in the network, when an agent creates an object in the virtual world.}
  \label{fig_object_create_graphic}
 \end{figure}
@@ -100,7 +100,7 @@ In Figure \ref{fig_event_update_flow_graphic}, Event 1 affects Object 1. Node 1,
 
 Determining which objects are affected by an event is termed \emph{event interest management}. Delivering the event to the authoritative nodes of the affected object is termed \emph{event dissemination}. \footnote{It should be noted that designs exist that use multiple authoritative objects, for example the event-based consistency model described in Section \ref{classic_event_based}, but that more research focus has been placed on consistency architectures where every object only possesses a single authoritative object, such as the update-based consistency model described in Section \ref{classic_update_based}.}
 
-When Event 1 arrives at Node 2, containing Object 1, the event is placed in a event queue in an order based on the time each event occurred in. The process of determining which order events have to be processed is called \emph{event ordering}, since many events will be arriving at an object's authoritative node from multiple agents simultaneously.
+When Event 1 arrives at Node 2, containing Object 1, the event is placed in a event queue in an order based on the time each event occurred in. The process of determining which order events have to be processed in is called \emph{event ordering}, since many events will be arriving at an object's authoritative node from multiple agents simultaneously.
 
 After event ordering has been performed, environment logic is applied to determine how a specific event will affect a specific object. To determine possible updates, that state of other objects might also have to be taken into account. An example is firing at an agent through a wall. If the thickness of the wall determines how much damage is delivered to the agent, the authoritative node processing the damage to the agent object will have to know the thickness of the wall.
 
