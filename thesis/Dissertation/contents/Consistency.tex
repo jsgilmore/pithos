@@ -137,7 +137,7 @@ Each identified consistency scenario is in the same basic request-response form.
  \label{fig_event_update_flowdiagram}
 \end{figure}
 
-Three ``flows'' exist, that model each of the query, create and modification scenarios discussed earlier. A flow is initiated by an agent at terminated at an agent. Flows are symmetrical, which means any agent can initiate a flow or be the terminating agent for a flow. Each flow corresponds to the three scenarios discussed in Section \ref{environment_change_scenarios}.
+Three ``flows'' exist, that model each of the query, create and modification scenarios discussed earlier. A flow is initiated by an agent and terminated at an agent. Flows are symmetrical, which means any agent can initiate a flow or be the terminating agent for a flow. Each flow corresponds to the three scenarios discussed in Section \ref{environment_change_scenarios}.
 
 \subsubsection{Agents and generators}
 
@@ -147,7 +147,7 @@ Agents may be able to build structures, make clothes or construct a variety of m
 
 Agents can also interact with the virtual environment and other agents, which are objects themselves. Agents interacting with objects generate events, which have to be sent to the authoritative node.
 
-Lastly, as agents more around in the virtual world, they might query an authoritative node for any new objects that have entered their AoI. This is referred to as a range query and requires the retrieval of all objects within a certain area.
+Lastly, as agents move around in the virtual world, they might query an authoritative node for any new objects that have entered their AoI. This is referred to as a range query and requires the retrieval of all objects within a certain area.
 
 \subsubsection{Display updater and non-authoritative environmental logic and object store}
 
@@ -185,7 +185,7 @@ It should be noted that object queries and object creation can both be implement
 
 Object creation can also be handled as an event, where an ``object creation'' event contains the information required to instantiate the required object. The object creation event can then be sent to the applicable authoritative node. The environment logic will process the object creation event, generate a state update containing the new object and respond with that update to the node of the agent generating the object. This is also considered the safer method by which an object can be generated, since the environment logic can ensure that the object is allowed within the confines of the environment rules.
 
-It is therefore sufficient for the generic state consistency model to only contain the event-logic-update flow, but the other two flow were added for clarity. For the range query, it clarifies that the response is always sent to the node generating the query. For the object creation case, it clarifies that the object itself is generated on the non-authoritative node and then sent to the authoritative node, where it is then housed.
+It is therefore sufficient for the generic state consistency model to only contain the event-logic-update flow, but the other two flows were added for clarity. For the range query, it clarifies that the response is always sent to the node generating the query. For the object creation case, it clarifies that the object itself is generated on the non-authoritative node and then sent to the authoritative node, where it is then housed.
 
 \subsection{Discussion}
 
@@ -261,9 +261,7 @@ When latency issues are not present and all users possess reasonable latencies, 
 
 \subsubsection{Disadvantages}
 The event-based model is not scalable, since all nodes must connect to all other nodes and all events are transmitted to
-everyone. This means that as $N$, the number of nodes in the network increases, the traffic increases with a factor of $N^2$. The security issues of
-the P2P network model, on which this consistency model is based, are also present. A degradation of responsiveness is also experienced by all user if one user's
-latency is below par, since the lockstep mechanism has to wait for all events to be received for that round to conclude \cite{cheat_proof_event_ordering}.
+everyone. This means that as $N$, the number of nodes in the network increases, the traffic increases with a factor of $N^2$. The security issues of the P2P network model, on which this consistency model is based, are also present. A degradation of responsiveness is also experienced by all users if one user's latency is below par, since the lockstep mechanism has to wait for all events to be received for that round to conclude \cite{cheat_proof_event_ordering}.
 
 \subsubsection{Partially connected event-based consistency}
 An event-based model that is not fully distributed might be considered, although such a model holds many challenges. Interest management techniques might be used to determine which nodes require updates. A challenge arises when nodes that were not aware of each other come into contact in the virtual world. A merge operation will have to be performed on the two authoritative environment states to ensure consistency. Such a model has not been proposed in practice and significant research will have to be performed into defining a framework that establishes relationships between events to maintain consistency. Such a system might be developed by defining classes of events and their interactions. A linear temporal logic model might then be developed to ensure consistent merging of states.
@@ -332,7 +330,7 @@ All disadvantages of the C/S architecture, as discussed in Section \ref{classic_
 \section{P2P MMVE state consistency models}
 \label{p2p_mmve_state_consistency}
 
-Various schemes have been proposed to address the various challenges of P2P MMVE state consistency, but these have mostly occurred in isolation. Each approach focuses on a few of the modules identified in the generic state consistency model presented in Section \ref{generic_event_update_model}, but no approach addressing all modules.
+Various schemes have been proposed to address the various challenges of P2P MMVE state consistency, but these have mostly occurred in isolation. Each approach focuses on a few of the modules identified in the generic state consistency model presented in Section \ref{generic_event_update_model}, but no approach addresses all modules.
 
 \subsection{Related work}
 The most complete implementation of a P2P MMVE state consistency model found was P2P Second Life, although greater emphasis was placed on creating and discovering new objects than updating existing object states \cite{varvello_p2p_second_life}, \cite{Walkad_Varvello}. This might be due to Second Life's focus on object creation, where other MMOGs, for example, World of Warcraft and Eve Online, have less of a focus on object creation and more of a focus on interaction with existing objects. P2P Second Life, therefore, described the object creation and query flows, but did not explain the process of altering existing objects in depth.
