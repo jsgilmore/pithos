@@ -50,7 +50,7 @@ The inspiration for Pithos come from two observations:
 
 Fully distributed architectures are, however, not scalable because the number of messages scaling by $O(N^2)$, where $N$ is the number of nodes in the network. We, therefore, use groups of peers, where all the peers in a group are fully connected.
 
-This section will describe how the design of Pithos satisfies the identified storage requirements. For each of the requirements of fairness, reliability, responsiveness, scalability and security, the design decisions made to achieve the specific requirement will discussed. Some design decisions satisfy multiple requirements, therefore different requirements might discuss the same design decision, with a focus on how the decision satisfies the specific requirement.
+This section will describe how the design of Pithos satisfies the identified storage requirements. For each of the requirements of fairness, reliability, responsiveness, scalability and security, the design decisions made to achieve the specific requirement will be discussed. Some design decisions satisfy multiple requirements, therefore different requirements might discuss the same design decision, with a focus on how the decision satisfies the specific requirement.
 
 \subsection{Responsiveness}
 
@@ -250,7 +250,7 @@ Affinity propagation clusters nodes using a similarity matrix to find similar no
 
 Clustering is also used in mobile ad-hoc networks (MANETs) for routing purposes. Mobile-aware clustering algorithms used in MANETs, might also be applicable to P2P MMVEs \cite{clustering_survey}. Mobile-aware clustering uses relative velocities of mobile nodes to define clusters containing nodes with low relative velocity to each other.
 
-Any of the above mentioned techniques might be used to achieve distributed clustering in P2P MMVEs. The focus of this work is, however, not on developing a novel clustering algorithm for P2P MMVEs, therefore we have chosen to use a super peer centered distance-based grouping approach for group clustering. Our current implementation makes use of a centralised grouping algorithm that adds a peer to the group of the nearest super peer. The directory server is used to determine compare super peer and peer distances. This grouping algorithm will be discussed in more depth in Section \ref{joining_and_grouping_imp}.
+Any of the above mentioned techniques might be used to achieve distributed clustering in P2P MMVEs. The focus of this work is, however, not on developing a novel clustering algorithm for P2P MMVEs, therefore we have chosen to use a super peer centered distance-based grouping approach for group clustering. Our current implementation makes use of a centralised grouping algorithm that adds a peer to the group of the nearest super peer. The directory server is used to determine the best group by  comparing super peer and peer distances. This grouping algorithm will be discussed in more depth in Section \ref{joining_and_grouping_imp}.
 
 \subsubsection{Distance-based storage mechanism}
 \label{distance_based_design}
