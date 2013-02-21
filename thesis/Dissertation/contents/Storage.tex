@@ -22,7 +22,7 @@ State management is defined to mean the storage of the VE state in primary memor
 \item supply information of other objects needed by the environment logic, in order to generate authoritative object updates for a received event.
 \end{enumerate}
 
-Although state management and state persistency are two different types of storage, with different storage requirements, there are also similar aspects between state management and persistency. Since state management and persistency are very similar (as discussed in Section \ref{key_challenges_cm}), the term ``storage'' will be used when referring to both.
+Although state management and state persistency are two different types of storage, with different storage requirements, there are also similar aspects between state management and persistency. Since state management and persistency are similar (as discussed in Section \ref{key_challenges_cm}), the term ``storage'' will be used when referring to both.
 
 Many ``storage types'', which can be used for either state management or persistency are discussed in this chapter. The reference of the storage type to state management and/or persistency will be discussed where applicable.
 
@@ -37,6 +37,8 @@ This section introduces the classic state management and persistency architectur
 \label{sharding}
 
 A storage model where the VE state is duplicated over multiple servers, with users connecting to one of these servers is termed ``sharding''. For all practical purposes, this approach is still merely a C/S approach, with users forced into a specific C/S environment. Each shard hosts the global authoritative state and thus state management and persistency is performed centrally by the shard server, where all objects are stored.
+
+Project Darkstar was created as middleware for a shard-based system to provide a networking architecture for MMOGs \cite{Blackman_darkstar_storage}.
 
 \subsubsection{Advantages}
 
@@ -107,7 +109,7 @@ between users in the virtual environment. Users playing together move together, 
 
 \subsection{Conclusion}
 
-Examining the disadvantages and advantages of each classic storage method, the two methods that seem most promising are the region-based and object-based approaches. Sharding doesn't allow for a single world or any form of load balancing and replication-based schemes still have the single database as a bottleneck.
+Examining the disadvantages and advantages of each classic storage method, the two methods that seem most promising are the region-based and object-based approaches. Sharding does not allow for a single world or any form of load balancing and replication-based schemes still have the single database as a bottleneck.
 
 Because of the advantages of region-based storage, it has become a popular storage architecture to employ for virtual environments. Most virtual environments can be divided into regions and the virtual environment can be designed in such a way that region boundaries are difficult to cross and that users can only cross these boundaries when moving from one distinct area into the next. This can be done by placing high mountain ranges on region boundaries, with a single pass through the range. This prevents users from switching between regions if they stand on a region boundary. It also ensures that most users that interact, do so within the same server, which decreases inter-server communication.
 
@@ -133,11 +135,15 @@ For systems that will support the MMVEs of the future, it is believed that a tar
 \subsection{Fairness}
 \label{fairness_requirement}
 
-Ensuring fairness in the system means distributing load evenly according to the abilities of individual nodes. This ensures that not only a small number of nodes provide all system resources required for the system to function, but that all nodes contribute what they can, in order to support the system.
+Ensuring fairness in the system means distributing load evenly according to the abilities of individual nodes. This ensures that a small number of nodes do not provide all system resources required for the system to function, but that all nodes contribute what they can, in order to support the system.
 
 Fairness does not exclude heterogeneity of nodes. It is accepted that nodes have different amounts of available resources. It also does not exclude node specialisation. It is accepted that some P2P architectures require specialised nodes or require a set of different types of super peers to function. Fairness merely states that when all node contributions are added, the sum of all node contributions should be equal.
 
-\emph{Fairness can be evaluated by evaluating the distribution of virtual objects amongst all nodes in the P2P network.} This can be measured at a file level, i.e. what is the standard deviation of the number of files contained on each node, or on byte level, i.e. what is the standard deviation of the number of bytes stored on each node. A lower standard deviation will point to a fairer data storage scheme, if it is assumed that all nodes should contribute an equal amount of storage.
+Fairness is based on the assumption that nodes are required to donate resources to the network for which their users might have to pay. One cannot expect that a small percentage of users pay for the network resources, while other users use it for free. For a storage system, nodes that store more data will have to serve more data to other nodes. This means that nodes that store more data will also have to contribute more bandwidth. The extra bandwidth means that the users of the nodes will either have to pay more for the extra bandwidth. Where users do not pay for bandwidth, they will still have that much less bandwidth to use for their personal use.
+
+If objects are distributed across more nodes, it also means that each node will have to store fewer objects, than if only a small number of nodes stored objects. Where fewer nodes store objects, the nodes that store objects will each have to store more objects than if the load was more evenly spread.
+
+\emph{Fairness can be evaluated by evaluating the distribution of virtual objects amongst all nodes in the P2P network.} This is, however, a measure of fairness that implies equal distribution and does not take into account the heterogeneity of nodes. The distribution can be measured at a file level, i.e. what is the standard deviation of the number of files contained on each node, or on byte level, i.e. what is the standard deviation of the number of bytes stored on each node. A lower standard deviation will point to a fairer data storage scheme, if it is assumed that all nodes should contribute an equal amount of storage.
 
 \subsection{Reliability}
 
@@ -226,7 +232,7 @@ Super peer storage is not secure, since a single peer stores all environment sta
 A scheme that would improve the security of this systems has been proposed, where every event is also sent to the backup super peer of the region \cite{past_storage_focus}. The main super peer responds with the update and the backup super peer responds with a hash of the update. A peer can then check whether the hashes match to determine whether the data has been received correctly. A hash is not the state update itself, so will be smaller, but the events that have to be sent to all super peers will increase traffic in the network and bandwidth usage by peers.
 
 \subsubsection{Responsiveness}
-The advantage of super peer storage is its responsiveness. All data are stored on the super peer, which means that storing data is a low latency operation. The regional state can be stored and retrieved at high speeds, making the system very responsive. Data retrieval from such a storage is as fast as data retrieval from a server. Peers can request data from a super peer and the data can be returned to the peer in one hop after transmission of the request. Super peers may, however, become overloaded with requests and thereby increase the latency of the system.
+The advantage of super peer storage is its responsiveness. All data are stored on the super peer, which means that storing data is a low latency operation. The regional state can be stored and retrieved at high speeds, making the system responsive. Data retrieval from such a storage is as fast as data retrieval from a server. Peers can request data from a super peer and the data can be returned to the peer in one hop after transmission of the request. Super peers may, however, become overloaded with requests and thereby increase the latency of the system.
 
 \subsubsection{Existing architectures}
 \label{super_peer_storage_rel_arhcs}
@@ -247,7 +253,7 @@ It should also be noted that the required number of replicas will be a function 
 \subsection{Overlay storage}
 \label{overlay_storage}
 
-Overlay storage is classified as using any type of structured P2P overlay to store data in a distributed fashion. This is a very broad definition, which basically encompasses any P2P distributed storage currently in use. Some examples and a comparison of different distributed storage techniques can be found in \cite{Hasan_distributed_storage_survey}. The reasoning is that any P2P distributed storage can be used to only store virtual objects. Therefore, distributed storage is used as a distributed database for virtual objects.
+Overlay storage is classified as using any type of structured P2P overlay to store data in a distributed fashion. This is a broad definition, which basically encompasses any P2P distributed storage currently in use. Some examples and a comparison of different distributed storage techniques can be found in \cite{Hasan_distributed_storage_survey}. The reasoning is that any P2P distributed storage can be used to only store virtual objects. Therefore, distributed storage is used as a distributed database for virtual objects.
 
 \subsubsection{Reliability}
 \label{overlay_storage_reliability}
@@ -277,10 +283,6 @@ The network overhead can, however, be reduced by having file replica peers only 
 Overlay storage is fair, as all peers share file data and requests equally. The system might be made fairer by taking into account the heterogeneity of peers. Peers do not all possess the same resources, something which a truly fair system should take into account. The difficulty with using such a scheme is that peers can be made to report incorrect resource information in order to reduce their resource donation requirement. This is where incentive mechanisms have to be investigated as well as ways to ensure correct resource reporting.
 
 \subsubsection{Existing architectures}
-
-%Merabi, 2004 \cite{using_freenet_storage}
-In 2004, Merabti and El Rhalibi mention the issue of ``Data Storage'' \cite{using_freenet_storage}. It is recognised that a distributed storage scheme is required and that such a scheme ``\ldots requires careful designing\ldots''. They propose the use of a data storage architecture based on the Freenet project \cite{clarke_freenet}. Freenet is a distributed storage facility that uses a Darknet to ensure user anonymity when distributing files. A system such as Freenet is designed for general file sharing, which means that no focus is placed on achieving the high levels of responsiveness required for MMVEs. While the need for state persistency is briefly mentioned in the 2004 paper by Marabti and El Rhalibi, Douglas et
-al. implement a workable solution for state persistency in 2005.
 
 %Douglas, 2005 \cite{Douglas05enablingmassively}
 Douglas et al. designed a P2P MMVE architecture in 2005 \cite{Douglas05enablingmassively} and implemented state persistency using a distributed storage implementation, which they developed in 2003 \cite{Harwood03hashingspatial}. The storage system allows for the manipulation of spatial data, while also implementing range queries. This enables the system to store and retrieve data that exist in a certain area of the virtual environment. In the MMVE architecture they developed, state persistency is implemented by the ``Spatial Data Service'' (SDS), which is a distributed storage architecture that uses the Chord P2P overlay for routing \cite{chord}.
@@ -345,6 +347,13 @@ The first hybrid state persistency model for P2P MMVEs was proposed by Iimura et
 An extended abstract, published by GauthierDickey et al. in 2004 \cite{hybrid_storage1}, proposed to distinguish between permanent and ephemeral data. Permanent data are described as data that should exist at all times and ephemeral data are described as data that need only exist for as long as its owner is in the virtual environment. An item, being dropped by a dispatched NPC, can be considered as ephemeral. When the peer on which the data is hosted leaves the area, that item can disappear. An example of permanent data is a player's inventory contents, which can further be classified as participatory data or a player's house, which can be classified as existential data. Participatory data are data that need only be available when a specific player is in the virtual environment and existential data are data that should be available, even when a certain user is not present in the virtual environment.
 
 Categorising data by how long and under which circumstances the data should exist, may assist in the design of the storage model. Since ephemeral data does not have to exist after the player has left the virtual environment, it may be stored in primary memory. Participatory data might also be stored on the player's computer, but security issues will have to be kept in mind. Existential data will have to be stored somewhere other than on the player's computer, since other players will require the data, even in the absence of the player that might have left the virtual environment. GauthierDickey et al. did not explore how their data classification scheme might be translated into a state persistency model.
+
+%Merabi, 2004 \cite{using_freenet_storage}
+In 2004, Merabti and El Rhalibi describe the implementation of the ``Time Prisoners'' MMOG \cite{using_freenet_storage}. They propose a hybrid network topology, where the network architecture starts out as client/server, but as players are added to the world, a P2P architecture is created. There exists a single central database, that acts as an initial entry point into the network. Peers can also become super peers in the form of region servers. Region servers maintain all the state in the region and clients only interact with a region server, after having been assigned one by the central server.
+
+Merabti and El Rhalibi also discuss the ``data storage'' requirement and propose the use of a data storage architecture based on the Freenet project \cite{clarke_freenet}. Freenet is a distributed storage facility that uses a Darknet to ensure user anonymity when distributing files \cite{Darknet}. A system such as Freenet is designed for general file sharing, which means that no focus is placed on achieving the high levels of responsiveness required for MMVEs.
+
+Without defining it as such, Merabti and El Rhalibi propose a form of super peer storage for state management and overlay storage for state persistency. Where super peer storage is the storage on the regional servers and overlay storage is the storage in Freenet. Freenet is a an overlay storage, which is not as responsive as direct connections. The work by Merabti and El Rhalibi is one of the more mature hybrid region-based storage systems encountered.
 
 \subsection{Distance-based storage}
 \label{distance_based_storage}
@@ -418,10 +427,10 @@ The works by Buyukkaya and Abdallah, Hu et al., and Chang form part of the VAST 
 
 After providing an overview of the classic C/S and C/MS state persistency techniques, the chapter classified P2P MMVE state persistency techniques into super peer based, overlay based, distance based and hybrid storage. The advantages and disadvantages of each method were discussed after identifying key challenges that state persistency techniques have to solve. These challenges are: fairness, overhead, reliability, responsiveness, scalability and security.
 
-Supper peer storage can be seen as a C/S type storage implementation, where every region has a super peer that stores all data for that region. Overlay storage is a fully distributed, P2P approach to storage, where every peer stores data as part of a P2P overlay network. Hybrid region based storage combines super peer and overlay storage to improve the overall storage performance. Distance based storage is a different paradigm that stores virtual objects on the nearest peer to that virtual object. This type of storage is usually characterised by the use of Voronoi diagrams to
+Super peer storage can be seen as a C/S type storage implementation, where every region has a super peer that stores all data for that region. Overlay storage is a fully distributed, P2P approach to storage, where every peer stores data as part of a P2P overlay network. Hybrid region based storage combines super peer and overlay storage to improve the overall storage performance. Distance based storage is a different paradigm that stores virtual objects on the nearest peer to that virtual object. This type of storage is usually characterised by the use of Voronoi diagrams to
 determine which peers are nearest to which objects.
 
-Super peer storage is characterised by its high level of responsiveness and ease of implementation. Overlay storage is characterised by its high level of fairness and reliability. Hybrid region-based storage combines the two previous schemes and has high levels of reliability and responsiveness. Distance based storage is also very responsive and can be made both reliable and fair.
+Super peer storage is characterised by its high level of responsiveness and ease of implementation. Overlay storage is characterised by its high level of fairness and reliability. Hybrid region-based storage combines the two previous schemes and has high levels of reliability and responsiveness. Distance based storage is also responsive and can be made both reliable and fair.
 
 Security is still an issue for all storage types. Super peer storage has the issues that are usually present in a centralised system, namely low fairness, security and also not being reliable and not resistant to failure. The main issue with overlay storage is its unresponsiveness, because of the routing delay in the P2P overlay. Hybrid storage suffers from the disadvantages of super peer storage, namely low fairness and security, due to all files still stored on super peers. The main issue of distance based storage is security, because users that have the most incentive to alter object states own those objects.
 

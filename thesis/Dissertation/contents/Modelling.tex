@@ -40,7 +40,7 @@ In order to model the effects of a finite network size on the lifetime of an obj
 
 Every state is a tuple of the form \verb.(replicas,nodes).. The state $(r, n)$ represents that $r$ replicas of an object are currently stored in a network currently containing $n$ nodes. $R$ is the required number of object replicas and $N$ is the maximum number of nodes in the network. It is assumed that $R$ replicas are always stored in the network, if sufficient space is available. If the number of nodes currently in the network $n$ are fewer than the required number of replicas ($n < R$), only $n$ replicas are stored. The initial states of the Markov chain are therefore all the states ($R,n$) as well as all the states ($n,n$), for $n < R$. There are therefore $N$ initial states, one for every possible network size. The initial state is the initial network size that an object is placed in.
 
-If there are no more replicas in the network, an object cannot be repaired and the Markov chains remains in the set of states ($0,n$). These are said to be the absorbing states of the Markov chain and there exists $N - R + 1$ absorbing states in the model presented here. All other states out of which transition is possible are said to be transient states. It can be shown that if sets of transient and absorbing states exist, the system will always end up in the absorbing states \cite{grinstead1997introduction_probability}. The time to absorbtion can be calculated, which in the case of object storage means the time when no more objects exist in the network.
+If there are no more replicas in the network, an object cannot be repaired and the Markov chains remains in the set of states ($0,n$). These are said to be the absorbing states of the Markov chain and there exists $N - R + 1$ absorbing states in the model presented here. All other states out of which transition is possible are said to be transient states. It can be shown that if sets of transient and absorbing states exist, the system will always end up in the absorbing states \cite{grinstead1997introduction_probability}. The time to absorption can be calculated, which in the case of object storage means the time when no more objects exist in the network.
 
 \subsection{State transitions}
 
@@ -120,18 +120,18 @@ No transitions other than the ones described above can occur in the presented Ma
  \label{fig_markov_example}
 \end{figure}
 %
-Figure \ref{fig_markov_example} shows the example Markov chain shown earlier with the transition rates as described for the example. Apart from the example model developed, the initial states and absorbtion states have also been identified. The place bounds on the final Markov chain. An edge case has also been identified when there are too few nodes to perform a full repair. This limits the extent to which a repair can cause a state transition in the model.
+Figure \ref{fig_markov_example} shows the example Markov chain shown earlier with the transition rates as described for the example. Apart from the example model developed, the initial states and absorption states have also been identified. These place bounds on the final Markov chain. An edge case has also been identified when there are too few nodes to perform a full repair. This limits the extent to which a repair can cause a state transition in the model.
 
 \begin{figure}[htbp]
  \centering
  \includegraphics[clip=true, viewport=0.5cm 19.5cm 8.5cm 29.5cm, width=0.7\columnwidth]{Markov_chain_repair_compact}
- \caption{Markov chain modeling object replica number as well as network size and taking into account initial states, absorbtion states and the edge case of the network size limiting the replica number.}
+ \caption{Markov chain modeling object replica number as well as network size and taking into account initial states, absorption states and the edge case of the network size limiting the replica number.}
  \label{fig_markov_chain}
 \end{figure}
 %
 When these three aspects are taken into account, a Markov model of the form shown in Figure \ref{fig_markov_chain} is described. State transitions from one state to a consecutive state are shown by solid lines and transitions from one state to another state that contains intermediate state are shown by dashed lines. For dashed lines, to transition probabilities are shown: the transition probability from the source state and the transition probability to the destination state. The exception here is repair that has a fixed transition probability of $\mu$. For repair, the destination state is also given.
 
-In Figure \ref{fig_markov_chain}, white states are initial states, red states are absorbtion states and blue states are neither initial nor absorbtion states. As explained earlier, initial state are state where the number of required replicas $r=R$ are inserted into the network if $n\geq R$, or where number of replicas equal to the number of nodes $r=n$ are inserted into the network if $n < R$. Absorbtion states are where no more object replicas exist in the network. There is, therefore, no way for objects to be repaired from this state.
+In Figure \ref{fig_markov_chain}, white states are initial states, red states are absorption states and blue states are neither initial nor absorption states. As explained earlier, initial states are states where the number of required replicas $r=R$ are inserted into the network if $n\geq R$, or where number of replicas equal to the number of nodes $r=n$ are inserted into the network if $n < R$. Absorption states are where no more object replicas exist in the network. There is, therefore, no way for objects to be repaired from this state.
 
 It is evident that this model is a finite state model when a maximum number of nodes are assumed. In the horizontal, it is bounded by the required number of replicas $R$ and in the vertical it is bounded by the maximum number of nodes $N$. It can also be seen that this model does not have a rectangular shape, since there can never be more replicas than nodes ($r\leq n$).
 
@@ -178,7 +178,7 @@ The total number of states is the sum of the two cases and is given by
 
 For the size of network that Pithos was simulated for with 2500 nodes and 6 replicas per object, the resulting Markov chain contains 17486 states. The large number of states makes a closed form solution to the object lifetime problem intractable. Fortunately, numerical methods can be used to calculate object lifetimes for given numbers of replicas and maximum node sizes.
 
-When calculating absorbtion times in the Markov chain, the number of transient states is also required. Transient states, as opposed to absorbtion states, are states out of which a transition can occur. In the model presented, all states containing zero replicas are absorbtion states. If the absorbtion states are removed, following the same process as with Equation \eqref{eq_states_num_ans}, but using $R$ instead of $R+1$ replica states, the number of transient states is given by
+When calculating absorption times in the Markov chain, the number of transient states is also required. Transient states, as opposed to absorption states, are states out of which a transition can occur. In the model presented, all states containing zero replicas are absorption states. If the absorption states are removed, following the same process as with Equation \eqref{eq_states_num_ans}, but using $R$ instead of $R+1$ replica states, the number of transient states is given by
 %
 \begin{equation}
 S_\textrm{transient} = 0.5 R (2 N - R + 1), \quad\textrm{where}\quad N \geq R. \label{eq_transient_states_num}
@@ -210,7 +210,7 @@ Using $t_{ik}$, \textbf{\^{P}} is given by
     \hat{p}(ik, jl) = p(ik, jl) t_{ik}.
 \end{equation}
 
-Object lifetime can be calculated by calculating the expected time to absorbtion of the embedded continuous time Markov chain. To do this, the normalised transitional rates matrix is partitioned into the form
+Object lifetime can be calculated by calculating the expected time to absorption of the embedded continuous time Markov chain. To do this, the normalised transitional rates matrix is partitioned into the form
 %
 \begin{equation} \label{matrix_partition}
     \textbf{\^{P}} = \left[\begin{array}{c|c}
@@ -232,7 +232,7 @@ From \textbf{Q}, the fundamental matrix \textbf{N} may be calculated as \cite{gr
 %
 Every element $n_{ik,jl}$ in the fundamental matrix \textbf{N} gives the expected number of times that the model is in the state $jl$, if it started in the transient state $ik$.
 
-The expected time to absorbtion is then the product of the time spent in each state and the expected number of times a state will be entered, as given by
+The expected time to absorption is then the product of the time spent in each state and the expected number of times a state will be entered, as given by
 %
 \begin{equation} \label{expected_lifetime}
     \textbf{E[L]} = \textbf{Nt},
@@ -404,7 +404,7 @@ The transitional rates matrix is then normalised using Equation \eqref{eq_markov
 }.
 \end{equation}
 %
-The transient normalised transitional rates matrix $\textbf{Q}$ can be calculated by simply removing all rows and columns where there are zero replicas from the normalised transitional rates matrix $\textbf{\^{P}}$. Take note that most rows in $\textbf{Q}$ sum to one, but that some do not. These are where an absorbtion state was removed. When taking the absorbtion state into account, all rows sum to one.
+The transient normalised transitional rates matrix $\textbf{Q}$ can be calculated by simply removing all rows and columns where there are zero replicas from the normalised transitional rates matrix $\textbf{\^{P}}$. Take note that most rows in $\textbf{Q}$ sum to one, but that some do not. These are where an absorption state was removed. When taking the absorption state into account, all rows sum to one.
 
 The fundamental matrix can then by calculated by Equation \ref{eq_fundamental_mat}, which gives
 %
@@ -448,7 +448,7 @@ The expected node lifetimes, for every initial state, can then be calculated usi
  \textbf{1 node} &                & 2          \\
 \hline
 \end{tabular}
-\caption{Table showing expected object lifetimes for the number of nodes and replicas calculated in the example.}
+\caption{Expected object lifetimes for the number of nodes and replicas calculated in the example.}
 \label{tab_lifetimes_example}
 \end{table}
 %
@@ -459,7 +459,7 @@ Table \ref{tab_lifetimes_example} shows the results from Equation \eqref{expecte
 
 The simulation model will now be explored for larger numbers of objects and replicas to get an understanding of how the various network parameters influence object lifetime. For all results presented in this section, the following parameter values are used: a maximum network size of $N=120$, a required number of replicas of $R = 10$ and exponential node lifetime distributions with $\lambda = \theta = 1/1800$, which gives expected \emph{node} lifetimes of $1/\lambda = 1800$ seconds.
 
-It should be noted that the geometry of the practical network is not important for the model developed in this chapter. All that should be ensured is that objects are replicated and repaired as assumed in the model. The purpose of this chapter is, however, to investigate object lifetimes in Pithos groups. This is why a focus was placed on finite sized networks, since Pithos groups are often size limited. Which means that the size of a Pithos groups is comparable to the number of required object replicas. This is why a model assuming an infinite sized network is not applicable to Pithos.
+It should be noted that the network topology of the practical network is not important for the model developed in this chapter. All that should be ensured is that objects are replicated and repaired as assumed in the model. The purpose of this chapter is, however, to investigate object lifetimes in Pithos groups. This is why a focus was placed on finite sized networks, since Pithos groups are often size limited. Which means that the size of a Pithos groups is comparable to the number of required object replicas. This is why a model assuming an infinite sized network is not applicable to Pithos.
 
 During an investigation of the model, it was found that for the maximum network size $N$ to be sufficiently large, it does not have to be many orders of magnitude higher than the average network size presented. The choice of $N=120$ is the smallest number of nodes that no longer have an influence on the maximum average group size of $\tilde{n}=50$ being investigated in this section. It is preferable to choose the smallest possible maximum network size to minimise the state explosion of the Markov model and thereby allowing modern desktop computers to calculate the expected node lifetimes successfully.
 
@@ -571,10 +571,19 @@ Figure \ref{fig_lifetime_simulation_model_500_100} shows the simulation data and
 
 \section{Conclusion}
 
+\subsection{Summary}
 The Markov chain model proposed by Wu, Tian and Ng was extended to take network size into account when predicting object lifetimes. Results from the theoretical model show that when the average network size is comparable to the required number of replicas, object lifetimes are significantly decreased as is expected. The theoretical model validated the results of the model that ignores network size, when the average network size is large, compared to the required number of replicas. The model was also shown to compare well to simulation, with predicted and simulated mean object lifetimes differing on average by 3\%.
 
 We show how to reliably predict expected object lifetimes under the assumption of finite network sizes. When it is known that the average network size is comparable to the required number of replicas, the network size should be taken into account when modelling object lifetimes in a situation with repair. The theoretical model presented here allows for the design of a distributed storage system when the various average network sizes and node lifetime distributions are known.
 
+\subsection{The model in practice}
+
 The theoretical model allows for the Pithos architecture to be designed with specific expected node lifetimes. It provides a guideline for the values of various parameters in the Pithos architecture, such as repair rate and required number of replicas. The expansion of the theoretical model to take into account finite networks allows for the model to accurately predict object lifetimes for small Pithos groups.
 
-Because of the various groups that exist in Pithos, the possible range of group sizes have to be evaluated. The theoretical model will also assist in designing a system using dynamic parameters as a function of group size.
+Objects in Pithos possess finite TTLs. This is the time that an object is required to exist for in the group. The object TTL will depend on the type of object, as well as the overhead required to extend the TTL of objects. If a value has been chosen for the TTL, it fixes the required object lifetime in the storage system. The object lifetime prediction model allows for the network parameters to be taken into account and values for the required number of replicas and repair rate to be chosen to ensure (to a high probability) that an object will live as long as its required TTL.
+
+It should be noted that the Markov chain model developed in this chapter does not take malicious users into account. It is possible to have a required number of replicas in the network that produces expected object lifetimes that is sufficiently longer than the object TTL, to such an extent that object repair is not required. This scenario will lead to the number of object replicas steadily decreasing.
+
+The lower the number of replicas in the system, the more influence a malicious user or group of malicious users can exert in the system. For example, if there are only two replicas remaining in the system and a retrieval request returns different versions of the same object, it is not possible to determine which object has been maliciously altered.
+
+Because of this security weakness, it is recommended that object repair always be used and that the required number of replicas be made sufficiently large to enable quorum mechanisms to function correctly.

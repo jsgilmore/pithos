@@ -67,7 +67,9 @@ Grouping users is not sufficient to achieve a responsive system. Users should al
 
 \subsubsection{Replication}
 
-Replication improves responsiveness, because multiple copies of an object may be requested in parallel and the object that arrives fastest is used. Therefore, a set minimum number of object copies are stored in a group.
+Replication improves retrieval responsiveness, if multiple copies of an object may be requested in parallel and the object that arrives fastest is used. This is termed parallel retrieval in the Pithos design and is evaluated in Chapter \ref{chp:EVALUATION}.
+
+Depending on how storage is implemented, replication can also improve storage responsiveness if the first object that is successfully stored signals success to the higher layer. This is termed ``fast storage'' in the Pithos design, the suitability of which is evaluated in Chapter \ref{chp:EVALUATION}.
 
 \subsection{Reliability}
 
@@ -83,6 +85,8 @@ Every retrieve request is requested from both the group and the overlay storage.
 \subsubsection{Replication}
 
 Replication allows for multiple peers to leave the network before an object becomes unavailable, improving reliability. Because of network churn, replication is essential to ensuring objects survive network churn. If only a single object is stored, a node unexpectedly leaving the network destroys an object. There is no chance of an object being recovered if no replicas are used.
+
+It is, therefore, important that a sufficiently large number of replicas and repair rate be chosen, while taking the network parameters such as expected node lifetime and required TTL into account. The interaction between these parameters are explored in Chapter \ref{chp:MODELLING}.
 
 \subsubsection{Repair}
 
@@ -132,55 +136,58 @@ In this section we identify and discuss the key modules and mechanisms that Pith
  \label{fig_pithos}
 \end{figure}
 %
-Figure \ref{fig_pithos} shows the Pithos geometry. The figure shows groups of fully connected peers (light blue) and super peers (dark red). All peers are further connected to a single overlay. Pithos groups peers to form a two tiered storage model. The first tier is a storage model at group level (group storage) and the second is a storage model over all groups (overlay storage). Pithos can be considered as a multi-tiered structured overlay, with group storage an implementation of an $O(1)$ overlay and overlay storage an implementation of an $O(\log (N))$ overlay.
+Figure \ref{fig_pithos} shows the Pithos network topology. The figure shows groups of fully connected peers (light blue) and super peers (dark red). All peers are further connected to a single overlay. Pithos groups peers to form a two tiered storage model. The first tier is a storage model at group level (group storage) and the second is a storage model over all groups (overlay storage). Pithos can be considered as a multi-tiered structured overlay, with group storage an implementation of an $O(1)$ overlay and overlay storage an implementation of an $O(\log (N))$ overlay.
 
 When referring to state management and persistency as defined in Section \ref{management_persistency_def}, Pithos is designed to serve both requirements. Group storage is designed for state management and overlay storage for state persistency. Since state persistency does not require responsive storage, the overlay section of Pithos is well suited to this task, while group storage, with its high responsiveness is well suited to state management.
 
 \subsection{Group storage module}
 
-On a network level, group storage consists out of three node types: super peers, peers and a single directory server for the whole network. It is possible for a single Pithos terminal to be both a peer and a super peer.
+On a network level, group storage consists out of two node types: super peers and peers. It is possible for a single Pithos terminal to be both a peer and a super peer.
 
-Since group storage can be seen as an $O(1)$ structured overlay, it requires the features identified in Section \ref{structured_overlay_features}: geometry, routing, network join and leave and bootstrapping. Additionally to the required routing features, group migration should also be possible (moving from one group to another) and records of all objects stored and all peers present are also required. Lastly, some method of determining group membership is required.
+Since group storage can be seen as an $O(1)$ structured overlay, it requires the features identified in Section \ref{structured_overlay_features}: network topology, routing, network join and leave and bootstrapping. Additionally to the required routing features, group migration should also be possible (moving from one group to another) and records of all objects stored and all peers present are also required. Lastly, some method of determining group membership is required.
 
-\subsubsection{Geometry and routing}
+\subsubsection{Network topology and routing}
 
-The geometry is fully connected and routing in such a geometry is trivial. A peer's routing table contains a list of all peers in the group. To route a message to a destination peer, the peer address is retrieved from the routing table and a message is sent directly to that peer.
+The network topology is fully connected and routing in such a network topology is trivial. A peer's routing table contains a list of all peers in the group. To route a message to a destination peer, the peer address is retrieved from the routing table and a message is sent directly to that peer.
 
 \subsubsection{Super peers and peers}
 
 In group storage, peers handle requests from the higher application layers. Peers also represent users in group storage, which means that peers are the originators of all store, retrieve, modify and remove requests from a group perspective. The peers themselves receive those requests from the higher layer (such as a game client).
 
-Super peers are responsible for representing a group and managing group membership. Super peers also manage object repair.
+%Super peer selection
+Super peers are responsible for representing a group, managing group membership and managing object repair. The design of Pithos attempted to minimise super peer load, to prevent the functionality of the super peer to adversely affect the peer. The super peer does, however, require extra resources from the underlying system. It would, therefore, be preferable to select peers that have sufficient additional resources to become super peers.
+
+The question of super peer selection has not yet received sufficient research attention. The authors in \cite{Suesselbeck_super_peer_selection} discuss the need for a utility function that is able to calculate the appropriateness of a peer to become a super peer. The utility function takes certain system parameters into account. The issue is that many of the identified parameters cannot currently be reliably measured, including for example: user reputation, bandwidth and delay. The super peer selection problem is, therefore, still an open research problem.
+
+For the current Pithos design, it is assumed that some utility function exists to select the most appropriate peer and to promote that peer to super peer status.
 
 \subsubsection{Join and bootstrapping mechanisms}
 \label{join_mechanism_design}
 
-The directory server places joining peers into groups represented by super peers. The first task of a Pithos peer is to join the network and a group. This is done using the directory server, which possesses a static IP address and port that is known to every new peer and super peer.
+Peers should be able to join the P2P network and join a group in the P2P network. The Pithos design specifies that some well known entry point into the P2P network should exist that a peer can use for bootstrapping. For an MMVE, it is recommended that this be a peer or a set of peers that is controlled by the VE operator. It is understood that this design breaks away from a pure P2P design, but a pure P2P design is not always the best design in practice.
 
-\begin{figure}[htbp]
- \centering
- \includegraphics[clip=true, viewport=15mm 105mm 115mm 199mm, width=0.7\columnwidth]{Pithos_mechanisms}
- \caption{Pithos group join mechanism. The super peer publishes its VE location at the directory server, which allows the joining peer to be matched with a super peer and to join that super peer's group.}
- \label{fig_pithos_join}
-\end{figure}
-%
-With reference to Figure \ref{fig_pithos_join}, the join and bootstrapping mechanism works as follows:
-%
-\begin{enumerate}
-\item Whenever a super peer is created or potentially selected, it advertises its information with the directory server. This information includes its IP address, port and virtual location of the super peer in the VE.
+It is assumed that VE operators want to control access to the VE. The operator controlled bootstrapping mechanism will aid in that goal. If the bootstrapping mechanism is fully distributed, operators might have no way to control access to their VEs, which would simplify the task of pirating the VE and creating a separate free VE.
 
-\item When a peer wishes to join the network, it sends its current VE location to the directory server.
+A well known entry point into the network also simplifies the network design.
 
-\item  The directory server then responds with the address of a super peer, representing an initial group which the peer can join.
+For a peer to join a group, it is assumed that some distributed grouping mechanism would exist. Super peer might form part of their own virtual location aware overlay network. A joining peer can then be passed from super peer to neighbouring super peer, until an appropriate peer accepts the peer's join request.
 
-\item The joining peer then sends the same type of join request to the supplied super peer address.
+Peer joining will also depend on the specific grouping algorithm used.
 
-\item If the super peer accepts the joining peer, it sends that peer a list of all peers currently in the group, as well as a list of objects currently available in the group.
+\subsubsection{Grouping mechanism}
+\label{grouping_design}
 
-\item The super peer also informs all other group peers of the newly joined peer.
-\end{enumerate}
+In order for Pithos to build groups, a clustering mechanism is required. There already exists a wealth of clustering algorithms in literature and a few will be reviewed here.
 
-The super peer can elect to accept or reject the joining peer. This extra step is intended to prevent groups from becoming overloaded. The super peer can supply an alternative address for the joining peer to contact. This extra step is also intended to compensate for the movement of super peers. If a super peer moves, and by the time a joining peer contacts a super peer there is another super peer in closer range, the super peer receiving the join request can supply the joining peer with the address of the closer super peer.
+\emph{Distributed peer clustering techniques}: use the distance between users in the virtual environment to dynamically group users. The main idea of flocking is that users move around in groups, rather than randomly on their own. It is desirable that user density within groups should remain constant, because a fully distributed architecture is not scalable. This means that groups should merge or split as the user density within them change. It might also be required to have mobile groups, where a group has a velocity as well as a position, to be able to uniquely identify groups, even with users joining and leaving and the group moving through the virtual world.
+
+Affinity propagation clusters nodes using a similarity matrix to find similar nodes \cite{affinity_propagation}. The similarity matrix may contain user positions. In this case, affinity propagation will group nodes depending on their location in a virtual world. This algorithm might be well suited to P2P applications, since it is a distributed clustering algorithm based on message passing.
+
+\emph{Dynamic Voronoi regioning}: divides the virtual world into regions that can be resized or further divided to maintain constant user densities across regions. VSO \cite{VSO_Hu_Chen}, \cite{self_organising_sps_post} creates dynamic regions based on a Voronoi overlay network \cite{voronoi_diagrams_survey}. Near constant user density is achieved by increasing and decreasing the area sizes. This system is based on VON, a distributed Voronoi overlay network designed for MMVEs \cite{VON_VAST}.
+
+Clustering is also used in mobile ad-hoc networks (MANETs) for routing purposes. Mobile-aware clustering algorithms used in MANETs, might also be applicable to P2P MMVEs \cite{clustering_survey}. Mobile-aware clustering uses relative velocities of mobile nodes to define clusters containing nodes with low relative velocity to each other.
+
+Any of the above mentioned techniques might be used to achieve distributed clustering in P2P MMVEs. The focus of this work is, however, not on developing a novel clustering algorithm for P2P MMVEs, therefore we have chosen to use a super peer centered distance-based grouping approach for group clustering in our implementation. The implemented joining and grouping algorithms will be discussed in more detail in Section \ref{joining_and_grouping_imp}.
 
 \subsubsection{Leave mechanism}
 \label{leave_design}
@@ -205,7 +212,7 @@ In Pithos, two methods exist to ensure group consistency and handle peers leavin
 
 \item The originating peer of the keep alive message informs the super peer that the target of the keep-alive message is thought to have left the group.
 
-\item The super peer then also sends a keep-alive message to the target peer, to ensure that there isn't some communications issue between the two group peers and the target peer has actually left the network.
+\item The super peer then also sends a keep-alive message to the target peer, to ensure that there does not exist some communications issue between the two group peers, and that the target peer has actually left the network.
 
 \item If the target peer does not respond to the super peer, the super peer informs all group peers that the target peer has left the group.
 \end{enumerate}
@@ -225,9 +232,11 @@ For graceful group leaves, the same leave mechanisms as used in group migration 
 
 Users will constantly be moving in the virtual environment, leading to changes in position. These position changes may lead to users moving from one group to another. It is imperative that all objects stored in Pithos remain available even with users traversing groups.
 
-As avatars move around in the virtual world, Pithos queries the directory server at regular intervals with the new avatar positions, using the same mechanism described for joining a group in Section \ref{join_mechanism_design}. Directory server query intervals are long enough to prevent overloading of the directory server, but short enough to ensure peers have an up-to-date view of the group. The peer then receives a new super peer address from the directory server, if this address is different from the address of the currently known super peer. When a new address is received, Pithos initiates group migration.
+Group migration involves informing the group that the peer is leaving and initiating the group join mechanism. Informing the group that the peer is leaving ensures that this peer will not be picked for any storage or retrieval requests, while the group is unaware that the peer has left. If this is not done, the group will only know that a peer has left after a timeout for a request to the peer expires, which reduces request success rates.
 
-Group migration involves informing the group that the peer is leaving, clearing all statistics and initiating the group join mechanism. Statistics are cleared to ensure that peers moving between groups only publish the statistic for that group. Recorded statistics include: group size, the number of successful and failed store and retrieve requests, the total number of objects stored, and recorded object lifetimes. Informing the group that the peer is leaving ensures that this peer will not be picked for any storage or retrieval requests, while the group is unaware that the peer has left. If this is not done, the group will only know that a peer has left after a timeout for a request to the peer expires, which reduces request success rates.
+There is a time window between a peer leaving a group and all peers being informed of the migration. During this time, a peer that has migrated might receive requests from its original group. The peer will serve these requests if able and include a group ID in its response. If a peer receives a response from another group, the requesting peer removes the responding peer from its group list. Inter-group requests are not currently allowed due to scalability concerns as time passes and peers continue to migrate.
+
+The current implementation of the group migration mechanism is based on a centralised approach discussed in Section \ref{group_migration_implementation}.
 
 \subsubsection{Ledgers and object store modules}
 
@@ -236,21 +245,6 @@ The previous sections have focussed on group storage, purely as an $O(1)$ struct
 Each peer in the group contains a local authoritative object store, containing all objects stored on the peer by group storage. Each object is stored with an associated time-to-life (TTL) to prevent stale object copies.
 
 Each peer and super peer in the network contain a group ledger to keep track of which objects are stored on which peers. The group ledger is required whenever an object is retrieved within the group to know from which peer an object can be requested. The ledger is also used by the super peer, to determine which objects should be repaired.
-
-\subsubsection{Grouping mechanism}
-\label{grouping_design}
-
-In order for Pithos to build group, a clustering mechanism is required. There already exists a wealth of clustering algorithms in literature and a few will be reviewed here.
-
-\emph{Distributed peer clustering techniques}: use the distance between users in the virtual environment to dynamically group users. The main idea of flocking is that users move around in groups, rather than randomly on their own. It is desirable that user density within groups should remain constant, because a fully distributed architecture is not scalable. This means that groups should merge or split as the user density within them change. It might also be required to have mobile groups, where a group has a velocity as well as a position, to be able to uniquely identify groups, even with users joining and leaving and the group moving through the virtual world.
-
-Affinity propagation clusters nodes using a similarity matrix to find similar nodes \cite{affinity_propagation}. The similarity matrix may contain user positions. In this case, affinity propagation will group nodes depending on their location in a virtual world. This algorithm might be well suited to P2P applications, since it is a distributed clustering algorithm based on message passing.
-
-\emph{Dynamic regioning}: divides the virtual world into regions that can be resized or further divided to maintain constant user densities across regions. SOSPS \cite{self_organising_sps_post} creates dynamic regions based on a Voronoi overlay network \cite{voronoi_diagrams_survey}. Near constant user density is achieved by increasing and decreasing the area sizes. This system is based on VON, a distributed Voronoi overlay network designed for MMVEs \cite{VON_VAST}.
-
-Clustering is also used in mobile ad-hoc networks (MANETs) for routing purposes. Mobile-aware clustering algorithms used in MANETs, might also be applicable to P2P MMVEs \cite{clustering_survey}. Mobile-aware clustering uses relative velocities of mobile nodes to define clusters containing nodes with low relative velocity to each other.
-
-Any of the above mentioned techniques might be used to achieve distributed clustering in P2P MMVEs. The focus of this work is, however, not on developing a novel clustering algorithm for P2P MMVEs, therefore we have chosen to use a super peer centered distance-based grouping approach for group clustering. Our current implementation makes use of a centralised grouping algorithm that adds a peer to the group of the nearest super peer. The directory server is used to determine the best group by  comparing super peer and peer distances. This grouping algorithm will be discussed in more depth in Section \ref{joining_and_grouping_imp}.
 
 \subsubsection{Distance-based storage mechanism}
 \label{distance_based_design}
@@ -273,9 +267,9 @@ An example of an overly storage that might be used in Pithos is PAST \cite{PAST_
 
 In order to design a secure distributed storage system, one requirement for the P2P overlay is that peers should not be able to select their own IDs or it will not be possible to secure the system against attack. Peer IDs should rather be assigned securely by some certification authority \cite{secure_overlay_routing}.
 
-To meet this requirement, Pithos implements its own certification authority to assign peer IDs securely and promote security in the P2P overlay. A certification server exists that handle ID requests from peers. This functionality is integrated into the directory server. The server assigns IDs to peers and provides the peer with a signed certificate that it may use to store data.
+To meet this requirement, Pithos implements its own certification authority to assign peer IDs securely and promote security in the P2P overlay. A certification server exists that handle ID requests from peers. The server assigns IDs to peers and provides the peer with a signed certificate that it may use to store data.
 
-Whenever an object is stored or updated in the storage network, peers have to sign the object to enable the tracking of object changes throughout the life of the object. This system is very different from classic distributed file storage designs that advocate anonymity in storage. The fact that all changes can be tracked to a specific peer will simplify the task of eliminating user cheating.
+Whenever an object is stored or updated in the storage network, peers have to sign the object to enable the tracking of object changes throughout the life of the object. This system is different from classic distributed file storage designs that advocate anonymity in storage. The fact that all changes can be tracked to a specific peer will simplify the task of eliminating user cheating.
 
 \subsection{Quorum mechanism}
 \label{quorum}
@@ -377,7 +371,7 @@ Because safe storage ensures that most of the replications are successfully stor
  \label{fig_pithos_retrieval}
 \end{figure}
 %
-The process of retrieving object data is very similar to that of storing object data. With reference to Figure \ref{fig_pithos_retrieval}, retrieval works as follows:
+The process of retrieving object data is similar to that of storing object data. With reference to Figure \ref{fig_pithos_retrieval}, retrieval works as follows:
 %
 \begin{enumerate}
 \item The retrieve request, received from the higher layer, contains the hash of the object name which the higher layer requires.
@@ -399,7 +393,7 @@ Sending multiple requests improves the chances of contacting a peer that is clos
 
 The safe retrieval request is more resistent to malicious nodes. For safe retrieval, Pithos waits for a specified number of responses in order to use the quorum mechanism described in Section \ref{quorum}.
 
-As shown in Figure \ref{fig_pithos_retrieval}, the super peer is not used for retrieval requests. This is not necessary, since all peers contain lists of all objects. The super peer should, however, still contain it own group ledger, to inform peers joining the group of the peers and objects already in the group. Not requiring the super peer to manage object requests prevents the super peer from becoming overloaded.
+As shown in Figure \ref{fig_pithos_retrieval}, the super peer is not used for retrieval requests. This is not necessary, since all peers contain lists of all objects. The super peer should, however, still contain its own group ledger, to inform peers joining the group of the peers and objects already in the group. Not requiring the super peer to manage object requests prevents the super peer from becoming overloaded.
 
 \subsection{Modify}
 
@@ -408,6 +402,7 @@ Modifying data is similar to storing data. A request to modify a specific object
 If the object exists within the group, all peers that contain the object are identified from the group ledger and modify requests are sent to them. The modify request is sent to the destination peer, where the object in the local store is updated and its version number incremented. If a retrieve request receives objects with multiple version numbers, it selects the set of objects with the latest version number for ``safe'' comparison.
 
 \subsection{Remove}
+\label{remove_use_case}
 
 Removal is handled by the object TTL. It is not possible to define an explicit remove operation for overlay storage, since a peer may be off-line when the removal request is sent. If the peer rejoins the network, the object becomes available again. Object TTL ensures that the storage space requirements does not increase indefinitely during the lifetime of the storage system.
 
@@ -419,6 +414,6 @@ The conceptual design is first described in terms of how it ensures the storage 
 
 Pithos is designed as a multi-tiered distributed storage system, containing multiple $O(1)$ group stores and a single $O(\log(N)$ overlay store. Each node is connected to the overlay storage and grouped into group storage. A certification mechanisms ensures store and retrieve requests can be tracked and that malicious users can be identified. It contains a quorum mechanism that rejects maliciously altered objects. To maintain reliability, a replication redundance mechanism with repair is used.
 
-Group storage has a fully connected geometry, containing peers and super peers. Joining, leaving, bootstrapping and migration makes use of a directory server to handle administration. Ledgers allow each peer in a group to keep track of all other group peers and all objects available on the group peers. Distance-based storage is used to ensure that retrieval requests for objects in the VE are mostly within the same group.
+Group storage has a fully connected network topology, containing peers and super peers. Ledgers allow each peer in a group to keep track of all other group peers and all objects available on the group peers. Distance-based storage is used to ensure that retrieval requests for objects in the VE are mostly within the same group.
 
 Every storage, retrieval and modification request is sent to both overlay and group storage. Group storage makes use of the group ledgers to find object locations for retrieval and possible peers for storage. Removal is ensured by the association of a TTL with all objects.

@@ -28,6 +28,10 @@ At the base of an Oversim simulation is the underlay network. The underlay netwo
 
 A node type is determined by the protocols executing on every layer of the Oversim architecture. As discussed in Section \ref{key_modules_mechs}, the Pithos node types are the peer, super peer and directory server.
 
+For the Pithos simulation, reliable communication was assumed. It was also assumed that nodes have sufficiently large receive buffers to buffer all required messages until they are handled. No message ordering was assumed. Messages are allowed to be received in a different order than the order they were sent in. This, in fact, always happens when a larger message is sent before a smaller message.
+
+The time that a message is scheduled to be received at the destination is the time when the message would have been fully received by the destination.
+
 \subsubsection{Latency profiles}
 In the simple underlay, node latencies are determined by the distance between nodes placed in a two dimensional Euclidean space. The positions of the nodes are chosen to match the latencies of the CAIDA/Skitter Internet mapping project \cite{caida_skitter}. Different nodes are also assigned different bandwidth and jitter parameters to simulate a heterogenous network. The simple underlay, therefore, captures the delay characteristics of a global scale network in an abstract way. The simple underlay network is ideal for simulating large scale overlay networks because of its simplicity and high accuracy \cite{oversim_applications}.
 
@@ -87,7 +91,7 @@ Tier 1 can communicate with the Tier 2, overlay, TCP and UDP layers. Tier 2 can 
 \begin{figure}[htbp]
  \centering
  \includegraphics[clip=true, viewport=37mm 27mm 263mm 155mm, width=0.8\columnwidth]{Oversim_architecture}
- \caption{The components of an Oversim terminal, including the tiered node architecture.}
+ \caption{Components of an Oversim terminal, including the tiered node architecture.}
  \label{fig_oversim_architecture}
 \end{figure}
 %
@@ -101,7 +105,7 @@ To allow for the evaluation of Pithos as a module of a larger generic state cons
 \begin{figure}[htbp]
  \centering
  \includegraphics[width=0.8\columnwidth]{MMVEHost_architecture}
- \caption{The components of the expanded Oversim terminal, including all modules required for the generic consistency model.}
+ \caption{Components of the expanded Oversim terminal, including all modules required for the generic consistency model.}
  \label{fig_mmvehost_architecture}
 \end{figure}
 
@@ -111,7 +115,7 @@ Every new layer can communicate with the layer above and below it, and can also 
 
 A difference between the generic model and the Oversim implementation is the two modules: ``overlay storage'' and ``overlay''. The ``overlay storage'' module houses the third-party overlay storage implementation and the implementation requires a separate overlay routing module. The separation is, therefore, for practical reasons. Conceptually, both the overlay storage and overlay modules form part of the authoritative object store.
 
-Every module can contain a collection of sub-modules which implements the layer itself. It the layer is not implemented, a dummy layer is specified. The Pithos implementation is located within the authoritative object store module. An application that provides Pithos with test inputs called ``PithosTestApp'' is situated within the authoritative object updater layer. Pithos also makes use of overlay storage, which is implemented in the overlay storage module. Overlay storage requires a P2P overlay for routing purposes, which is why it is connected to the overlay layer.
+Every module can contain a collection of sub-modules which implements the layer itself. If the layer is not implemented, a dummy layer is specified. The Pithos implementation is located within the authoritative object store module. An application that provides Pithos with test inputs called ``PithosTestApp'' is situated within the authoritative object updater layer. Pithos also makes use of overlay storage, which is implemented in the overlay storage module. Overlay storage requires a P2P overlay for routing purposes, which is why it is connected to the overlay layer.
 
 \section{Module types}
 \label{pithos_module_types}
@@ -220,24 +224,53 @@ While the previous chapter describes all key mechanisms, some adjustments had to
 \subsection{Joining the network and grouping}
 \label{joining_and_grouping_imp}
 
-As described in Section \ref{join_mechanism_design}, in order to join the network, a super peer should supply its location in the virtual environment (VE) to the directory server. A joining peer should also supply its location to the directory server, so the directory server may supply the joining peer with a super peer's address to join.
+It was decided that the work on Pithos would focus on improving the performance aspects of distributed storage systems, rather than on distributed joining and grouping mechanisms. It is accepted that this is work that has to be done, but it will be done as future research.
+
+For the Pithos implementation, a single directory server was used. The directory server places joining peers into groups represented by super peers. The first task of a Pithos peer is to join the network and a group. This is done using the directory server, which possesses a static IP address and port that is known to every new peer and super peer.
+
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[clip=true, viewport=15mm 105mm 115mm 199mm, width=0.7\columnwidth]{Pithos_mechanisms}
+ \caption{Pithos group join mechanism. The super peer publishes its VE location at the directory server, which allows the joining peer to be matched with a super peer and to join that super peer's group.}
+ \label{fig_pithos_join}
+\end{figure}
+%
+With reference to Figure \ref{fig_pithos_join}, the join and bootstrapping mechanism works as follows:
+%
+\begin{enumerate}
+\item Whenever a super peer is created or potentially selected, it advertises its information with the directory server. This information includes its IP address, port and virtual location of the super peer in the VE.
+
+\item When a peer wishes to join the network, it sends its current VE location to the directory server.
+
+\item  The directory server then responds with the address of a super peer, representing an initial group which the peer can join.
+
+\item The joining peer then sends the same type of join request to the supplied super peer address.
+
+\item If the super peer accepts the joining peer, it sends that peer a list of all peers currently in the group, as well as a list of objects currently available in the group.
+
+\item The super peer also informs all other group peers of the newly joined peer.
+\end{enumerate}
+
+The super peer can elect to accept or reject the joining peer. This extra step is intended to prevent groups from becoming overloaded. The super peer can supply an alternative address for the joining peer to contact. This extra step is also intended to compensate for the movement of super peers. If a super peer moves, and by the time a joining peer contacts a super peer there is another super peer in closer range, the super peer receiving the join request can supply the joining peer with the address of the closer super peer.
 
 Because Pithos is not functioning in an actual VE, peers have no locations. For simulation purposes, each super peer is assigned a random location created by sampling both an x and a y coordinate from a uniform random distribution in a fixed range (0 to 100). Joining peers are assigned positions in the same uniform random manner when they are initialised.
 
 These positions are used by the super peers and peers when contacting the directory server. The directory server supplies the peer with the address of the closest super peer to join. This is an implementation of a simple centralised grouping algorithm. Super peers effectively control certain areas in the VE, based on their and their neighbours' locations.
 
-Although the distributed grouping techniques discussed in Section \ref{grouping_design} are exchanged for a simple centralised scheme, it serves its purpose to group all peers into groups controlled by super peers for the simulation. In a practical implementation, this solution is still applicable, but the directory server might become overloaded. If this happens, a more powerful directory server can be used, or one of the distributed grouping algorithms may be implemented.
+Although the distributed grouping techniques discussed in Section \ref{grouping_design} are exchanged for a simple centralised scheme, it serves its purpose to group all peers into groups controlled by super peers for the simulation. In a practical implementation, this solution is still applicable, but the directory server might become overloaded. The distributed grouping and joining mechanism is, therefore, recommended.
 
 \subsection{Group migration}
 \label{group_migration_implementation}
 
 To simulate the effect that user movement will have on objects stored in Pithos, PithosTestApp is designed to generate position updates.
 
-PithosTestApp simulates a user moving around in a virtual world. This is done by having PithosTestApp generate a new random position chosen in the same way as when a node joined a group: by selected x and y coordinates in a uniformly random fashion. A position update timer determines when a node's position should change.
+PithosTestApp simulates a user moving around in a virtual world. This is done by having PithosTestApp generate a new random position chosen in the same way as when a node joined a group: by selected x and y coordinates in a uniformly random fashion. A position update timer determines when a node's position should change. When a new position is generated by PithosTestApp, this is sent to the group storage module, which then initiates the group migration mechanism.
 
-It is accepted that the movement this scheme will generate will not match the way users move in a virtual world. Modelling accurate user movement is, however, not important for the Pithos simulation. Storing and retrieving objects in Pithos only depends on which group a user occupies and how Pithos handles a user that moves to another group. The order in which a user might enter groups or, in fact, the specific group that a user moves to, is not important. All that is important is how objects are handled when any group migration occurs.
+As avatars move around in the virtual world and PithosTestApp sends position updates to Pithos, Pithos queries the directory server at regular intervals with new avatar positions, using the same mechanism described for joining a group in Section \ref{joining_and_grouping_imp}. Directory server query intervals are long enough to prevent overloading of the directory server, but short enough to ensure peers have an up-to-date view of the group. The peer then receives a new super peer address from the directory server, if this address is different from the address of the currently known super peer. When a new address is received, Pithos initiates group migration.
 
-When a new position is generated by PithosTestApp, this is sent to the group storage module, which then initiates the group migration mechanism explained in Section \ref{migration_design}.
+It is accepted that the movement scheme does not match the way users move in a virtual world. Modelling accurate user movement is, however, not considered important for the current Pithos simulation. Storing and retrieving objects in Pithos only depends on which group a user occupies, the group density and how Pithos handles a user that moves to another group. The order in which a user might enter groups or, in fact, the specific group that a user moves to, is not considered important. All that is important is how objects are handled when any group migration occurs and how group density affect the performance.
+
+The effect of user movement traces on the performance of Pithos will be explored as future research.
 
 \subsection{Tracking requests}
 \label{pending_rpcs_implementation}
@@ -280,7 +313,7 @@ For a detailed discussion on group consistency and the reasons for the various s
 
 \begin{figure}[htbp]
  \centering
- \includegraphics[clip=true, viewport=0mm 0mm 570mm 265mm, width=\columnwidth]{gc_final}
+ \includegraphics[clip=true, viewport=12mm 35mm 275mm 165mm, width=\columnwidth]{gc_final_png}
  \caption{Group consistency after all improvements}
  \label{fig_gc_final}
 \end{figure}
@@ -310,15 +343,15 @@ PithosTestApp has four functions:
 
 \subsection{Store requests}
 
-Pithos periodically generates store requests of random sizes. The sizes of these requests are based on the literature on how large game objects usually are. This includes an evaluation that was performed on the size of game objects in Ultima Online and the measurements acquired from the Donnybrook architecture \cite{Bharambe_Donnybrook}.
+PithosTestApp periodically generates store requests of random sizes. The sizes of these requests are based on the literature on how large game objects usually are. This includes an evaluation that was performed on the size of game objects in Ultima Online and the measurements acquired from the Donnybrook architecture \cite{Bharambe_Donnybrook}.
 
-All store request are sent to Pithos in the lower layer. When a response is received that an object has been successfully stored, the object information is added to a global map, containing all generated objects.
+All store requests are sent to Pithos in the lower layer. When a response is received that an object has been successfully stored, the object information is added to a global map, containing all generated objects.
 
 \subsection{Retrieve requests}
 
 The global object map is not available to Pithos and is only used by PithosTestApp to enable object retrieval and for retrieved objects to be verified. Objects in the global object map are grouped by the group they are stored in.
 
-Pithos periodically generates retrieve requests for random objects. An object is selected from the global object map and a request for this object is made to Pithos. The object itself is never supplied to Pithos, other than when it is stored.
+PithosTestApp periodically generates retrieve requests for random objects. An object is selected from the global object map and a request for this object is made to Pithos. The object itself is never supplied to Pithos, other than when it is stored.
 
 PithosTestApp can generate in-group object requests with a given probability. This is to test how well Pithos will function when distance-based storage is implemented to store objects. The assumption is that, with distance-based storage, a high number of retrieval requests will be for nodes within the same group, as opposed to out-of-group nodes.
 

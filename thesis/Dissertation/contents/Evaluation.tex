@@ -3,8 +3,6 @@
 
 The purpose of this chapter is to verify that Pithos meets the design requirements set out in Chapter \ref{chp:DESIGN} and to compare Pithos to overlay storage. Following the discussion of the Pithos design and implementation, the performance of Pithos will now be presented, along with a comparison of Pithos against overlay storage.
 
-The purpose of this chapter is twofold. To compare the various methods of mechanism implementation and to compare Pithos with other storage architectures reviewed in Chapter \ref{p2p_MMVE_state_persistency}. Each comparison will be performed using the applicable metrics defined in Section \ref{key_challenges_cm}.
-
 The overhead (bandwidth usage), reliability and responsiveness of Pithos will be evaluated together, since the one influences the other as will be shown. The fairness, scalability and security of Pithos will then be evaluated separately.
 
 \section{Simulation setup}
@@ -72,7 +70,7 @@ Reliability is measured as the ratio of successful responses received, to the to
 
 Responsiveness is measured as the round trip latency of a request in seconds.  In other words, the time it takes, since a request is generated, until a response is received. For the latencies measured in all the results shown, the widest 95\% confidence interval for all means measured is 0.3ms, which gives an idea of the precision of the results presented.
 
-\subsubsection{Bandwidth}
+\subsubsection{Bandwidth usage}
 
 Bandwidth is measured in bytes per second (Bps) and measures the amount of data transferred per unit of time. In the simulation, a distinction can be made between the data used for group storage and the data used for overlay storage. These two entities are two different modules in the Oversim simulation. Every module measures the amount of data that it sends and received over UDP. This data is used when measuring group and overlay storage bandwidth. It, therefore, includes both the object data as well as any overhead.
 
@@ -157,7 +155,11 @@ Fast    &  100     &   0.0665 (0.00593) \\
 \label{tab_pithos_storage_results}
 \end{table}
 %
-Table \ref{tab_pithos_storage_results} shows that when fast storage is used, a reliability of 100\% is achieved, which is higher then the 97.0\% reliability of safe storage. The real reliability isn't actually higher, but because fast storage only waits for a single successful response before reporting success, it reports more successful storages. Safe storage, on the other hand, ensures that a majority of replicas were successfully stored before reporting success. Fast storage will still report success, even if the majority of files were not successfully stored.
+Table \ref{tab_pithos_storage_results} shows that when fast storage is used, a reliability of 100\% is achieved, which is higher then the 97.0\% reliability of safe storage. The real reliability is not actually higher, but because fast storage only waits for a single successful response before reporting success, it reports more successful storages. Safe storage, on the other hand, ensures that a majority of replicas were successfully stored before reporting success.
+
+Fast storage will still report success, even if the majority of files were not successfully stored. Fast storage is thus trading reliability for responsiveness. If the underlying network is sufficiently reliable that there is a low probability of any request failing, fast storage is more appropriate than safe storage.
+
+Fast storage can also be extended to retry a failed storage request and to select a new destination for the request. If the failure probability is low, the extension should have a negligible effect on responsiveness, while increasing reliability.
 
 The advantage of fast storage over safe storage is its higher responsiveness of 0.0488s, compared to safe storage's 1.576 s. This means that data are available for retrieval 32 times faster with fast storage compared to safe storage.
 
@@ -198,7 +200,7 @@ The question whether fast or parallel retrieval is preferred depends on the impl
 \subsection{Bandwidth requirements}
 \label{bandwidth_requirements}
 
-To enable a fair comparison of the different Pithos storage and retrieval methods as well as overlay storage, requires also considering the required bandwidth. Table \ref{tab_pithos_results} shows the required bandwidth of Pithos's group storage architecture. Because Pithos is a hybrid storage scheme, its properties depend on the underlying properties of both group and overlay storage modules.
+Bandwidth requirements have to be taken into account to enable a fair comparison of the different Pithos storage and retrieval methods as well as to compare Pithos with overlay storage. Table \ref{tab_pithos_results} shows the required bandwidth of Pithos's group storage architecture. Because Pithos is a hybrid storage scheme, its properties depend on the underlying properties of both group and overlay storage modules.
 
 To place the bandwidth usage into perspective, the data sent to Pithos by PithosTestApp and received from Pithos by PithosTestApp should be considered. For the simulation setup as described, 4 bytes per second (Bps) is sent to Pithos and 157 Bps is received from Pithos. The reason why there is less data sent to Pithos, is because of nodes only generating objects for 20s, as discussed in Section \ref{simulation_setup} and retrieval requests being generated during the complete lifetime of a node.
 
@@ -340,7 +342,7 @@ The shape of Figure \ref{fig_group_get_zoom_fp} differs from that of Figure \ref
 
 It is expected that the characteristics of the underlying network architecture influence the performance of any higher layer architecture build on top of it. To investigate the influence of the underlay, an experiment is performed where the coordinate-based underlay network is replaced by a fixed delay 1ms underlay with 0.1\% jitter.
 
-It is expected that group storage should show two hop responsiveness, because of the fully connected group geometry, and that overlay storage should show more hops than group storage, because of the $O(\log(N))$ performance of the overlay.
+It is expected that group storage should show two hop responsiveness, because of the fully connected group network topology, and that overlay storage should show more hops than group storage, because of the $O(\log(N))$ performance of the overlay.
 
 \subsubsection{Group retrieval}
 
@@ -581,7 +583,7 @@ As expected, doing no repair does not cope well with short node lifetimes compar
 
 This observation is helpful when designing a P2P MMVE. Objects might be classified according to how long they should remain in the system. Objects that should only remain in the system for approximately the same amount of time as the expected user session time need not use repair mechanisms, if a sufficient number of replicas are used.
 
-When node lifetimes are the same as the periodic repair interval, leaving repair copes better than periodic repair. The periodic repair mechanism might be adjusted to less than the minimum expected node lifetime in the system, but this will increase the load on the super peer, which has to perform the periodic checks. From the data is seems that leaving repair might be able to better handle a situation where node lifetimes have a high dynamic range, since the rate at which peers leave the network is directly tied to how often leaving repair performs repairs.
+When node lifetimes are the same as the periodic repair interval, leaving repair copes better than periodic repair. The periodic repair mechanism might be adjusted to less than the minimum expected node lifetime in the system, but this will increase the load on the super peer, which has to perform the periodic checks. From the data it seems that leaving repair might be able to better handle a situation where node lifetimes have a high dynamic range, since the rate at which peers leave the network is directly tied to how often leaving repair performs repairs.
 
 Except for the case where the periodic repair timer is equal to the expected node lifetime, leaving and periodic repair appear to perform similarly in terms of reliability.
 
@@ -613,7 +615,7 @@ Although parallel retrieval has been shown to be the most reliable retrieval mec
 
 The reason why parallel retrieval's bandwidth continues to grow is due to the mean number of object replicas available. Although parallel retrieval always attempts to retrieve six replicas (for this experiment), depending on the network conditions, the average number of object replicas is always smaller than the required number of object replicas. This is especially true for the case with no repair, where an object starts with the maximum number of replicas, but that number gradually decreases over the lifetime of the object. Object lifetime, which determines the average number of available replicas, is highly dependant on node lifetime, as will be discussed in Chapter \ref{chp:MODELLING}.
 
-This means that the longer the average node lifetime, the higher the average number of replicas per object. The bandwidth usage shown for parallel retrieval thus converges to an amount representing six replicas in the system. The bandwidth does, however, not increase six fold, since most of the bandwidth is due to overlay storage, which doesn't increase.
+This means that the longer the average node lifetime, the higher the average number of replicas per object. The bandwidth usage shown for parallel retrieval thus converges to an amount representing six replicas in the system. The bandwidth does, however, not increase six fold, since most of the bandwidth is due to overlay storage, which does not increase.
 
 The bandwidth usage of leaving and periodic repair are similar for long peer lifetimes, compared to the periodic repair timer. Bandwidth usage is low for short node lifetimes, because of the low reliability. Many retrieve requests fail for short node lifetimes, which means that fewer object are returned and less bandwidth is used.
 
@@ -621,7 +623,7 @@ Although doing no repair is less reliable, it used less bandwidth, because no ob
 
 \subsection{Conclusion}
 
-The leaving and periodic repair mechanisms were found to posses similar reliability and bandwidth performances. It seemed that leaving repair does, however, cope better with dynamic node lifetimes. A periodic timer also has to be designed for specific network parameters, including expected node lifetime and object TTL. If, during the lifetime of the network, the parameters change, the system will not be able to dynamically adapt.
+The leaving and periodic repair mechanisms were found to possess similar reliability and bandwidth performances. It seemed that leaving repair does, however, cope better with dynamic node lifetimes. A periodic timer also has to be designed for specific network parameters, including expected node lifetime and object TTL. If, during the lifetime of the network, the parameters change, the system will not be able to dynamically adapt.
 
 As expected, doing no repair is less reliable than doing repair, but uses less bandwidth. Parallel retrieval is highly reliable, but requires a large amount of bandwidth.
 
@@ -630,7 +632,7 @@ Pithos shows improved performance when using Pareto lifetime distributions, disc
 \section{Security}
 \label{malicious_results}
 
-The results thus far have shown that Pithos is both responsive and reliable. In this section, in order verify that Pithos meets the security design requirements specified, we investigate the object retrieval reliability in the presence of malicious users in the P2P network.
+The results thus far have shown that Pithos is both responsive and reliable. In this section, in order to verify that Pithos meets the security design requirements specified, we investigate the object retrieval reliability in the presence of malicious users in the P2P network.
 
 As a result of its design, fast retrieval is not resistant to malicious users, since it will retrieve corrupted objects, if the first retrieval response was received from a malicious user. Safe retrieval uses a quorum mechanism to respond with the object, which the majority of queried peers agree is correct. We therefore expect safe retrieval to be resistant to the presence of malicious users.
 
@@ -692,7 +694,7 @@ Figure \ref{fig_malicious_nodes_rel} also shows the performance of overlay stora
  \label{fig_malicious_nodes_resp}
 \end{figure}
 %
-Figure \ref{fig_malicious_nodes_resp} shows the responsiveness of Pithos for various malicious node probabilities. Fast retrieval has the lowest latency, since it responds with the first object received and doesn't wait to compare objects. Overlay retrieval is slower than all other forms of retrieval, because of the nature of overlay retrieval as previously discussed.
+Figure \ref{fig_malicious_nodes_resp} shows the responsiveness of Pithos for various malicious node probabilities. Fast retrieval has the lowest latency, since it responds with the first object received and does not wait to compare objects. Overlay retrieval is slower than all other forms of retrieval, because of the nature of overlay retrieval as previously discussed.
 
 Safe retrieval, when comparing four objects is slower than fast retrieval, since it has to wait for four objects before it can compare. The responsiveness of the four compare retrieval is thus the responsiveness of the slowest of four requests. Safe retrieval, comparing six objects is slower than comparing four objects, since the responsiveness is now the slowest time of six requested objects. When requesting more objects, there is a higher probability that a slower object will be selected.
 
@@ -710,7 +712,7 @@ Safe retrieval performing four comparisons and safe retrieval performing six com
 
 \subsection{Conclusion}
 
-The section shows that Pithos's safe retrieval mechanism can be used to increase reliability in the presence of malicious users in the network, at the cost of responsiveness and bandwidth. Since we cannot assume that there will not be malicious in a virtual environment, this cost is deemed acceptable.
+The section shows that Pithos's safe retrieval mechanism can be used to increase reliability in the presence of malicious users in the network, at the cost of responsiveness and bandwidth. Since we cannot assume that there will not be malicious nodes in a virtual environment, this cost is deemed acceptable.
 
 During the lifetime of the virtual world, it is important to monitor the malicious user percentage, to determine how parameters, such as number of retrieve requests and number of compares, should be adjusted to combat the threat while minimising bandwidth and maximising responsiveness.
 
@@ -768,7 +770,7 @@ Figure \ref{fig_overlay_fairness} shows the distribution of overlay objects over
 Figure \ref{fig_pithos_fairness} shows the object distribution of Pithos, with a mean and standard deviation of 31.3 and 9 objects per node respectively. The figure shows that no peers store no objects. While all peers in Pithos store objects, the standard deviation of the objects stored is higher for Pithos (9 objects) than for overlay storage (6.4 objects), which means that Pithos is not as fair as overlay storage.
 
 \subsection{Conclusion}
-What should be concluded from this section is that there does no exist a minority of peers in Pithos that store the majority of objects. All peers are required to contribute to the P2P network. It is difficult to define an empirical measure of fairness. When standard deviation is used, Pithos performs somewhat worse than overlay storage. The performance is, however, still comparable.
+What should be concluded from this section is that there does not exist a minority of peers in Pithos that store the majority of objects. All peers are required to contribute to the P2P network. It is difficult to define an empirical measure of fairness. When standard deviation is used, Pithos performs somewhat worse than overlay storage. The performance is, however, still comparable.
 
 It should be noted that this section compared Pithos with theoretically the fairest storage system reviewed in Section \ref{storage_type_overview}. All other storage systems are expected to be as fair at best, or less fair (for example super peer storage).
 
@@ -849,6 +851,10 @@ It was shown that all peers in Pithos are required to contribute storage space t
 The effect of repair was shown by evaluating Pithos for various repair methods with varying node lifetimes. It was found that repair significantly increases reliability when the expected node lifetimes are small, compared to the object TTL. Repair is not required, if node lifetimes are large, compared to the object TTL.
 
 From the evaluation of object repair, it was found that there are many factors that influence how retrieval reliability. On a basic level, retrieval reliability is directly proportional to object lifetime. From the results shown, it was found that object lifetime is, therefore, related to node lifetimes, repair rates and object TTL.
+
+A question arises on what is acceptable reliability levels for MMVEs. There are probably types of objects in an MMVE that have to be retrieved with 100\% reliability and that for those objects, any reliability of less than 100\% is unacceptable. Firstly, it should be noted that the values shown in the above results were for specific churn rates and network parameters. It is theoretically possible to make the system reliability arbitrarily large, by exchanging bandwidth for reliability as shown. Higher update frequencies will lead to a more reliable system.
+
+That said, it might never be possible to always achieve 100\% reliability because of network churn. This might be due to a high current churn rate in the network. Mechanisms have to be put in place in the higher level application that can handle these scenarios. A retry might be the first solution. Another would be a reporting path for failed requests. Such a system might allow for failed requests to be reported to a group and the group replication mechanisms can then dynamically increase the repair frequency to ensure all objects are always available. A study into ensuring an arbitrary level of reliability for Pithos is left for future work.
 
 It should be possible to design a storage system with predictable levels of reliability, to ensure correct functionality of the larger system that uses the storage system. It is, therefore, of benefit to be able to predict objects lifetimes in a distributed storage system. Of greater benefit is to be able to design a storage system to ensure required levels of expected object lifetimes. This is the focus of the next chapter. Predicting object lifetimes in finite network under churn.
 

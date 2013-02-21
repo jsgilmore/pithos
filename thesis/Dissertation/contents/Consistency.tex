@@ -1,9 +1,9 @@
-\chapter{State Consistency}
+\chapter{State Consistency in Virtual Environments}
 \label{chp:CONSISTENCY}
 
 In order to design a state management and persistency architecture for P2P MMVEs, the requirements of such an architecture should first be understood. State management and persistency form part of the state consistency architecture of an MMVE. The requirements of the state management and persistency architecture, therefore, depends on what the state consistency architecture requires of it.
 
-The role of this chapter is to describe the state consistency architecture in which the state management and persistency architecture will exist. The chapter provides a broad overview of consistency architecture and also introduces a novel generic state consistency model that may be applied to both C/S and P2P network architectures to achieve state consistency in an MMVE. Classic state consistency architectures are also presented along with a discussion of how they fit into the generic architecture and their various advantages and disadvantages. Finally, the chapter presents an overview of the prevalant consistency model for P2P MMVE and discusses implementations of the various sections as they relate to the generic consistency model.
+The role of this chapter is to describe the state consistency architecture in which the state management and persistency architecture will exist. The chapter provides a broad overview of consistency architecture and also introduces a novel generic state consistency model that may be applied to both C/S and P2P network architectures to achieve state consistency in an MMVE. Two basic state consistency architectures are also presented along with a discussion of how they fit into the generic architecture and their various advantages and disadvantages. Finally, the chapter presents an overview of the prevalent consistency model for P2P MMVE and discusses implementations of the various sections as they relate to the generic consistency model.
 
 \section{The virtual environment}
 
@@ -19,7 +19,7 @@ User agents are users that connect to a VE and control their avatar through some
 
 On a physical level, each computer that executes a virtual environment (VE) is executing a copy of the virtual environment. This is because a computer can only operate on what is stored in its primary memory. Because computers cannot access each other's primary memory banks, the necessity of multiple object copies is created. The existence of multiple object copies necessitates an object consistency model.
 
-In MMVEs, each computer uses the information of the virtual environment, stored in memory, to display the virtual environment to the user. The user makes decisions based on what is displayed and the executed operations on the environment. These operations can effect change in the environment and this change has to be communicated to all other entities capable of interacting with the environment. The fact that users operate on a local version of the environment and that the environment should appear the same to all users requires state consistency mechanisms.
+In MMVEs, each computer uses the information of the virtual environment, stored in memory, to display the virtual environment to the user. The user makes decisions based on what is displayed and the executed operations on the environment. These operations can affect change in the environment and the change has to be communicated to all other entities capable of interacting with the environment. The fact that users operate on a local version of the environment and that the environment should appear the same to all users requires state consistency mechanisms.
 
 \section{Environment change scenarios}
 \label{environment_change_scenarios}
@@ -31,13 +31,13 @@ In a VE, three main actions should be possible concerning the environment state.
 \begin{figure}[htbp]
  \centering
  \includegraphics[clip=true, viewport=115mm 221mm 184mmm 278mm, height=0.5\textwidth]{generic_consistency_graphic}
- \caption{Diagram showing the flow of messages in the network, when an agent creates an object in the virtual world.}
+ \caption{Flow of messages in the network when an agent creates an object in the virtual world.}
  \label{fig_object_create_graphic}
 \end{figure}
 %
-Figure \ref{fig_query_flow_graphic} illustrates the process of an agent creating a new object and that object being stored on some authoritative node. The figure shows both the virtual environment and the network. Agent 1 creates an object in the virtual environment. For that object to remain in the virtual environment, a node has to be selected to store the authoritative version of the object. In the network, creating an object translates to the node that houses Agent 1, to create Object 1, and select a node (Node 2) to store the authoritative version of Object 1. Once Object 1 has been created in the virtual environment, all other agents that can perceive the new object should be informed of its existence.
+Figure \ref{fig_object_create_graphic} illustrates the process of an agent creating a new object and that object being stored on some authoritative node. The figure shows both the virtual environment and the network. Agent 1 creates an object in the virtual environment. For that object to remain in the virtual environment, a node has to be selected to store the authoritative version of the object. In the network, creating an object translates to the node that houses Agent 1, to create Object 1, and select a node (Node 2) to store the authoritative version of Object 1. Once Object 1 has been created in the virtual environment, all other agents that can perceive the new object should be informed of its existence.
 
-For an agent to perceive an object, the object should be within its AoI. When Node 2 therefore stores the authoritative object, it should discover which nodes can perceive the object and then send updates to those nodes informing them of the new object. In the example in Figure \ref{fig_query_flow_graphic}, Agent 2 can perceive Object 1, which means Node 2 must inform Node 3 of the existence of Object 1, using an object update. Node 3 then receives the object update and adds a non-authoritative version of the new object to its non-authoritative object store. The display of Agent 2 should then be updated to display the new object.
+For an agent to perceive an object, the object should be within its AoI. When Node 2 therefore stores the authoritative object, it should discover which nodes can perceive the object and then send updates to those nodes informing them of the new object. In the example in Figure \ref{fig_object_create_graphic}, Agent 2 can perceive Object 1, which means Node 2 must inform Node 3 of the existence of Object 1, using an object update. Node 3 then receives the object update and adds a non-authoritative version of the new object to its non-authoritative object store. The display of Agent 2 should then be updated to display the new object.
 
 \subsection{Range query flow}
 As an agent moves through the virtual environment, it should discover new objects that enter into its moving AoI.
@@ -45,7 +45,7 @@ As an agent moves through the virtual environment, it should discover new object
 \begin{figure}[htbp]
  \centering
  \includegraphics[clip=true, viewport=78mm 148mm 128mmm 208mm, height=0.5\textwidth]{generic_consistency_graphic}
- \caption{Diagram showing the flow of messages in the network, when an agent queries its AoI for objects in the virtual world.}
+ \caption{Flow of messages in the network when an agent queries its AoI for objects in the virtual world.}
  \label{fig_query_flow_graphic}
 \end{figure}
 %
@@ -56,7 +56,7 @@ The agent performing the queries might have to query multiple nodes and the quer
 \subsection{Event-update flow}
 \label{event_logic_update}
 
-Agents are not allowed to alter the state of an object in the virtual environment directly, since this leaves the VE open to abuse. To alter the state of objects in the VE, the event-update cycle is used.
+For the state consistency framework presented, it is assumed that changes in the virtual environment follow the event-update pattern. This means that agents are not allowed to alter the state of an object in the virtual environment directly, since this leaves the VE open to abuse.
 
 \subsubsection{Terminology}
 \emph{Events} are generated by agents and can be thought of as actions taken by those agents, where agents can be humans or artificial intelligence (AI) scripts. These include casting a spell, using an item or walking.
@@ -70,6 +70,8 @@ Environment logic communicates how the world should change via \emph{state updat
 An object exists in two forms: the \emph{authoritative object} and the \emph{non-authoritative object}. The state of the authoritative object is considered to be the true state or absolute state. Copies of the authoritative object can be made, but these copies are all non-authoritative objects. If a discrepancy occurs between an authoritative object and a non-authoritative object, the state of the authoritative object is considered to be the true state. The work of the consistency mechanism in the VE is to ensure that all non-authoritative object states follows the authoritative object state within a time frame that is reasonable for the particular VE and the particular type of object.
 
 Authoritative objects are the objects traditionally housed on the server in the C/S based MMVEs. All clients obtain replicas of these objects (termed the non-authoritative versions) and duplicate them locally in order to perform low latency computations. An example would be an NPC monster. When agents perceive the monster in the virtual world, a duplicate of the NPC objects is sent to the agent's computer for display purposes. When another agent attacks the NPC, the change in health will be computed at the server and an update is then sent in order to ensure consistency between authoritative and non-authoritative objects.
+
+It should be noted that a peer does not have to request object state every time it wishes to render it. A peer will render the object according to the local state of the object.
 
 \subsubsection{Motivation}
 
@@ -88,7 +90,7 @@ It should be noted that in this work, a node refers to a computer that is connec
 \begin{figure}[htbp]
  \centering
  \includegraphics[clip=true, viewport=28mm 221mm 96mmm 278mm, height=0.5\textwidth]{generic_consistency_graphic}
- \caption{Diagram showing the flow of messages in the network, when an agent generates an event that updates an object in the virtual world.}
+ \caption{Flow of messages in the network when an agent generates an event that updates an object in the virtual world.}
  \label{fig_event_update_flow_graphic}
 \end{figure}
 
@@ -102,11 +104,13 @@ Determining which objects are affected by an event is termed \emph{event interes
 
 When Event 1 arrives at Node 2, containing Object 1, the event is placed in a event queue in an order based on the time each event occurred in. The process of determining which order events have to be processed in is called \emph{event ordering}, since many events will be arriving at an object's authoritative node from multiple agents simultaneously.
 
-After event ordering has been performed, environment logic is applied to determine how a specific event will affect a specific object. To determine possible updates, that state of other objects might also have to be taken into account. An example is firing at an agent through a wall. If the thickness of the wall determines how much damage is delivered to the agent, the authoritative node processing the damage to the agent object will have to know the thickness of the wall.
+After event ordering has been performed, environment logic is applied to determine how a specific event will affect a specific object. To determine possible updates, the states of other objects might also have to be taken into account. An example is firing at an agent through a wall. If the thickness of the wall determines how much damage is delivered to the agent, the authoritative node processing the damage to the agent object will have to know the thickness of the wall.
 
 When an event has been translated into a state update, the authoritative object on the authoritative node (Node 2) is updated. The new state of the object should also be communicated with all agents that can perceive the object in the virtual world. An object is perceived by an agent if the agent's area of interest (AoI)  in the VE encompasses the object. Every agent that can perceive an object, requires a non-authoritative copy of that object. Determining which agents should receive object state updates is termed \emph{update interest management}. In the figure, Object 1 is perceived by Agent 2. Node 2, therefore, sends an update to Node 3, the node containing Agent 2. Delivering state updates to the affected agent nodes is termed \emph{update dissemination}.
 
 When the update is delivered to Agent 2, the local object state is updated and the object's new state is displayed to Agent 2 to allow the agent to make decisions and generate events based on the new object state.
+
+Object removal can be considered as a special case of object modification. An object modification request of type: ``remove object'' can be sent. An authoritative peer receiving this request can then remove the object. Is should be noted that it is difficult to remove objects from a distributed environment, since a node that contains an object might have left the network. For this purposes, object time-to-live is usually used in practice. This is described in more detail in Section \ref{remove_use_case}.
 
 \section{Generic consistency architecture}
 \label{generic_event_update_model}
@@ -133,7 +137,7 @@ Each identified consistency scenario is in the same basic request-response form.
 \begin{figure}[htbp]
  \centering
  \includegraphics[clip=true, viewport=30mm 85mm 192mm 282mm, width=0.72\textwidth]{generic_consistency_flowdiagram}
- \caption{Flow diagram describing the event-update flow cycle and all steps required, from generating an event to delivering an update, to ensure object consistency.}
+ \caption{Event-update flow cycle and all steps required from generating an event to delivering an update, to ensuring object consistency.}
  \label{fig_event_update_flowdiagram}
 \end{figure}
 
@@ -175,7 +179,7 @@ After receiving events, they are ordered to maintain causality. Object updates a
 
 The authoritative node, therefore, can create two reply streams: objects and updates. Objects are created in response to queries and sent to the node requesting the objects. Updates are created in response to received events and these updates have to be applied to the object in the authoritative object store, as well to all non-authoritative copies of the updated object.
 
-Update interest management determines which nodes require the generated update, which typically are the nodes whose agents can perceive the object in the virtual environment, and therefore posses non-authoritative copies of the object. Object interest management has to determine which node received a generated object. With a range query, this will merely be the node that sent the query, but other situation might occur where one node requests objects on behalf of another.
+Update interest management determines which nodes require the generated update, which typically are the nodes whose agents can perceive the object in the virtual environment, and therefore possess non-authoritative copies of the object. Object interest management has to determine which node received a generated object. With a range query, this will merely be the node that sent the query, but other situation might occur where one node requests objects on behalf of another.
 
 Update dissemination delivers a generated update to all nodes that contain local copies of the object. Multiple object updates may be generated for a single event. Any generated update may be delivered to multiple nodes that contain local copies of the object. Object dissemination delivers generated objects to the nodes that requested them.
 
@@ -195,10 +199,10 @@ It should be noted that the generic consistency model is developed to fit all co
 
 The differences between  the various architectures is where the authoritative objects are  housed, and how the authoritative nodes are distributed. In a C/S system, all authoritative objects are housed in the server. In a P2P architecture, authoritative objects can be distributed on a number of nodes, depending on the specific architecture. The various state consistency schemes for both C/S and P2P networks will be reviewed in the next sections.
 
-\section{Classic consistency models}
+\section{Basic consistency models}
 \label{classic_models}
 
-An overview of the two common models, currently used in MMVEs will be described. The models used in P2P MMVEs are all permutations of these two basic models. The two models are based on the two different network models. These are the fully distributed model, also called the event-based model \cite{p2p_cm_aoe}, and the C/S-based model, also called update-based model \cite{unreal_networking}.
+An overview of two basic models, currently used in MMVEs will be described. More complex models, for example ones that contain partitioning, exist and will be described in Section \ref{p2p_mmve_state_consistency}. The models used in P2P MMVEs are all permutations of the two basic models. The two models are based on the two different network models. These are the fully distributed model, also called the event-based model \cite{p2p_cm_aoe}, and the C/S-based model, also called update-based model \cite{unreal_networking}.
 
 \begin{figure}[htbp]
 \centering \subfloat[Event-based (fully distributed)]{\label{fig_p2p_cm}
@@ -217,7 +221,7 @@ Figure \ref{fig_p2p_cm} shows the fully distributed model. Each node has a copy 
 \begin{figure}[htbp]
  \centering
  \includegraphics[clip=true, viewport=1mm 129mm 209mm 266mm, width=\textwidth]{generic_to_fully_dist}
- \caption{The event-based consistency model, showing the modules as defined for the generic consistency model. The diagram shows how the generic consistency model may be used to describe the event-based consistency model.}
+ \caption{Event-based consistency model, showing the modules as defined for the generic consistency model. The diagram shows how the generic consistency model may be used to describe the event-based consistency model.}
  \label{fig_generic_to_fully_dist}
 \end{figure}
 %
@@ -237,7 +241,7 @@ Event layer interest management is trivial, since all nodes receive all updates.
 The order in which events are received is the same for all nodes, otherwise the environment states of different nodes may become inconsistent.
 Usually some kind of lockstep technique is used to solve this issue \cite{pessimistic_lock_step}. The issue with lockstep is that it reduces the latency to twice that of the node with the highest latency.
 
-Various techniques have been proposed that improves the latency by introducing some deadline before which all events should be submitted. An example of this is the New Event Ordering (NEO) technique \cite{cheat_proof_event_ordering}. Event ordering using deadlines makes it very difficult for a user with a high latency to access an MMVE, because if one user has a higher latency than the others and misses event deadlines, none of her actions will be processed by the other nodes which effectively excludes the user from the network.
+Various techniques have been proposed that improves the latency by introducing some deadline before which all events should be submitted. An example of this is the New Event Ordering (NEO) technique \cite{cheat_proof_event_ordering}. Event ordering using deadlines makes it difficult for a user with a high latency to access an MMVE, because if one user has a higher latency than the others and misses event deadlines, none of her actions will be processed by the other nodes which effectively excludes the user from the network.
 
 An alternative to NEO is a P2P and C/S hybrid scheme, called the referee anti cheat scheme (RACS) \cite{cheating_taxonomy}. The scheme proposes referees, that are similar to the C/S network model, which allow for greater resistance to more types of cheats.
 
@@ -266,7 +270,7 @@ everyone. This means that as $N$, the number of nodes in the network increases, 
 \subsubsection{Partially connected event-based consistency}
 An event-based model that is not fully distributed might be considered, although such a model holds many challenges. Interest management techniques might be used to determine which nodes require updates. A challenge arises when nodes that were not aware of each other come into contact in the virtual world. A merge operation will have to be performed on the two authoritative environment states to ensure consistency. Such a model has not been proposed in practice and significant research will have to be performed into defining a framework that establishes relationships between events to maintain consistency. Such a system might be developed by defining classes of events and their interactions. A linear temporal logic model might then be developed to ensure consistent merging of states.
 
-A partially connected model is not a classic consistency model.
+A partially connected model is not a basic consistency model.
 
 \subsection{Update-based (C/S)}
 \label{classic_update_based}
@@ -276,14 +280,14 @@ An alternative to the event-based model is the update-based model, shown in Figu
 \begin{figure}[htbp]
  \centering
  \includegraphics[clip=true, viewport=28mm 66mm 190mm 262mm, width=0.72\textwidth]{generic_to_cs}
- \caption{The update-based consistency model, showing the modules as defined for the generic consistency model. The diagram shows how the generic consistency model may be used to describe the update-based consistency model.}
+ \caption{Update-based consistency model, showing the modules as defined for the generic consistency model. The diagram shows how the generic consistency model may be used to describe the update-based consistency model.}
  \label{fig_generic_to_cs}
 \end{figure}
 %
 Figure \ref{fig_generic_to_cs} shows the update-based consistency model, showing the modules as defined for the generic consistency model. This model is similar to the generic consistency model itself, introduced in Figure \ref{fig_event_update_flowdiagram}. The only difference is that there exists a single authoritative node, containing all objects and that no interest management is required by the clients, since all queries, objects and events are only sent to the server.
 
 \subsubsection{Event generation and dissemination}
-Agents control clients that are able to generate events. As with classic event-based consistency, event layer interest management is trivial, since all events are sent to the server, usually making use of a unicast event dissemination technique. Interest management only becomes non-trivial when the P2P MMVE consistency model is considered in Section \ref{p2p_mmve_state_consistency}. The reasons why these sections exist in a discussion of the classic consistency models is to show that, although trivial, all sections relate to the generic consistency model.
+Agents control clients that are able to generate events. As with basic event-based consistency, event layer interest management is trivial, since all events are sent to the server, usually making use of a unicast event dissemination technique. Interest management only becomes non-trivial when the P2P MMVE consistency model is considered in Section \ref{p2p_mmve_state_consistency}. The reasons why these sections exist in a discussion of the basic consistency models is to show that, although trivial, all sections relate to the generic consistency model.
 
 \subsubsection{Event ordering}
 \label{cs_event_ordering}
@@ -332,15 +336,15 @@ All disadvantages of the C/S architecture, as discussed in Section \ref{classic_
 
 Various schemes have been proposed to address the various challenges of P2P MMVE state consistency, but these have mostly occurred in isolation. Each approach focuses on a few of the modules identified in the generic state consistency model presented in Section \ref{generic_event_update_model}, but no approach addresses all modules.
 
-\subsection{Related work}
-The most complete implementation of a P2P MMVE state consistency model found was P2P Second Life, although greater emphasis was placed on creating and discovering new objects than updating existing object states \cite{varvello_p2p_second_life}, \cite{Walkad_Varvello}. This might be due to Second Life's focus on object creation, where other MMOGs, for example, World of Warcraft and Eve Online, have less of a focus on object creation and more of a focus on interaction with existing objects. P2P Second Life, therefore, described the object creation and query flows, but did not explain the process of altering existing objects in depth.
-
-The only object alteration described is avatar alteration, called distributed avatar management \cite{Varvello_dist_avatar_management}. A focus was placed on ensuring that every peer is aware of all avatars within the AoI of its own avatar and that all neighbouring avatars remain connected. The process of updating avatar information was not discussed.
-
 What should be noted is that the various areas of state consistency, e.g. interest management, event ordering, state management, and the other areas discussed in Section \ref{generic_event_update_model}, are quite modular, which might allow for the integration of the best schemes in each area into a comprehensive P2P MMVE state consistency model. Therefore, some of the proposed schemes were reviewed to determine the scheme most suitable for integration.
 
+%\subsection{Related work}
+%The most complete implementation of a P2P MMVE state consistency model found was P2P Second Life, although greater emphasis was placed on creating and discovering new objects than updating existing object states \cite{varvello_p2p_second_life}, \cite{Walkad_Varvello}. This might be due to Second Life's focus on object creation, where other MMOGs, for example, World of Warcraft and Eve Online, have less of a focus on object creation and more of a focus on interaction with existing objects. P2P Second Life, therefore, described the object creation and query flows, but did not explain the process of altering existing objects in depth.
+
+%The only object alteration described is avatar alteration, called distributed avatar management \cite{Varvello_dist_avatar_management}. A focus was placed on ensuring that every peer is aware of all avatars within the AoI of its own avatar and that all neighbouring avatars remain connected. The process of updating avatar information was not discussed.
+
 \subsection{Region-based update-based consistency model}
-P2P MMVE schemes are based on one of the two classic consistency models described in Section \ref{classic_models}. Although it might seem that the fully distributed model is a better fit for P2P MMVE state consistency, this model has received less attention than the C/S model. The reason for this is partly because of the difficulties in getting the fully distributed model to scale. Usually the fully distributed model makes use of rounds, where users submit events and all user events are executed at the end of a round. In an MMVE with tens of thousands to millions of users, designing the round mechanism to remain scalable is a challenge. Rounds are required, because of the event ordering mechanism that ensures state consistency.
+P2P MMVE schemes are based on one of the two basic consistency models described in Section \ref{classic_models}. Although it might seem that the fully distributed model is a better fit for P2P MMVE state consistency, this model has received less attention than the C/S model. The reason for this is partly because of the difficulties in getting the fully distributed model to scale. Usually the fully distributed model makes use of rounds, where users submit events and all user events are executed at the end of a round. In an MMVE with tens of thousands to millions of users, designing the round mechanism to remain scalable is a challenge. Rounds are required, because of the event ordering mechanism that ensures state consistency.
 
 The C/S consistency architecture is applied to P2P MMVEs by distributing authoritative objects. Every authoritative object is maintained by a single peer, that receives all events for the object, applies the environment logic and informs all peers of the generated updates. This effectively creates a C/S consistency model from the perspective of each authoritative object. An example of such a consistency model is the region-based model, which requires that some peers be selected as super peers. Super peers are specialised peers that perform specialised tasks within the P2P network. \footnote{The super peer is selected in some logical way, from the available set of peers and then promoted. Super peer selection in itself is a complex topic that has to deal with determining whether a peer has sufficient resources available and also whether the peer is trustworthy.}
 
@@ -357,7 +361,7 @@ Figure \ref{fig_cs_region_cm} shows the region-based P2P consistency model. The 
 
 In the remainder of this section an overview is presented of the different techniques and general trends present in the various areas of P2P MMVEs. The overview does not presume to present an exhaustive list of papers in these areas, rather to place the topic of state management and state persistency in context.
 
-\subsection{Reqeust generation and dissemination}
+\subsection{Request generation and dissemination}
 
 In P2P networks, each peer contains an agent that represents a user (player). Each agent generates events, queries and objects that have to be transmitted to the required peers.
 
@@ -375,13 +379,21 @@ Where distributed architectures are proposed for P2P MMVEs, event ordering is of
 
 To support a large number of users using an event-based model, event ordering with the concept of interest has been developed using N-trees \cite{GauthierDickey_ntrees}.
 
+An active field of research is that of optimistic event ordering techniques, which is used in the field of synchronised parallel discrete event simulators \cite{Fujimoto_parallel_discrete_event_simulation}. An example of such a technique is the time warp algorithm \cite{Jefferson_time_warp}. The basis of time warp is that all events are executed optimistically, without regard for the causal order between events. If an event is later received that should have been processed before an event that has already been processed, the system is rolled back in time to process the correct event first.
+
+The time warp algorithm is a complex one, with many possible transient errors and race conditions that can occur. Since a design of the algorithm, a formal verification effort has been working on showing the correctness of the algorithm and identifying issues that should be guarded against \cite{time_warp_formal_specification}.
+
 \subsection{Environment logic}
 
 In P2P architectures, the environment logic for all objects have to be housed on all peers, since any peer can be selected to store any object. The environment logic itself is, therefore, usually also distributed as part of the client software. This does not mean that the environment logic cannot change, but any change in environment logic will be in the form of a client patch, which occurs while the application is off-line.
 
+For distributed applications where the code base might have to be dynamically updated, dynamic code deployment might provide a partial solution \cite{dynamic_code_deployment_patent}. Dynamic code deployment works by a deployment system being able to deploy code to a host system. The host system is able to verify the identity of the deployment system and the validity of the code. The deployment system is able to verify whether the code is successfully deployed.
+
 \subsection{Update generation and dissemination}
 
 In P2P MMVEs, update generation is the responsibility the peer containing the authoritative object. When the peer receives an event, environment logic is applied to generate an update. This update is then disseminated to all peers that have local non-authoritative copies of the object. This is similar to the update-based consistency model discussed in Section \ref{classic_update_based}.
+
+Hybrid C/S and P2P update dissemination schemes that use the concept of area of propagation (AoP) exist, to achieve high levels of responsiveness \cite{AoP_event_dissemination}. If updates that a peer generates only affect peers within its AoP, the peer directly transmits the updates to those peers. If a peer generates updates that affect peers outside of its AoP, it sends the updates to a server, which retransmits the updates to all affected peers. Preliminary results show the hybrid approach remains more scalable, i.t.o numbers of peers, than either P2P or C/S techniques in terms of responsiveness. The work uses the terms event and update interchangeably, so it is not always apparent what is being referred to.
 
 \subsection{Update and event layer interest management}
 \label{key_challenges_im}
@@ -396,13 +408,19 @@ The main idea is that a user has a limited visual range and area around the user
 
 Extensive research has been done into solving AoI problems and a comparison of techniques can be found in \cite{Boulanger_IM_compare} and \cite{IM_and_ED_survey_Krause}. The solutions range from aura/nimbus \cite{Benford_spatial_IM} to publish/subscribe  \cite{mercury_publish_subscribe} to Voronoi based models \cite{Hu_voronoi_IM},  \cite{Buyukkaya_voronoi_state_management} to hybrid models \cite{hybrid_IM}, \cite{MOPAR}, \cite{fan_mediator_paper}.
 
-Generally, interest management solutions can be divided into coarsely or finely grained solutions, although the hybrid models, especially MOPAR, seem to have gained greater popularity because they seem to have all the benefits of the two solutions and little of the drawbacks \cite{MOPAR}. MOPAR has been shown to perform better than either a finely grained technique or a coarsely grained technique.
+Generally, interest management solutions can be divided into coarsely or finely grained solutions.
 
-Coarsely grained solutions usually divide the virtual environment into multiple regions and when a user enters a region, it subscribes to that region's events. This is called the region-based publish subscribe model \cite{Fan_deisgn_issues_p2p}. All users in the region then receive the region's events, even for users not in their AoI.
+\subsubsection{Coarsely grained IM}
+Coarsely grained solutions usually divide the virtual environment into multiple regions and when a user enters a region, it subscribes to that region's events. This is called the region-based publish subscribe model \cite{Fan_deisgn_issues_p2p}. All users in the region receive all events generated in the region.
 
+\subsubsection{Finely grained IM}
 Finely grained techniques create groups of agents based on their AoIs. Groups of interacting agents directly exchange information, so all agents only receive information that is relevant to them. This has been termed the spatial model \cite{Fan_deisgn_issues_p2p}. The grain of the solution in turn determines the type of event dissemination that should be used, as described later in this section.
 
 Another example of finely grained interest management, making use of frontier sets, was presented in \cite{IM_frontier_sets} and implemented in Quake 3. By using Frontier Sets, it is possible to describe an area in which an agent may move, where no other users will require updates of that movement. Conversely, a set of other users that require movement updates from a specific user is also given by the frontier set.
+
+
+\subsubsection{Hybrid IM}
+Hybrid models, especially MOPAR, seem to have gained greater popularity because they seem to have all the benefits of the two solutions and little of the drawbacks \cite{MOPAR}. MOPAR has been shown to perform better than either a finely grained technique or a coarsely grained technique.
 
 MOPAR partitions the VE into hexagonal regions and appoints ``home'' peers to act as bootstrap peers for each region. A home peer of a region is that peer whose ID is the closest match the the region ID. This allows any peer to find the home peer for a region. A master peer is then selected for every region, whose function it is to inform slave peers of new neighbours. All slaves peers in a region register at their region's master peer.
 
@@ -418,8 +436,8 @@ The most mature state management model reviewed is that of P2P Second Life, whic
 
 \section{Conclusion}
 
-This chapter introduced the event-update consistency model that is mostly used in MMVE. From the literature reviewed, a generic process was developed that will ensure state consistency. Classic state consistency models were introduced and it was shown how these models relate to the generic state consistency process. This is followed by a description of state consistency for P2P MMVEs. It was shown how the models used are all based on the classic consistency models. Some research into every area of P2P MMVE state consistency was discussed to enable the reader place the research of this work into perspective.
+This chapter introduced the event-update consistency model that is mostly used in MMVE. From the literature reviewed, a generic process was developed that will ensure state consistency. Basic state consistency models were introduced and it was shown how these models relate to the generic state consistency process. This is followed by a description of state consistency for P2P MMVEs. It was shown how the models used are all based on the basic consistency models. Some research into every area of P2P MMVE state consistency was discussed to enable the reader place the research of this work into perspective.
 
 In this chapter it was shown that the field of P2P MMVE state consistency is a growing one, already containing many significant contributions. The purpose of this chapter was to place contributions in the field of P2P state consistency into perspective, to structure the literature concerning state consistency. It is believed that this structure will allow for more complex state consistency designs, by making use of the modular approach proposed in this chapter.
 
-A thorough investigation into state consistency has now been performed. It was found that significant work still remains in the authoritative object store. Maintaining the authoritative object store is termed state management and state persistency. These techniques will be reciewed in the following chapter. P2P storage is classified into multiple types found in the literature and metrics are identified by which to judge the various storage schemes. This is done to work towards a point where our own novel state management and persistency architecture can be proposed.
+A thorough investigation into state consistency has now been performed. It was found that significant work still remains in the authoritative object store. Maintaining the authoritative object store is termed state management and state persistency. These techniques will be reviewed in the following chapter. P2P storage is classified into multiple types found in the literature and metrics are identified by which to judge the various storage schemes. This is done to work towards a point where our own novel state management and persistency architecture can be proposed.
