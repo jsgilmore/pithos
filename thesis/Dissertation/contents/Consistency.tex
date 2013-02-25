@@ -71,7 +71,7 @@ An object exists in two forms: the \emph{authoritative object} and the \emph{non
 
 Authoritative objects are the objects traditionally housed on the server in the C/S based MMVEs. All clients obtain replicas of these objects (termed the non-authoritative versions) and duplicate them locally in order to perform low latency computations. An example would be an NPC monster. When agents perceive the monster in the virtual world, a duplicate of the NPC objects is sent to the agent's computer for display purposes. When another agent attacks the NPC, the change in health will be computed at the server and an update is then sent in order to ensure consistency between authoritative and non-authoritative objects.
 
-It should be noted that a peer does not have to request object state every time it wishes to render it. A peer will render the object according to the local state of the object.
+It should be noted that a peer does not have to request object state every time it wishes to render it. A peer will render the object according to the local state of the object. It might be possible that a local object's state has not yet been updated with a state update that is en route. To maintain interactivity in the virtual environment, all operations should occur on the current state of local objects. If it is found that an operation occurred on an out-of-date object and the change is not consistent, the change to the old object has to be rolled back, since the authoritative object's state is always accepted.
 
 \subsubsection{Motivation}
 
