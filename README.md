@@ -19,17 +19,17 @@ Before trying to use Pithos, make sure you have read everything there is to read
 
 If anyone is interested, this is the way to take Pithos further.
 
-Major:
+### Major
 1. Implment Pithos as a real world application
 2. Develop grouping algorithm based on player traces
 3. Have Pithos construct groups based on the grouping algorithm
 4. Integrate Pithos into an existing P2P MMOG
 
-Minor:
+### Minor
 1. Implement the designed object modification for group storage.
 2. Extend the pithos test application to add modify testing.
 
-Really minor:
+### Really minor
 1. Make the latitude and longitude ranges for peers and super peers a changeable paramter instead of 100
 2. Support can be added for partially connected groups that will reduce network bandwidth at the cost of latency
 3. Add a debug mode to the code, which ads the debugging code currently present in Pithos as an option and not always.
